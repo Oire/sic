@@ -328,7 +328,7 @@ partial class MainWindow {
         ClientSize = new Size(900, 550);
         Controls.Add(mainLayout);
         Name = "MainWindow";
-        Text = "SIC! — Simple Image Convertor";
+        Text = "SIC! — Simple Image Converter";
         MinimumSize = new Size(640, 400);
 
         mainLayout.ResumeLayout(false);

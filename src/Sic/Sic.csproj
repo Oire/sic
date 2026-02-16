@@ -16,7 +16,7 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Product>SIC!</Product>
-    <Description>SIC! — Simple Image Convertor</Description>
+    <Description>SIC! — Simple Image Converter</Description>
     <Company>Oire Software</Company>
     <Copyright>Copyright © 2026 Oire Software SARL. All rights reserved.</Copyright>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>

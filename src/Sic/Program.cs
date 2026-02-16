@@ -63,7 +63,7 @@ internal static class Program
         var outputOption = new Option<string>("--output", "-o") { Required = true, Description = "Path for the converted image (format inferred from extension)" };
         var resizeOption = new Option<string?>("--resize", "-r") { Description = "Resize dimensions as WxH (e.g. 128x128)" };
 
-        var rootCommand = new RootCommand("SIC! — Simple Image Convertor") {
+        var rootCommand = new RootCommand("SIC! — Simple Image Converter") {
             inputOption,
             outputOption,
             resizeOption,
