@@ -9,17 +9,13 @@ using LogLevel = Serilog.Events.LogEventLevel;
 
 namespace Oire.Sic;
 
-internal static class Program
-{
+internal static class Program {
     [STAThread]
-    static int Main(string[] args)
-    {
+    static int Main(string[] args) {
         ConfigureLogging();
 
-        try
-        {
-            if (args.Length > 0)
-            {
+        try {
+            if (args.Length > 0) {
                 return RunCli(args);
             }
 
@@ -31,34 +27,27 @@ internal static class Program
 
             Application.Run(new MainWindow());
             return 0;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Log.Fatal("App Startup: Unable to initialize application: {0}", ex.Message);
 
-            if (args.Length > 0)
-            {
+            if (args.Length > 0) {
                 Console.Error.WriteLine($"Fatal error: {ex.Message}");
                 return 1;
             }
 
             DialogResult msg = MessageBox.Show("Unable to start the program up. Please contact the developer.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
-            if (msg == DialogResult.OK)
-            {
+            if (msg == DialogResult.OK) {
                 System.Windows.Forms.Application.Exit();
             }
 
             return 1;
-        }
-        finally
-        {
+        } finally {
             Log.CloseAndFlush();
         }
     }
 
-    private static int RunCli(string[] args)
-    {
+    private static int RunCli(string[] args) {
         var inputOption = new Option<string>("--input", "-i") { Required = true, Description = "Path to the source image file" };
         var outputOption = new Option<string>("--output", "-o") { Required = true, Description = "Path for the converted image (format inferred from extension)" };
         var resizeOption = new Option<string?>("--resize", "-r") { Description = "Resize dimensions as WxH (e.g. 128x128)" };
@@ -69,66 +58,54 @@ internal static class Program
             resizeOption,
         };
 
-        rootCommand.SetAction((Func<ParseResult, int>)(parseResult =>
-        {
+        rootCommand.SetAction((Func<ParseResult, int>)(parseResult => {
             var input = parseResult.GetValue(inputOption)!;
             var output = parseResult.GetValue(outputOption)!;
             var resize = parseResult.GetValue(resizeOption);
 
-            if (!File.Exists(input))
-            {
+            if (!File.Exists(input)) {
                 Console.Error.WriteLine($"File not found: {input}");
                 return 1;
             }
 
             var extension = Path.GetExtension(output).TrimStart('.').ToUpperInvariant();
-            if (string.IsNullOrWhiteSpace(extension))
-            {
+            if (string.IsNullOrWhiteSpace(extension)) {
                 Console.Error.WriteLine("Output path must have a file extension (e.g. .jpg, .png)");
                 return 1;
             }
 
             var targetFormat = extension == "JPEG" ? "JPG" : extension == "TIF" ? "TIFF" : extension;
             var supportedFormats = ImageConverter.GetSupportedFormats();
-            if (!supportedFormats.Any(f => f.Equals(targetFormat, StringComparison.OrdinalIgnoreCase)))
-            {
+            if (!supportedFormats.Any(f => f.Equals(targetFormat, StringComparison.OrdinalIgnoreCase))) {
                 Console.Error.WriteLine($"Unsupported format: {extension}");
                 Console.Error.WriteLine($"Supported formats: {string.Join(", ", supportedFormats)}");
                 return 1;
             }
 
             int? width = null, height = null;
-            if (!string.IsNullOrWhiteSpace(resize))
-            {
+            if (!string.IsNullOrWhiteSpace(resize)) {
                 var parts = resize.Split('x', 'X');
-                if (parts.Length == 2 && int.TryParse(parts[0], out var w) && int.TryParse(parts[1], out var h))
-                {
+                if (parts.Length == 2 && int.TryParse(parts[0], out var w) && int.TryParse(parts[1], out var h)) {
                     width = w;
                     height = h;
-                }
-                else
-                {
+                } else {
                     Console.Error.WriteLine($"Invalid resize format: {resize}. Use WxH (e.g. 128x128)");
                     return 1;
                 }
             }
 
-            try
-            {
+            try {
                 var item = ImageConverter.LoadFromFile(input);
 
                 var dir = Path.GetDirectoryName(output);
-                if (dir != null && !Directory.Exists(dir))
-                {
+                if (dir != null && !Directory.Exists(dir)) {
                     Directory.CreateDirectory(dir);
                 }
 
                 ImageConverter.Convert(item, targetFormat, output, width, height);
                 Console.WriteLine($"Converted: {output}");
                 return 0;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Console.Error.WriteLine($"Conversion failed: {ex.Message}");
                 return 1;
             }
@@ -137,8 +114,7 @@ internal static class Program
         return rootCommand.Parse(args).Invoke();
     }
 
-    private static void ConfigureLogging()
-    {
+    private static void ConfigureLogging() {
 #if DEBUG
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()

@@ -2,8 +2,7 @@
 
 namespace Oire.Sic.Utils.Constants;
 
-public static class Logging
-{
+public static class Logging {
     public static readonly string LogFolder = Path.Combine(App.DataFolder, "logs");
     public static readonly string LogFileExtension = "log";
     public static readonly string GenericFile = Path.Combine(Logging.LogFolder, String.Format("{0}.{1}", App.Name, Logging.LogFileExtension));

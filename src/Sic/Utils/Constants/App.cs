@@ -2,8 +2,7 @@
 
 namespace Oire.Sic.Utils.Constants;
 
-public static class App
-{
+public static class App {
     public static readonly string Name = "Sic";
     public static readonly string ManufacturerNameShort = "Oire";
     public static readonly string ManufacturerNameFull = "Oire Software";

@@ -1,0 +1,213 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Cleanup previous test services
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        echo "=== Cleaning up any previous test services ==="
+        docker compose -f docker-compose.test.yml down -v --remove-orphans || true
+        sudo rm -rf /tmp/localstack || true
+        echo "=== Removing stale Docker volumes ==="
+        docker volume rm sharp-sync_sftp-data || true
+        docker volume rm sharp-sync_ftp-data || true
+        docker volume rm sharp-sync_webdav-data || true
+
+    - name: Start test services
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        echo "=== Starting test services with docker-compose ==="
+        docker compose -f docker-compose.test.yml up -d
+
+    - name: Wait for services to be ready
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        echo "=== Waiting for services to be healthy ==="
+        docker compose -f docker-compose.test.yml ps
+
+        echo "=== Waiting for SFTP server ==="
+        for i in {1..18}; do
+          nc -z localhost 2222 && echo "SFTP ready" && break
+          echo "SFTP not ready, retrying in 5 seconds... ($i/18)"
+          sleep 5
+        done
+
+        echo "=== Waiting for FTP server ==="
+        for i in {1..18}; do
+          nc -z localhost 21 && echo "FTP ready" && break
+          echo "FTP not ready, retrying in 5 seconds... ($i/18)"
+          sleep 5
+        done
+
+        echo "=== Waiting for LocalStack ==="
+        for i in {1..30}; do
+          curl -sf http://localhost:4566/_localstack/health && echo "LocalStack ready" && break
+          echo "LocalStack not ready, retrying in 10 seconds... ($i/30)"
+          sleep 10
+        done
+
+        echo "=== Waiting for WebDAV server ==="
+        WEBDAV_BASIC_READY=false
+        for i in {1..30}; do
+          if curl -sf -u testuser:testpass http://localhost:8080/ > /dev/null 2>&1; then
+            echo "WebDAV responding to basic requests"
+            WEBDAV_BASIC_READY=true
+            break
+          fi
+          echo "WebDAV not responding, retrying in 5 seconds... ($i/30)"
+          sleep 5
+        done
+
+        if [ "$WEBDAV_BASIC_READY" = "false" ]; then
+          echo "ERROR: WebDAV server not responding after 30 attempts"
+          docker compose -f docker-compose.test.yml logs webdav
+          exit 1
+        fi
+
+        echo "=== Checking WebDAV full functionality (MKCOL) ==="
+        WEBDAV_FULLY_READY=false
+        for i in {1..40}; do
+          # Show verbose output for debugging
+          echo "Attempt $i: Testing MKCOL operation..."
+          MKCOL_RESULT=$(curl -s -w "%{http_code}" -u testuser:testpass -X MKCOL http://localhost:8080/_health-check-dir/ -o /dev/null 2>&1)
+          echo "MKCOL response code: $MKCOL_RESULT"
+
+          if [ "$MKCOL_RESULT" = "201" ] || [ "$MKCOL_RESULT" = "405" ]; then
+            echo "WebDAV is fully operational (MKCOL working)"
+            # Cleanup test directory
+            curl -sf -u testuser:testpass -X DELETE http://localhost:8080/_health-check-dir/ > /dev/null 2>&1 || true
+            WEBDAV_FULLY_READY=true
+            break
+          fi
+
+          # Show container status and logs on failures
+          if [ $((i % 5)) -eq 0 ]; then
+            echo "--- WebDAV container status ---"
+            docker compose -f docker-compose.test.yml ps webdav
+            echo "--- Recent WebDAV logs ---"
+            docker compose -f docker-compose.test.yml logs --tail=10 webdav
+          fi
+
+          echo "MKCOL not working yet, retrying in 5 seconds..."
+          sleep 5
+        done
+
+        if [ "$WEBDAV_FULLY_READY" = "false" ]; then
+          echo "ERROR: WebDAV MKCOL not working after 40 attempts"
+          echo "=== Full WebDAV logs ==="
+          docker compose -f docker-compose.test.yml logs webdav
+          exit 1
+        fi
+
+        echo "=== Final service status ==="
+        docker compose -f docker-compose.test.yml ps
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Check format
+      run: dotnet format --verify-no-changes
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Create S3 test bucket
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        docker exec sharp-sync-localstack-1 awslocal s3 mb s3://test-bucket
+
+    - name: Debug WebDAV setup
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        echo "=== WebDAV Container Status ==="
+        docker compose -f docker-compose.test.yml ps webdav
+        echo ""
+        echo "=== WebDAV Container Logs ==="
+        docker compose -f docker-compose.test.yml logs webdav
+        echo ""
+        echo "=== Testing WebDAV Operations ==="
+        echo "PROPFIND (list root):"
+        curl -s -w "\nHTTP Status: %{http_code}\n" -u testuser:testpass -X PROPFIND http://localhost:8080/ -H "Depth: 1" | head -30
+        echo ""
+        echo "PUT (write test):"
+        echo "test content" | curl -s -w "\nHTTP Status: %{http_code}\n" -u testuser:testpass -X PUT http://localhost:8080/_debug-test.txt -d @-
+        echo ""
+        echo "DELETE (cleanup):"
+        curl -s -w "\nHTTP Status: %{http_code}\n" -u testuser:testpass -X DELETE http://localhost:8080/_debug-test.txt
+
+    - name: Prepare WebDAV test root
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        echo "=== Creating WebDAV test root directory ==="
+        # Delete existing test root if present
+        curl -sf -u testuser:testpass -X DELETE http://localhost:8080/ci-root/ --output /dev/null 2>&1 || true
+        # Create fresh test root
+        curl -sf -u testuser:testpass -X MKCOL http://localhost:8080/ci-root/
+        echo "WebDAV test root created successfully"
+
+    # On Ubuntu: Run all tests (unit + integration) with Docker services
+    - name: Test (with integration tests)
+      if: matrix.os == 'ubuntu-latest'
+      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage"
+      env:
+        SFTP_TEST_HOST: localhost
+        SFTP_TEST_PORT: 2222
+        SFTP_TEST_USER: testuser
+        SFTP_TEST_PASS: testpass
+        SFTP_TEST_ROOT: upload
+        FTP_TEST_HOST: localhost
+        FTP_TEST_PORT: 21
+        FTP_TEST_USER: testuser
+        FTP_TEST_PASS: testpass
+        FTP_TEST_ROOT: ""
+        S3_TEST_BUCKET: test-bucket
+        S3_TEST_ACCESS_KEY: test
+        S3_TEST_SECRET_KEY: test
+        S3_TEST_ENDPOINT: http://localhost:4566
+        S3_TEST_PREFIX: sharpsync-tests
+        WEBDAV_TEST_URL: http://localhost:8080/
+        WEBDAV_TEST_USER: testuser
+        WEBDAV_TEST_PASS: testpass
+        WEBDAV_TEST_ROOT: "ci-root"
+
+    # On Windows/macOS: Run unit tests only (integration tests auto-skip without env vars)
+    - name: Test (unit tests only)
+      if: matrix.os != 'ubuntu-latest'
+      run: dotnet test --no-build --verbosity normal
+
+    - name: Upload coverage reports to Codecov
+      if: matrix.os == 'ubuntu-latest'
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: Oire/sharp-sync
+
+    - name: Dump container logs
+      if: failure() && matrix.os == 'ubuntu-latest'
+      run: |
+        echo "=== Container logs for debugging ==="
+        docker compose -f docker-compose.test.yml logs
+
+    - name: Stop test services
+      if: always() && matrix.os == 'ubuntu-latest'
+      run: |
+        docker compose -f docker-compose.test.yml down -v --remove-orphans || true

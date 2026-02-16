@@ -6,19 +6,16 @@ using ImageConverter = Oire.Sic.Services.ImageConverter;
 
 namespace Oire.Sic;
 
-public partial class MainWindow : Form
-{
+public partial class MainWindow: Form {
     private readonly List<ImageItem> _imageItems = [];
 
-    public MainWindow()
-    {
+    public MainWindow() {
         InitializeComponent();
         SetupEventHandlers();
         PopulateFormatComboBox();
     }
 
-    private void SetupEventHandlers()
-    {
+    private void SetupEventHandlers() {
         addFileButton.Click += AddFileButton_Click;
         addUrlButton.Click += AddUrlButton_Click;
         removeButton.Click += RemoveButton_Click;
@@ -32,40 +29,33 @@ public partial class MainWindow : Form
         KeyDown += MainWindow_KeyDown;
     }
 
-    private void PopulateFormatComboBox()
-    {
-        foreach (var format in ImageConverter.GetSupportedFormats())
-        {
+    private void PopulateFormatComboBox() {
+        foreach (var format in ImageConverter.GetSupportedFormats()) {
             formatComboBox.Items.Add(format);
         }
 
-        if (formatComboBox.Items.Count > 0)
-        {
+        if (formatComboBox.Items.Count > 0) {
             formatComboBox.SelectedIndex = 0;
         }
     }
 
-    private void AddFileButton_Click(object? sender, EventArgs e)
-    {
-        using var dialog = new OpenFileDialog
-        {
+    private void AddFileButton_Click(object? sender, EventArgs e) {
+        using var dialog = new OpenFileDialog {
             Title = "Select images to add",
             Filter = "Image files|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.tiff;*.tif;*.webp;*.ico;*.avif|All files|*.*",
             Multiselect = true,
         };
 
-        if (dialog.ShowDialog() != DialogResult.OK) return;
+        if (dialog.ShowDialog() != DialogResult.OK)
+            return;
 
-        foreach (var file in dialog.FileNames)
-        {
+        foreach (var file in dialog.FileNames) {
             AddImageFromFile(file);
         }
     }
 
-    private async void AddUrlButton_Click(object? sender, EventArgs e)
-    {
-        using var inputDialog = new Form
-        {
+    private async void AddUrlButton_Click(object? sender, EventArgs e) {
+        using var inputDialog = new Form {
             Text = "Add Image from URL",
             Size = new Size(500, 150),
             StartPosition = FormStartPosition.CenterParent,
@@ -74,8 +64,7 @@ public partial class MainWindow : Form
             MinimizeBox = false,
         };
 
-        var layout = new TableLayoutPanel
-        {
+        var layout = new TableLayoutPanel {
             Dock = DockStyle.Fill,
             ColumnCount = 1,
             RowCount = 3,
@@ -85,21 +74,18 @@ public partial class MainWindow : Form
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-        var urlLabel = new Label
-        {
+        var urlLabel = new Label {
             Text = "Enter image URL:",
             AutoSize = true,
             AccessibleName = "Image URL label",
         };
 
-        var urlTextBox = new TextBox
-        {
+        var urlTextBox = new TextBox {
             Dock = DockStyle.Fill,
             AccessibleName = "Image URL",
         };
 
-        var buttonPanel = new FlowLayoutPanel
-        {
+        var buttonPanel = new FlowLayoutPanel {
             Dock = DockStyle.Fill,
             FlowDirection = FlowDirection.RightToLeft,
             AutoSize = true,
@@ -118,32 +104,30 @@ public partial class MainWindow : Form
         layout.Controls.Add(buttonPanel, 0, 2);
         inputDialog.Controls.Add(layout);
 
-        if (inputDialog.ShowDialog() != DialogResult.OK) return;
+        if (inputDialog.ShowDialog() != DialogResult.OK)
+            return;
 
         var url = urlTextBox.Text.Trim();
-        if (string.IsNullOrWhiteSpace(url)) return;
+        if (string.IsNullOrWhiteSpace(url))
+            return;
 
         statusLabel.Text = "Downloading image...";
-        try
-        {
+        try {
             var item = await ImageConverter.LoadFromUrl(url);
             AddImageItem(item);
             statusLabel.Text = $"Added {item.FileName} from URL";
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Log.Error("Failed to load image from URL {Url}: {Error}", url, ex.Message);
             MessageBox.Show($"Failed to load image from URL:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             statusLabel.Text = "Ready";
         }
     }
 
-    private void RemoveButton_Click(object? sender, EventArgs e)
-    {
-        if (imageListView.SelectedIndices.Count == 0) return;
+    private void RemoveButton_Click(object? sender, EventArgs e) {
+        if (imageListView.SelectedIndices.Count == 0)
+            return;
 
-        for (var i = imageListView.SelectedIndices.Count - 1; i >= 0; i--)
-        {
+        for (var i = imageListView.SelectedIndices.Count - 1; i >= 0; i--) {
             var index = imageListView.SelectedIndices[i];
             _imageItems.RemoveAt(index);
             imageListView.Items.RemoveAt(index);
@@ -154,23 +138,19 @@ public partial class MainWindow : Form
         statusLabel.Text = $"{_imageItems.Count} image(s) in queue";
     }
 
-    private async void ConvertButton_Click(object? sender, EventArgs e)
-    {
-        if (_imageItems.Count == 0)
-        {
+    private async void ConvertButton_Click(object? sender, EventArgs e) {
+        if (_imageItems.Count == 0) {
             MessageBox.Show("No images to convert. Add some images first.", "Nothing to convert", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
-        if (formatComboBox.SelectedItem is not string targetFormat)
-        {
+        if (formatComboBox.SelectedItem is not string targetFormat) {
             MessageBox.Show("Please select a target format.", "No format selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
         int? width = null, height = null;
-        if (resizeCheckBox.Checked)
-        {
+        if (resizeCheckBox.Checked) {
             width = (int)widthNumeric.Value;
             height = (int)heightNumeric.Value;
         }
@@ -185,19 +165,15 @@ public partial class MainWindow : Form
         var converted = 0;
         var skipped = 0;
 
-        await Task.Run(() =>
-        {
-            for (var i = 0; i < _imageItems.Count; i++)
-            {
+        await Task.Run(() => {
+            for (var i = 0; i < _imageItems.Count; i++) {
                 var item = _imageItems[i];
                 var outputPath = ImageConverter.GenerateOutputPath(item, targetFormat, outputFolder);
 
-                if (File.Exists(outputPath))
-                {
+                if (File.Exists(outputPath)) {
                     var resolution = ResolveFileConflict(outputPath);
 
-                    switch (resolution)
-                    {
+                    switch (resolution) {
                         case ConflictResolution.Overwrite:
                             break;
                         case ConflictResolution.Rename:
@@ -205,8 +181,7 @@ public partial class MainWindow : Form
                             break;
                         case ConflictResolution.Skip:
                             skipped++;
-                            Invoke(() =>
-                            {
+                            Invoke(() => {
                                 progressBar.Value = i + 1;
                                 statusLabel.Text = $"Skipped {item.FileName}";
                             });
@@ -214,28 +189,22 @@ public partial class MainWindow : Form
                     }
                 }
 
-                try
-                {
+                try {
                     var dir = Path.GetDirectoryName(outputPath);
-                    if (dir != null && !Directory.Exists(dir))
-                    {
+                    if (dir != null && !Directory.Exists(dir)) {
                         Directory.CreateDirectory(dir);
                     }
 
                     ImageConverter.Convert(item, targetFormat, outputPath, width, height);
                     converted++;
 
-                    Invoke(() =>
-                    {
+                    Invoke(() => {
                         progressBar.Value = i + 1;
                         statusLabel.Text = $"Converted {item.FileName} ({i + 1}/{_imageItems.Count})";
                     });
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     Log.Error("Failed to convert {FileName}: {Error}", item.FileName, ex.Message);
-                    Invoke(() =>
-                    {
+                    Invoke(() => {
                         MessageBox.Show($"Failed to convert {item.FileName}:\n{ex.Message}", "Conversion Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     });
                 }
@@ -247,14 +216,12 @@ public partial class MainWindow : Form
         statusLabel.Text = $"Done! Converted {converted} image(s), skipped {skipped}.";
     }
 
-    private void SettingsButton_Click(object? sender, EventArgs e)
-    {
+    private void SettingsButton_Click(object? sender, EventArgs e) {
         using var dialog = new SettingsDialog();
         dialog.ShowDialog(this);
     }
 
-    private void ResizeCheckBox_CheckedChanged(object? sender, EventArgs e)
-    {
+    private void ResizeCheckBox_CheckedChanged(object? sender, EventArgs e) {
         var enabled = resizeCheckBox.Checked;
         widthLabel.Enabled = enabled;
         widthNumeric.Enabled = enabled;
@@ -263,10 +230,8 @@ public partial class MainWindow : Form
         heightNumeric.Enabled = enabled;
     }
 
-    private void ImageListView_SelectedIndexChanged(object? sender, EventArgs e)
-    {
-        if (imageListView.SelectedIndices.Count == 0)
-        {
+    private void ImageListView_SelectedIndexChanged(object? sender, EventArgs e) {
+        if (imageListView.SelectedIndices.Count == 0) {
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = null;
             return;
@@ -275,101 +240,80 @@ public partial class MainWindow : Form
         var index = imageListView.SelectedIndices[0];
         var item = _imageItems[index];
 
-        try
-        {
+        try {
             var preview = ImageConverter.GeneratePreview(item, previewPictureBox.Width, previewPictureBox.Height);
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = preview;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Log.Warning("Failed to generate preview for {FileName}: {Error}", item.FileName, ex.Message);
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = null;
         }
     }
 
-    private void ImageListView_DragEnter(object? sender, DragEventArgs e)
-    {
-        if (e.Data?.GetDataPresent(DataFormats.FileDrop) == true)
-        {
+    private void ImageListView_DragEnter(object? sender, DragEventArgs e) {
+        if (e.Data?.GetDataPresent(DataFormats.FileDrop) == true) {
             e.Effect = DragDropEffects.Copy;
         }
     }
 
-    private void ImageListView_DragDrop(object? sender, DragEventArgs e)
-    {
-        if (e.Data?.GetData(DataFormats.FileDrop) is not string[] files) return;
+    private void ImageListView_DragDrop(object? sender, DragEventArgs e) {
+        if (e.Data?.GetData(DataFormats.FileDrop) is not string[] files)
+            return;
 
-        foreach (var file in files)
-        {
+        foreach (var file in files) {
             AddImageFromFile(file);
         }
     }
 
-    private void MainWindow_KeyDown(object? sender, KeyEventArgs e)
-    {
-        if (e.Control && e.KeyCode == Keys.V)
-        {
+    private void MainWindow_KeyDown(object? sender, KeyEventArgs e) {
+        if (e.Control && e.KeyCode == Keys.V) {
             HandlePaste();
             e.Handled = true;
-        }
-        else if (e.KeyCode == Keys.Delete)
-        {
+        } else if (e.KeyCode == Keys.Delete) {
             RemoveButton_Click(sender, e);
             e.Handled = true;
         }
     }
 
-    private void HandlePaste()
-    {
-        if (Clipboard.ContainsFileDropList())
-        {
+    private void HandlePaste() {
+        if (Clipboard.ContainsFileDropList()) {
             var files = Clipboard.GetFileDropList();
-            foreach (var file in files)
-            {
-                if (file != null) AddImageFromFile(file);
+            foreach (var file in files) {
+                if (file != null)
+                    AddImageFromFile(file);
             }
-        }
-        else if (Clipboard.ContainsImage())
-        {
+        } else if (Clipboard.ContainsImage()) {
             var clipImage = Clipboard.GetImage();
-            if (clipImage == null) return;
+            if (clipImage == null)
+                return;
 
             using var ms = new MemoryStream();
             clipImage.Save(ms, ImageFormat.Png);
             var data = ms.ToArray();
 
-            try
-            {
+            try {
                 var item = ImageConverter.LoadFromBytes(data, "clipboard_image.png");
                 AddImageItem(item);
                 statusLabel.Text = "Added image from clipboard";
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Log.Error("Failed to load clipboard image: {Error}", ex.Message);
                 MessageBox.Show($"Failed to load clipboard image:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
 
-    private void AddImageFromFile(string path)
-    {
-        try
-        {
+    private void AddImageFromFile(string path) {
+        try {
             var item = ImageConverter.LoadFromFile(path);
             AddImageItem(item);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Log.Error("Failed to load image {Path}: {Error}", path, ex.Message);
             MessageBox.Show($"Failed to load image:\n{path}\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
-    private void AddImageItem(ImageItem item)
-    {
+    private void AddImageItem(ImageItem item) {
         _imageItems.Add(item);
 
         var listItem = new ListViewItem(item.FileName);
@@ -381,15 +325,12 @@ public partial class MainWindow : Form
         statusLabel.Text = $"{_imageItems.Count} image(s) in queue";
     }
 
-    private ConflictResolution ResolveFileConflict(string outputPath)
-    {
+    private ConflictResolution ResolveFileConflict(string outputPath) {
         var result = ConflictResolution.Skip;
         var fileName = Path.GetFileName(outputPath);
 
-        Invoke(() =>
-        {
-            using var dialog = new Form
-            {
+        Invoke(() => {
+            using var dialog = new Form {
                 Text = "File Already Exists",
                 Size = new Size(450, 180),
                 StartPosition = FormStartPosition.CenterParent,
@@ -398,8 +339,7 @@ public partial class MainWindow : Form
                 MinimizeBox = false,
             };
 
-            var layout = new TableLayoutPanel
-            {
+            var layout = new TableLayoutPanel {
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
                 RowCount = 2,
@@ -408,15 +348,13 @@ public partial class MainWindow : Form
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-            var messageLabel = new Label
-            {
+            var messageLabel = new Label {
                 Text = $"The file \"{fileName}\" already exists.\nWhat would you like to do?",
                 AutoSize = true,
                 AccessibleName = $"File {fileName} already exists",
             };
 
-            var buttonPanel = new FlowLayoutPanel
-            {
+            var buttonPanel = new FlowLayoutPanel {
                 Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.LeftToRight,
                 AutoSize = true,
@@ -446,8 +384,7 @@ public partial class MainWindow : Form
         return result;
     }
 
-    private enum ConflictResolution
-    {
+    private enum ConflictResolution {
         Overwrite,
         Rename,
         Skip,

@@ -6,12 +6,10 @@ using Serilog;
 
 namespace Oire.Sic.Services;
 
-public static class ImageConverter
-{
+public static class ImageConverter {
     private static readonly HttpClient HttpClient = new();
 
-    private static readonly Dictionary<string, MagickFormat> FormatMap = new(StringComparer.OrdinalIgnoreCase)
-    {
+    private static readonly Dictionary<string, MagickFormat> FormatMap = new(StringComparer.OrdinalIgnoreCase) {
         ["JPG"] = MagickFormat.Jpeg,
         ["PNG"] = MagickFormat.Png,
         ["WEBP"] = MagickFormat.WebP,
@@ -24,13 +22,11 @@ public static class ImageConverter
 
     public static IReadOnlyList<string> GetSupportedFormats() => FormatMap.Keys.ToList();
 
-    public static ImageItem LoadFromFile(string path)
-    {
+    public static ImageItem LoadFromFile(string path) {
         using var image = new MagickImage(path);
         var fileInfo = new FileInfo(path);
 
-        return new ImageItem
-        {
+        return new ImageItem {
             FilePath = path,
             OriginalFormat = image.Format.ToString(),
             FileName = fileInfo.Name,
@@ -40,16 +36,14 @@ public static class ImageConverter
         };
     }
 
-    public static ImageItem LoadFromStream(Stream stream, string fileName)
-    {
+    public static ImageItem LoadFromStream(Stream stream, string fileName) {
         using var ms = new MemoryStream();
         stream.CopyTo(ms);
         var data = ms.ToArray();
 
         using var image = new MagickImage(data);
 
-        return new ImageItem
-        {
+        return new ImageItem {
             ImageData = data,
             OriginalFormat = image.Format.ToString(),
             FileName = fileName,
@@ -59,12 +53,10 @@ public static class ImageConverter
         };
     }
 
-    public static ImageItem LoadFromBytes(byte[] data, string fileName)
-    {
+    public static ImageItem LoadFromBytes(byte[] data, string fileName) {
         using var image = new MagickImage(data);
 
-        return new ImageItem
-        {
+        return new ImageItem {
             ImageData = data,
             OriginalFormat = image.Format.ToString(),
             FileName = fileName,
@@ -74,21 +66,18 @@ public static class ImageConverter
         };
     }
 
-    public static async Task<ImageItem> LoadFromUrl(string url)
-    {
+    public static async Task<ImageItem> LoadFromUrl(string url) {
         var uri = new Uri(url);
         var data = await HttpClient.GetByteArrayAsync(uri).ConfigureAwait(false);
         var fileName = Path.GetFileName(uri.LocalPath);
 
-        if (string.IsNullOrWhiteSpace(fileName))
-        {
+        if (string.IsNullOrWhiteSpace(fileName)) {
             fileName = "downloaded_image";
         }
 
         using var image = new MagickImage(data);
 
-        return new ImageItem
-        {
+        return new ImageItem {
             ImageData = data,
             OriginalFormat = image.Format.ToString(),
             FileName = fileName,
@@ -98,17 +87,14 @@ public static class ImageConverter
         };
     }
 
-    public static void Convert(ImageItem item, string targetFormat, string outputPath, int? width, int? height)
-    {
-        if (!FormatMap.TryGetValue(targetFormat, out var magickFormat))
-        {
+    public static void Convert(ImageItem item, string targetFormat, string outputPath, int? width, int? height) {
+        if (!FormatMap.TryGetValue(targetFormat, out var magickFormat)) {
             throw new ArgumentException($"Unsupported target format: {targetFormat}");
         }
 
         using var image = LoadMagickImage(item);
 
-        if (width.HasValue || height.HasValue)
-        {
+        if (width.HasValue || height.HasValue) {
             var geometry = CalculateResizeGeometry(image, width, height);
             image.Resize(geometry);
         }
@@ -119,12 +105,10 @@ public static class ImageConverter
         Log.Information("Converted {FileName} to {Format} at {OutputPath}", item.FileName, targetFormat, outputPath);
     }
 
-    public static Bitmap GeneratePreview(ImageItem item, int maxWidth, int maxHeight)
-    {
+    public static Bitmap GeneratePreview(ImageItem item, int maxWidth, int maxHeight) {
         using var image = LoadMagickImage(item);
 
-        var geometry = new MagickGeometry((uint)maxWidth, (uint)maxHeight)
-        {
+        var geometry = new MagickGeometry((uint)maxWidth, (uint)maxHeight) {
             IgnoreAspectRatio = false,
         };
         image.Resize(geometry);
@@ -135,10 +119,8 @@ public static class ImageConverter
         return new Bitmap(ms);
     }
 
-    public static string GetFileExtension(string format)
-    {
-        return format.ToUpperInvariant() switch
-        {
+    public static string GetFileExtension(string format) {
+        return format.ToUpperInvariant() switch {
             "JPG" => ".jpg",
             "PNG" => ".png",
             "WEBP" => ".webp",
@@ -151,20 +133,14 @@ public static class ImageConverter
         };
     }
 
-    public static string GenerateOutputPath(ImageItem item, string targetFormat, string? outputFolder)
-    {
+    public static string GenerateOutputPath(ImageItem item, string targetFormat, string? outputFolder) {
         string directory;
 
-        if (!string.IsNullOrWhiteSpace(outputFolder))
-        {
+        if (!string.IsNullOrWhiteSpace(outputFolder)) {
             directory = outputFolder;
-        }
-        else if (!string.IsNullOrWhiteSpace(item.FilePath))
-        {
+        } else if (!string.IsNullOrWhiteSpace(item.FilePath)) {
             directory = Path.GetDirectoryName(item.FilePath) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-        }
-        else
-        {
+        } else {
             directory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
         }
 
@@ -174,8 +150,7 @@ public static class ImageConverter
         return Path.Combine(directory, baseName + extension);
     }
 
-    public static string GetConflictRenamePath(string outputPath)
-    {
+    public static string GetConflictRenamePath(string outputPath) {
         var directory = Path.GetDirectoryName(outputPath) ?? ".";
         var baseName = Path.GetFileNameWithoutExtension(outputPath);
         var extension = Path.GetExtension(outputPath);
@@ -183,8 +158,7 @@ public static class ImageConverter
 
         string newPath;
 
-        do
-        {
+        do {
             newPath = Path.Combine(directory, $"{baseName}_{counter}{extension}");
             counter++;
         } while (File.Exists(newPath));
@@ -192,47 +166,37 @@ public static class ImageConverter
         return newPath;
     }
 
-    private static MagickImage LoadMagickImage(ImageItem item)
-    {
-        if (item.ImageData != null)
-        {
+    private static MagickImage LoadMagickImage(ImageItem item) {
+        if (item.ImageData != null) {
             return new MagickImage(item.ImageData);
         }
 
-        if (!string.IsNullOrWhiteSpace(item.FilePath))
-        {
+        if (!string.IsNullOrWhiteSpace(item.FilePath)) {
             return new MagickImage(item.FilePath);
         }
 
         throw new InvalidOperationException("ImageItem has no data source");
     }
 
-    private static MagickGeometry CalculateResizeGeometry(MagickImage image, int? width, int? height)
-    {
-        if (width.HasValue && height.HasValue)
-        {
-            return new MagickGeometry((uint)width.Value, (uint)height.Value)
-            {
+    private static MagickGeometry CalculateResizeGeometry(MagickImage image, int? width, int? height) {
+        if (width.HasValue && height.HasValue) {
+            return new MagickGeometry((uint)width.Value, (uint)height.Value) {
                 IgnoreAspectRatio = true,
             };
         }
 
-        if (width.HasValue)
-        {
+        if (width.HasValue) {
             var ratio = (double)width.Value / image.Width;
             var newHeight = (uint)(image.Height * ratio);
-            return new MagickGeometry((uint)width.Value, newHeight)
-            {
+            return new MagickGeometry((uint)width.Value, newHeight) {
                 IgnoreAspectRatio = true,
             };
         }
 
-        if (height.HasValue)
-        {
+        if (height.HasValue) {
             var ratio = (double)height.Value / image.Height;
             var newWidth = (uint)(image.Width * ratio);
-            return new MagickGeometry(newWidth, (uint)height.Value)
-            {
+            return new MagickGeometry(newWidth, (uint)height.Value) {
                 IgnoreAspectRatio = true,
             };
         }

@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet clean:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet test:*)",
+      "Bash(grep:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker exec:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh pr checks:*)",
+      "WebFetch(domain:api.codecov.io)",
+      "WebSearch"
+    ],
+    "deny": []
+  }
+}
