@@ -25,7 +25,7 @@ internal static class Localization {
         return culture;
     }
 
-    private static ICatalog stringsCatalog = new Catalog(App.Name, App.LocalesFolder, Localization.GetCurrentCulture());
+    private static Catalog stringsCatalog = new Catalog(App.Name, App.LocalesFolder, Localization.GetCurrentCulture());
 
     public static string _(string text) {
         return stringsCatalog.GetString(text);
