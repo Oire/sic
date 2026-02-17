@@ -18,6 +18,7 @@ public class Config {
         public string Language { get; set; } = "System";
         public bool BrailleUiMode { get; set; }
         public string OutputFolder { get; set; } = "";
+        public string LastInputFolder { get; set; } = "";
     }
 
     #endregion

@@ -24,12 +24,30 @@ partial class MainWindow {
     ///  the contents of this method with the code editor.
     /// </summary>
     private void InitializeComponent() {
+        menuStrip = new MenuStrip();
+
+        // File menu
+        fileMenu = new ToolStripMenuItem();
+        addImageMenuItem = new ToolStripMenuItem();
+        addFolderMenuItem = new ToolStripMenuItem();
+        addFromUrlMenuItem = new ToolStripMenuItem();
+        removeMenuItem = new ToolStripMenuItem();
+        removeAllMenuItem = new ToolStripMenuItem();
+        optionsMenuItem = new ToolStripMenuItem();
+        exitMenuItem = new ToolStripMenuItem();
+
+        // Help menu
+        helpMenu = new ToolStripMenuItem();
+        userGuideMenuItem = new ToolStripMenuItem();
+        aboutMenuItem = new ToolStripMenuItem();
+
         mainLayout = new TableLayoutPanel();
         imageListView = new ListView();
         colFileName = new ColumnHeader();
         colFormat = new ColumnHeader();
         colDimensions = new ColumnHeader();
         colSize = new ColumnHeader();
+        colStatus = new ColumnHeader();
         previewPictureBox = new PictureBox();
         controlsLayout = new TableLayoutPanel();
         formatLabel = new Label();
@@ -40,24 +58,129 @@ partial class MainWindow {
         dimensionSeparatorLabel = new Label();
         heightLabel = new Label();
         heightNumeric = new NumericUpDown();
-        buttonsLayout = new TableLayoutPanel();
-        addFileButton = new Button();
-        addUrlButton = new Button();
-        removeButton = new Button();
-        settingsButton = new Button();
         convertButton = new Button();
         statusStrip = new StatusStrip();
         statusLabel = new ToolStripStatusLabel();
         progressBar = new ToolStripProgressBar();
 
+        menuStrip.SuspendLayout();
         mainLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).BeginInit();
         controlsLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)widthNumeric).BeginInit();
         ((System.ComponentModel.ISupportInitialize)heightNumeric).BeginInit();
-        buttonsLayout.SuspendLayout();
         statusStrip.SuspendLayout();
         SuspendLayout();
+
+        //
+        // menuStrip
+        //
+        menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu, helpMenu });
+        menuStrip.Name = "menuStrip";
+        menuStrip.AccessibleName = "Menu bar";
+
+        //
+        // fileMenu
+        //
+        fileMenu.Text = "&File";
+        fileMenu.Name = "fileMenu";
+        fileMenu.DropDownItems.AddRange(new ToolStripItem[] {
+            addImageMenuItem,
+            addFolderMenuItem,
+            addFromUrlMenuItem,
+            new ToolStripSeparator(),
+            removeMenuItem,
+            removeAllMenuItem,
+            new ToolStripSeparator(),
+            optionsMenuItem,
+            new ToolStripSeparator(),
+            exitMenuItem,
+        });
+
+        //
+        // addImageMenuItem
+        //
+        addImageMenuItem.Text = "Add &Image...";
+        addImageMenuItem.ShortcutKeys = Keys.Control | Keys.O;
+        addImageMenuItem.Name = "addImageMenuItem";
+        addImageMenuItem.AccessibleName = "Add image file";
+
+        //
+        // addFolderMenuItem
+        //
+        addFolderMenuItem.Text = "Add F&older...";
+        addFolderMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.O;
+        addFolderMenuItem.Name = "addFolderMenuItem";
+        addFolderMenuItem.AccessibleName = "Add folder of images";
+
+        //
+        // addFromUrlMenuItem
+        //
+        addFromUrlMenuItem.Text = "Add from &URL...";
+        addFromUrlMenuItem.ShortcutKeys = Keys.Control | Keys.U;
+        addFromUrlMenuItem.Name = "addFromUrlMenuItem";
+        addFromUrlMenuItem.AccessibleName = "Add image from URL";
+
+        //
+        // removeMenuItem
+        //
+        removeMenuItem.Text = "&Remove";
+        removeMenuItem.ShortcutKeys = Keys.Delete;
+        removeMenuItem.Name = "removeMenuItem";
+        removeMenuItem.AccessibleName = "Remove selected image";
+        removeMenuItem.Enabled = false;
+
+        //
+        // removeAllMenuItem
+        //
+        removeAllMenuItem.Text = "Remove &All";
+        removeAllMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.Delete;
+        removeAllMenuItem.Name = "removeAllMenuItem";
+        removeAllMenuItem.AccessibleName = "Remove all images";
+        removeAllMenuItem.Enabled = false;
+
+        //
+        // optionsMenuItem
+        //
+        optionsMenuItem.Text = "&Options...";
+        optionsMenuItem.ShortcutKeys = Keys.Control | Keys.Oemcomma;
+        optionsMenuItem.Name = "optionsMenuItem";
+        optionsMenuItem.AccessibleName = "Open options";
+
+        //
+        // exitMenuItem
+        //
+        exitMenuItem.Text = "E&xit";
+        exitMenuItem.ShortcutKeys = Keys.Alt | Keys.F4;
+        exitMenuItem.Name = "exitMenuItem";
+        exitMenuItem.AccessibleName = "Exit application";
+
+        //
+        // helpMenu
+        //
+        helpMenu.Text = "&Help";
+        helpMenu.Name = "helpMenu";
+        helpMenu.DropDownItems.AddRange(new ToolStripItem[] {
+            userGuideMenuItem,
+            new ToolStripSeparator(),
+            aboutMenuItem,
+        });
+
+        //
+        // userGuideMenuItem
+        //
+        userGuideMenuItem.Text = "&User Guide";
+        userGuideMenuItem.ShortcutKeys = Keys.F1;
+        userGuideMenuItem.Name = "userGuideMenuItem";
+        userGuideMenuItem.AccessibleName = "User guide";
+
+        //
+        // aboutMenuItem
+        //
+        aboutMenuItem.Text = "&About SIC!...";
+        aboutMenuItem.ShortcutKeys = Keys.Shift | Keys.F1;
+        aboutMenuItem.Name = "aboutMenuItem";
+        aboutMenuItem.AccessibleName = "About SIC!";
 
         //
         // mainLayout
@@ -65,9 +188,8 @@ partial class MainWindow {
         mainLayout.ColumnCount = 2;
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-        mainLayout.RowCount = 4;
+        mainLayout.RowCount = 3;
         mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.Dock = DockStyle.Fill;
@@ -77,18 +199,17 @@ partial class MainWindow {
         mainLayout.Controls.Add(imageListView, 0, 0);
         mainLayout.Controls.Add(previewPictureBox, 1, 0);
         mainLayout.Controls.Add(controlsLayout, 0, 1);
-        mainLayout.Controls.Add(buttonsLayout, 0, 2);
-        mainLayout.Controls.Add(statusStrip, 0, 3);
+        mainLayout.Controls.Add(statusStrip, 0, 2);
         mainLayout.SetColumnSpan(controlsLayout, 2);
-        mainLayout.SetColumnSpan(buttonsLayout, 2);
         mainLayout.SetColumnSpan(statusStrip, 2);
 
         //
         // imageListView
         //
-        imageListView.Columns.AddRange(new ColumnHeader[] { colFileName, colFormat, colDimensions, colSize });
+        imageListView.Columns.AddRange(new ColumnHeader[] { colFileName, colFormat, colDimensions, colSize, colStatus });
         imageListView.Dock = DockStyle.Fill;
         imageListView.FullRowSelect = true;
+        imageListView.MultiSelect = false;
         imageListView.View = View.Details;
         imageListView.Name = "imageListView";
         imageListView.AccessibleName = "Image list";
@@ -106,6 +227,8 @@ partial class MainWindow {
         colDimensions.Width = 90;
         colSize.Text = "Size";
         colSize.Width = 70;
+        colStatus.Text = "Status";
+        colStatus.Width = 90;
 
         //
         // previewPictureBox
@@ -121,7 +244,7 @@ partial class MainWindow {
         //
         // controlsLayout
         //
-        controlsLayout.ColumnCount = 8;
+        controlsLayout.ColumnCount = 9;
         controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Format label
         controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F)); // Format combo
         controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Resize checkbox
@@ -130,6 +253,7 @@ partial class MainWindow {
         controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // x label
         controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Height label
         controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F)); // Height numeric
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Convert button
         controlsLayout.RowCount = 1;
         controlsLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         controlsLayout.Dock = DockStyle.Fill;
@@ -144,6 +268,7 @@ partial class MainWindow {
         controlsLayout.Controls.Add(dimensionSeparatorLabel, 5, 0);
         controlsLayout.Controls.Add(heightLabel, 6, 0);
         controlsLayout.Controls.Add(heightNumeric, 7, 0);
+        controlsLayout.Controls.Add(convertButton, 8, 0);
 
         //
         // formatLabel
@@ -229,78 +354,21 @@ partial class MainWindow {
         heightNumeric.TabIndex = 9;
 
         //
-        // buttonsLayout
-        //
-        buttonsLayout.ColumnCount = 5;
-        buttonsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-        buttonsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-        buttonsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-        buttonsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-        buttonsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-        buttonsLayout.RowCount = 1;
-        buttonsLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        buttonsLayout.Dock = DockStyle.Fill;
-        buttonsLayout.AutoSize = true;
-        buttonsLayout.Name = "buttonsLayout";
-        buttonsLayout.Padding = new Padding(0, 4, 0, 4);
-        buttonsLayout.Controls.Add(addFileButton, 0, 0);
-        buttonsLayout.Controls.Add(addUrlButton, 1, 0);
-        buttonsLayout.Controls.Add(removeButton, 2, 0);
-        buttonsLayout.Controls.Add(settingsButton, 3, 0);
-        buttonsLayout.Controls.Add(convertButton, 4, 0);
-
-        //
-        // addFileButton
-        //
-        addFileButton.Text = "Add File...";
-        addFileButton.Dock = DockStyle.Fill;
-        addFileButton.Name = "addFileButton";
-        addFileButton.AccessibleName = "Add image file";
-        addFileButton.TabIndex = 10;
-
-        //
-        // addUrlButton
-        //
-        addUrlButton.Text = "Add URL...";
-        addUrlButton.Dock = DockStyle.Fill;
-        addUrlButton.Name = "addUrlButton";
-        addUrlButton.AccessibleName = "Add image from URL";
-        addUrlButton.TabIndex = 11;
-
-        //
-        // removeButton
-        //
-        removeButton.Text = "Remove";
-        removeButton.Dock = DockStyle.Fill;
-        removeButton.Name = "removeButton";
-        removeButton.AccessibleName = "Remove selected images";
-        removeButton.TabIndex = 12;
-
-        //
-        // settingsButton
-        //
-        settingsButton.Text = "Settings...";
-        settingsButton.Dock = DockStyle.Fill;
-        settingsButton.Name = "settingsButton";
-        settingsButton.AccessibleName = "Open settings";
-        settingsButton.TabIndex = 13;
-
-        //
         // convertButton
         //
         convertButton.Text = "Convert";
-        convertButton.Dock = DockStyle.Fill;
         convertButton.Name = "convertButton";
         convertButton.AccessibleName = "Convert all images";
-        convertButton.TabIndex = 14;
         convertButton.Font = new Font(convertButton.Font, FontStyle.Bold);
+        convertButton.Padding = new Padding(8, 0, 8, 0);
+        convertButton.TabIndex = 10;
 
         //
         // statusStrip
         //
         statusStrip.Items.AddRange(new ToolStripItem[] { statusLabel, progressBar });
         statusStrip.Name = "statusStrip";
-        statusStrip.TabIndex = 15;
+        statusStrip.TabIndex = 11;
         statusStrip.Dock = DockStyle.Fill;
 
         //
@@ -327,10 +395,14 @@ partial class MainWindow {
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(900, 550);
         Controls.Add(mainLayout);
+        Controls.Add(menuStrip);
+        MainMenuStrip = menuStrip;
         Name = "MainWindow";
-        Text = "SIC! — Simple Image Converter";
+        Text = "SIC! \u2014 Simple Image Converter";
         MinimumSize = new Size(640, 400);
 
+        menuStrip.ResumeLayout(false);
+        menuStrip.PerformLayout();
         mainLayout.ResumeLayout(false);
         mainLayout.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).EndInit();
@@ -338,7 +410,6 @@ partial class MainWindow {
         controlsLayout.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)widthNumeric).EndInit();
         ((System.ComponentModel.ISupportInitialize)heightNumeric).EndInit();
-        buttonsLayout.ResumeLayout(false);
         statusStrip.ResumeLayout(false);
         statusStrip.PerformLayout();
         ResumeLayout(false);
@@ -347,12 +418,25 @@ partial class MainWindow {
 
     #endregion
 
+    private MenuStrip menuStrip;
+    private ToolStripMenuItem fileMenu;
+    private ToolStripMenuItem addImageMenuItem;
+    private ToolStripMenuItem addFolderMenuItem;
+    private ToolStripMenuItem addFromUrlMenuItem;
+    private ToolStripMenuItem removeMenuItem;
+    private ToolStripMenuItem removeAllMenuItem;
+    private ToolStripMenuItem optionsMenuItem;
+    private ToolStripMenuItem exitMenuItem;
+    private ToolStripMenuItem helpMenu;
+    private ToolStripMenuItem userGuideMenuItem;
+    private ToolStripMenuItem aboutMenuItem;
     private TableLayoutPanel mainLayout;
     private ListView imageListView;
     private ColumnHeader colFileName;
     private ColumnHeader colFormat;
     private ColumnHeader colDimensions;
     private ColumnHeader colSize;
+    private ColumnHeader colStatus;
     private PictureBox previewPictureBox;
     private TableLayoutPanel controlsLayout;
     private Label formatLabel;
@@ -363,11 +447,6 @@ partial class MainWindow {
     private Label dimensionSeparatorLabel;
     private Label heightLabel;
     private NumericUpDown heightNumeric;
-    private TableLayoutPanel buttonsLayout;
-    private Button addFileButton;
-    private Button addUrlButton;
-    private Button removeButton;
-    private Button settingsButton;
     private Button convertButton;
     private StatusStrip statusStrip;
     private ToolStripStatusLabel statusLabel;
