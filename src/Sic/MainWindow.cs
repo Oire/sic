@@ -33,6 +33,8 @@ public partial class MainWindow: Form {
         // Controls
         convertButton.Click += ConvertButton_Click;
         resizeCheckBox.CheckedChanged += ResizeCheckBox_CheckedChanged;
+        widthTextBox.GotFocus += (s, _) => (s as TextBox)?.BeginInvoke(((TextBox)s!).SelectAll);
+        heightTextBox.GotFocus += (s, _) => (s as TextBox)?.BeginInvoke(((TextBox)s!).SelectAll);
         imageListView.SelectedIndexChanged += ImageListView_SelectedIndexChanged;
         imageListView.DragEnter += ImageListView_DragEnter;
         imageListView.DragDrop += ImageListView_DragDrop;
@@ -231,8 +233,22 @@ public partial class MainWindow: Form {
 
         int? width = null, height = null;
         if (resizeCheckBox.Checked) {
-            width = (int)widthNumeric.Value;
-            height = (int)heightNumeric.Value;
+            if (!int.TryParse(widthTextBox.Text, out var w) || w < 1 || w > 65535) {
+                MessageBox.Show("Please enter a valid width (1\u201365535).", "Invalid width", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                widthTextBox.Focus();
+                widthTextBox.SelectAll();
+                return;
+            }
+
+            if (!int.TryParse(heightTextBox.Text, out var h) || h < 1 || h > 65535) {
+                MessageBox.Show("Please enter a valid height (1\u201365535).", "Invalid height", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                heightTextBox.Focus();
+                heightTextBox.SelectAll();
+                return;
+            }
+
+            width = w;
+            height = h;
         }
 
         var outputFolder = string.IsNullOrWhiteSpace(Config.General.OutputFolder) ? null : Config.General.OutputFolder;
@@ -336,10 +352,10 @@ public partial class MainWindow: Form {
     private void ResizeCheckBox_CheckedChanged(object? sender, EventArgs e) {
         var enabled = resizeCheckBox.Checked;
         widthLabel.Enabled = enabled;
-        widthNumeric.Enabled = enabled;
+        widthTextBox.Enabled = enabled;
         dimensionSeparatorLabel.Enabled = enabled;
         heightLabel.Enabled = enabled;
-        heightNumeric.Enabled = enabled;
+        heightTextBox.Enabled = enabled;
     }
 
     private void ImageListView_SelectedIndexChanged(object? sender, EventArgs e) {

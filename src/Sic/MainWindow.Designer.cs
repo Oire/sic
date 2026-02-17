@@ -54,10 +54,10 @@ partial class MainWindow {
         formatComboBox = new ComboBox();
         resizeCheckBox = new CheckBox();
         widthLabel = new Label();
-        widthNumeric = new NumericUpDown();
+        widthTextBox = new TextBox();
         dimensionSeparatorLabel = new Label();
         heightLabel = new Label();
-        heightNumeric = new NumericUpDown();
+        heightTextBox = new TextBox();
         convertButton = new Button();
         statusStrip = new StatusStrip();
         statusLabel = new ToolStripStatusLabel();
@@ -67,8 +67,6 @@ partial class MainWindow {
         mainLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).BeginInit();
         controlsLayout.SuspendLayout();
-        ((System.ComponentModel.ISupportInitialize)widthNumeric).BeginInit();
-        ((System.ComponentModel.ISupportInitialize)heightNumeric).BeginInit();
         statusStrip.SuspendLayout();
         SuspendLayout();
 
@@ -264,10 +262,10 @@ partial class MainWindow {
         controlsLayout.Controls.Add(formatComboBox, 1, 0);
         controlsLayout.Controls.Add(resizeCheckBox, 2, 0);
         controlsLayout.Controls.Add(widthLabel, 3, 0);
-        controlsLayout.Controls.Add(widthNumeric, 4, 0);
+        controlsLayout.Controls.Add(widthTextBox, 4, 0);
         controlsLayout.Controls.Add(dimensionSeparatorLabel, 5, 0);
         controlsLayout.Controls.Add(heightLabel, 6, 0);
-        controlsLayout.Controls.Add(heightNumeric, 7, 0);
+        controlsLayout.Controls.Add(heightTextBox, 7, 0);
         controlsLayout.Controls.Add(convertButton, 8, 0);
 
         //
@@ -310,16 +308,14 @@ partial class MainWindow {
         widthLabel.TabIndex = 5;
 
         //
-        // widthNumeric
+        // widthTextBox
         //
-        widthNumeric.Minimum = 1;
-        widthNumeric.Maximum = 65535;
-        widthNumeric.Value = 128;
-        widthNumeric.Dock = DockStyle.Fill;
-        widthNumeric.Enabled = false;
-        widthNumeric.Name = "widthNumeric";
-        widthNumeric.AccessibleName = "Width in pixels";
-        widthNumeric.TabIndex = 6;
+        widthTextBox.Text = "128";
+        widthTextBox.Dock = DockStyle.Fill;
+        widthTextBox.Enabled = false;
+        widthTextBox.Name = "widthTextBox";
+        widthTextBox.AccessibleName = "Width in pixels";
+        widthTextBox.TabIndex = 6;
 
         //
         // dimensionSeparatorLabel
@@ -342,16 +338,14 @@ partial class MainWindow {
         heightLabel.TabIndex = 8;
 
         //
-        // heightNumeric
+        // heightTextBox
         //
-        heightNumeric.Minimum = 1;
-        heightNumeric.Maximum = 65535;
-        heightNumeric.Value = 128;
-        heightNumeric.Dock = DockStyle.Fill;
-        heightNumeric.Enabled = false;
-        heightNumeric.Name = "heightNumeric";
-        heightNumeric.AccessibleName = "Height in pixels";
-        heightNumeric.TabIndex = 9;
+        heightTextBox.Text = "128";
+        heightTextBox.Dock = DockStyle.Fill;
+        heightTextBox.Enabled = false;
+        heightTextBox.Name = "heightTextBox";
+        heightTextBox.AccessibleName = "Height in pixels";
+        heightTextBox.TabIndex = 9;
 
         //
         // convertButton
@@ -408,8 +402,6 @@ partial class MainWindow {
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).EndInit();
         controlsLayout.ResumeLayout(false);
         controlsLayout.PerformLayout();
-        ((System.ComponentModel.ISupportInitialize)widthNumeric).EndInit();
-        ((System.ComponentModel.ISupportInitialize)heightNumeric).EndInit();
         statusStrip.ResumeLayout(false);
         statusStrip.PerformLayout();
         ResumeLayout(false);
@@ -443,10 +435,10 @@ partial class MainWindow {
     private ComboBox formatComboBox;
     private CheckBox resizeCheckBox;
     private Label widthLabel;
-    private NumericUpDown widthNumeric;
+    private TextBox widthTextBox;
     private Label dimensionSeparatorLabel;
     private Label heightLabel;
-    private NumericUpDown heightNumeric;
+    private TextBox heightTextBox;
     private Button convertButton;
     private StatusStrip statusStrip;
     private ToolStripStatusLabel statusLabel;
