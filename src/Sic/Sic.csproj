@@ -44,10 +44,10 @@
         <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="GetText.NET" Version="10.0.1" />
-        <PackageReference Include="System.CommandLine" Version="2.0.2" />
+        <PackageReference Include="System.CommandLine" Version="2.0.3" />
         <PackageReference Include="sharpconfig-huanlin" Version="4.1.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.102" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.103" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
