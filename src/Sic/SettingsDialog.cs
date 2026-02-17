@@ -10,6 +10,8 @@ public partial class SettingsDialog: Form {
         browseButton.Click += BrowseButton_Click;
         clearOutputFolderButton.Click += ClearOutputFolderButton_Click;
         okButton.Click += OkButton_Click;
+        outputFolderTextBox.TextChanged += (_, _) => UpdateClearButtonState();
+        UpdateClearButtonState();
     }
 
     private void LoadSettings() {
@@ -40,6 +42,10 @@ public partial class SettingsDialog: Form {
 
     private void ClearOutputFolderButton_Click(object? sender, EventArgs e) {
         outputFolderTextBox.Text = "";
+    }
+
+    private void UpdateClearButtonState() {
+        clearOutputFolderButton.Enabled = !string.IsNullOrEmpty(outputFolderTextBox.Text);
     }
 
     private void OkButton_Click(object? sender, EventArgs e) {
