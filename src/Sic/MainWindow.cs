@@ -10,6 +10,7 @@ public partial class MainWindow: Form {
     private readonly List<ImageItem> _imageItems = [];
     private ImageItem? _selectedItem;
     private bool _isAutoFilling;
+    private int _clipboardImageCount;
 
     public MainWindow() {
         InitializeComponent();
@@ -487,7 +488,9 @@ public partial class MainWindow: Form {
             var data = ms.ToArray();
 
             try {
-                var item = ImageConverter.LoadFromBytes(data, "clipboard_image.png");
+                _clipboardImageCount++;
+                var suffix = _clipboardImageCount > 1 ? $"_{_clipboardImageCount}" : "";
+                var item = ImageConverter.LoadFromBytes(data, $"clipboard_image{suffix}.png");
                 AddImageItem(item);
                 UpdateMenuState();
                 statusLabel.Text = "Added image from clipboard";
