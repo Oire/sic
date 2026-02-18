@@ -12,7 +12,7 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 - **Multiple input methods** — file dialog, drag & drop, Ctrl+V paste (files or screenshots), download from URL
 - **Filename conflict handling** — always asks: overwrite, rename (`_1` suffix), or skip
 - **CLI mode** — headless conversion from the command line, no UI needed
-- **Accessible** — all controls have screen-reader labels, logical tab order, keyboard shortcuts
+- **Accessible** — logical tab order, keyboard shortcuts, screen-reader friendly
 
 ## Requirements
 

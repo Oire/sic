@@ -97,7 +97,7 @@ SIC! is an accessible image format converter primarily aimed at blind and low-co
 - **Use `TableLayoutPanel` throughout** — the developer is blind and needs to adjust layouts without counting pixel coordinates. Use flat layouts (no nesting) with percentage-based column styles where possible.
 - **Image preview panel** — sighted users should see a preview of the selected image. This is not a blind-only tool; it should look and feel like a proper app a sighted person would also choose to use.
 - **Resize controls** — consider visual resize handles or interactive controls for sighted users in addition to the WxH text fields.
-- **Accessibility first** — all controls must have `AccessibleName` set, proper tab order, meaningful labels.
+- **Accessibility first** — proper tab order, meaningful labels. Do **not** set `AccessibleName` on controls — it overrides the `Text` property that screen readers already use, causing JAWS to read verbose descriptions instead of the actual button/menu text.
 
 ### Settings (via SharpConfig, stored in `%APPDATA%/Oire/Sic/Sic.cfg`)
 

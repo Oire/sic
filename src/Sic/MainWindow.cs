@@ -139,12 +139,10 @@ public partial class MainWindow: Form {
         var urlLabel = new Label {
             Text = "Enter image URL:",
             AutoSize = true,
-            AccessibleName = "Image URL label",
         };
 
         var urlTextBox = new TextBox {
             Dock = DockStyle.Fill,
-            AccessibleName = "Image URL",
         };
 
         var buttonPanel = new FlowLayoutPanel {
@@ -494,7 +492,6 @@ public partial class MainWindow: Form {
             var messageLabel = new Label {
                 Text = $"The file \"{fileName}\" already exists.\nWhat would you like to do?",
                 AutoSize = true,
-                AccessibleName = $"File {fileName} already exists",
             };
 
             var buttonPanel = new FlowLayoutPanel {
@@ -503,9 +500,9 @@ public partial class MainWindow: Form {
                 AutoSize = true,
             };
 
-            var overwriteBtn = new Button { Text = "Overwrite", AccessibleName = "Overwrite existing file" };
-            var renameBtn = new Button { Text = "Rename", AccessibleName = "Save with different name" };
-            var skipBtn = new Button { Text = "Skip", AccessibleName = "Skip this file" };
+            var overwriteBtn = new Button { Text = "Overwrite" };
+            var renameBtn = new Button { Text = "Rename" };
+            var skipBtn = new Button { Text = "Skip" };
 
             overwriteBtn.Click += (_, _) => { result = ConflictResolution.Overwrite; dialog.Close(); };
             renameBtn.Click += (_, _) => { result = ConflictResolution.Rename; dialog.Close(); };

@@ -75,7 +75,6 @@ partial class AddFolderDialog {
         folderTextBox.Dock = DockStyle.Fill;
         folderTextBox.ReadOnly = true;
         folderTextBox.Name = "folderTextBox";
-        folderTextBox.AccessibleName = "Folder path";
         folderTextBox.TabIndex = 1;
 
         //
@@ -83,7 +82,6 @@ partial class AddFolderDialog {
         //
         browseButton.Text = "Browse...";
         browseButton.Name = "browseButton";
-        browseButton.AccessibleName = "Browse for folder";
         browseButton.TabIndex = 2;
 
         //
@@ -101,7 +99,6 @@ partial class AddFolderDialog {
         filterComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
         filterComboBox.Dock = DockStyle.Fill;
         filterComboBox.Name = "filterComboBox";
-        filterComboBox.AccessibleName = "Image type filter";
         filterComboBox.TabIndex = 4;
 
         //
@@ -111,7 +108,6 @@ partial class AddFolderDialog {
         includeSubfoldersCheckBox.AutoSize = true;
         includeSubfoldersCheckBox.Anchor = AnchorStyles.Left;
         includeSubfoldersCheckBox.Name = "includeSubfoldersCheckBox";
-        includeSubfoldersCheckBox.AccessibleName = "Include all subfolders";
         includeSubfoldersCheckBox.TabIndex = 5;
         includeSubfoldersCheckBox.Padding = new Padding(0, 4, 0, 4);
 
@@ -122,7 +118,6 @@ partial class AddFolderDialog {
         okButton.Anchor = AnchorStyles.Right;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
-        okButton.AccessibleName = "OK";
         okButton.TabIndex = 6;
 
         //
@@ -131,7 +126,6 @@ partial class AddFolderDialog {
         cancelButton.Text = "Cancel";
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
-        cancelButton.AccessibleName = "Cancel";
         cancelButton.TabIndex = 7;
 
         //

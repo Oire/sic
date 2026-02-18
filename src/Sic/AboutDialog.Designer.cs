@@ -49,7 +49,6 @@ partial class AboutDialog {
         appNameLabel.Font = new Font(appNameLabel.Font.FontFamily, 14F, FontStyle.Bold);
         appNameLabel.Anchor = AnchorStyles.None;
         appNameLabel.Name = "appNameLabel";
-        appNameLabel.AccessibleName = "Application name";
         appNameLabel.Padding = new Padding(0, 0, 0, 8);
         appNameLabel.TabIndex = 0;
 
@@ -60,7 +59,6 @@ partial class AboutDialog {
         versionLabel.AutoSize = true;
         versionLabel.Anchor = AnchorStyles.None;
         versionLabel.Name = "versionLabel";
-        versionLabel.AccessibleName = "Version";
         versionLabel.Padding = new Padding(0, 0, 0, 4);
         versionLabel.TabIndex = 1;
 
@@ -71,7 +69,6 @@ partial class AboutDialog {
         copyrightLabel.AutoSize = true;
         copyrightLabel.Anchor = AnchorStyles.None;
         copyrightLabel.Name = "copyrightLabel";
-        copyrightLabel.AccessibleName = "Copyright";
         copyrightLabel.Padding = new Padding(0, 0, 0, 12);
         copyrightLabel.TabIndex = 2;
 
@@ -83,7 +80,6 @@ partial class AboutDialog {
         okButton.Anchor = AnchorStyles.None;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
-        okButton.AccessibleName = "OK";
         okButton.TabIndex = 3;
 
         //
@@ -100,6 +96,7 @@ partial class AboutDialog {
         MaximizeBox = false;
         MinimizeBox = false;
         AcceptButton = okButton;
+        AccessibleRole = AccessibleRole.Dialog;
 
         mainLayout.ResumeLayout(false);
         mainLayout.PerformLayout();

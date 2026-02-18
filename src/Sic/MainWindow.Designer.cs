@@ -75,7 +75,6 @@ partial class MainWindow {
         //
         menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu, helpMenu });
         menuStrip.Name = "menuStrip";
-        menuStrip.AccessibleName = "Menu bar";
 
         //
         // fileMenu
@@ -101,7 +100,6 @@ partial class MainWindow {
         addImageMenuItem.Text = "Add &Image...";
         addImageMenuItem.ShortcutKeys = Keys.Control | Keys.O;
         addImageMenuItem.Name = "addImageMenuItem";
-        addImageMenuItem.AccessibleName = "Add image file";
 
         //
         // addFolderMenuItem
@@ -109,7 +107,6 @@ partial class MainWindow {
         addFolderMenuItem.Text = "Add F&older...";
         addFolderMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.O;
         addFolderMenuItem.Name = "addFolderMenuItem";
-        addFolderMenuItem.AccessibleName = "Add folder of images";
 
         //
         // addFromUrlMenuItem
@@ -117,7 +114,6 @@ partial class MainWindow {
         addFromUrlMenuItem.Text = "Add from &URL...";
         addFromUrlMenuItem.ShortcutKeys = Keys.Control | Keys.U;
         addFromUrlMenuItem.Name = "addFromUrlMenuItem";
-        addFromUrlMenuItem.AccessibleName = "Add image from URL";
 
         //
         // removeMenuItem
@@ -125,7 +121,6 @@ partial class MainWindow {
         removeMenuItem.Text = "&Remove";
         removeMenuItem.ShortcutKeys = Keys.Delete;
         removeMenuItem.Name = "removeMenuItem";
-        removeMenuItem.AccessibleName = "Remove selected image";
         removeMenuItem.Enabled = false;
 
         //
@@ -134,7 +129,6 @@ partial class MainWindow {
         removeAllMenuItem.Text = "Remove &All";
         removeAllMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.Delete;
         removeAllMenuItem.Name = "removeAllMenuItem";
-        removeAllMenuItem.AccessibleName = "Remove all images";
         removeAllMenuItem.Enabled = false;
 
         //
@@ -143,7 +137,6 @@ partial class MainWindow {
         optionsMenuItem.Text = "&Options...";
         optionsMenuItem.ShortcutKeys = Keys.Control | Keys.Oemcomma;
         optionsMenuItem.Name = "optionsMenuItem";
-        optionsMenuItem.AccessibleName = "Open options";
 
         //
         // exitMenuItem
@@ -151,7 +144,6 @@ partial class MainWindow {
         exitMenuItem.Text = "E&xit";
         exitMenuItem.ShortcutKeys = Keys.Alt | Keys.F4;
         exitMenuItem.Name = "exitMenuItem";
-        exitMenuItem.AccessibleName = "Exit application";
 
         //
         // helpMenu
@@ -170,7 +162,6 @@ partial class MainWindow {
         userGuideMenuItem.Text = "&User Guide";
         userGuideMenuItem.ShortcutKeys = Keys.F1;
         userGuideMenuItem.Name = "userGuideMenuItem";
-        userGuideMenuItem.AccessibleName = "User guide";
 
         //
         // aboutMenuItem
@@ -178,7 +169,6 @@ partial class MainWindow {
         aboutMenuItem.Text = "&About SIC!...";
         aboutMenuItem.ShortcutKeys = Keys.Shift | Keys.F1;
         aboutMenuItem.Name = "aboutMenuItem";
-        aboutMenuItem.AccessibleName = "About SIC!";
 
         //
         // mainLayout
@@ -210,7 +200,6 @@ partial class MainWindow {
         imageListView.MultiSelect = false;
         imageListView.View = View.Details;
         imageListView.Name = "imageListView";
-        imageListView.AccessibleName = "Image list";
         imageListView.AllowDrop = true;
         imageListView.TabIndex = 0;
 
@@ -235,7 +224,6 @@ partial class MainWindow {
         previewPictureBox.SizeMode = PictureBoxSizeMode.Zoom;
         previewPictureBox.BorderStyle = BorderStyle.FixedSingle;
         previewPictureBox.Name = "previewPictureBox";
-        previewPictureBox.AccessibleName = "Image preview";
         previewPictureBox.TabIndex = 1;
         previewPictureBox.TabStop = false;
 
@@ -283,7 +271,6 @@ partial class MainWindow {
         formatComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
         formatComboBox.Dock = DockStyle.Fill;
         formatComboBox.Name = "formatComboBox";
-        formatComboBox.AccessibleName = "Target format";
         formatComboBox.TabIndex = 3;
 
         //
@@ -293,7 +280,6 @@ partial class MainWindow {
         resizeCheckBox.AutoSize = true;
         resizeCheckBox.Anchor = AnchorStyles.Left;
         resizeCheckBox.Name = "resizeCheckBox";
-        resizeCheckBox.AccessibleName = "Resize images";
         resizeCheckBox.TabIndex = 4;
         resizeCheckBox.Padding = new Padding(8, 0, 0, 0);
 
@@ -314,7 +300,6 @@ partial class MainWindow {
         widthTextBox.Dock = DockStyle.Fill;
         widthTextBox.Enabled = false;
         widthTextBox.Name = "widthTextBox";
-        widthTextBox.AccessibleName = "Width in pixels";
         widthTextBox.TabIndex = 6;
 
         //
@@ -344,7 +329,6 @@ partial class MainWindow {
         heightTextBox.Dock = DockStyle.Fill;
         heightTextBox.Enabled = false;
         heightTextBox.Name = "heightTextBox";
-        heightTextBox.AccessibleName = "Height in pixels";
         heightTextBox.TabIndex = 9;
 
         //
@@ -352,7 +336,6 @@ partial class MainWindow {
         //
         convertButton.Text = "Convert";
         convertButton.Name = "convertButton";
-        convertButton.AccessibleName = "Convert all images";
         convertButton.Font = new Font(convertButton.Font, FontStyle.Bold);
         convertButton.Padding = new Padding(8, 0, 8, 0);
         convertButton.TabIndex = 10;
@@ -372,7 +355,6 @@ partial class MainWindow {
         statusLabel.Text = "Ready";
         statusLabel.Spring = true;
         statusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-        statusLabel.AccessibleName = "Status";
 
         //
         // progressBar
@@ -380,7 +362,6 @@ partial class MainWindow {
         progressBar.Name = "progressBar";
         progressBar.Visible = false;
         progressBar.Size = new Size(150, 16);
-        progressBar.AccessibleName = "Conversion progress";
 
         //
         // MainWindow

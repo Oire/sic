@@ -71,7 +71,6 @@ partial class SettingsDialog {
         outputFolderTextBox.Dock = DockStyle.Fill;
         outputFolderTextBox.ReadOnly = true;
         outputFolderTextBox.Name = "outputFolderTextBox";
-        outputFolderTextBox.AccessibleName = "Output folder path";
         outputFolderTextBox.TabIndex = 1;
 
         //
@@ -80,7 +79,6 @@ partial class SettingsDialog {
         browseButton.Text = "Browse...";
         browseButton.Dock = DockStyle.Fill;
         browseButton.Name = "browseButton";
-        browseButton.AccessibleName = "Browse for output folder";
         browseButton.TabIndex = 2;
 
         //
@@ -89,7 +87,6 @@ partial class SettingsDialog {
         clearOutputFolderButton.Text = "Clear";
         clearOutputFolderButton.Dock = DockStyle.Fill;
         clearOutputFolderButton.Name = "clearOutputFolderButton";
-        clearOutputFolderButton.AccessibleName = "Clear output folder to use same folder as source";
         clearOutputFolderButton.TabIndex = 3;
 
         //
@@ -107,7 +104,6 @@ partial class SettingsDialog {
         languageComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
         languageComboBox.Dock = DockStyle.Fill;
         languageComboBox.Name = "languageComboBox";
-        languageComboBox.AccessibleName = "Language";
         languageComboBox.TabIndex = 5;
 
         //
@@ -117,7 +113,6 @@ partial class SettingsDialog {
         okButton.Dock = DockStyle.Fill;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
-        okButton.AccessibleName = "OK";
         okButton.TabIndex = 6;
 
         //
@@ -127,7 +122,6 @@ partial class SettingsDialog {
         cancelButton.Dock = DockStyle.Fill;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
-        cancelButton.AccessibleName = "Cancel";
         cancelButton.TabIndex = 7;
 
         //
