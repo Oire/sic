@@ -569,6 +569,9 @@ public partial class MainWindow: Form {
         listItem.SubItems.Add(""); // Status column — blank on add
 
         imageListView.Items.Add(listItem);
+        listItem.Selected = true;
+        listItem.Focused = true;
+        listItem.EnsureVisible();
         statusLabel.Text = $"{_imageItems.Count} image(s) in queue";
     }
 
