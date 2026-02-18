@@ -59,6 +59,8 @@ partial class MainWindow {
         heightLabel = new Label();
         heightTextBox = new TextBox();
         convertButton = new Button();
+        keepProportionsRadioButton = new RadioButton();
+        cropRadioButton = new RadioButton();
         statusStrip = new StatusStrip();
         statusLabel = new ToolStripStatusLabel();
         progressBar = new ToolStripProgressBar();
@@ -119,7 +121,7 @@ partial class MainWindow {
         // removeMenuItem
         //
         removeMenuItem.Text = "&Remove";
-        removeMenuItem.ShortcutKeys = Keys.Delete;
+        removeMenuItem.ShortcutKeyDisplayString = "Del";
         removeMenuItem.Name = "removeMenuItem";
         removeMenuItem.Enabled = false;
 
@@ -240,7 +242,8 @@ partial class MainWindow {
         controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Height label
         controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F)); // Height numeric
         controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Convert button
-        controlsLayout.RowCount = 1;
+        controlsLayout.RowCount = 2;
+        controlsLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         controlsLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         controlsLayout.Dock = DockStyle.Fill;
         controlsLayout.AutoSize = true;
@@ -255,6 +258,10 @@ partial class MainWindow {
         controlsLayout.Controls.Add(heightLabel, 6, 0);
         controlsLayout.Controls.Add(heightTextBox, 7, 0);
         controlsLayout.Controls.Add(convertButton, 8, 0);
+        controlsLayout.Controls.Add(keepProportionsRadioButton, 2, 1);
+        controlsLayout.SetColumnSpan(keepProportionsRadioButton, 3);
+        controlsLayout.Controls.Add(cropRadioButton, 5, 1);
+        controlsLayout.SetColumnSpan(cropRadioButton, 3);
 
         //
         // formatLabel
@@ -291,16 +298,16 @@ partial class MainWindow {
         widthLabel.Anchor = AnchorStyles.Left;
         widthLabel.Name = "widthLabel";
         widthLabel.Enabled = false;
-        widthLabel.TabIndex = 5;
+        widthLabel.TabIndex = 7;
 
         //
         // widthTextBox
         //
-        widthTextBox.Text = "128";
+        widthTextBox.Text = "";
         widthTextBox.Dock = DockStyle.Fill;
         widthTextBox.Enabled = false;
         widthTextBox.Name = "widthTextBox";
-        widthTextBox.TabIndex = 6;
+        widthTextBox.TabIndex = 8;
 
         //
         // dimensionSeparatorLabel
@@ -310,7 +317,7 @@ partial class MainWindow {
         dimensionSeparatorLabel.Anchor = AnchorStyles.Left;
         dimensionSeparatorLabel.Name = "dimensionSeparatorLabel";
         dimensionSeparatorLabel.Enabled = false;
-        dimensionSeparatorLabel.TabIndex = 7;
+        dimensionSeparatorLabel.TabIndex = 9;
 
         //
         // heightLabel
@@ -320,16 +327,16 @@ partial class MainWindow {
         heightLabel.Anchor = AnchorStyles.Left;
         heightLabel.Name = "heightLabel";
         heightLabel.Enabled = false;
-        heightLabel.TabIndex = 8;
+        heightLabel.TabIndex = 10;
 
         //
         // heightTextBox
         //
-        heightTextBox.Text = "128";
+        heightTextBox.Text = "";
         heightTextBox.Dock = DockStyle.Fill;
         heightTextBox.Enabled = false;
         heightTextBox.Name = "heightTextBox";
-        heightTextBox.TabIndex = 9;
+        heightTextBox.TabIndex = 11;
 
         //
         // convertButton
@@ -338,14 +345,36 @@ partial class MainWindow {
         convertButton.Name = "convertButton";
         convertButton.Font = new Font(convertButton.Font, FontStyle.Bold);
         convertButton.Padding = new Padding(8, 0, 8, 0);
-        convertButton.TabIndex = 10;
+        convertButton.TabIndex = 12;
+
+        //
+        // keepProportionsRadioButton
+        //
+        keepProportionsRadioButton.Text = "Keep proportions";
+        keepProportionsRadioButton.AutoSize = true;
+        keepProportionsRadioButton.Anchor = AnchorStyles.Left;
+        keepProportionsRadioButton.Name = "keepProportionsRadioButton";
+        keepProportionsRadioButton.Checked = true;
+        keepProportionsRadioButton.Enabled = false;
+        keepProportionsRadioButton.TabIndex = 5;
+        keepProportionsRadioButton.Padding = new Padding(8, 0, 0, 0);
+
+        //
+        // cropRadioButton
+        //
+        cropRadioButton.Text = "Crop";
+        cropRadioButton.AutoSize = true;
+        cropRadioButton.Anchor = AnchorStyles.Left;
+        cropRadioButton.Name = "cropRadioButton";
+        cropRadioButton.Enabled = false;
+        cropRadioButton.TabIndex = 6;
 
         //
         // statusStrip
         //
         statusStrip.Items.AddRange(new ToolStripItem[] { statusLabel, progressBar });
         statusStrip.Name = "statusStrip";
-        statusStrip.TabIndex = 11;
+        statusStrip.TabIndex = 13;
         statusStrip.Dock = DockStyle.Fill;
 
         //
@@ -421,6 +450,8 @@ partial class MainWindow {
     private Label heightLabel;
     private TextBox heightTextBox;
     private Button convertButton;
+    private RadioButton keepProportionsRadioButton;
+    private RadioButton cropRadioButton;
     private StatusStrip statusStrip;
     private ToolStripStatusLabel statusLabel;
     private ToolStripProgressBar progressBar;

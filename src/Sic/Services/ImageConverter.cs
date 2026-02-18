@@ -87,7 +87,7 @@ public static class ImageConverter {
         };
     }
 
-    public static void Convert(ImageItem item, string targetFormat, string outputPath, int? width, int? height) {
+    public static void Convert(ImageItem item, string targetFormat, string outputPath, int? width, int? height, ResizeMode mode = ResizeMode.KeepProportions) {
         if (!FormatMap.TryGetValue(targetFormat, out var magickFormat)) {
             throw new ArgumentException($"Unsupported target format: {targetFormat}");
         }
@@ -95,8 +95,24 @@ public static class ImageConverter {
         using var image = LoadMagickImage(item);
 
         if (width.HasValue || height.HasValue) {
-            var geometry = CalculateResizeGeometry(image, width, height);
-            image.Resize(geometry);
+            if (mode == ResizeMode.Crop && width.HasValue && height.HasValue) {
+                var scaleX = (double)width.Value / image.Width;
+                var scaleY = (double)height.Value / image.Height;
+                var scale = Math.Max(scaleX, scaleY);
+                var intermediateWidth = (uint)Math.Round(image.Width * scale);
+                var intermediateHeight = (uint)Math.Round(image.Height * scale);
+                var intermediateGeometry = new MagickGeometry(intermediateWidth, intermediateHeight) {
+                    IgnoreAspectRatio = true,
+                };
+                image.Resize(intermediateGeometry);
+
+                var cropGeometry = new MagickGeometry((uint)width.Value, (uint)height.Value);
+                image.Crop(cropGeometry, Gravity.Center);
+                image.ResetPage();
+            } else {
+                var geometry = CalculateResizeGeometry(image, width, height);
+                image.Resize(geometry);
+            }
         }
 
         image.Format = magickFormat;
@@ -180,14 +196,17 @@ public static class ImageConverter {
 
     private static MagickGeometry CalculateResizeGeometry(MagickImage image, int? width, int? height) {
         if (width.HasValue && height.HasValue) {
-            return new MagickGeometry((uint)width.Value, (uint)height.Value) {
+            var scale = Math.Min((double)width.Value / image.Width, (double)height.Value / image.Height);
+            var newWidth = (uint)Math.Round(image.Width * scale);
+            var newHeight = (uint)Math.Round(image.Height * scale);
+            return new MagickGeometry(newWidth, newHeight) {
                 IgnoreAspectRatio = true,
             };
         }
 
         if (width.HasValue) {
             var ratio = (double)width.Value / image.Width;
-            var newHeight = (uint)(image.Height * ratio);
+            var newHeight = (uint)Math.Round(image.Height * ratio);
             return new MagickGeometry((uint)width.Value, newHeight) {
                 IgnoreAspectRatio = true,
             };
@@ -195,7 +214,7 @@ public static class ImageConverter {
 
         if (height.HasValue) {
             var ratio = (double)height.Value / image.Height;
-            var newWidth = (uint)(image.Width * ratio);
+            var newWidth = (uint)Math.Round(image.Width * ratio);
             return new MagickGeometry(newWidth, (uint)height.Value) {
                 IgnoreAspectRatio = true,
             };

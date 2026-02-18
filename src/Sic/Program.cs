@@ -1,4 +1,5 @@
 using System.CommandLine;
+using Oire.Sic.Models;
 using Oire.Sic.Utils;
 using ImageConverter = Oire.Sic.Services.ImageConverter;
 using Serilog;
@@ -50,18 +51,21 @@ internal static class Program {
     private static int RunCli(string[] args) {
         var inputOption = new Option<string>("--input", "-i") { Required = true, Description = "Path to the source image file" };
         var outputOption = new Option<string>("--output", "-o") { Required = true, Description = "Path for the converted image (format inferred from extension)" };
-        var resizeOption = new Option<string?>("--resize", "-r") { Description = "Resize dimensions as WxH (e.g. 128x128)" };
+        var resizeOption = new Option<string?>("--resize", "-r") { Description = "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)" };
+        var cropOption = new Option<bool>("--crop", "-c") { Description = "Use crop mode (scale to cover, then center-crop to exact dimensions)" };
 
         var rootCommand = new RootCommand("SIC! — Simple Image Converter") {
             inputOption,
             outputOption,
             resizeOption,
+            cropOption,
         };
 
         rootCommand.SetAction((Func<ParseResult, int>)(parseResult => {
             var input = parseResult.GetValue(inputOption)!;
             var output = parseResult.GetValue(outputOption)!;
             var resize = parseResult.GetValue(resizeOption);
+            var crop = parseResult.GetValue(cropOption);
 
             if (!File.Exists(input)) {
                 Console.Error.WriteLine($"File not found: {input}");
@@ -83,15 +87,49 @@ internal static class Program {
             }
 
             int? width = null, height = null;
+            var resizeMode = crop ? ResizeMode.Crop : ResizeMode.KeepProportions;
+
             if (!string.IsNullOrWhiteSpace(resize)) {
-                var parts = resize.Split('x', 'X');
-                if (parts.Length == 2 && int.TryParse(parts[0], out var w) && int.TryParse(parts[1], out var h)) {
-                    width = w;
-                    height = h;
+                var normalized = resize.ToLowerInvariant();
+                string[] parts;
+
+                if (normalized.Contains('x')) {
+                    parts = normalized.Split('x');
+                    if (parts.Length != 2) {
+                        Console.Error.WriteLine($"Invalid resize format: {resize}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, 128)");
+                        return 1;
+                    }
                 } else {
-                    Console.Error.WriteLine($"Invalid resize format: {resize}. Use WxH (e.g. 128x128)");
+                    parts = [normalized, ""];
+                }
+
+                var hasWidth = int.TryParse(parts[0], out var w) && w >= 1;
+                var hasHeight = int.TryParse(parts[1], out var h) && h >= 1;
+
+                if (!hasWidth && !string.IsNullOrEmpty(parts[0])) {
+                    Console.Error.WriteLine($"Invalid width value: {parts[0]}");
                     return 1;
                 }
+
+                if (!hasHeight && !string.IsNullOrEmpty(parts[1])) {
+                    Console.Error.WriteLine($"Invalid height value: {parts[1]}");
+                    return 1;
+                }
+
+                if (!hasWidth && !hasHeight) {
+                    Console.Error.WriteLine($"Invalid resize format: {resize}. At least one dimension is required.");
+                    return 1;
+                }
+
+                if (hasWidth)
+                    width = w;
+                if (hasHeight)
+                    height = h;
+            }
+
+            if (crop && (!width.HasValue || !height.HasValue)) {
+                Console.Error.WriteLine("Crop mode requires both width and height (e.g. --resize 128x128 --crop)");
+                return 1;
             }
 
             try {
@@ -102,7 +140,7 @@ internal static class Program {
                     Directory.CreateDirectory(dir);
                 }
 
-                ImageConverter.Convert(item, targetFormat, output, width, height);
+                ImageConverter.Convert(item, targetFormat, output, width, height, resizeMode);
                 Console.WriteLine($"Converted: {output}");
                 return 0;
             } catch (Exception ex) {

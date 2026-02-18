@@ -8,6 +8,8 @@ namespace Oire.Sic;
 
 public partial class MainWindow: Form {
     private readonly List<ImageItem> _imageItems = [];
+    private ImageItem? _selectedItem;
+    private bool _isAutoFilling;
 
     public MainWindow() {
         InitializeComponent();
@@ -33,8 +35,11 @@ public partial class MainWindow: Form {
         // Controls
         convertButton.Click += ConvertButton_Click;
         resizeCheckBox.CheckedChanged += ResizeCheckBox_CheckedChanged;
+        keepProportionsRadioButton.CheckedChanged += ResizeModeRadioButton_CheckedChanged;
         widthTextBox.GotFocus += (s, _) => (s as TextBox)?.BeginInvoke(((TextBox)s!).SelectAll);
         heightTextBox.GotFocus += (s, _) => (s as TextBox)?.BeginInvoke(((TextBox)s!).SelectAll);
+        widthTextBox.TextChanged += WidthTextBox_TextChanged;
+        heightTextBox.TextChanged += HeightTextBox_TextChanged;
         imageListView.SelectedIndexChanged += ImageListView_SelectedIndexChanged;
         imageListView.DragEnter += ImageListView_DragEnter;
         imageListView.DragDrop += ImageListView_DragDrop;
@@ -230,23 +235,44 @@ public partial class MainWindow: Form {
         }
 
         int? width = null, height = null;
+        var resizeMode = Models.ResizeMode.KeepProportions;
+
         if (resizeCheckBox.Checked) {
-            if (!int.TryParse(widthTextBox.Text, out var w) || w < 1 || w > 65535) {
-                MessageBox.Show("Please enter a valid width (1\u201365535).", "Invalid width", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                widthTextBox.Focus();
-                widthTextBox.SelectAll();
-                return;
-            }
+            resizeMode = cropRadioButton.Checked ? Models.ResizeMode.Crop : Models.ResizeMode.KeepProportions;
 
-            if (!int.TryParse(heightTextBox.Text, out var h) || h < 1 || h > 65535) {
-                MessageBox.Show("Please enter a valid height (1\u201365535).", "Invalid height", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                heightTextBox.Focus();
-                heightTextBox.SelectAll();
-                return;
-            }
+            var hasWidth = int.TryParse(widthTextBox.Text, out var w) && w >= 1 && w <= 65535;
+            var hasHeight = int.TryParse(heightTextBox.Text, out var h) && h >= 1 && h <= 65535;
 
-            width = w;
-            height = h;
+            if (resizeMode == Models.ResizeMode.Crop) {
+                if (!hasWidth) {
+                    MessageBox.Show("Crop mode requires a valid width (1\u201365535).", "Invalid width", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    widthTextBox.Focus();
+                    widthTextBox.SelectAll();
+                    return;
+                }
+
+                if (!hasHeight) {
+                    MessageBox.Show("Crop mode requires a valid height (1\u201365535).", "Invalid height", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    heightTextBox.Focus();
+                    heightTextBox.SelectAll();
+                    return;
+                }
+
+                width = w;
+                height = h;
+            } else {
+                if (!hasWidth && !hasHeight) {
+                    MessageBox.Show("Please enter at least one valid dimension (1\u201365535).", "Invalid dimensions", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    widthTextBox.Focus();
+                    widthTextBox.SelectAll();
+                    return;
+                }
+
+                if (hasWidth)
+                    width = w;
+                if (hasHeight)
+                    height = h;
+            }
         }
 
         var outputFolder = string.IsNullOrWhiteSpace(Config.General.OutputFolder) ? null : Config.General.OutputFolder;
@@ -297,7 +323,7 @@ public partial class MainWindow: Form {
                         Directory.CreateDirectory(dir);
                     }
 
-                    ImageConverter.Convert(item, targetFormat, outputPath, width, height);
+                    ImageConverter.Convert(item, targetFormat, outputPath, width, height, resizeMode);
                     converted++;
                     convertedIndices.Add(i);
 
@@ -354,12 +380,84 @@ public partial class MainWindow: Form {
         dimensionSeparatorLabel.Enabled = enabled;
         heightLabel.Enabled = enabled;
         heightTextBox.Enabled = enabled;
+        keepProportionsRadioButton.Enabled = enabled;
+        cropRadioButton.Enabled = enabled;
+
+        if (enabled) {
+            PopulateResizeFieldsFromSelection();
+        }
+    }
+
+    private void PopulateResizeFieldsFromSelection() {
+        if (_selectedItem == null)
+            return;
+
+        _isAutoFilling = true;
+        try {
+            widthTextBox.Text = _selectedItem.Width.ToString();
+            heightTextBox.Text = _selectedItem.Height.ToString();
+        } finally {
+            _isAutoFilling = false;
+        }
+    }
+
+    private void ResizeModeRadioButton_CheckedChanged(object? sender, EventArgs e) {
+        if (!cropRadioButton.Checked) {
+            AutoFillFromWidth();
+        }
+    }
+
+    private void WidthTextBox_TextChanged(object? sender, EventArgs e) {
+        if (_isAutoFilling || cropRadioButton.Checked || !resizeCheckBox.Checked)
+            return;
+
+        AutoFillFromWidth();
+    }
+
+    private void HeightTextBox_TextChanged(object? sender, EventArgs e) {
+        if (_isAutoFilling || cropRadioButton.Checked || !resizeCheckBox.Checked)
+            return;
+
+        AutoFillFromHeight();
+    }
+
+    private void AutoFillFromWidth() {
+        if (_selectedItem == null || _selectedItem.Width <= 0)
+            return;
+
+        if (!int.TryParse(widthTextBox.Text, out var w) || w < 1)
+            return;
+
+        var newHeight = (int)Math.Round((double)w / _selectedItem.Width * _selectedItem.Height);
+        _isAutoFilling = true;
+        try {
+            heightTextBox.Text = newHeight.ToString();
+        } finally {
+            _isAutoFilling = false;
+        }
+    }
+
+    private void AutoFillFromHeight() {
+        if (_selectedItem == null || _selectedItem.Height <= 0)
+            return;
+
+        if (!int.TryParse(heightTextBox.Text, out var h) || h < 1)
+            return;
+
+        var newWidth = (int)Math.Round((double)h / _selectedItem.Height * _selectedItem.Width);
+        _isAutoFilling = true;
+        try {
+            widthTextBox.Text = newWidth.ToString();
+        } finally {
+            _isAutoFilling = false;
+        }
     }
 
     private void ImageListView_SelectedIndexChanged(object? sender, EventArgs e) {
         UpdateMenuState();
 
         if (imageListView.SelectedIndices.Count == 0) {
+            _selectedItem = null;
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = null;
             return;
@@ -367,6 +465,11 @@ public partial class MainWindow: Form {
 
         var index = imageListView.SelectedIndices[0];
         var item = _imageItems[index];
+        _selectedItem = item;
+
+        if (resizeCheckBox.Checked && !widthTextBox.Focused && !heightTextBox.Focused) {
+            PopulateResizeFieldsFromSelection();
+        }
 
         try {
             var preview = ImageConverter.GeneratePreview(item, previewPictureBox.Width, previewPictureBox.Height);
@@ -401,7 +504,10 @@ public partial class MainWindow: Form {
     }
 
     private void MainWindow_KeyDown(object? sender, KeyEventArgs e) {
-        if (e.Control && e.KeyCode == Keys.V) {
+        if (e.KeyCode == Keys.Delete && imageListView.Focused) {
+            RemoveMenuItem_Click(sender, e);
+            e.Handled = true;
+        } else if (e.Control && e.KeyCode == Keys.V) {
             HandlePaste();
             e.Handled = true;
         }
