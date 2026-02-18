@@ -122,68 +122,19 @@ public partial class MainWindow: Form {
     }
 
     private async void AddFromUrlMenuItem_Click(object? sender, EventArgs e) {
-        using var inputDialog = new Form {
-            Text = "Add Image from URL",
-            Size = new Size(500, 150),
-            StartPosition = FormStartPosition.CenterParent,
-            FormBorderStyle = FormBorderStyle.FixedDialog,
-            MaximizeBox = false,
-            MinimizeBox = false,
-        };
+        using var dialog = new AddUrlDialog();
 
-        var layout = new TableLayoutPanel {
-            Dock = DockStyle.Fill,
-            ColumnCount = 1,
-            RowCount = 3,
-            Padding = new Padding(8),
-        };
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-
-        var urlLabel = new Label {
-            Text = "Enter image URL:",
-            AutoSize = true,
-        };
-
-        var urlTextBox = new TextBox {
-            Dock = DockStyle.Fill,
-        };
-
-        var buttonPanel = new FlowLayoutPanel {
-            Dock = DockStyle.Fill,
-            FlowDirection = FlowDirection.RightToLeft,
-            AutoSize = true,
-        };
-
-        var cancelBtn = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel };
-        var okBtn = new Button { Text = "OK", DialogResult = DialogResult.OK };
-        buttonPanel.Controls.Add(cancelBtn);
-        buttonPanel.Controls.Add(okBtn);
-
-        inputDialog.AcceptButton = okBtn;
-        inputDialog.CancelButton = cancelBtn;
-
-        layout.Controls.Add(urlLabel, 0, 0);
-        layout.Controls.Add(urlTextBox, 0, 1);
-        layout.Controls.Add(buttonPanel, 0, 2);
-        inputDialog.Controls.Add(layout);
-
-        if (inputDialog.ShowDialog() != DialogResult.OK)
-            return;
-
-        var url = urlTextBox.Text.Trim();
-        if (string.IsNullOrWhiteSpace(url))
+        if (dialog.ShowDialog() != DialogResult.OK)
             return;
 
         statusLabel.Text = "Downloading image...";
         try {
-            var item = await ImageConverter.LoadFromUrl(url);
+            var item = await ImageConverter.LoadFromUrl(dialog.Url);
             AddImageItem(item);
             UpdateMenuState();
             statusLabel.Text = $"Added {item.FileName} from URL";
         } catch (Exception ex) {
-            Log.Error("Failed to load image from URL {Url}: {Error}", url, ex.Message);
+            Log.Error("Failed to load image from URL {Url}: {Error}", dialog.Url, ex.Message);
             MessageBox.Show($"Failed to load image from URL:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             statusLabel.Text = "Ready";
         }

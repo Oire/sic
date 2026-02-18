@@ -1,0 +1,18 @@
+namespace Oire.Sic;
+
+public partial class AddUrlDialog: Form {
+    public string Url => urlTextBox.Text.Trim();
+
+    public AddUrlDialog() {
+        InitializeComponent();
+    }
+
+    protected override void OnFormClosing(FormClosingEventArgs e) {
+        base.OnFormClosing(e);
+
+        if (DialogResult == DialogResult.OK && string.IsNullOrWhiteSpace(urlTextBox.Text)) {
+            MessageBox.Show("Please enter a URL.", "No URL entered", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            e.Cancel = true;
+        }
+    }
+}
