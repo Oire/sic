@@ -11,6 +11,7 @@ public partial class MainWindow: Form {
     private ImageItem? _selectedItem;
     private bool _isAutoFilling;
     private int _clipboardImageCount;
+    private readonly System.Windows.Forms.Timer _previewDebounceTimer = new() { Interval = 300 };
 
     public MainWindow() {
         InitializeComponent();
@@ -44,6 +45,12 @@ public partial class MainWindow: Form {
         imageListView.SelectedIndexChanged += ImageListView_SelectedIndexChanged;
         imageListView.DragEnter += ImageListView_DragEnter;
         imageListView.DragDrop += ImageListView_DragDrop;
+
+        // Preview debounce
+        _previewDebounceTimer.Tick += (_, _) => {
+            _previewDebounceTimer.Stop();
+            UpdatePreview();
+        };
 
         // Keyboard
         KeyPreview = true;
@@ -364,6 +371,8 @@ public partial class MainWindow: Form {
         if (enabled) {
             PopulateResizeFieldsFromSelection();
         }
+
+        UpdatePreview();
     }
 
     private void PopulateResizeFieldsFromSelection() {
@@ -383,20 +392,30 @@ public partial class MainWindow: Form {
         if (!cropRadioButton.Checked) {
             AutoFillFromWidth();
         }
+
+        UpdatePreview();
     }
 
     private void WidthTextBox_TextChanged(object? sender, EventArgs e) {
-        if (_isAutoFilling || cropRadioButton.Checked || !resizeCheckBox.Checked)
+        if (_isAutoFilling)
             return;
 
-        AutoFillFromWidth();
+        if (!cropRadioButton.Checked && resizeCheckBox.Checked) {
+            AutoFillFromWidth();
+        }
+
+        SchedulePreviewUpdate();
     }
 
     private void HeightTextBox_TextChanged(object? sender, EventArgs e) {
-        if (_isAutoFilling || cropRadioButton.Checked || !resizeCheckBox.Checked)
+        if (_isAutoFilling)
             return;
 
-        AutoFillFromHeight();
+        if (!cropRadioButton.Checked && resizeCheckBox.Checked) {
+            AutoFillFromHeight();
+        }
+
+        SchedulePreviewUpdate();
     }
 
     private void AutoFillFromWidth() {
@@ -431,6 +450,40 @@ public partial class MainWindow: Form {
         }
     }
 
+    private void SchedulePreviewUpdate() {
+        _previewDebounceTimer.Stop();
+        _previewDebounceTimer.Start();
+    }
+
+    private void UpdatePreview() {
+        if (_selectedItem == null)
+            return;
+
+        int? resizeWidth = null, resizeHeight = null;
+        var resizeMode = Models.ResizeMode.KeepProportions;
+
+        if (resizeCheckBox.Checked) {
+            resizeMode = cropRadioButton.Checked ? Models.ResizeMode.Crop : Models.ResizeMode.KeepProportions;
+
+            if (int.TryParse(widthTextBox.Text, out var w) && w >= 1)
+                resizeWidth = w;
+            if (int.TryParse(heightTextBox.Text, out var h) && h >= 1)
+                resizeHeight = h;
+        }
+
+        try {
+            var preview = ImageConverter.GeneratePreview(
+                _selectedItem, previewPictureBox.Width, previewPictureBox.Height,
+                resizeWidth, resizeHeight, resizeMode);
+            previewPictureBox.Image?.Dispose();
+            previewPictureBox.Image = preview;
+        } catch (Exception ex) {
+            Log.Warning("Failed to generate preview for {FileName}: {Error}", _selectedItem.FileName, ex.Message);
+            previewPictureBox.Image?.Dispose();
+            previewPictureBox.Image = null;
+        }
+    }
+
     private void ImageListView_SelectedIndexChanged(object? sender, EventArgs e) {
         UpdateMenuState();
 
@@ -449,15 +502,7 @@ public partial class MainWindow: Form {
             PopulateResizeFieldsFromSelection();
         }
 
-        try {
-            var preview = ImageConverter.GeneratePreview(item, previewPictureBox.Width, previewPictureBox.Height);
-            previewPictureBox.Image?.Dispose();
-            previewPictureBox.Image = preview;
-        } catch (Exception ex) {
-            Log.Warning("Failed to generate preview for {FileName}: {Error}", item.FileName, ex.Message);
-            previewPictureBox.Image?.Dispose();
-            previewPictureBox.Image = null;
-        }
+        UpdatePreview();
     }
 
     private void ImageListView_DragEnter(object? sender, DragEventArgs e) {

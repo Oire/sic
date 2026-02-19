@@ -44,7 +44,7 @@ partial class AboutDialog {
         //
         // appNameLabel
         //
-        appNameLabel.Text = "SIC! \u2014 Simple Image Converter";
+        appNameLabel.Text = "SIC! — Simple Image Converter";
         appNameLabel.AutoSize = true;
         appNameLabel.Font = new Font(appNameLabel.Font.FontFamily, 14F, FontStyle.Bold);
         appNameLabel.Anchor = AnchorStyles.None;
@@ -75,7 +75,7 @@ partial class AboutDialog {
         //
         // okButton
         //
-        okButton.Text = "OK";
+        okButton.Text = "&OK";
         okButton.MinimumSize = new Size(80, 0);
         okButton.Anchor = AnchorStyles.None;
         okButton.DialogResult = DialogResult.OK;

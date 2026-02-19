@@ -122,12 +122,37 @@ public static class ImageConverter {
     }
 
     public static Bitmap GeneratePreview(ImageItem item, int maxWidth, int maxHeight) {
+        return GeneratePreview(item, maxWidth, maxHeight, null, null, ResizeMode.KeepProportions);
+    }
+
+    public static Bitmap GeneratePreview(ImageItem item, int maxWidth, int maxHeight, int? resizeWidth, int? resizeHeight, ResizeMode resizeMode) {
         using var image = LoadMagickImage(item);
 
-        var geometry = new MagickGeometry((uint)maxWidth, (uint)maxHeight) {
+        if (resizeWidth.HasValue || resizeHeight.HasValue) {
+            if (resizeMode == ResizeMode.Crop && resizeWidth.HasValue && resizeHeight.HasValue) {
+                var scaleX = (double)resizeWidth.Value / image.Width;
+                var scaleY = (double)resizeHeight.Value / image.Height;
+                var scale = Math.Max(scaleX, scaleY);
+                var intermediateWidth = (uint)Math.Round(image.Width * scale);
+                var intermediateHeight = (uint)Math.Round(image.Height * scale);
+                var intermediateGeometry = new MagickGeometry(intermediateWidth, intermediateHeight) {
+                    IgnoreAspectRatio = true,
+                };
+                image.Resize(intermediateGeometry);
+
+                var cropGeometry = new MagickGeometry((uint)resizeWidth.Value, (uint)resizeHeight.Value);
+                image.Crop(cropGeometry, Gravity.Center);
+                image.ResetPage();
+            } else {
+                var geometry = CalculateResizeGeometry(image, resizeWidth, resizeHeight);
+                image.Resize(geometry);
+            }
+        }
+
+        var previewGeometry = new MagickGeometry((uint)maxWidth, (uint)maxHeight) {
             IgnoreAspectRatio = false,
         };
-        image.Resize(geometry);
+        image.Resize(previewGeometry);
 
         using var ms = new MemoryStream();
         image.Write(ms, MagickFormat.Bmp);
@@ -183,7 +208,7 @@ public static class ImageConverter {
     }
 
     private static MagickImage LoadMagickImage(ImageItem item) {
-        if (item.ImageData != null) {
+        if (item.ImageData is not null) {
             return new MagickImage(item.ImageData);
         }
 
