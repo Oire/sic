@@ -128,9 +128,19 @@ public partial class MainWindow: Form {
         if (dialog.ShowDialog() != DialogResult.OK)
             return;
 
-        statusLabel.Text = "Downloading image...";
+        ProgressDialog? progressDialog = null;
+
         try {
+            progressDialog = new ProgressDialog("Downloading image...");
+            progressDialog.Show(this);
+            Application.DoEvents();
+
             var item = await ImageConverter.LoadFromUrl(dialog.Url);
+
+            progressDialog.Close();
+            progressDialog.Dispose();
+            progressDialog = null;
+
             AddImageItem(item);
             UpdateMenuState();
             statusLabel.Text = $"Added {item.FileName} from URL";
@@ -138,6 +148,11 @@ public partial class MainWindow: Form {
             Log.Error("Failed to load image from URL {Url}: {Error}", dialog.Url, ex.Message);
             MessageBox.Show($"Failed to load image from URL:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             statusLabel.Text = "Ready";
+        } finally {
+            if (progressDialog != null) {
+                progressDialog.Close();
+                progressDialog.Dispose();
+            }
         }
     }
 
@@ -229,69 +244,71 @@ public partial class MainWindow: Form {
 
         var outputFolder = string.IsNullOrWhiteSpace(Config.General.OutputFolder) ? null : Config.General.OutputFolder;
 
-        progressBar.Visible = true;
-        progressBar.Maximum = _imageItems.Count;
-        progressBar.Value = 0;
         convertButton.Enabled = false;
 
         var totalCount = _imageItems.Count;
         var converted = 0;
         var skipped = 0;
         var convertedIndices = new List<int>();
+        ProgressDialog? progressDialog = null;
 
-        await Task.Run(() => {
-            for (var i = 0; i < totalCount; i++) {
-                var item = _imageItems[i];
+        try {
+            progressDialog = new ProgressDialog("Preparing to convert...");
+            progressDialog.Show(this);
+            Application.DoEvents();
 
-                Invoke(() => {
-                    imageListView.Items[i].SubItems[4].Text = "Converting...";
-                });
-
-                var outputPath = ImageConverter.GenerateOutputPath(item, targetFormat, outputFolder);
-
-                if (File.Exists(outputPath)) {
-                    var resolution = ResolveFileConflict(outputPath);
-
-                    switch (resolution) {
-                        case ConflictResolution.Overwrite:
-                            break;
-                        case ConflictResolution.Rename:
-                            outputPath = ImageConverter.GetConflictRenamePath(outputPath);
-                            break;
-                        case ConflictResolution.Skip:
-                            skipped++;
-                            Invoke(() => {
-                                progressBar.Value = i + 1;
-                                statusLabel.Text = $"Skipped {item.FileName}";
-                                imageListView.Items[i].SubItems[4].Text = "Skipped";
-                            });
-                            continue;
-                    }
-                }
-
-                try {
-                    var dir = Path.GetDirectoryName(outputPath);
-                    if (dir != null && !Directory.Exists(dir)) {
-                        Directory.CreateDirectory(dir);
-                    }
-
-                    ImageConverter.Convert(item, targetFormat, outputPath, width, height, resizeMode);
-                    converted++;
-                    convertedIndices.Add(i);
+            await Task.Run(() => {
+                for (var i = 0; i < totalCount; i++) {
+                    var item = _imageItems[i];
 
                     Invoke(() => {
-                        progressBar.Value = i + 1;
-                        statusLabel.Text = $"Converted {item.FileName} ({i + 1}/{totalCount})";
+                        progressDialog!.UpdateMessage(
+                            $"Converting {item.FileName} ({i + 1}/{totalCount})...");
+                        imageListView.Items[i].SubItems[4].Text = "Converting...";
                     });
-                } catch (Exception ex) {
-                    Log.Error("Failed to convert {FileName}: {Error}", item.FileName, ex.Message);
-                    Invoke(() => {
-                        imageListView.Items[i].SubItems[4].Text = "Failed";
-                        MessageBox.Show($"Failed to convert {item.FileName}:\n{ex.Message}", "Conversion Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    });
+
+                    var outputPath = ImageConverter.GenerateOutputPath(item, targetFormat, outputFolder);
+
+                    if (File.Exists(outputPath)) {
+                        var resolution = ResolveFileConflict(outputPath);
+
+                        switch (resolution) {
+                            case ConflictResolution.Overwrite:
+                                break;
+                            case ConflictResolution.Rename:
+                                outputPath = ImageConverter.GetConflictRenamePath(outputPath);
+                                break;
+                            case ConflictResolution.Skip:
+                                skipped++;
+                                Invoke(() => {
+                                    imageListView.Items[i].SubItems[4].Text = "Skipped";
+                                });
+                                continue;
+                        }
+                    }
+
+                    try {
+                        var dir = Path.GetDirectoryName(outputPath);
+                        if (dir != null && !Directory.Exists(dir)) {
+                            Directory.CreateDirectory(dir);
+                        }
+
+                        ImageConverter.Convert(item, targetFormat, outputPath, width, height, resizeMode);
+                        converted++;
+                        convertedIndices.Add(i);
+                    } catch (Exception ex) {
+                        Log.Error("Failed to convert {FileName}: {Error}", item.FileName, ex.Message);
+                        Invoke(() => {
+                            imageListView.Items[i].SubItems[4].Text = "Failed";
+                            MessageBox.Show($"Failed to convert {item.FileName}:\n{ex.Message}", "Conversion Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        });
+                    }
                 }
-            }
-        });
+            });
+        } finally {
+            progressDialog?.Close();
+            progressDialog?.Dispose();
+        }
 
         // Remove successfully converted items from queue (in reverse order to preserve indices)
         imageListView.BeginUpdate();
@@ -307,8 +324,17 @@ public partial class MainWindow: Form {
         previewPictureBox.Image?.Dispose();
         previewPictureBox.Image = null;
         convertButton.Enabled = true;
-        progressBar.Visible = false;
-        statusLabel.Text = $"Done! Converted {converted} image(s), skipped {skipped}.";
+
+        var failed = totalCount - converted - skipped;
+        var summary = $"Converted: {converted}";
+
+        if (skipped > 0)
+            summary += $", skipped: {skipped}";
+        if (failed > 0)
+            summary += $", failed: {failed}";
+
+        statusLabel.Text = summary;
+        MessageBox.Show(summary, "Conversion Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
         UpdateMenuState();
     }
 

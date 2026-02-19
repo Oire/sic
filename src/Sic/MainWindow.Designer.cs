@@ -63,7 +63,8 @@ partial class MainWindow {
         cropRadioButton = new RadioButton();
         statusStrip = new StatusStrip();
         statusLabel = new ToolStripStatusLabel();
-        progressBar = new ToolStripProgressBar();
+
+
 
         menuStrip.SuspendLayout();
         mainLayout.SuspendLayout();
@@ -372,7 +373,7 @@ partial class MainWindow {
         //
         // statusStrip
         //
-        statusStrip.Items.AddRange(new ToolStripItem[] { statusLabel, progressBar });
+        statusStrip.Items.AddRange(new ToolStripItem[] { statusLabel });
         statusStrip.Name = "statusStrip";
         statusStrip.TabIndex = 13;
         statusStrip.Dock = DockStyle.Fill;
@@ -384,13 +385,6 @@ partial class MainWindow {
         statusLabel.Text = "Ready";
         statusLabel.Spring = true;
         statusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-
-        //
-        // progressBar
-        //
-        progressBar.Name = "progressBar";
-        progressBar.Visible = false;
-        progressBar.Size = new Size(150, 16);
 
         //
         // MainWindow
@@ -454,5 +448,6 @@ partial class MainWindow {
     private RadioButton cropRadioButton;
     private StatusStrip statusStrip;
     private ToolStripStatusLabel statusLabel;
-    private ToolStripProgressBar progressBar;
+
+
 }

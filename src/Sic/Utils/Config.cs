@@ -16,7 +16,6 @@ public class Config {
     #region Config Section Classes
     public class SectionGeneral {
         public string Language { get; set; } = "System";
-        public bool BrailleUiMode { get; set; }
         public string OutputFolder { get; set; } = "";
         public string LastInputFolder { get; set; } = "";
     }
