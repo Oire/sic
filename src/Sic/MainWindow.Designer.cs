@@ -234,15 +234,15 @@ partial class MainWindow {
         // controlsLayout
         //
         controlsLayout.ColumnCount = 9;
-        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Format label
-        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F)); // Format combo
-        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Resize checkbox
-        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Width label
-        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F)); // Width numeric
-        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // x label
-        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Height label
-        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F)); // Height numeric
-        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Convert button
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F)); // Format label
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 11F)); // Format combo
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16F)); // Resize checkbox
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 3F)); // Width label
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 9F)); // Width numeric
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2F)); // x label
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 3F)); // Height label
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 9F)); // Height numeric
+        controlsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 32F)); // Convert button
         controlsLayout.RowCount = 2;
         controlsLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         controlsLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -343,9 +343,9 @@ partial class MainWindow {
         // convertButton
         //
         convertButton.Text = "Convert";
+        convertButton.Dock = DockStyle.Fill;
         convertButton.Name = "convertButton";
         convertButton.Font = new Font(convertButton.Font, FontStyle.Bold);
-        convertButton.Padding = new Padding(8, 0, 8, 0);
         convertButton.TabIndex = 12;
 
         //
