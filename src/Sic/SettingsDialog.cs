@@ -1,4 +1,5 @@
 using Oire.Sic.Utils;
+using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
 
 namespace Oire.Sic;
@@ -27,7 +28,7 @@ public partial class SettingsDialog: Form {
 
     private void BrowseButton_Click(object? sender, EventArgs e) {
         using var dialog = new FolderBrowserDialog {
-            Description = "Select output folder for converted images",
+            Description = _("Select output folder for converted images"),
             UseDescriptionForTitle = true,
         };
 

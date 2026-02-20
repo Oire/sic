@@ -57,7 +57,7 @@ partial class ProgressDialog {
         MessageLabel.Name = "MessageLabel";
         MessageLabel.Size = new Size(101, 21);
         MessageLabel.TabIndex = 0;
-        MessageLabel.Text = "Please wait...";
+        MessageLabel.Text = _("Please wait...");
         MessageLabel.TextAlign = ContentAlignment.MiddleCenter;
         //
         // ProgressBar

@@ -1,6 +1,7 @@
 using System.Drawing.Imaging;
 using Oire.Sic.Models;
 using Oire.Sic.Utils;
+using static Oire.Sic.Utils.Localization;
 using Serilog;
 using ImageConverter = Oire.Sic.Services.ImageConverter;
 
@@ -80,8 +81,8 @@ public partial class MainWindow: Form {
 
     private void AddImageMenuItem_Click(object? sender, EventArgs e) {
         using var dialog = new OpenFileDialog {
-            Title = "Select images to add",
-            Filter = "Image files|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.tiff;*.tif;*.webp;*.ico;*.avif|All files|*.*",
+            Title = _("Select images to add"),
+            Filter = _("Image files") + "|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.tiff;*.tif;*.webp;*.ico;*.avif|" + _("All files") + "|*.*",
             Multiselect = true,
         };
 
@@ -125,7 +126,7 @@ public partial class MainWindow: Form {
         UpdateMenuState();
 
         if (addedCount == 0) {
-            MessageBox.Show("No matching images found in the selected folder.", "No images found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(_("No matching images found in the selected folder."), _("No images found"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 
@@ -138,7 +139,7 @@ public partial class MainWindow: Form {
         ProgressDialog? progressDialog = null;
 
         try {
-            progressDialog = new ProgressDialog("Downloading image...");
+            progressDialog = new ProgressDialog(_("Downloading image..."));
             progressDialog.Show(this);
             Application.DoEvents();
 
@@ -150,11 +151,11 @@ public partial class MainWindow: Form {
 
             AddImageItem(item);
             UpdateMenuState();
-            statusLabel.Text = $"Added {item.FileName} from URL";
+            statusLabel.Text = _("Added {0} from URL", item.FileName);
         } catch (Exception ex) {
             Log.Error("Failed to load image from URL {Url}: {Error}", dialog.Url, ex.Message);
-            MessageBox.Show($"Failed to load image from URL:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            statusLabel.Text = "Ready";
+            MessageBox.Show(_("Failed to load image from URL:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            statusLabel.Text = _("Ready");
         } finally {
             if (progressDialog != null) {
                 progressDialog.Close();
@@ -173,7 +174,7 @@ public partial class MainWindow: Form {
 
         previewPictureBox.Image?.Dispose();
         previewPictureBox.Image = null;
-        statusLabel.Text = $"{_imageItems.Count} image(s) in queue";
+        statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
         UpdateMenuState();
     }
 
@@ -182,7 +183,7 @@ public partial class MainWindow: Form {
         imageListView.Items.Clear();
         previewPictureBox.Image?.Dispose();
         previewPictureBox.Image = null;
-        statusLabel.Text = "Ready";
+        statusLabel.Text = _("Ready");
         UpdateMenuState();
     }
 
@@ -199,12 +200,12 @@ public partial class MainWindow: Form {
 
     private async void ConvertButton_Click(object? sender, EventArgs e) {
         if (_imageItems.Count == 0) {
-            MessageBox.Show("No images to convert. Add some images first.", "Nothing to convert", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(_("No images to convert. Add some images first."), _("Nothing to convert"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
         if (formatComboBox.SelectedItem is not string targetFormat) {
-            MessageBox.Show("Please select a target format.", "No format selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(_("Please select a target format."), _("No format selected"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -219,14 +220,14 @@ public partial class MainWindow: Form {
 
             if (resizeMode == Models.ResizeMode.Crop) {
                 if (!hasWidth) {
-                    MessageBox.Show("Crop mode requires a valid width (1\u201365535).", "Invalid width", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(_("Crop mode requires a valid width (1\u201365535)."), _("Invalid width"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
                     return;
                 }
 
                 if (!hasHeight) {
-                    MessageBox.Show("Crop mode requires a valid height (1\u201365535).", "Invalid height", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(_("Crop mode requires a valid height (1\u201365535)."), _("Invalid height"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     heightTextBox.Focus();
                     heightTextBox.SelectAll();
                     return;
@@ -236,7 +237,7 @@ public partial class MainWindow: Form {
                 height = h;
             } else {
                 if (!hasWidth && !hasHeight) {
-                    MessageBox.Show("Please enter at least one valid dimension (1\u201365535).", "Invalid dimensions", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(_("Please enter at least one valid dimension (1\u201365535)."), _("Invalid dimensions"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
                     return;
@@ -260,7 +261,7 @@ public partial class MainWindow: Form {
         ProgressDialog? progressDialog = null;
 
         try {
-            progressDialog = new ProgressDialog("Preparing to convert...");
+            progressDialog = new ProgressDialog(_("Preparing to convert..."));
             progressDialog.Show(this);
             Application.DoEvents();
 
@@ -270,8 +271,8 @@ public partial class MainWindow: Form {
 
                     Invoke(() => {
                         progressDialog!.UpdateMessage(
-                            $"Converting {item.FileName} ({i + 1}/{totalCount})...");
-                        imageListView.Items[i].SubItems[4].Text = "Converting...";
+                            _("Converting {0} ({1}/{2})...", item.FileName, i + 1, totalCount));
+                        imageListView.Items[i].SubItems[4].Text = _("Converting...");
                     });
 
                     var outputPath = ImageConverter.GenerateOutputPath(item, targetFormat, outputFolder);
@@ -288,7 +289,7 @@ public partial class MainWindow: Form {
                             case ConflictResolution.Skip:
                                 skipped++;
                                 Invoke(() => {
-                                    imageListView.Items[i].SubItems[4].Text = "Skipped";
+                                    imageListView.Items[i].SubItems[4].Text = _("Skipped");
                                 });
                                 continue;
                         }
@@ -306,8 +307,8 @@ public partial class MainWindow: Form {
                     } catch (Exception ex) {
                         Log.Error("Failed to convert {FileName}: {Error}", item.FileName, ex.Message);
                         Invoke(() => {
-                            imageListView.Items[i].SubItems[4].Text = "Failed";
-                            MessageBox.Show($"Failed to convert {item.FileName}:\n{ex.Message}", "Conversion Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            imageListView.Items[i].SubItems[4].Text = _("Failed");
+                            MessageBox.Show(_("Failed to convert {0}:\n{1}", item.FileName, ex.Message), _("Conversion Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                         });
                     }
                 }
@@ -333,22 +334,27 @@ public partial class MainWindow: Form {
         convertButton.Enabled = true;
 
         var failed = totalCount - converted - skipped;
-        var summary = $"Converted: {converted}";
-
+        var total = converted + skipped + failed;
+        var summary = _n("Processed {0} image.", "Processed {0} images.", total, total);
+        var parts = new List<string>();
+        if (converted > 0)
+            parts.Add(_("{0} converted", converted));
         if (skipped > 0)
-            summary += $", skipped: {skipped}";
+            parts.Add(_("{0} skipped", skipped));
         if (failed > 0)
-            summary += $", failed: {failed}";
+            parts.Add(_("{0} failed", failed));
+        if (parts.Count > 0)
+            summary += " " + string.Join(_(", "), parts);
 
         statusLabel.Text = summary;
-        MessageBox.Show(summary, "Conversion Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        MessageBox.Show(summary, _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         UpdateMenuState();
     }
 
     // --- Help menu handlers ---
 
     private void UserGuideMenuItem_Click(object? sender, EventArgs e) {
-        MessageBox.Show("The user guide is coming soon.", "User Guide", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        MessageBox.Show(_("The user guide is coming soon."), _("User Guide"), MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
     private void AboutMenuItem_Click(object? sender, EventArgs e) {
@@ -564,10 +570,10 @@ public partial class MainWindow: Form {
                 var item = ImageConverter.LoadFromBytes(data, $"clipboard_image{suffix}.png");
                 AddImageItem(item);
                 UpdateMenuState();
-                statusLabel.Text = "Added image from clipboard";
+                statusLabel.Text = _("Added image from clipboard");
             } catch (Exception ex) {
                 Log.Error("Failed to load clipboard image: {Error}", ex.Message);
-                MessageBox.Show($"Failed to load clipboard image:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(_("Failed to load clipboard image:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
@@ -580,7 +586,7 @@ public partial class MainWindow: Form {
             AddImageItem(item);
         } catch (Exception ex) {
             Log.Error("Failed to load image {Path}: {Error}", path, ex.Message);
-            MessageBox.Show($"Failed to load image:\n{path}\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(_("Failed to load image:\n{0}\n{1}", path, ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -597,7 +603,7 @@ public partial class MainWindow: Form {
         listItem.Selected = true;
         listItem.Focused = true;
         listItem.EnsureVisible();
-        statusLabel.Text = $"{_imageItems.Count} image(s) in queue";
+        statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
     }
 
     private ConflictResolution ResolveFileConflict(string outputPath) {
@@ -606,7 +612,7 @@ public partial class MainWindow: Form {
 
         Invoke(() => {
             using var dialog = new Form {
-                Text = "File Already Exists",
+                Text = _("File Already Exists"),
                 Size = new Size(450, 180),
                 StartPosition = FormStartPosition.CenterParent,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
@@ -624,7 +630,7 @@ public partial class MainWindow: Form {
             layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
             var messageLabel = new Label {
-                Text = $"The file \"{fileName}\" already exists.\nWhat would you like to do?",
+                Text = _("The file \"{0}\" already exists.\nWhat would you like to do?", fileName),
                 AutoSize = true,
             };
 
@@ -634,9 +640,9 @@ public partial class MainWindow: Form {
                 AutoSize = true,
             };
 
-            var overwriteBtn = new Button { Text = "Overwrite" };
-            var renameBtn = new Button { Text = "Rename" };
-            var skipBtn = new Button { Text = "Skip" };
+            var overwriteBtn = new Button { Text = _("Overwrite") };
+            var renameBtn = new Button { Text = _("Rename") };
+            var skipBtn = new Button { Text = _("Skip") };
 
             overwriteBtn.Click += (_, _) => { result = ConflictResolution.Overwrite; dialog.Close(); };
             renameBtn.Click += (_, _) => { result = ConflictResolution.Rename; dialog.Close(); };

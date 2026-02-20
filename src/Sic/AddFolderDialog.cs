@@ -1,28 +1,31 @@
 using Oire.Sic.Utils;
+using static Oire.Sic.Utils.Localization;
 
 namespace Oire.Sic;
 
 public partial class AddFolderDialog: Form {
-    private static readonly (string Label, string[] Extensions)[] Filters = [
-        ("All supported images", ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.ico", "*.bmp", "*.tif", "*.tiff", "*.gif", "*.avif"]),
-        ("JPEG images (*.jpg, *.jpeg)", ["*.jpg", "*.jpeg"]),
-        ("PNG images (*.png)", ["*.png"]),
-        ("WebP images (*.webp)", ["*.webp"]),
-        ("ICO icons (*.ico)", ["*.ico"]),
-        ("BMP images (*.bmp)", ["*.bmp"]),
-        ("TIFF images (*.tif, *.tiff)", ["*.tif", "*.tiff"]),
-        ("GIF images (*.gif)", ["*.gif"]),
-        ("AVIF images (*.avif)", ["*.avif"]),
+    private static (string Label, string[] Extensions)[] GetFilters() => [
+        (_("All supported images"), ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.ico", "*.bmp", "*.tif", "*.tiff", "*.gif", "*.avif"]),
+        (_("JPEG images (*.jpg, *.jpeg)"), ["*.jpg", "*.jpeg"]),
+        (_("PNG images (*.png)"), ["*.png"]),
+        (_("WebP images (*.webp)"), ["*.webp"]),
+        (_("ICO icons (*.ico)"), ["*.ico"]),
+        (_("BMP images (*.bmp)"), ["*.bmp"]),
+        (_("TIFF images (*.tif, *.tiff)"), ["*.tif", "*.tiff"]),
+        (_("GIF images (*.gif)"), ["*.gif"]),
+        (_("AVIF images (*.avif)"), ["*.avif"]),
     ];
 
+    private readonly (string Label, string[] Extensions)[] _filters = GetFilters();
+
     public string SelectedFolder => folderTextBox.Text;
-    public string[] SelectedExtensions => Filters[filterComboBox.SelectedIndex].Extensions;
+    public string[] SelectedExtensions => _filters[filterComboBox.SelectedIndex].Extensions;
     public bool IncludeSubfolders => includeSubfoldersCheckBox.Checked;
 
     public AddFolderDialog() {
         InitializeComponent();
 
-        foreach (var (label, _) in Filters) {
+        foreach (var (label, _) in _filters) {
             filterComboBox.Items.Add(label);
         }
         filterComboBox.SelectedIndex = 0;
@@ -34,7 +37,7 @@ public partial class AddFolderDialog: Form {
 
     private void BrowseButton_Click(object? sender, EventArgs e) {
         using var dialog = new FolderBrowserDialog {
-            Description = "Select folder containing images",
+            Description = _("Select folder containing images"),
             UseDescriptionForTitle = true,
         };
 
@@ -52,7 +55,7 @@ public partial class AddFolderDialog: Form {
 
         if (DialogResult == DialogResult.OK) {
             if (string.IsNullOrWhiteSpace(folderTextBox.Text)) {
-                MessageBox.Show("Please select a folder.", "No folder selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(_("Please select a folder."), _("No folder selected"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 e.Cancel = true;
                 return;
             }

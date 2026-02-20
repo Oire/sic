@@ -1,6 +1,7 @@
 using System.CommandLine;
 using Oire.Sic.Models;
 using Oire.Sic.Utils;
+using static Oire.Sic.Utils.Localization;
 using ImageConverter = Oire.Sic.Services.ImageConverter;
 using Serilog;
 using Serilog.Formatting.Compact;
@@ -32,11 +33,11 @@ internal static class Program {
             Log.Fatal("App Startup: Unable to initialize application: {0}", ex.Message);
 
             if (args.Length > 0) {
-                Console.Error.WriteLine($"Fatal error: {ex.Message}");
+                Console.Error.WriteLine(_("Fatal error: {0}", ex.Message));
                 return 1;
             }
 
-            DialogResult msg = MessageBox.Show("Unable to start the program up. Please contact the developer.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            DialogResult msg = MessageBox.Show(_("Unable to start the program up. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
             if (msg == DialogResult.OK) {
                 System.Windows.Forms.Application.Exit();
@@ -49,12 +50,12 @@ internal static class Program {
     }
 
     private static int RunCli(string[] args) {
-        var inputOption = new Option<string>("--input", "-i") { Required = true, Description = "Path to the source image file" };
-        var outputOption = new Option<string>("--output", "-o") { Required = true, Description = "Path for the converted image (format inferred from extension)" };
-        var resizeOption = new Option<string?>("--resize", "-r") { Description = "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)" };
-        var cropOption = new Option<bool>("--crop", "-c") { Description = "Use crop mode (scale to cover, then center-crop to exact dimensions)" };
+        var inputOption = new Option<string>("--input", "-i") { Required = true, Description = _("Path to the source image file") };
+        var outputOption = new Option<string>("--output", "-o") { Required = true, Description = _("Path for the converted image (format inferred from extension)") };
+        var resizeOption = new Option<string?>("--resize", "-r") { Description = _("Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)") };
+        var cropOption = new Option<bool>("--crop", "-c") { Description = _("Use crop mode (scale to cover, then center-crop to exact dimensions)") };
 
-        var rootCommand = new RootCommand("SIC! — Simple Image Converter") {
+        var rootCommand = new RootCommand(_("SIC! \u2014 Simple Image Converter")) {
             inputOption,
             outputOption,
             resizeOption,
@@ -68,21 +69,21 @@ internal static class Program {
             var crop = parseResult.GetValue(cropOption);
 
             if (!File.Exists(input)) {
-                Console.Error.WriteLine($"File not found: {input}");
+                Console.Error.WriteLine(_("File not found: {0}", input));
                 return 1;
             }
 
             var extension = Path.GetExtension(output).TrimStart('.').ToUpperInvariant();
             if (string.IsNullOrWhiteSpace(extension)) {
-                Console.Error.WriteLine("Output path must have a file extension (e.g. .jpg, .png)");
+                Console.Error.WriteLine(_("Output path must have a file extension (e.g. .jpg, .png)"));
                 return 1;
             }
 
             var targetFormat = extension == "JPEG" ? "JPG" : extension == "TIF" ? "TIFF" : extension;
             var supportedFormats = ImageConverter.GetSupportedFormats();
             if (!supportedFormats.Any(f => f.Equals(targetFormat, StringComparison.OrdinalIgnoreCase))) {
-                Console.Error.WriteLine($"Unsupported format: {extension}");
-                Console.Error.WriteLine($"Supported formats: {string.Join(", ", supportedFormats)}");
+                Console.Error.WriteLine(_("Unsupported format: {0}", extension));
+                Console.Error.WriteLine(_("Supported formats: {0}", string.Join(", ", supportedFormats)));
                 return 1;
             }
 
@@ -96,7 +97,7 @@ internal static class Program {
                 if (normalized.Contains('x')) {
                     parts = normalized.Split('x');
                     if (parts.Length != 2) {
-                        Console.Error.WriteLine($"Invalid resize format: {resize}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, 128)");
+                        Console.Error.WriteLine(_("Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, 128)", resize));
                         return 1;
                     }
                 } else {
@@ -107,17 +108,17 @@ internal static class Program {
                 var hasHeight = int.TryParse(parts[1], out var h) && h >= 1;
 
                 if (!hasWidth && !string.IsNullOrEmpty(parts[0])) {
-                    Console.Error.WriteLine($"Invalid width value: {parts[0]}");
+                    Console.Error.WriteLine(_("Invalid width value: {0}", parts[0]));
                     return 1;
                 }
 
                 if (!hasHeight && !string.IsNullOrEmpty(parts[1])) {
-                    Console.Error.WriteLine($"Invalid height value: {parts[1]}");
+                    Console.Error.WriteLine(_("Invalid height value: {0}", parts[1]));
                     return 1;
                 }
 
                 if (!hasWidth && !hasHeight) {
-                    Console.Error.WriteLine($"Invalid resize format: {resize}. At least one dimension is required.");
+                    Console.Error.WriteLine(_("Invalid resize format: {0}. At least one dimension is required.", resize));
                     return 1;
                 }
 
@@ -128,7 +129,7 @@ internal static class Program {
             }
 
             if (crop && (!width.HasValue || !height.HasValue)) {
-                Console.Error.WriteLine("Crop mode requires both width and height (e.g. --resize 128x128 --crop)");
+                Console.Error.WriteLine(_("Crop mode requires both width and height (e.g. --resize 128x128 --crop)"));
                 return 1;
             }
 
@@ -141,10 +142,10 @@ internal static class Program {
                 }
 
                 ImageConverter.Convert(item, targetFormat, output, width, height, resizeMode);
-                Console.WriteLine($"Converted: {output}");
+                Console.WriteLine(_("Converted: {0}", output));
                 return 0;
             } catch (Exception ex) {
-                Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+                Console.Error.WriteLine(_("Conversion failed: {0}", ex.Message));
                 return 1;
             }
         }));

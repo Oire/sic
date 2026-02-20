@@ -1,3 +1,5 @@
+using static Oire.Sic.Utils.Localization;
+
 namespace Oire.Sic;
 
 partial class MainWindow {
@@ -82,7 +84,7 @@ partial class MainWindow {
         //
         // fileMenu
         //
-        fileMenu.Text = "&File";
+        fileMenu.Text = _("&File");
         fileMenu.Name = "fileMenu";
         fileMenu.DropDownItems.AddRange(new ToolStripItem[] {
             addImageMenuItem,
@@ -100,28 +102,28 @@ partial class MainWindow {
         //
         // addImageMenuItem
         //
-        addImageMenuItem.Text = "Add &Image...";
+        addImageMenuItem.Text = _("Add &Image...");
         addImageMenuItem.ShortcutKeys = Keys.Control | Keys.O;
         addImageMenuItem.Name = "addImageMenuItem";
 
         //
         // addFolderMenuItem
         //
-        addFolderMenuItem.Text = "Add F&older...";
+        addFolderMenuItem.Text = _("Add F&older...");
         addFolderMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.O;
         addFolderMenuItem.Name = "addFolderMenuItem";
 
         //
         // addFromUrlMenuItem
         //
-        addFromUrlMenuItem.Text = "Add from &URL...";
+        addFromUrlMenuItem.Text = _("Add from &URL...");
         addFromUrlMenuItem.ShortcutKeys = Keys.Control | Keys.U;
         addFromUrlMenuItem.Name = "addFromUrlMenuItem";
 
         //
         // removeMenuItem
         //
-        removeMenuItem.Text = "&Remove";
+        removeMenuItem.Text = _("&Remove");
         removeMenuItem.ShortcutKeyDisplayString = "Del";
         removeMenuItem.Name = "removeMenuItem";
         removeMenuItem.Enabled = false;
@@ -129,7 +131,7 @@ partial class MainWindow {
         //
         // removeAllMenuItem
         //
-        removeAllMenuItem.Text = "Remove &All";
+        removeAllMenuItem.Text = _("Remove &All");
         removeAllMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.Delete;
         removeAllMenuItem.Name = "removeAllMenuItem";
         removeAllMenuItem.Enabled = false;
@@ -137,21 +139,21 @@ partial class MainWindow {
         //
         // optionsMenuItem
         //
-        optionsMenuItem.Text = "&Options...";
+        optionsMenuItem.Text = _("&Options...");
         optionsMenuItem.ShortcutKeys = Keys.Control | Keys.Oemcomma;
         optionsMenuItem.Name = "optionsMenuItem";
 
         //
         // exitMenuItem
         //
-        exitMenuItem.Text = "E&xit";
+        exitMenuItem.Text = _("E&xit");
         exitMenuItem.ShortcutKeys = Keys.Alt | Keys.F4;
         exitMenuItem.Name = "exitMenuItem";
 
         //
         // helpMenu
         //
-        helpMenu.Text = "&Help";
+        helpMenu.Text = _("&Help");
         helpMenu.Name = "helpMenu";
         helpMenu.DropDownItems.AddRange(new ToolStripItem[] {
             userGuideMenuItem,
@@ -162,14 +164,14 @@ partial class MainWindow {
         //
         // userGuideMenuItem
         //
-        userGuideMenuItem.Text = "&User Guide";
+        userGuideMenuItem.Text = _("&User Guide");
         userGuideMenuItem.ShortcutKeys = Keys.F1;
         userGuideMenuItem.Name = "userGuideMenuItem";
 
         //
         // aboutMenuItem
         //
-        aboutMenuItem.Text = "&About SIC!...";
+        aboutMenuItem.Text = _("&About SIC!...");
         aboutMenuItem.ShortcutKeys = Keys.Shift | Keys.F1;
         aboutMenuItem.Name = "aboutMenuItem";
 
@@ -209,15 +211,15 @@ partial class MainWindow {
         //
         // Column Headers
         //
-        colFileName.Text = "File Name";
+        colFileName.Text = _("File Name");
         colFileName.Width = 180;
-        colFormat.Text = "Format";
+        colFormat.Text = _("Format");
         colFormat.Width = 60;
-        colDimensions.Text = "Dimensions";
+        colDimensions.Text = _("Dimensions");
         colDimensions.Width = 90;
-        colSize.Text = "Size";
+        colSize.Text = _("Size");
         colSize.Width = 70;
-        colStatus.Text = "Status";
+        colStatus.Text = _("Status");
         colStatus.Width = 90;
 
         //
@@ -267,7 +269,7 @@ partial class MainWindow {
         //
         // formatLabel
         //
-        formatLabel.Text = "Target format:";
+        formatLabel.Text = _("Target format:");
         formatLabel.AutoSize = true;
         formatLabel.Anchor = AnchorStyles.Left;
         formatLabel.Name = "formatLabel";
@@ -284,7 +286,7 @@ partial class MainWindow {
         //
         // resizeCheckBox
         //
-        resizeCheckBox.Text = "Resize";
+        resizeCheckBox.Text = _("Resize");
         resizeCheckBox.AutoSize = true;
         resizeCheckBox.Anchor = AnchorStyles.Left;
         resizeCheckBox.Name = "resizeCheckBox";
@@ -294,7 +296,7 @@ partial class MainWindow {
         //
         // widthLabel
         //
-        widthLabel.Text = "W:";
+        widthLabel.Text = _("W:");
         widthLabel.AutoSize = true;
         widthLabel.Anchor = AnchorStyles.Left;
         widthLabel.Name = "widthLabel";
@@ -323,7 +325,7 @@ partial class MainWindow {
         //
         // heightLabel
         //
-        heightLabel.Text = "H:";
+        heightLabel.Text = _("H:");
         heightLabel.AutoSize = true;
         heightLabel.Anchor = AnchorStyles.Left;
         heightLabel.Name = "heightLabel";
@@ -342,7 +344,7 @@ partial class MainWindow {
         //
         // convertButton
         //
-        convertButton.Text = "Convert";
+        convertButton.Text = _("Convert");
         convertButton.Name = "convertButton";
         convertButton.Font = new Font(convertButton.Font, FontStyle.Bold);
         convertButton.Padding = new Padding(8, 0, 8, 0);
@@ -351,7 +353,7 @@ partial class MainWindow {
         //
         // keepProportionsRadioButton
         //
-        keepProportionsRadioButton.Text = "Keep proportions";
+        keepProportionsRadioButton.Text = _("Keep proportions");
         keepProportionsRadioButton.AutoSize = true;
         keepProportionsRadioButton.Anchor = AnchorStyles.Left;
         keepProportionsRadioButton.Name = "keepProportionsRadioButton";
@@ -363,7 +365,7 @@ partial class MainWindow {
         //
         // cropRadioButton
         //
-        cropRadioButton.Text = "Crop";
+        cropRadioButton.Text = _("Crop");
         cropRadioButton.AutoSize = true;
         cropRadioButton.Anchor = AnchorStyles.Left;
         cropRadioButton.Name = "cropRadioButton";
@@ -382,7 +384,7 @@ partial class MainWindow {
         // statusLabel
         //
         statusLabel.Name = "statusLabel";
-        statusLabel.Text = "Ready";
+        statusLabel.Text = _("Ready");
         statusLabel.Spring = true;
         statusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 
@@ -396,7 +398,7 @@ partial class MainWindow {
         Controls.Add(menuStrip);
         MainMenuStrip = menuStrip;
         Name = "MainWindow";
-        Text = "SIC! \u2014 Simple Image Converter";
+        Text = _("SIC! \u2014 Simple Image Converter");
         MinimumSize = new Size(640, 400);
 
         menuStrip.ResumeLayout(false);

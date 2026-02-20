@@ -3,6 +3,7 @@ using System.Diagnostics.Metrics;
 using System.IO;
 using System.Windows.Forms;
 using SharpConfig;
+using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
 
 namespace Oire.Sic.Utils;
@@ -37,14 +38,14 @@ public class Config {
                 }
                 Cfg.SaveToFile(ConfigFileName);
             } catch (Exception) {
-                DialogResult msg = MessageBox.Show("Unable to save configuration. Please contact the developer.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                DialogResult msg = MessageBox.Show(_("Unable to save configuration. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
                 if (msg == DialogResult.OK) {
                     System.Windows.Forms.Application.Exit();
                 }
             }
         } catch (Exception) {
-            DialogResult msg = MessageBox.Show("Unable to load configuration. Please contact the developer.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            DialogResult msg = MessageBox.Show(_("Unable to load configuration. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
             if (msg == DialogResult.OK) {
                 System.Windows.Forms.Application.Exit();
@@ -59,7 +60,7 @@ public class Config {
         try {
             Cfg.SaveToFile(ConfigFileName);
         } catch (Exception) {
-            DialogResult msg = MessageBox.Show("Unable to save configuration. Please contact the developer.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            DialogResult msg = MessageBox.Show(_("Unable to save configuration. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
             if (msg == DialogResult.OK) {
                 System.Windows.Forms.Application.Exit();

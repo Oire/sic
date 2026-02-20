@@ -1,3 +1,5 @@
+using static Oire.Sic.Utils.Localization;
+
 namespace Oire.Sic.Models;
 
 public class ImageItem {
@@ -10,22 +12,16 @@ public class ImageItem {
     public long FileSize { get; set; }
 
     public string GetDisplayDescription() {
-        var size = FileSize switch {
-            < 1024 => $"{FileSize} B",
-            < 1024 * 1024 => $"{FileSize / 1024.0:F1} KB",
-            _ => $"{FileSize / (1024.0 * 1024.0):F1} MB"
-        };
-
-        return $"{FileName} ({OriginalFormat.ToUpperInvariant()}, {Width}x{Height}, {size})";
+        return _("{0} ({1}, {2}, {3})", FileName, OriginalFormat.ToUpperInvariant(), GetDimensionsDisplay(), GetSizeDisplay());
     }
 
-    public string GetDimensionsDisplay() => $"{Width}x{Height}";
+    public string GetDimensionsDisplay() => _("{0}x{1}", Width, Height);
 
     public string GetSizeDisplay() {
         return FileSize switch {
-            < 1024 => $"{FileSize} B",
-            < 1024 * 1024 => $"{FileSize / 1024.0:F1} KB",
-            _ => $"{FileSize / (1024.0 * 1024.0):F1} MB"
+            < 1024 => _("{0} B", FileSize),
+            < 1024 * 1024 => _("{0} KB", (FileSize / 1024.0).ToString("F1")),
+            _ => _("{0} MB", (FileSize / (1024.0 * 1024.0)).ToString("F1")),
         };
     }
 }

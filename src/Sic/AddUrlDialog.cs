@@ -1,3 +1,5 @@
+using static Oire.Sic.Utils.Localization;
+
 namespace Oire.Sic;
 
 public partial class AddUrlDialog: Form {
@@ -11,7 +13,7 @@ public partial class AddUrlDialog: Form {
         base.OnFormClosing(e);
 
         if (DialogResult == DialogResult.OK && string.IsNullOrWhiteSpace(urlTextBox.Text)) {
-            MessageBox.Show("Please enter a URL.", "No URL entered", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(_("Please enter a URL."), _("No URL entered"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             e.Cancel = true;
         }
     }
