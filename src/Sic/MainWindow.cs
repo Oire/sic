@@ -1,4 +1,5 @@
 using System.Drawing.Imaging;
+using GetText.WindowsForms;
 using Oire.Sic.Models;
 using Oire.Sic.Utils;
 using static Oire.Sic.Utils.Localization;
@@ -13,9 +14,11 @@ public partial class MainWindow: Form {
     private bool _isAutoFilling;
     private int _clipboardImageCount;
     private readonly System.Windows.Forms.Timer _previewDebounceTimer = new() { Interval = 300 };
+    private readonly ObjectPropertiesStore _localizationStore = new();
 
     public MainWindow() {
         InitializeComponent();
+        Localizer.Localize(this, Localization.Catalog, _localizationStore);
         SetupEventHandlers();
         PopulateFormatComboBox();
         UpdateMenuState();
@@ -188,8 +191,19 @@ public partial class MainWindow: Form {
     }
 
     private void OptionsMenuItem_Click(object? sender, EventArgs e) {
+        var previousLanguage = Config.General.Language;
         using var dialog = new SettingsDialog();
         dialog.ShowDialog(this);
+
+        if (Config.General.Language != previousLanguage) {
+            ApplyLocalization();
+        }
+    }
+
+    private void ApplyLocalization() {
+        Localizer.Revert(this, _localizationStore);
+        Localizer.Localize(this, Localization.Catalog, _localizationStore);
+        statusLabel.Text = _("Ready");
     }
 
     private void ExitMenuItem_Click(object? sender, EventArgs e) {

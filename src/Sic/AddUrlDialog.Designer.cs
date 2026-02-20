@@ -1,5 +1,3 @@
-using static Oire.Sic.Utils.Localization;
-
 namespace Oire.Sic;
 
 partial class AddUrlDialog {
@@ -50,7 +48,7 @@ partial class AddUrlDialog {
         //
         // urlLabel
         //
-        urlLabel.Text = _("URL:");
+        urlLabel.Text = "URL:";
         urlLabel.AutoSize = true;
         urlLabel.Anchor = AnchorStyles.Left;
         urlLabel.Name = "urlLabel";
@@ -66,7 +64,7 @@ partial class AddUrlDialog {
         //
         // okButton
         //
-        okButton.Text = _("OK");
+        okButton.Text = "OK";
         okButton.Anchor = AnchorStyles.Left;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
@@ -75,7 +73,7 @@ partial class AddUrlDialog {
         //
         // cancelButton
         //
-        cancelButton.Text = _("Cancel");
+        cancelButton.Text = "Cancel";
         cancelButton.Anchor = AnchorStyles.Right;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
@@ -89,7 +87,7 @@ partial class AddUrlDialog {
         ClientSize = new Size(480, 100);
         Controls.Add(mainLayout);
         Name = "AddUrlDialog";
-        Text = _("Add Image from URL");
+        Text = "Add Image from URL";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         StartPosition = FormStartPosition.CenterParent;
         MaximizeBox = false;

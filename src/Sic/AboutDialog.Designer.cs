@@ -1,5 +1,3 @@
-using static Oire.Sic.Utils.Localization;
-
 namespace Oire.Sic;
 
 partial class AboutDialog {
@@ -46,7 +44,7 @@ partial class AboutDialog {
         //
         // appNameLabel
         //
-        appNameLabel.Text = _("SIC! \u2014 Simple Image Converter");
+        appNameLabel.Text = "SIC! \u2014 Simple Image Converter";
         appNameLabel.AutoSize = true;
         appNameLabel.Font = new Font(appNameLabel.Font.FontFamily, 14F, FontStyle.Bold);
         appNameLabel.Anchor = AnchorStyles.None;
@@ -57,7 +55,7 @@ partial class AboutDialog {
         //
         // versionLabel
         //
-        versionLabel.Text = _("Version");
+        versionLabel.Text = "Version";
         versionLabel.AutoSize = true;
         versionLabel.Anchor = AnchorStyles.None;
         versionLabel.Name = "versionLabel";
@@ -67,7 +65,7 @@ partial class AboutDialog {
         //
         // copyrightLabel
         //
-        copyrightLabel.Text = _("Oire Software");
+        copyrightLabel.Text = "Oire Software";
         copyrightLabel.AutoSize = true;
         copyrightLabel.Anchor = AnchorStyles.None;
         copyrightLabel.Name = "copyrightLabel";
@@ -77,7 +75,7 @@ partial class AboutDialog {
         //
         // okButton
         //
-        okButton.Text = _("&OK");
+        okButton.Text = "&OK";
         okButton.MinimumSize = new Size(80, 0);
         okButton.Anchor = AnchorStyles.None;
         okButton.DialogResult = DialogResult.OK;
@@ -92,7 +90,7 @@ partial class AboutDialog {
         ClientSize = new Size(380, 180);
         Controls.Add(mainLayout);
         Name = "AboutDialog";
-        Text = _("About SIC!");
+        Text = "About SIC!";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         StartPosition = FormStartPosition.CenterParent;
         MaximizeBox = false;

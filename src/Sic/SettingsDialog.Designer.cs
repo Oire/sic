@@ -1,5 +1,3 @@
-using static Oire.Sic.Utils.Localization;
-
 namespace Oire.Sic;
 
 partial class SettingsDialog {
@@ -61,7 +59,7 @@ partial class SettingsDialog {
         //
         // outputFolderLabel
         //
-        outputFolderLabel.Text = _("Output folder:");
+        outputFolderLabel.Text = "Output folder:";
         outputFolderLabel.AutoSize = true;
         outputFolderLabel.Anchor = AnchorStyles.Left;
         outputFolderLabel.Name = "outputFolderLabel";
@@ -78,7 +76,7 @@ partial class SettingsDialog {
         //
         // browseButton
         //
-        browseButton.Text = _("Browse...");
+        browseButton.Text = "Browse...";
         browseButton.Dock = DockStyle.Fill;
         browseButton.Name = "browseButton";
         browseButton.TabIndex = 2;
@@ -86,7 +84,7 @@ partial class SettingsDialog {
         //
         // clearOutputFolderButton
         //
-        clearOutputFolderButton.Text = _("Clear");
+        clearOutputFolderButton.Text = "Clear";
         clearOutputFolderButton.Dock = DockStyle.Fill;
         clearOutputFolderButton.Name = "clearOutputFolderButton";
         clearOutputFolderButton.TabIndex = 3;
@@ -94,7 +92,7 @@ partial class SettingsDialog {
         //
         // languageLabel
         //
-        languageLabel.Text = _("Language:");
+        languageLabel.Text = "Language:";
         languageLabel.AutoSize = true;
         languageLabel.Anchor = AnchorStyles.Left;
         languageLabel.Name = "languageLabel";
@@ -111,7 +109,7 @@ partial class SettingsDialog {
         //
         // okButton
         //
-        okButton.Text = _("OK");
+        okButton.Text = "OK";
         okButton.Dock = DockStyle.Fill;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
@@ -120,7 +118,7 @@ partial class SettingsDialog {
         //
         // cancelButton
         //
-        cancelButton.Text = _("Cancel");
+        cancelButton.Text = "Cancel";
         cancelButton.Dock = DockStyle.Fill;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
@@ -134,7 +132,7 @@ partial class SettingsDialog {
         ClientSize = new Size(450, 160);
         Controls.Add(mainLayout);
         Name = "SettingsDialog";
-        Text = _("Settings");
+        Text = "Settings";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         StartPosition = FormStartPosition.CenterParent;
         MaximizeBox = false;

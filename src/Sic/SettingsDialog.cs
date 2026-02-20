@@ -1,4 +1,5 @@
 using System.Globalization;
+using GetText.WindowsForms;
 using Oire.Sic.Utils;
 using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
@@ -10,6 +11,7 @@ public partial class SettingsDialog: Form {
 
     public SettingsDialog() {
         InitializeComponent();
+        Localizer.Localize(this, Localization.Catalog);
         LoadSettings();
         browseButton.Click += BrowseButton_Click;
         clearOutputFolderButton.Click += ClearOutputFolderButton_Click;

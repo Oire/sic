@@ -1,3 +1,5 @@
+using GetText.WindowsForms;
+using Oire.Sic.Utils;
 using static Oire.Sic.Utils.Localization;
 
 namespace Oire.Sic;
@@ -7,6 +9,7 @@ public partial class AddUrlDialog: Form {
 
     public AddUrlDialog() {
         InitializeComponent();
+        Localizer.Localize(this, Localization.Catalog);
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {

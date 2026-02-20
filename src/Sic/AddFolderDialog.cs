@@ -1,3 +1,4 @@
+using GetText.WindowsForms;
 using Oire.Sic.Utils;
 using static Oire.Sic.Utils.Localization;
 
@@ -24,6 +25,7 @@ public partial class AddFolderDialog: Form {
 
     public AddFolderDialog() {
         InitializeComponent();
+        Localizer.Localize(this, Localization.Catalog);
 
         foreach (var (label, _) in _filters) {
             filterComboBox.Items.Add(label);

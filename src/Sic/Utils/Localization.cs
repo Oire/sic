@@ -5,6 +5,7 @@ using GetText;
 namespace Oire.Sic.Utils;
 
 internal static class Localization {
+    public static ICatalog Catalog => StringsCatalog;
     private static string? _languageOverride;
 
     /// <summary>

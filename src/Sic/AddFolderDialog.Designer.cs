@@ -1,5 +1,3 @@
-using static Oire.Sic.Utils.Localization;
-
 namespace Oire.Sic;
 
 partial class AddFolderDialog {
@@ -65,7 +63,7 @@ partial class AddFolderDialog {
         //
         // folderLabel
         //
-        folderLabel.Text = _("Folder:");
+        folderLabel.Text = "Folder:";
         folderLabel.AutoSize = true;
         folderLabel.Anchor = AnchorStyles.Left;
         folderLabel.Name = "folderLabel";
@@ -82,14 +80,14 @@ partial class AddFolderDialog {
         //
         // browseButton
         //
-        browseButton.Text = _("Browse...");
+        browseButton.Text = "Browse...";
         browseButton.Name = "browseButton";
         browseButton.TabIndex = 2;
 
         //
         // filterLabel
         //
-        filterLabel.Text = _("Filter:");
+        filterLabel.Text = "Filter:";
         filterLabel.AutoSize = true;
         filterLabel.Anchor = AnchorStyles.Left;
         filterLabel.Name = "filterLabel";
@@ -106,7 +104,7 @@ partial class AddFolderDialog {
         //
         // includeSubfoldersCheckBox
         //
-        includeSubfoldersCheckBox.Text = _("Include all subfolders");
+        includeSubfoldersCheckBox.Text = "Include all subfolders";
         includeSubfoldersCheckBox.AutoSize = true;
         includeSubfoldersCheckBox.Anchor = AnchorStyles.Left;
         includeSubfoldersCheckBox.Name = "includeSubfoldersCheckBox";
@@ -116,7 +114,7 @@ partial class AddFolderDialog {
         //
         // okButton
         //
-        okButton.Text = _("OK");
+        okButton.Text = "OK";
         okButton.Anchor = AnchorStyles.Right;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
@@ -125,7 +123,7 @@ partial class AddFolderDialog {
         //
         // cancelButton
         //
-        cancelButton.Text = _("Cancel");
+        cancelButton.Text = "Cancel";
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
         cancelButton.TabIndex = 7;
@@ -138,7 +136,7 @@ partial class AddFolderDialog {
         ClientSize = new Size(480, 190);
         Controls.Add(mainLayout);
         Name = "AddFolderDialog";
-        Text = _("Add Folder");
+        Text = "Add Folder";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         StartPosition = FormStartPosition.CenterParent;
         MaximizeBox = false;

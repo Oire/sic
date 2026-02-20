@@ -1,5 +1,3 @@
-using static Oire.Sic.Utils.Localization;
-
 namespace Oire.Sic;
 
 partial class ProgressDialog {
@@ -57,7 +55,7 @@ partial class ProgressDialog {
         MessageLabel.Name = "MessageLabel";
         MessageLabel.Size = new Size(101, 21);
         MessageLabel.TabIndex = 0;
-        MessageLabel.Text = _("Please wait...");
+        MessageLabel.Text = "Please wait...";
         MessageLabel.TextAlign = ContentAlignment.MiddleCenter;
         //
         // ProgressBar
@@ -82,7 +80,7 @@ partial class ProgressDialog {
         MinimizeBox = false;
         Name = "ProgressDialog";
         StartPosition = FormStartPosition.CenterParent;
-        Text = _("Converting...");
+        Text = "Converting...";
         AccessibleRole = AccessibleRole.Dialog;
         MainLayout.ResumeLayout(false);
         MainLayout.PerformLayout();
