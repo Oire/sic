@@ -23,6 +23,7 @@ internal static class Program {
 
             ApplicationConfiguration.Initialize();
             Config.Load();
+            Localization.SetLanguage(Config.General.Language);
 #if DEBUG
             Log.Debug("App Startup: Config loaded");
 #endif

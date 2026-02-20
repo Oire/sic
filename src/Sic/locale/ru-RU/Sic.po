@@ -1,0 +1,608 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Sic\n"
+"POT-Creation-Date: 2026-02-20 19:45:01+0100\n"
+"PO-Revision-Date: 2026-02-20 19:45:23+01:00\n"
+"Last-Translator: \n"
+"Language-Team: ru-RU\n"
+"Language: ru-RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: GetText.NET Extractor\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: ..\..\MainWindow.cs:347
+msgid ", "
+msgstr ", "
+
+#: ..\..\Models\ImageItem.cs:15
+#, csharp-format
+msgid "{0} ({1}, {2}, {3})"
+msgstr "{0} ({1}, {2}, {3})"
+
+#: ..\..\Models\ImageItem.cs:22
+#, csharp-format
+msgid "{0} B"
+msgstr "{0} Б"
+
+#: ..\..\MainWindow.cs:341
+#, csharp-format
+msgid "{0} converted"
+msgstr "{0} сконвертировано"
+
+#: ..\..\MainWindow.cs:345
+#, csharp-format
+msgid "{0} failed"
+msgstr "{0} с ошибкой"
+
+#: ..\..\Models\ImageItem.cs:23
+#, csharp-format
+msgid "{0} KB"
+msgstr "{0} КБ"
+
+#: ..\..\Models\ImageItem.cs:24
+#, csharp-format
+msgid "{0} MB"
+msgstr "{0} МБ"
+
+#: ..\..\MainWindow.cs:343
+#, csharp-format
+msgid "{0} skipped"
+msgstr "{0} пропущено"
+
+#: ..\..\Models\ImageItem.cs:18
+#, csharp-format
+msgid "{0}x{1}"
+msgstr "{0}x{1}"
+
+#: ..\..\MainWindow.Designer.cs:174
+msgid "&About SIC!..."
+msgstr "&О программе SIC!..."
+
+#: ..\..\MainWindow.Designer.cs:87
+msgid "&File"
+msgstr "&Файл"
+
+#: ..\..\MainWindow.Designer.cs:156
+msgid "&Help"
+msgstr "&Справка"
+
+#: ..\..\AboutDialog.Designer.cs:80
+msgid "&OK"
+msgstr "&OK"
+
+#: ..\..\MainWindow.Designer.cs:142
+msgid "&Options..."
+msgstr "&Параметры..."
+
+#: ..\..\MainWindow.Designer.cs:126
+msgid "&Remove"
+msgstr "&Удалить"
+
+#: ..\..\MainWindow.Designer.cs:167
+msgid "&User Guide"
+msgstr "&Руководство"
+
+#: ..\..\AboutDialog.cs:9
+#, csharp-format
+msgid "© {0} Oire Software"
+msgstr "© {0} Oire Software"
+
+#: ..\..\MainWindow.cs:177
+#: ..\..\MainWindow.cs:606
+#, csharp-format
+msgid "1 image in queue"
+msgid_plural "{0} images in queue"
+msgstr[0] "{0} изображение в очереди"
+msgstr[1] "{0} изображения в очереди"
+msgstr[2] "{0} изображений в очереди"
+
+#: ..\..\AboutDialog.Designer.cs:95
+msgid "About SIC!"
+msgstr "О программе SIC!"
+
+#: ..\..\MainWindow.Designer.cs:105
+msgid "Add &Image..."
+msgstr "Добавить &изображение..."
+
+#: ..\..\MainWindow.Designer.cs:112
+msgid "Add F&older..."
+msgstr "Добавить &папку..."
+
+#: ..\..\AddFolderDialog.Designer.cs:141
+msgid "Add Folder"
+msgstr "Добавить папку"
+
+#: ..\..\MainWindow.Designer.cs:119
+msgid "Add from &URL..."
+msgstr "Добавить по &URL..."
+
+#: ..\..\AddUrlDialog.Designer.cs:92
+msgid "Add Image from URL"
+msgstr "Добавить изображение по URL"
+
+#: ..\..\MainWindow.cs:154
+#, csharp-format
+msgid "Added {0} from URL"
+msgstr "Добавлено {0} по URL"
+
+#: ..\..\MainWindow.cs:573
+msgid "Added image from clipboard"
+msgstr "Добавлено изображение из буфера обмена"
+
+#: ..\..\MainWindow.cs:85
+msgid "All files"
+msgstr "Все файлы"
+
+#: ..\..\AddFolderDialog.cs:8
+msgid "All supported images"
+msgstr "Все поддерживаемые изображения"
+
+#: ..\..\AddFolderDialog.cs:16
+msgid "AVIF images (*.avif)"
+msgstr "Изображения AVIF (*.avif)"
+
+#: ..\..\AddFolderDialog.cs:13
+msgid "BMP images (*.bmp)"
+msgstr "Изображения BMP (*.bmp)"
+
+#: ..\..\AddFolderDialog.Designer.cs:85
+#: ..\..\SettingsDialog.Designer.cs:81
+msgid "Browse..."
+msgstr "Обзор..."
+
+#: ..\..\AddUrlDialog.Designer.cs:78
+#: ..\..\SettingsDialog.Designer.cs:123
+#: ..\..\AddFolderDialog.Designer.cs:128
+msgid "Cancel"
+msgstr "Отмена"
+
+#: ..\..\SettingsDialog.Designer.cs:89
+msgid "Clear"
+msgstr "Очистить"
+
+#: ..\..\MainWindow.cs:350
+msgid "Conversion Complete"
+msgstr "Конвертация завершена"
+
+#: ..\..\MainWindow.cs:311
+msgid "Conversion Error"
+msgstr "Ошибка конвертации"
+
+#: ..\..\Program.cs:148
+#, csharp-format
+msgid "Conversion failed: {0}"
+msgstr "Ошибка конвертации: {0}"
+
+#: ..\..\MainWindow.Designer.cs:347
+msgid "Convert"
+msgstr "Конвертировать"
+
+#: ..\..\Program.cs:145
+#, csharp-format
+msgid "Converted: {0}"
+msgstr "Сконвертировано: {0}"
+
+#: ..\..\MainWindow.cs:274
+#, csharp-format
+msgid "Converting {0} ({1}/{2})..."
+msgstr "Конвертация {0} ({1}/{2})..."
+
+#: ..\..\ProgressDialog.Designer.cs:85
+#: ..\..\MainWindow.cs:275
+msgid "Converting..."
+msgstr "Конвертация..."
+
+#: ..\..\MainWindow.Designer.cs:368
+msgid "Crop"
+msgstr "Обрезка"
+
+#: ..\..\MainWindow.cs:230
+msgid "Crop mode requires a valid height (1–65535)."
+msgstr "Для обрезки необходима допустимая высота (1–65535)."
+
+#: ..\..\MainWindow.cs:223
+msgid "Crop mode requires a valid width (1–65535)."
+msgstr "Для обрезки необходима допустимая ширина (1–65535)."
+
+#: ..\..\Program.cs:132
+msgid "Crop mode requires both width and height (e.g. --resize 128x128 --crop)"
+msgstr "Для обрезки необходимы и ширина, и высота (например, --resize 128x128 --crop)"
+
+#: ..\..\MainWindow.Designer.cs:218
+msgid "Dimensions"
+msgstr "Размеры"
+
+#: ..\..\MainWindow.cs:142
+msgid "Downloading image..."
+msgstr "Загрузка изображения..."
+
+#: ..\..\MainWindow.Designer.cs:149
+msgid "E&xit"
+msgstr "В&ыход"
+
+#: ..\..\Utils\Config.cs:41
+#: ..\..\Utils\Config.cs:48
+#: ..\..\Program.cs:40
+#: ..\..\Utils\Config.cs:63
+#: ..\..\MainWindow.cs:157
+#: ..\..\MainWindow.cs:576
+#: ..\..\MainWindow.cs:589
+msgid "Error"
+msgstr "Ошибка"
+
+#: ..\..\MainWindow.cs:310
+msgid "Failed"
+msgstr "Ошибка"
+
+#: ..\..\MainWindow.cs:311
+#, csharp-format
+msgid ""
+"Failed to convert {0}:\n"
+"{1}"
+msgstr ""
+"Не удалось сконвертировать {0}:\n"
+"{1}"
+
+#: ..\..\MainWindow.cs:576
+#, csharp-format
+msgid ""
+"Failed to load clipboard image:\n"
+"{0}"
+msgstr ""
+"Не удалось загрузить изображение из буфера обмена:\n"
+"{0}"
+
+#: ..\..\MainWindow.cs:157
+#, csharp-format
+msgid ""
+"Failed to load image from URL:\n"
+"{0}"
+msgstr ""
+"Не удалось загрузить изображение по URL:\n"
+"{0}"
+
+#: ..\..\MainWindow.cs:589
+#, csharp-format
+msgid ""
+"Failed to load image:\n"
+"{0}\n"
+"{1}"
+msgstr ""
+"Не удалось загрузить изображение:\n"
+"{0}\n"
+"{1}"
+
+#: ..\..\Program.cs:36
+#, csharp-format
+msgid "Fatal error: {0}"
+msgstr "Критическая ошибка: {0}"
+
+#: ..\..\MainWindow.cs:615
+msgid "File Already Exists"
+msgstr "Файл уже существует"
+
+#: ..\..\MainWindow.Designer.cs:214
+msgid "File Name"
+msgstr "Имя файла"
+
+#: ..\..\Program.cs:72
+#, csharp-format
+msgid "File not found: {0}"
+msgstr "Файл не найден: {0}"
+
+#: ..\..\AddFolderDialog.Designer.cs:92
+msgid "Filter:"
+msgstr "Фильтр:"
+
+#: ..\..\AddFolderDialog.Designer.cs:68
+msgid "Folder:"
+msgstr "Папка:"
+
+#: ..\..\MainWindow.Designer.cs:216
+msgid "Format"
+msgstr "Формат"
+
+#: ..\..\AddFolderDialog.cs:15
+msgid "GIF images (*.gif)"
+msgstr "Изображения GIF (*.gif)"
+
+#: ..\..\MainWindow.Designer.cs:328
+msgid "H:"
+msgstr "В:"
+
+#: ..\..\AddFolderDialog.cs:12
+msgid "ICO icons (*.ico)"
+msgstr "Значки ICO (*.ico)"
+
+#: ..\..\MainWindow.cs:85
+msgid "Image files"
+msgstr "Файлы изображений"
+
+#: ..\..\AddFolderDialog.Designer.cs:109
+msgid "Include all subfolders"
+msgstr "Включая все подпапки"
+
+#: ..\..\MainWindow.cs:240
+msgid "Invalid dimensions"
+msgstr "Недопустимые размеры"
+
+#: ..\..\MainWindow.cs:230
+msgid "Invalid height"
+msgstr "Недопустимая высота"
+
+#: ..\..\Program.cs:116
+#, csharp-format
+msgid "Invalid height value: {0}"
+msgstr "Недопустимое значение высоты: {0}"
+
+#: ..\..\Program.cs:121
+#, csharp-format
+msgid "Invalid resize format: {0}. At least one dimension is required."
+msgstr "Недопустимый формат размера: {0}. Необходимо указать хотя бы одно измерение."
+
+#: ..\..\Program.cs:100
+#, csharp-format
+msgid ""
+"Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, "
+"128)"
+msgstr ""
+"Недопустимый формат размера: {0}. Используйте ШxВ, Шx, xВ или Ш (например, "
+"128x128, 128x, x128, 128)"
+
+#: ..\..\MainWindow.cs:223
+msgid "Invalid width"
+msgstr "Недопустимая ширина"
+
+#: ..\..\Program.cs:111
+#, csharp-format
+msgid "Invalid width value: {0}"
+msgstr "Недопустимое значение ширины: {0}"
+
+#: ..\..\AddFolderDialog.cs:9
+msgid "JPEG images (*.jpg, *.jpeg)"
+msgstr "Изображения JPEG (*.jpg, *.jpeg)"
+
+#: ..\..\MainWindow.Designer.cs:356
+msgid "Keep proportions"
+msgstr "Сохранять пропорции"
+
+#: ..\..\SettingsDialog.Designer.cs:97
+msgid "Language:"
+msgstr "Язык:"
+
+#: ..\..\AddFolderDialog.cs:58
+msgid "No folder selected"
+msgstr "Папка не выбрана"
+
+#: ..\..\MainWindow.cs:208
+msgid "No format selected"
+msgstr "Формат не выбран"
+
+#: ..\..\MainWindow.cs:129
+msgid "No images found"
+msgstr "Изображения не найдены"
+
+#: ..\..\MainWindow.cs:203
+msgid "No images to convert. Add some images first."
+msgstr "Нет изображений для конвертации. Сначала добавьте изображения."
+
+#: ..\..\MainWindow.cs:129
+msgid "No matching images found in the selected folder."
+msgstr "В выбранной папке не найдено подходящих изображений."
+
+#: ..\..\AddUrlDialog.cs:16
+msgid "No URL entered"
+msgstr "URL не указан"
+
+#: ..\..\MainWindow.cs:203
+msgid "Nothing to convert"
+msgstr "Нечего конвертировать"
+
+#: ..\..\AboutDialog.Designer.cs:70
+msgid "Oire Software"
+msgstr "Oire Software"
+
+#: ..\..\AddUrlDialog.Designer.cs:69
+#: ..\..\SettingsDialog.Designer.cs:114
+#: ..\..\AddFolderDialog.Designer.cs:119
+msgid "OK"
+msgstr "OK"
+
+#: ..\..\SettingsDialog.Designer.cs:64
+msgid "Output folder:"
+msgstr "Папка назначения:"
+
+#: ..\..\Program.cs:78
+msgid "Output path must have a file extension (e.g. .jpg, .png)"
+msgstr "Путь назначения должен содержать расширение файла (например, .jpg, .png)"
+
+#: ..\..\MainWindow.cs:643
+msgid "Overwrite"
+msgstr "Перезаписать"
+
+#: ..\..\Program.cs:54
+msgid "Path for the converted image (format inferred from extension)"
+msgstr "Путь для сконвертированного изображения (формат определяется по расширению)"
+
+#: ..\..\Program.cs:53
+msgid "Path to the source image file"
+msgstr "Путь к исходному файлу изображения"
+
+#: ..\..\AddUrlDialog.cs:16
+msgid "Please enter a URL."
+msgstr "Пожалуйста, введите URL."
+
+#: ..\..\MainWindow.cs:240
+msgid "Please enter at least one valid dimension (1–65535)."
+msgstr "Пожалуйста, укажите хотя бы одно допустимое измерение (1–65535)."
+
+#: ..\..\AddFolderDialog.cs:58
+msgid "Please select a folder."
+msgstr "Пожалуйста, выберите папку."
+
+#: ..\..\MainWindow.cs:208
+msgid "Please select a target format."
+msgstr "Пожалуйста, выберите целевой формат."
+
+#: ..\..\ProgressDialog.Designer.cs:60
+msgid "Please wait..."
+msgstr "Пожалуйста, подождите..."
+
+#: ..\..\AddFolderDialog.cs:10
+msgid "PNG images (*.png)"
+msgstr "Изображения PNG (*.png)"
+
+#: ..\..\MainWindow.cs:264
+msgid "Preparing to convert..."
+msgstr "Подготовка к конвертации..."
+
+#: ..\..\MainWindow.cs:338
+#, csharp-format
+msgid "Processed {0} image."
+msgid_plural "Processed {0} images."
+msgstr[0] "Обработано {0} изображение."
+msgstr[1] "Обработано {0} изображения."
+msgstr[2] "Обработано {0} изображений."
+
+#: ..\..\MainWindow.cs:158
+#: ..\..\MainWindow.cs:186
+#: ..\..\MainWindow.Designer.cs:387
+msgid "Ready"
+msgstr "Готово"
+
+#: ..\..\MainWindow.Designer.cs:134
+msgid "Remove &All"
+msgstr "Удалить &все"
+
+#: ..\..\MainWindow.cs:644
+msgid "Rename"
+msgstr "Переименовать"
+
+#: ..\..\MainWindow.Designer.cs:289
+msgid "Resize"
+msgstr "Изменить размер"
+
+#: ..\..\Program.cs:55
+msgid "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)"
+msgstr "Размеры в формате ШxВ, Шx или xВ (например, 128x128, 128x, x128)"
+
+#: ..\..\AddFolderDialog.cs:40
+msgid "Select folder containing images"
+msgstr "Выберите папку с изображениями"
+
+#: ..\..\MainWindow.cs:84
+msgid "Select images to add"
+msgstr "Выберите изображения для добавления"
+
+#: ..\..\SettingsDialog.cs:31
+msgid "Select output folder for converted images"
+msgstr "Выберите папку назначения для сконвертированных изображений"
+
+#: ..\..\SettingsDialog.Designer.cs:137
+msgid "Settings"
+msgstr "Параметры"
+
+#: ..\..\AboutDialog.Designer.cs:49
+#: ..\..\Program.cs:58
+#: ..\..\MainWindow.Designer.cs:401
+msgid "SIC! — Simple Image Converter"
+msgstr "SIC! — Простой конвертер изображений"
+
+#: ..\..\MainWindow.Designer.cs:220
+msgid "Size"
+msgstr "Размер"
+
+#: ..\..\MainWindow.cs:645
+msgid "Skip"
+msgstr "Пропустить"
+
+#: ..\..\MainWindow.cs:292
+msgid "Skipped"
+msgstr "Пропущено"
+
+#: ..\..\MainWindow.Designer.cs:222
+msgid "Status"
+msgstr "Статус"
+
+#: ..\..\Program.cs:86
+#, csharp-format
+msgid "Supported formats: {0}"
+msgstr "Поддерживаемые форматы: {0}"
+
+#: ..\..\SettingsDialog.cs
+msgid "System"
+msgstr "Системный"
+
+#: ..\..\MainWindow.Designer.cs:272
+msgid "Target format:"
+msgstr "Целевой формат:"
+
+#: ..\..\MainWindow.cs:633
+#, csharp-format
+msgid ""
+"The file \"{0}\" already exists.\n"
+"What would you like to do?"
+msgstr ""
+"Файл \"{0}\" уже существует.\n"
+"Что вы хотите сделать?"
+
+#: ..\..\MainWindow.cs:357
+msgid "The user guide is coming soon."
+msgstr "Руководство пользователя скоро появится."
+
+#: ..\..\AddFolderDialog.cs:14
+msgid "TIFF images (*.tif, *.tiff)"
+msgstr "Изображения TIFF (*.tif, *.tiff)"
+
+#: ..\..\Utils\Config.cs:48
+msgid "Unable to load configuration. Please contact the developer."
+msgstr "Не удалось загрузить конфигурацию. Пожалуйста, обратитесь к разработчику."
+
+#: ..\..\Utils\Config.cs:41
+#: ..\..\Utils\Config.cs:63
+msgid "Unable to save configuration. Please contact the developer."
+msgstr "Не удалось сохранить конфигурацию. Пожалуйста, обратитесь к разработчику."
+
+#: ..\..\Program.cs:40
+msgid "Unable to start the program up. Please contact the developer."
+msgstr "Не удалось запустить программу. Пожалуйста, обратитесь к разработчику."
+
+#: ..\..\Program.cs:85
+#, csharp-format
+msgid "Unsupported format: {0}"
+msgstr "Неподдерживаемый формат: {0}"
+
+#: ..\..\AddUrlDialog.Designer.cs:53
+msgid "URL:"
+msgstr "URL:"
+
+#: ..\..\Program.cs:56
+msgid "Use crop mode (scale to cover, then center-crop to exact dimensions)"
+msgstr "Режим обрезки (масштабировать с заполнением, затем обрезать по центру до точных размеров)"
+
+#: ..\..\MainWindow.cs:357
+msgid "User Guide"
+msgstr "Руководство"
+
+#: ..\..\AboutDialog.Designer.cs:60
+msgid "Version"
+msgstr "Версия"
+
+#: ..\..\AboutDialog.cs:8
+#, csharp-format
+msgid "Version {0}"
+msgstr "Версия {0}"
+
+#: ..\..\MainWindow.Designer.cs:299
+msgid "W:"
+msgstr "Ш:"
+
+#: ..\..\AddFolderDialog.cs:11
+msgid "WebP images (*.webp)"
+msgstr "Изображения WebP (*.webp)"
+
+#: ..\..\MainWindow.Designer.cs:318
+msgid "x"
+msgstr "x"
