@@ -20,7 +20,6 @@
     <Company>Oire Software</Company>
     <Copyright>Copyright © 2026 Oire Software SARL. All rights reserved.</Copyright>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <GitCommitIdShortFixedLength>0</GitCommitIdShortFixedLength>
   </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -37,8 +36,7 @@
     <ItemGroup>
         <PackageReference Include="GetText.NET.WindowsForms" Version="10.0.1" NoWarn="NU1701" />
         <PackageReference Include="Magick.NET-Q16-x64" Version="14.10.2" />
-        <PackageReference Include="Nerdbank.GitVersioning" Version="3.9.50">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="GitVersion.MsBuild" Version="6.6.0">
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Serilog" Version="4.3.1" />
