@@ -175,8 +175,16 @@ public partial class MainWindow: Form {
         _imageItems.RemoveAt(index);
         imageListView.Items.RemoveAt(index);
 
-        previewPictureBox.Image?.Dispose();
-        previewPictureBox.Image = null;
+        if (imageListView.Items.Count > 0) {
+            var newIndex = index < imageListView.Items.Count ? index : imageListView.Items.Count - 1;
+            imageListView.Items[newIndex].Selected = true;
+            imageListView.Items[newIndex].Focused = true;
+            imageListView.EnsureVisible(newIndex);
+        } else {
+            previewPictureBox.Image?.Dispose();
+            previewPictureBox.Image = null;
+        }
+
         statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
         UpdateMenuState();
     }
