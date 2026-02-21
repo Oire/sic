@@ -1,0 +1,52 @@
+name: Feature Request
+description: Hey! 🎉 Want to suggest a feature or improvement? Please do it here!
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: What category best describes this feature or improvement:
+      options:
+        - Image Formats, Conversion
+        - User Interface, visual design, wording, keyboard shortcuts
+        - Command Line Mode
+        - Translation into other languages
+        - Settings
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Use Case:
+      description: What problem does this solve, or what workflow does it improve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution:
+      description: How would you like this to work?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: SIC! Mode:
+      options:
+        - Graphical User Inteface
+        - Command Line Interface
+        - Both
+        - Not sure
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered:
+      description: Any other approaches you've thought of?

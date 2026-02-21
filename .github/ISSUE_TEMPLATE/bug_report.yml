@@ -1,0 +1,86 @@
+name: Bug Report
+description: Hi! 👋🏻 Found a bug? Please report it here to help us improve SIC!
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: What category best describes the bug:
+      options:
+        - Image Formats, conversion
+        - User Interface, visual design, wording, keyboard shortcuts
+        - Command Line Mode
+        - Translation into other languages
+        - Settings
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Please describe the bug:
+      description: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce:
+      description: How can we reproduce this?
+      placeholder: |
+        1. Open SIC!
+        2. Add a PNG file
+        3. Select WEBP as target format
+        4. Click Convert
+        5. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior:
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: SIC! Mode:
+      options:
+        - Graphical User Inteface
+        - Command Line Interface
+        - Both
+        - Not sure
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: SIC! Version (can be seen in the About SIC! dialog):
+    validations:
+      required: true
+
+  - type: input
+    id: formats
+    attributes:
+      label: Image Formats Involved
+      description: If applicable, which source and target formats?
+      placeholder: "e.g., PNG -> ICO"
+
+  - type: input
+    id: windows-version
+    attributes:
+      label: Windows Version:
+      placeholder: "e.g., Windows 11 24H2"
+
+  - type: input
+    id: screen-reader
+    attributes:
+      label: Screen reader and version you used, if applicable:
+      placeholder: "e.g., JAWS2026.2602.49"
