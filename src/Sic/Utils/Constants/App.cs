@@ -16,6 +16,7 @@ public static class App {
             ManufacturerNameShort,
             Name
         );
+    public static readonly string DefaultOutputFolder = Path.Combine(DataFolder, "Converted");
     public static readonly string SystemLanguageName = "System";
     public static readonly string LocalesFolder = "./locale";
     public static readonly string DatabaseName = Path.Combine(App.DataFolder, String.Format("{0}.{1}", App.Name, App.DatabaseFileExtension));

@@ -84,7 +84,7 @@ partial class SettingsDialog {
         //
         // clearOutputFolderButton
         //
-        clearOutputFolderButton.Text = "Clear";
+        clearOutputFolderButton.Text = "Reset";
         clearOutputFolderButton.Dock = DockStyle.Fill;
         clearOutputFolderButton.Name = "clearOutputFolderButton";
         clearOutputFolderButton.TabIndex = 3;

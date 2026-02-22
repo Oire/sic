@@ -17,7 +17,7 @@ public class Config {
     #region Config Section Classes
     public class SectionGeneral {
         public string Language { get; set; } = "System";
-        public string OutputFolder { get; set; } = "";
+        public string OutputFolder { get; set; } = App.DefaultOutputFolder;
         public string LastInputFolder { get; set; } = "";
     }
 
@@ -27,6 +27,10 @@ public class Config {
         try {
             Cfg = Configuration.LoadFromFile(ConfigFileName);
             General = Cfg["General"].ToObject<SectionGeneral>();
+
+            if (string.IsNullOrWhiteSpace(General.OutputFolder)) {
+                General.OutputFolder = App.DefaultOutputFolder;
+            }
         } catch (FileNotFoundException) {
             Cfg = new Configuration();
             General = new Config.SectionGeneral();

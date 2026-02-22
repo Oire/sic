@@ -119,7 +119,7 @@ public partial class MainWindow: Form {
             foreach (var extension in extensions) {
                 var pattern = extension; // e.g. "*.jpg"
                 foreach (var file in Directory.EnumerateFiles(folder, pattern, searchOption)) {
-                    AddImageFromFile(file);
+                    AddImageFromFile(file, folder);
                     addedCount++;
                 }
             }
@@ -272,7 +272,7 @@ public partial class MainWindow: Form {
             }
         }
 
-        var outputFolder = string.IsNullOrWhiteSpace(Config.General.OutputFolder) ? null : Config.General.OutputFolder;
+        var outputFolder = Config.General.OutputFolder;
 
         convertButton.Enabled = false;
 
@@ -602,9 +602,10 @@ public partial class MainWindow: Form {
 
     // --- Shared helpers ---
 
-    private void AddImageFromFile(string path) {
+    private void AddImageFromFile(string path, string? basePath = null) {
         try {
             var item = ImageConverter.LoadFromFile(path);
+            item.BasePath = basePath;
             AddImageItem(item);
         } catch (Exception ex) {
             Log.Error("Failed to load image {Path}: {Error}", path, ex.Message);
