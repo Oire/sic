@@ -51,7 +51,7 @@ body:
     attributes:
       label: SIC! Mode:
       options:
-        - Graphical User Inteface
+        - Graphical User Interface
         - Command Line Interface
         - Both
         - Not sure

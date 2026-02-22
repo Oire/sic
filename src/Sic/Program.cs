@@ -24,6 +24,7 @@ internal static class Program {
             ApplicationConfiguration.Initialize();
             Config.Load();
             Localization.SetLanguage(Config.General.Language);
+            EnsureOutputFolderExists();
 #if DEBUG
             Log.Debug("App Startup: Config loaded");
 #endif
@@ -50,22 +51,42 @@ internal static class Program {
         }
     }
 
+    private static void EnsureOutputFolderExists() {
+        var outputFolder = Config.General.OutputFolder;
+        if (string.IsNullOrWhiteSpace(outputFolder)) {
+            return;
+        }
+
+        try {
+            Directory.CreateDirectory(outputFolder);
+        } catch (Exception ex) {
+            Log.Warning("Failed to create output folder {Folder}: {Error}", outputFolder, ex.Message);
+        }
+    }
+
     private static int RunCli(string[] args) {
+        Config.Load();
+        Localization.SetLanguage(Config.General.Language);
+        EnsureOutputFolderExists();
+
         var inputOption = new Option<string>("--input", "-i") { Required = true, Description = _("Path to the source image file") };
-        var outputOption = new Option<string>("--output", "-o") { Required = true, Description = _("Path for the converted image (format inferred from extension)") };
+        var outputOption = new Option<string?>("--output", "-o") { Description = _("Path for the converted image (format inferred from extension)") };
+        var formatOption = new Option<string?>("--format", "-f") { Description = _("Target format (e.g. jpg, png, webp). Used when --output is omitted.") };
         var resizeOption = new Option<string?>("--resize", "-r") { Description = _("Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)") };
         var cropOption = new Option<bool>("--crop", "-c") { Description = _("Use crop mode (scale to cover, then center-crop to exact dimensions)") };
 
         var rootCommand = new RootCommand(_("SIC! \u2014 Simple Image Converter")) {
             inputOption,
             outputOption,
+            formatOption,
             resizeOption,
             cropOption,
         };
 
         rootCommand.SetAction((Func<ParseResult, int>)(parseResult => {
             var input = parseResult.GetValue(inputOption)!;
-            var output = parseResult.GetValue(outputOption)!;
+            var output = parseResult.GetValue(outputOption);
+            var format = parseResult.GetValue(formatOption);
             var resize = parseResult.GetValue(resizeOption);
             var crop = parseResult.GetValue(cropOption);
 
@@ -74,16 +95,33 @@ internal static class Program {
                 return 1;
             }
 
-            var extension = Path.GetExtension(output).TrimStart('.').ToUpperInvariant();
-            if (string.IsNullOrWhiteSpace(extension)) {
-                Console.Error.WriteLine(_("Output path must have a file extension (e.g. .jpg, .png)"));
+            string targetFormat;
+            if (!string.IsNullOrWhiteSpace(output)) {
+                var extension = Path.GetExtension(output).TrimStart('.').ToUpperInvariant();
+                if (string.IsNullOrWhiteSpace(extension)) {
+                    Console.Error.WriteLine(_("Output path must have a file extension (e.g. .jpg, .png)"));
+                    return 1;
+                }
+                targetFormat = extension == "JPEG" ? "JPG" : extension == "TIF" ? "TIFF" : extension;
+            } else if (!string.IsNullOrWhiteSpace(format)) {
+                targetFormat = format.TrimStart('.').ToUpperInvariant();
+                targetFormat = targetFormat == "JPEG" ? "JPG" : targetFormat == "TIF" ? "TIFF" : targetFormat;
+                var baseName = Path.GetFileNameWithoutExtension(input);
+                var ext = ImageConverter.GetFileExtension(targetFormat);
+                var outputFolder = Config.General.OutputFolder;
+                if (string.IsNullOrWhiteSpace(outputFolder)) {
+                    outputFolder = App.DefaultOutputFolder;
+                }
+                Directory.CreateDirectory(outputFolder);
+                output = Path.Combine(outputFolder, baseName + ext);
+            } else {
+                Console.Error.WriteLine(_("Either --output or --format must be specified."));
                 return 1;
             }
 
-            var targetFormat = extension == "JPEG" ? "JPG" : extension == "TIF" ? "TIFF" : extension;
             var supportedFormats = ImageConverter.GetSupportedFormats();
             if (!supportedFormats.Any(f => f.Equals(targetFormat, StringComparison.OrdinalIgnoreCase))) {
-                Console.Error.WriteLine(_("Unsupported format: {0}", extension));
+                Console.Error.WriteLine(_("Unsupported format: {0}", targetFormat));
                 Console.Error.WriteLine(_("Supported formats: {0}", string.Join(", ", supportedFormats)));
                 return 1;
             }
@@ -137,12 +175,12 @@ internal static class Program {
             try {
                 var item = ImageConverter.LoadFromFile(input);
 
-                var dir = Path.GetDirectoryName(output);
+                var dir = Path.GetDirectoryName(output!);
                 if (dir != null && !Directory.Exists(dir)) {
                     Directory.CreateDirectory(dir);
                 }
 
-                ImageConverter.Convert(item, targetFormat, output, width, height, resizeMode);
+                ImageConverter.Convert(item, targetFormat, output!, width, height, resizeMode);
                 Console.WriteLine(_("Converted: {0}", output));
                 return 0;
             } catch (Exception ex) {

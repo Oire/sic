@@ -4,6 +4,7 @@ namespace Oire.Sic.Models;
 
 public class ImageItem {
     public string? FilePath { get; set; }
+    public string? BasePath { get; set; }
     public byte[]? ImageData { get; set; }
     public string OriginalFormat { get; set; } = "";
     public string FileName { get; set; } = "";

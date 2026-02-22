@@ -3,6 +3,7 @@ using System.Net.Http;
 using ImageMagick;
 using Oire.Sic.Models;
 using Serilog;
+using App = Oire.Sic.Utils.Constants.App;
 
 namespace Oire.Sic.Services;
 
@@ -174,21 +175,21 @@ public static class ImageConverter {
         };
     }
 
-    public static string GenerateOutputPath(ImageItem item, string targetFormat, string? outputFolder) {
-        string directory;
-
-        if (!string.IsNullOrWhiteSpace(outputFolder)) {
-            directory = outputFolder;
-        } else if (!string.IsNullOrWhiteSpace(item.FilePath)) {
-            directory = Path.GetDirectoryName(item.FilePath) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-        } else {
-            directory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+    public static string GenerateOutputPath(ImageItem item, string targetFormat, string outputFolder) {
+        if (string.IsNullOrWhiteSpace(outputFolder)) {
+            outputFolder = App.DefaultOutputFolder;
         }
 
         var baseName = Path.GetFileNameWithoutExtension(item.FileName);
         var extension = GetFileExtension(targetFormat);
 
-        return Path.Combine(directory, baseName + extension);
+        if (item.BasePath != null && item.FilePath != null) {
+            var relativePath = Path.GetRelativePath(item.BasePath, item.FilePath);
+            var relativeDir = Path.GetDirectoryName(relativePath) ?? "";
+            return Path.Combine(outputFolder, relativeDir, baseName + extension);
+        }
+
+        return Path.Combine(outputFolder, baseName + extension);
     }
 
     public static string GetConflictRenamePath(string outputPath) {

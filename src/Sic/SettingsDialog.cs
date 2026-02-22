@@ -84,11 +84,11 @@ public partial class SettingsDialog: Form {
     }
 
     private void ClearOutputFolderButton_Click(object? sender, EventArgs e) {
-        outputFolderTextBox.Text = "";
+        outputFolderTextBox.Text = App.DefaultOutputFolder;
     }
 
     private void UpdateClearButtonState() {
-        clearOutputFolderButton.Enabled = !string.IsNullOrEmpty(outputFolderTextBox.Text);
+        clearOutputFolderButton.Enabled = outputFolderTextBox.Text != App.DefaultOutputFolder;
     }
 
     private void OkButton_Click(object? sender, EventArgs e) {
