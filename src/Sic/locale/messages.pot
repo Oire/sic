@@ -54,15 +54,23 @@ msgstr ""
 msgid "{0}x{1}"
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:174
+#: ..\..\MainWindow.Designer.cs
 msgid "&About SIC!..."
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:87
+#: ..\..\MainWindow.Designer.cs
+msgid "&Convert"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "&Edit"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
 msgid "&File"
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:156
+#: ..\..\MainWindow.Designer.cs
 msgid "&Help"
 msgstr ""
 
@@ -172,8 +180,24 @@ msgstr ""
 msgid "Conversion failed: {0}"
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:347
+#: ..\..\MainWindow.Designer.cs
 msgid "Convert"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert &All"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert &Selected"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert All"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert Selected"
 msgstr ""
 
 #: ..\..\Program.cs:145
@@ -191,7 +215,15 @@ msgstr ""
 msgid "Converting..."
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:368
+#: ..\..\MainWindow.Designer.cs
+msgid "Create &Favicon..."
+msgstr ""
+
+#: ..\..\MainWindow.cs
+msgid "Creating favicon..."
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
 msgid "Crop"
 msgstr ""
 
@@ -262,12 +294,31 @@ msgid ""
 "{1}"
 msgstr ""
 
+#: ..\..\MainWindow.cs
+msgid "Favicon Created"
+msgstr ""
+
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "Favicon created successfully:\n{0}"
+msgstr ""
+
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "Favicon created: {0}"
+msgstr ""
+
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "Failed to create favicon:\n{0}"
+msgstr ""
+
 #: ..\..\Program.cs:36
 #, csharp-format
 msgid "Fatal error: {0}"
 msgstr ""
 
-#: ..\..\MainWindow.cs:615
+#: ..\..\MainWindow.cs
 msgid "File Already Exists"
 msgstr ""
 
@@ -511,12 +562,16 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+#: ..\..\MainWindow.Designer.cs
+msgid "&Support Development..."
+msgstr ""
+
 #: ..\..\Program.cs:86
 #, csharp-format
 msgid "Supported formats: {0}"
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:272
+#: ..\..\MainWindow.Designer.cs
 msgid "Target format:"
 msgstr ""
 

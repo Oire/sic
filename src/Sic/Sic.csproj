@@ -35,7 +35,7 @@
 
     <ItemGroup>
         <PackageReference Include="GetText.NET.WindowsForms" Version="10.0.1" NoWarn="NU1701" />
-        <PackageReference Include="Magick.NET-Q16-x64" Version="14.10.2" />
+        <PackageReference Include="Magick.NET-Q16-x64" Version="14.10.3" />
         <PackageReference Include="GitVersion.MsBuild" Version="6.6.0">
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
