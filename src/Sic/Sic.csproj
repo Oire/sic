@@ -10,6 +10,7 @@
     <Platform>x64</Platform>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <SatelliteResourceLanguages>fr;de;uk;ru</SatelliteResourceLanguages>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <AnalysisLevel>latest</AnalysisLevel>

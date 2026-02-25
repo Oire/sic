@@ -84,8 +84,10 @@ public partial class MainWindow: Form {
         var hasItems = _imageItems.Count > 0;
         var hasSelection = imageListView.SelectedIndices.Count > 0;
 
+        editMenu.Enabled = hasItems;
         removeMenuItem.Enabled = hasSelection;
         removeAllMenuItem.Enabled = hasItems;
+        convertMenu.Enabled = hasItems;
         convertSelectedButton.Enabled = hasSelection;
         convertButton.Enabled = hasItems;
         convertSelectedMenuItem.Enabled = hasSelection;

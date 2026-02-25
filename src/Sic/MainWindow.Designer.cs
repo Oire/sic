@@ -64,6 +64,7 @@ partial class MainWindow {
         resizeCheckBox = new CheckBox();
         resizeModeGroupBox = new GroupBox();
         resizeModeFlowLayout = new FlowLayoutPanel();
+        resizeFieldsLayout = new TableLayoutPanel();
         keepProportionsRadioButton = new RadioButton();
         cropRadioButton = new RadioButton();
         widthLabel = new Label();
@@ -82,6 +83,7 @@ partial class MainWindow {
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).BeginInit();
         resizeModeGroupBox.SuspendLayout();
         resizeModeFlowLayout.SuspendLayout();
+        resizeFieldsLayout.SuspendLayout();
         statusStrip.SuspendLayout();
         SuspendLayout();
 
@@ -183,6 +185,7 @@ partial class MainWindow {
         // convertSelectedMenuItem
         //
         convertSelectedMenuItem.Text = "Convert &Selected";
+        convertSelectedMenuItem.ShortcutKeys = Keys.F5;
         convertSelectedMenuItem.Name = "convertSelectedMenuItem";
         convertSelectedMenuItem.Enabled = false;
 
@@ -190,6 +193,7 @@ partial class MainWindow {
         // convertAllMenuItem
         //
         convertAllMenuItem.Text = "Convert &All";
+        convertAllMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.F5;
         convertAllMenuItem.Name = "convertAllMenuItem";
         convertAllMenuItem.Enabled = false;
 
@@ -240,9 +244,8 @@ partial class MainWindow {
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-        mainLayout.RowCount = 6;
+        mainLayout.RowCount = 5;
         mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -261,19 +264,16 @@ partial class MainWindow {
         mainLayout.Controls.Add(formatComboBox, 1, 1);
         mainLayout.Controls.Add(resizeCheckBox, 2, 1);
         mainLayout.SetColumnSpan(resizeCheckBox, 2);
-        // Row 2: Resize mode GroupBox
+        // Row 2: Resize mode GroupBox + Convert Selected
         mainLayout.Controls.Add(resizeModeGroupBox, 0, 2);
-        mainLayout.SetColumnSpan(resizeModeGroupBox, 4);
-        // Row 3: Width/Height fields
-        mainLayout.Controls.Add(widthLabel, 0, 3);
-        mainLayout.Controls.Add(widthTextBox, 1, 3);
-        mainLayout.Controls.Add(heightLabel, 2, 3);
-        mainLayout.Controls.Add(heightTextBox, 3, 3);
-        // Row 4: Convert buttons
-        mainLayout.Controls.Add(convertSelectedButton, 0, 4);
-        mainLayout.Controls.Add(convertButton, 3, 4);
-        // Row 5: Status strip
-        mainLayout.Controls.Add(statusStrip, 0, 5);
+        mainLayout.SetColumnSpan(resizeModeGroupBox, 3);
+        mainLayout.Controls.Add(convertSelectedButton, 3, 2);
+        // Row 3: Width/Height fields + Convert All
+        mainLayout.Controls.Add(resizeFieldsLayout, 0, 3);
+        mainLayout.SetColumnSpan(resizeFieldsLayout, 3);
+        mainLayout.Controls.Add(convertButton, 3, 3);
+        // Row 4: Status strip
+        mainLayout.Controls.Add(statusStrip, 0, 4);
         mainLayout.SetColumnSpan(statusStrip, 4);
 
         //
@@ -398,11 +398,30 @@ partial class MainWindow {
         heightTextBox.TabIndex = 10;
 
         //
+        // resizeFieldsLayout
+        //
+        resizeFieldsLayout.ColumnCount = 4;
+        resizeFieldsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        resizeFieldsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+        resizeFieldsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        resizeFieldsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+        resizeFieldsLayout.RowCount = 1;
+        resizeFieldsLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        resizeFieldsLayout.AutoSize = true;
+        resizeFieldsLayout.Dock = DockStyle.Fill;
+        resizeFieldsLayout.Margin = new Padding(0);
+        resizeFieldsLayout.Name = "resizeFieldsLayout";
+        resizeFieldsLayout.Controls.Add(widthLabel, 0, 0);
+        resizeFieldsLayout.Controls.Add(widthTextBox, 1, 0);
+        resizeFieldsLayout.Controls.Add(heightLabel, 2, 0);
+        resizeFieldsLayout.Controls.Add(heightTextBox, 3, 0);
+
+        //
         // convertSelectedButton
         //
         convertSelectedButton.Text = "Convert Selected";
         convertSelectedButton.AutoSize = true;
-        convertSelectedButton.Anchor = AnchorStyles.Left;
+        convertSelectedButton.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
         convertSelectedButton.Name = "convertSelectedButton";
         convertSelectedButton.Enabled = false;
         convertSelectedButton.TabIndex = 11;
@@ -412,7 +431,7 @@ partial class MainWindow {
         //
         convertButton.Text = "Convert All";
         convertButton.AutoSize = true;
-        convertButton.Anchor = AnchorStyles.Right;
+        convertButton.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         convertButton.Name = "convertButton";
         convertButton.Font = new Font(convertButton.Font, FontStyle.Bold);
         convertButton.TabIndex = 12;
@@ -468,6 +487,8 @@ partial class MainWindow {
         mainLayout.ResumeLayout(false);
         mainLayout.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).EndInit();
+        resizeFieldsLayout.ResumeLayout(false);
+        resizeFieldsLayout.PerformLayout();
         resizeModeFlowLayout.ResumeLayout(false);
         resizeModeFlowLayout.PerformLayout();
         resizeModeGroupBox.ResumeLayout(false);
@@ -511,6 +532,7 @@ partial class MainWindow {
     private CheckBox resizeCheckBox;
     private GroupBox resizeModeGroupBox;
     private FlowLayoutPanel resizeModeFlowLayout;
+    private TableLayoutPanel resizeFieldsLayout;
     private RadioButton keepProportionsRadioButton;
     private RadioButton cropRadioButton;
     private Label widthLabel;
