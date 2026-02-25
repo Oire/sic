@@ -29,16 +29,25 @@ public partial class MainWindow: Form {
         addImageMenuItem.Click += AddImageMenuItem_Click;
         addFolderMenuItem.Click += AddFolderMenuItem_Click;
         addFromUrlMenuItem.Click += AddFromUrlMenuItem_Click;
-        removeMenuItem.Click += RemoveMenuItem_Click;
-        removeAllMenuItem.Click += RemoveAllMenuItem_Click;
         optionsMenuItem.Click += OptionsMenuItem_Click;
         exitMenuItem.Click += ExitMenuItem_Click;
 
+        // Edit menu
+        removeMenuItem.Click += RemoveMenuItem_Click;
+        removeAllMenuItem.Click += RemoveAllMenuItem_Click;
+
+        // Convert menu
+        convertSelectedMenuItem.Click += ConvertSelectedMenuItem_Click;
+        convertAllMenuItem.Click += ConvertButton_Click;
+        createFaviconMenuItem.Click += CreateFaviconMenuItem_Click;
+
         // Help menu
         userGuideMenuItem.Click += UserGuideMenuItem_Click;
+        supportDevelopmentMenuItem.Click += SupportDevelopmentMenuItem_Click;
         aboutMenuItem.Click += AboutMenuItem_Click;
 
         // Controls
+        convertSelectedButton.Click += ConvertSelectedMenuItem_Click;
         convertButton.Click += ConvertButton_Click;
         resizeCheckBox.CheckedChanged += ResizeCheckBox_CheckedChanged;
         keepProportionsRadioButton.CheckedChanged += ResizeModeRadioButton_CheckedChanged;
@@ -75,9 +84,15 @@ public partial class MainWindow: Form {
         var hasItems = _imageItems.Count > 0;
         var hasSelection = imageListView.SelectedIndices.Count > 0;
 
+        editMenu.Enabled = hasItems;
         removeMenuItem.Enabled = hasSelection;
         removeAllMenuItem.Enabled = hasItems;
+        convertMenu.Enabled = hasItems;
+        convertSelectedButton.Enabled = hasSelection;
         convertButton.Enabled = hasItems;
+        convertSelectedMenuItem.Enabled = hasSelection;
+        convertAllMenuItem.Enabled = hasItems;
+        createFaviconMenuItem.Enabled = hasSelection;
     }
 
     // --- File menu handlers ---
@@ -218,21 +233,20 @@ public partial class MainWindow: Form {
         Close();
     }
 
-    // --- Convert button handler ---
+    // --- Convert handlers ---
 
-    private async void ConvertButton_Click(object? sender, EventArgs e) {
-        if (_imageItems.Count == 0) {
-            MessageBox.Show(_("No images to convert. Add some images first."), _("Nothing to convert"), MessageBoxButtons.OK, MessageBoxIcon.Information);
-            return;
-        }
+    private bool TryGetConversionParams(out string targetFormat, out int? width, out int? height, out Models.ResizeMode resizeMode) {
+        targetFormat = "";
+        width = null;
+        height = null;
+        resizeMode = Models.ResizeMode.KeepProportions;
 
-        if (formatComboBox.SelectedItem is not string targetFormat) {
+        if (formatComboBox.SelectedItem is not string format) {
             MessageBox.Show(_("Please select a target format."), _("No format selected"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
+            return false;
         }
 
-        int? width = null, height = null;
-        var resizeMode = Models.ResizeMode.KeepProportions;
+        targetFormat = format;
 
         if (resizeCheckBox.Checked) {
             resizeMode = cropRadioButton.Checked ? Models.ResizeMode.Crop : Models.ResizeMode.KeepProportions;
@@ -245,14 +259,14 @@ public partial class MainWindow: Form {
                     MessageBox.Show(_("Crop mode requires a valid width (1\u201365535)."), _("Invalid width"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
-                    return;
+                    return false;
                 }
 
                 if (!hasHeight) {
                     MessageBox.Show(_("Crop mode requires a valid height (1\u201365535)."), _("Invalid height"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     heightTextBox.Focus();
                     heightTextBox.SelectAll();
-                    return;
+                    return false;
                 }
 
                 width = w;
@@ -262,7 +276,7 @@ public partial class MainWindow: Form {
                     MessageBox.Show(_("Please enter at least one valid dimension (1\u201365535)."), _("Invalid dimensions"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
-                    return;
+                    return false;
                 }
 
                 if (hasWidth)
@@ -272,11 +286,18 @@ public partial class MainWindow: Form {
             }
         }
 
+        return true;
+    }
+
+    private async Task ConvertItemsAsync(List<int> indices) {
+        if (!TryGetConversionParams(out var targetFormat, out var width, out var height, out var resizeMode))
+            return;
+
         var outputFolder = Config.General.OutputFolder;
 
         convertButton.Enabled = false;
 
-        var totalCount = _imageItems.Count;
+        var totalCount = indices.Count;
         var converted = 0;
         var skipped = 0;
         var convertedIndices = new List<int>();
@@ -288,12 +309,13 @@ public partial class MainWindow: Form {
             Application.DoEvents();
 
             await Task.Run(() => {
-                for (var i = 0; i < totalCount; i++) {
+                for (var j = 0; j < totalCount; j++) {
+                    var i = indices[j];
                     var item = _imageItems[i];
 
                     Invoke(() => {
                         progressDialog!.UpdateMessage(
-                            _("Converting {0} ({1}/{2})...", item.FileName, i + 1, totalCount));
+                            _("Converting {0} ({1}/{2})...", item.FileName, j + 1, totalCount));
                         imageListView.Items[i].SubItems[4].Text = _("Converting...");
                     });
 
@@ -373,6 +395,97 @@ public partial class MainWindow: Form {
         UpdateMenuState();
     }
 
+    private async void ConvertButton_Click(object? sender, EventArgs e) {
+        if (_imageItems.Count == 0) {
+            MessageBox.Show(_("No images to convert. Add some images first."), _("Nothing to convert"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        var allIndices = Enumerable.Range(0, _imageItems.Count).ToList();
+        await ConvertItemsAsync(allIndices);
+    }
+
+    private async void ConvertSelectedMenuItem_Click(object? sender, EventArgs e) {
+        if (imageListView.SelectedIndices.Count == 0)
+            return;
+
+        var selectedIndices = imageListView.SelectedIndices.Cast<int>().ToList();
+        await ConvertItemsAsync(selectedIndices);
+    }
+
+    private async void CreateFaviconMenuItem_Click(object? sender, EventArgs e) {
+        if (imageListView.SelectedIndices.Count == 0)
+            return;
+
+        var index = imageListView.SelectedIndices[0];
+        var item = _imageItems[index];
+        var outputFolder = Config.General.OutputFolder;
+        var outputPath = ImageConverter.GenerateOutputPath(item, "ICO", outputFolder);
+
+        if (File.Exists(outputPath)) {
+            var resolution = ResolveFileConflict(outputPath);
+
+            switch (resolution) {
+                case ConflictResolution.Overwrite:
+                    break;
+                case ConflictResolution.Rename:
+                    outputPath = ImageConverter.GetConflictRenamePath(outputPath);
+                    break;
+                case ConflictResolution.Skip:
+                    return;
+            }
+        }
+
+        convertButton.Enabled = false;
+        ProgressDialog? progressDialog = null;
+
+        try {
+            progressDialog = new ProgressDialog(_("Creating favicon..."));
+            progressDialog.Show(this);
+            Application.DoEvents();
+
+            Invoke(() => {
+                imageListView.Items[index].SubItems[4].Text = _("Converting...");
+            });
+
+            await Task.Run(() => {
+                var dir = Path.GetDirectoryName(outputPath);
+                if (dir != null && !Directory.Exists(dir)) {
+                    Directory.CreateDirectory(dir);
+                }
+
+                ImageConverter.CreateFavicon(item, outputPath);
+            });
+
+            _imageItems.RemoveAt(index);
+            imageListView.Items.RemoveAt(index);
+            previewPictureBox.Image?.Dispose();
+            previewPictureBox.Image = null;
+
+            statusLabel.Text = _("Favicon created: {0}", Path.GetFileName(outputPath));
+            MessageBox.Show(_("Favicon created successfully:\n{0}", outputPath), _("Favicon Created"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+        } catch (Exception ex) {
+            Log.Error("Failed to create favicon for {FileName}: {Error}", item.FileName, ex.Message);
+            Invoke(() => {
+                imageListView.Items[index].SubItems[4].Text = _("Failed");
+            });
+            MessageBox.Show(_("Failed to create favicon:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+        } finally {
+            progressDialog?.Close();
+            progressDialog?.Dispose();
+            convertButton.Enabled = true;
+        }
+
+        UpdateMenuState();
+    }
+
+    private void SupportDevelopmentMenuItem_Click(object? sender, EventArgs e) {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo {
+            FileName = "https://oire.org/donate",
+            UseShellExecute = true,
+        });
+    }
+
     // --- Help menu handlers ---
 
     private void UserGuideMenuItem_Click(object? sender, EventArgs e) {
@@ -388,13 +501,11 @@ public partial class MainWindow: Form {
 
     private void ResizeCheckBox_CheckedChanged(object? sender, EventArgs e) {
         var enabled = resizeCheckBox.Checked;
+        resizeModeGroupBox.Enabled = enabled;
         widthLabel.Enabled = enabled;
         widthTextBox.Enabled = enabled;
-        dimensionSeparatorLabel.Enabled = enabled;
         heightLabel.Enabled = enabled;
         heightTextBox.Enabled = enabled;
-        keepProportionsRadioButton.Enabled = enabled;
-        cropRadioButton.Enabled = enabled;
 
         if (enabled) {
             PopulateResizeFieldsFromSelection();
@@ -623,6 +734,7 @@ public partial class MainWindow: Form {
         listItem.SubItems.Add(""); // Status column — blank on add
 
         imageListView.Items.Add(listItem);
+        imageListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         listItem.Selected = true;
         listItem.Focused = true;
         listItem.EnsureVisible();

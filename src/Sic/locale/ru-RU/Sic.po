@@ -56,15 +56,23 @@ msgstr "{0} пропущено"
 msgid "{0}x{1}"
 msgstr "{0}x{1}"
 
-#: ..\..\MainWindow.Designer.cs:174
+#: ..\..\MainWindow.Designer.cs
 msgid "&About SIC!..."
 msgstr "&О программе SIC!..."
 
-#: ..\..\MainWindow.Designer.cs:87
+#: ..\..\MainWindow.Designer.cs
+msgid "&Convert"
+msgstr "&Конвертация"
+
+#: ..\..\MainWindow.Designer.cs
+msgid "&Edit"
+msgstr "&Редактирование"
+
+#: ..\..\MainWindow.Designer.cs
 msgid "&File"
 msgstr "&Файл"
 
-#: ..\..\MainWindow.Designer.cs:156
+#: ..\..\MainWindow.Designer.cs
 msgid "&Help"
 msgstr "&Справка"
 
@@ -175,9 +183,25 @@ msgstr "Ошибка конвертации"
 msgid "Conversion failed: {0}"
 msgstr "Ошибка конвертации: {0}"
 
-#: ..\..\MainWindow.Designer.cs:347
+#: ..\..\MainWindow.Designer.cs
 msgid "Convert"
 msgstr "Конвертировать"
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert &All"
+msgstr "Конвертировать &всё"
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert &Selected"
+msgstr "Конвертировать &выбранное"
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert All"
+msgstr "Конвертировать всё"
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert Selected"
+msgstr "Конвертировать выбранное"
 
 #: ..\..\Program.cs:145
 #, csharp-format
@@ -194,7 +218,15 @@ msgstr "Конвертация {0} ({1}/{2})..."
 msgid "Converting..."
 msgstr "Конвертация..."
 
-#: ..\..\MainWindow.Designer.cs:368
+#: ..\..\MainWindow.Designer.cs
+msgid "Create &Favicon..."
+msgstr "Создать &фавикон..."
+
+#: ..\..\MainWindow.cs
+msgid "Creating favicon..."
+msgstr "Создание фавикона..."
+
+#: ..\..\MainWindow.Designer.cs
 msgid "Crop"
 msgstr "Обрезка"
 
@@ -274,12 +306,31 @@ msgstr ""
 "{0}\n"
 "{1}"
 
+#: ..\..\MainWindow.cs
+msgid "Favicon Created"
+msgstr "Фавикон создан"
+
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "Favicon created successfully:\n{0}"
+msgstr "Фавикон успешно создан:\n{0}"
+
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "Favicon created: {0}"
+msgstr "Фавикон создан: {0}"
+
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "Failed to create favicon:\n{0}"
+msgstr "Не удалось создать фавикон:\n{0}"
+
 #: ..\..\Program.cs:36
 #, csharp-format
 msgid "Fatal error: {0}"
 msgstr "Критическая ошибка: {0}"
 
-#: ..\..\MainWindow.cs:615
+#: ..\..\MainWindow.cs
 msgid "File Already Exists"
 msgstr "Файл уже существует"
 
@@ -526,6 +577,10 @@ msgstr "Пропущено"
 msgid "Status"
 msgstr "Статус"
 
+#: ..\..\MainWindow.Designer.cs
+msgid "&Support Development..."
+msgstr "&Поддержать разработку..."
+
 #: ..\..\Program.cs:86
 #, csharp-format
 msgid "Supported formats: {0}"
@@ -535,7 +590,7 @@ msgstr "Поддерживаемые форматы: {0}"
 msgid "System"
 msgstr "Системный"
 
-#: ..\..\MainWindow.Designer.cs:272
+#: ..\..\MainWindow.Designer.cs
 msgid "Target format:"
 msgstr "Целевой формат:"
 

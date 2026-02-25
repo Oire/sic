@@ -208,6 +208,25 @@ public static class ImageConverter {
         return newPath;
     }
 
+    public static void CreateFavicon(ImageItem item, string outputPath) {
+        using var source = LoadMagickImage(item);
+        var sizes = new uint[] { 16, 32, 48, 64 };
+
+        using var collection = new MagickImageCollection();
+
+        foreach (var size in sizes) {
+            var frame = (MagickImage)source.Clone();
+            var geometry = new MagickGeometry(size, size) {
+                IgnoreAspectRatio = true,
+            };
+            frame.Resize(geometry);
+            collection.Add(frame);
+        }
+
+        collection.Write(outputPath, MagickFormat.Ico);
+        Log.Information("Created favicon from {FileName} at {OutputPath} with sizes {Sizes}", item.FileName, outputPath, string.Join(", ", sizes));
+    }
+
     private static MagickImage LoadMagickImage(ImageItem item) {
         if (item.ImageData is not null) {
             return new MagickImage(item.ImageData);

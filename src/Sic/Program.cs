@@ -67,6 +67,7 @@ internal static class Program {
     private static int RunCli(string[] args) {
         Config.Load();
         Localization.SetLanguage(Config.General.Language);
+        Thread.CurrentThread.CurrentUICulture = Localization.GetCurrentCulture();
         EnsureOutputFolderExists();
 
         var inputOption = new Option<string>("--input", "-i") { Required = true, Description = _("Path to the source image file") };
