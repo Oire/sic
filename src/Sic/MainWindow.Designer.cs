@@ -43,7 +43,7 @@ partial class MainWindow {
         convertMenu = new ToolStripMenuItem();
         convertSelectedMenuItem = new ToolStripMenuItem();
         convertAllMenuItem = new ToolStripMenuItem();
-        createFaviconMenuItem = new ToolStripMenuItem();
+        createMultiSizeIcoMenuItem = new ToolStripMenuItem();
 
         // Help menu
         helpMenu = new ToolStripMenuItem();
@@ -178,7 +178,7 @@ partial class MainWindow {
             convertSelectedMenuItem,
             convertAllMenuItem,
             new ToolStripSeparator(),
-            createFaviconMenuItem,
+            createMultiSizeIcoMenuItem,
         });
 
         //
@@ -198,11 +198,11 @@ partial class MainWindow {
         convertAllMenuItem.Enabled = false;
 
         //
-        // createFaviconMenuItem
+        // createMultiSizeIcoMenuItem
         //
-        createFaviconMenuItem.Text = "Create &Favicon...";
-        createFaviconMenuItem.Name = "createFaviconMenuItem";
-        createFaviconMenuItem.Enabled = false;
+        createMultiSizeIcoMenuItem.Text = "Create Multi-size &ICO...";
+        createMultiSizeIcoMenuItem.Name = "createMultiSizeIcoMenuItem";
+        createMultiSizeIcoMenuItem.Enabled = false;
 
         //
         // helpMenu
@@ -514,7 +514,7 @@ partial class MainWindow {
     private ToolStripMenuItem convertMenu;
     private ToolStripMenuItem convertSelectedMenuItem;
     private ToolStripMenuItem convertAllMenuItem;
-    private ToolStripMenuItem createFaviconMenuItem;
+    private ToolStripMenuItem createMultiSizeIcoMenuItem;
     private ToolStripMenuItem helpMenu;
     private ToolStripMenuItem userGuideMenuItem;
     private ToolStripMenuItem supportDevelopmentMenuItem;
