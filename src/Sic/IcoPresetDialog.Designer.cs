@@ -21,16 +21,14 @@ partial class IcoPresetDialog {
         customRadioButton = new RadioButton();
         sizesLabel = new Label();
         sizesListBox = new ListBox();
-        removeSizeButton = new Button();
-        sizeNumericUpDown = new NumericUpDown();
         addSizeButton = new Button();
+        removeSizeButton = new Button();
         okButton = new Button();
         cancelButton = new Button();
 
         mainLayout.SuspendLayout();
         presetGroupBox.SuspendLayout();
         presetFlowLayout.SuspendLayout();
-        ((System.ComponentModel.ISupportInitialize)sizeNumericUpDown).BeginInit();
         SuspendLayout();
 
         //
@@ -42,8 +40,8 @@ partial class IcoPresetDialog {
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         mainLayout.RowCount = 4;
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.Dock = DockStyle.Fill;
         mainLayout.Padding = new Padding(12);
@@ -53,14 +51,14 @@ partial class IcoPresetDialog {
         mainLayout.Controls.Add(presetGroupBox, 0, 0);
         mainLayout.SetColumnSpan(presetGroupBox, 3);
 
-        // Row 1: Sizes label, list box, remove button
+        // Row 1: Sizes label, list box (rowspan 2), add button
         mainLayout.Controls.Add(sizesLabel, 0, 1);
         mainLayout.Controls.Add(sizesListBox, 1, 1);
-        mainLayout.Controls.Add(removeSizeButton, 2, 1);
+        mainLayout.SetRowSpan(sizesListBox, 2);
+        mainLayout.Controls.Add(addSizeButton, 2, 1);
 
-        // Row 2: (empty col 0), numeric up-down, add button
-        mainLayout.Controls.Add(sizeNumericUpDown, 1, 2);
-        mainLayout.Controls.Add(addSizeButton, 2, 2);
+        // Row 2: (empty col 0), (listbox continues), remove button
+        mainLayout.Controls.Add(removeSizeButton, 2, 2);
 
         // Row 3: OK button (col 0), cancel button (col 2)
         mainLayout.Controls.Add(okButton, 0, 3);
@@ -132,6 +130,16 @@ partial class IcoPresetDialog {
         sizesListBox.TabIndex = 4;
 
         //
+        // addSizeButton
+        //
+        addSizeButton.Text = "Add...";
+        addSizeButton.AutoSize = true;
+        addSizeButton.Anchor = AnchorStyles.Left | AnchorStyles.Top;
+        addSizeButton.Name = "addSizeButton";
+        addSizeButton.Enabled = false;
+        addSizeButton.TabIndex = 5;
+
+        //
         // removeSizeButton
         //
         removeSizeButton.Text = "Remove";
@@ -139,29 +147,7 @@ partial class IcoPresetDialog {
         removeSizeButton.Anchor = AnchorStyles.Left | AnchorStyles.Top;
         removeSizeButton.Name = "removeSizeButton";
         removeSizeButton.Enabled = false;
-        removeSizeButton.TabIndex = 5;
-
-        //
-        // sizeNumericUpDown
-        //
-        sizeNumericUpDown.Dock = DockStyle.Fill;
-        sizeNumericUpDown.Minimum = 16;
-        sizeNumericUpDown.Maximum = 512;
-        sizeNumericUpDown.Increment = 1;
-        sizeNumericUpDown.Value = 16;
-        sizeNumericUpDown.Name = "sizeNumericUpDown";
-        sizeNumericUpDown.Enabled = false;
-        sizeNumericUpDown.TabIndex = 6;
-
-        //
-        // addSizeButton
-        //
-        addSizeButton.Text = "Add";
-        addSizeButton.AutoSize = true;
-        addSizeButton.Anchor = AnchorStyles.Left;
-        addSizeButton.Name = "addSizeButton";
-        addSizeButton.Enabled = false;
-        addSizeButton.TabIndex = 7;
+        removeSizeButton.TabIndex = 6;
 
         //
         // okButton
@@ -170,7 +156,7 @@ partial class IcoPresetDialog {
         okButton.Dock = DockStyle.Fill;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
-        okButton.TabIndex = 8;
+        okButton.TabIndex = 7;
 
         //
         // cancelButton
@@ -179,7 +165,7 @@ partial class IcoPresetDialog {
         cancelButton.Dock = DockStyle.Fill;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
-        cancelButton.TabIndex = 9;
+        cancelButton.TabIndex = 8;
 
         //
         // IcoPresetDialog
@@ -197,7 +183,6 @@ partial class IcoPresetDialog {
         AcceptButton = okButton;
         CancelButton = cancelButton;
 
-        ((System.ComponentModel.ISupportInitialize)sizeNumericUpDown).EndInit();
         presetFlowLayout.ResumeLayout(false);
         presetFlowLayout.PerformLayout();
         presetGroupBox.ResumeLayout(false);
@@ -218,9 +203,8 @@ partial class IcoPresetDialog {
     private RadioButton customRadioButton;
     private Label sizesLabel;
     private ListBox sizesListBox;
-    private Button removeSizeButton;
-    private NumericUpDown sizeNumericUpDown;
     private Button addSizeButton;
+    private Button removeSizeButton;
     private Button okButton;
     private Button cancelButton;
 }

@@ -39,7 +39,6 @@ public partial class IcoPresetDialog: Form {
 
         sizesLabel.Enabled = isCustom;
         sizesListBox.Enabled = isCustom;
-        sizeNumericUpDown.Enabled = isCustom;
         addSizeButton.Enabled = isCustom;
         removeSizeButton.Enabled = isCustom && sizesListBox.SelectedIndex >= 0;
 
@@ -68,7 +67,12 @@ public partial class IcoPresetDialog: Form {
     }
 
     private void AddSizeButton_Click(object? sender, EventArgs e) {
-        var size = (uint)sizeNumericUpDown.Value;
+        using var addDialog = new AddSizeDialog();
+
+        if (addDialog.ShowDialog(this) != DialogResult.OK)
+            return;
+
+        var size = addDialog.EnteredSize;
 
         if (_customSizes.Contains(size)) {
             MessageBox.Show(
@@ -81,6 +85,11 @@ public partial class IcoPresetDialog: Form {
 
         _customSizes.Add(size);
         RefreshSizesList();
+
+        var index = sizesListBox.Items.IndexOf(size.ToString());
+
+        if (index >= 0)
+            sizesListBox.SelectedIndex = index;
     }
 
     private void RemoveSizeButton_Click(object? sender, EventArgs e) {
