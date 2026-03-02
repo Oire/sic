@@ -24,8 +24,33 @@ public static class ImageConverter {
     public static IReadOnlyList<string> GetSupportedFormats() => FormatMap.Keys.ToList();
 
     public static ImageItem LoadFromFile(string path) {
-        using var image = new MagickImage(path);
         var fileInfo = new FileInfo(path);
+
+        if (IsIcoFile(path)) {
+            using var collection = new MagickImageCollection(path);
+            var frame = collection.Count > 1
+                ? collection.OrderByDescending(f => (long)f.Width * f.Height).First()
+                : collection[0];
+
+            if (collection.Count > 1) {
+                Log.Information(
+                    "Multi-frame ICO {FileName} contains {Count} frames ({Sizes}), using largest: {Width}x{Height}",
+                    fileInfo.Name, collection.Count,
+                    string.Join(", ", collection.Select(f => $"{f.Width}x{f.Height}")),
+                    frame.Width, frame.Height);
+            }
+
+            return new ImageItem {
+                FilePath = path,
+                OriginalFormat = "Ico",
+                FileName = fileInfo.Name,
+                Width = (int)frame.Width,
+                Height = (int)frame.Height,
+                FileSize = fileInfo.Length,
+            };
+        }
+
+        using var image = new MagickImage(path);
 
         return new ImageItem {
             FilePath = path,
@@ -208,9 +233,8 @@ public static class ImageConverter {
         return newPath;
     }
 
-    public static void CreateFavicon(ImageItem item, string outputPath) {
+    public static void CreateMultiSizeIco(ImageItem item, string outputPath, uint[] sizes) {
         using var source = LoadMagickImage(item);
-        var sizes = new uint[] { 16, 32, 48, 64 };
 
         using var collection = new MagickImageCollection();
 
@@ -224,19 +248,38 @@ public static class ImageConverter {
         }
 
         collection.Write(outputPath, MagickFormat.Ico);
-        Log.Information("Created favicon from {FileName} at {OutputPath} with sizes {Sizes}", item.FileName, outputPath, string.Join(", ", sizes));
+        Log.Information("Created multi-size ICO from {FileName} at {OutputPath} with sizes {Sizes}", item.FileName, outputPath, string.Join(", ", sizes));
     }
 
     private static MagickImage LoadMagickImage(ImageItem item) {
         if (item.ImageData is not null) {
+            if (string.Equals(item.OriginalFormat, "Ico", StringComparison.OrdinalIgnoreCase)) {
+                return SelectLargestIcoFrame(new MagickImageCollection(item.ImageData));
+            }
+
             return new MagickImage(item.ImageData);
         }
 
         if (!string.IsNullOrWhiteSpace(item.FilePath)) {
+            if (IsIcoFile(item.FilePath)) {
+                return SelectLargestIcoFrame(new MagickImageCollection(item.FilePath));
+            }
+
             return new MagickImage(item.FilePath);
         }
 
         throw new InvalidOperationException("ImageItem has no data source");
+    }
+
+    private static bool IsIcoFile(string path) {
+        return Path.GetExtension(path).Equals(".ico", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static MagickImage SelectLargestIcoFrame(MagickImageCollection collection) {
+        using (collection) {
+            var largest = collection.OrderByDescending(f => (long)f.Width * f.Height).First();
+            return (MagickImage)largest.Clone();
+        }
     }
 
     private static MagickGeometry CalculateResizeGeometry(MagickImage image, int? width, int? height) {

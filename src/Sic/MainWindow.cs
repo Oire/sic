@@ -39,7 +39,7 @@ public partial class MainWindow: Form {
         // Convert menu
         convertSelectedMenuItem.Click += ConvertSelectedMenuItem_Click;
         convertAllMenuItem.Click += ConvertButton_Click;
-        createFaviconMenuItem.Click += CreateFaviconMenuItem_Click;
+        createMultiSizeIcoMenuItem.Click += CreateMultiSizeIcoMenuItem_Click;
 
         // Help menu
         userGuideMenuItem.Click += UserGuideMenuItem_Click;
@@ -92,7 +92,7 @@ public partial class MainWindow: Form {
         convertButton.Enabled = hasItems;
         convertSelectedMenuItem.Enabled = hasSelection;
         convertAllMenuItem.Enabled = hasItems;
-        createFaviconMenuItem.Enabled = hasSelection;
+        createMultiSizeIcoMenuItem.Enabled = hasSelection;
     }
 
     // --- File menu handlers ---
@@ -413,10 +413,15 @@ public partial class MainWindow: Form {
         await ConvertItemsAsync(selectedIndices);
     }
 
-    private async void CreateFaviconMenuItem_Click(object? sender, EventArgs e) {
+    private async void CreateMultiSizeIcoMenuItem_Click(object? sender, EventArgs e) {
         if (imageListView.SelectedIndices.Count == 0)
             return;
 
+        using var presetDialog = new IcoPresetDialog();
+        if (presetDialog.ShowDialog(this) != DialogResult.OK)
+            return;
+
+        var sizes = presetDialog.SelectedSizes;
         var index = imageListView.SelectedIndices[0];
         var item = _imageItems[index];
         var outputFolder = Config.General.OutputFolder;
@@ -440,7 +445,7 @@ public partial class MainWindow: Form {
         ProgressDialog? progressDialog = null;
 
         try {
-            progressDialog = new ProgressDialog(_("Creating favicon..."));
+            progressDialog = new ProgressDialog(_("Creating multi-size ICO..."));
             progressDialog.Show(this);
             Application.DoEvents();
 
@@ -454,7 +459,7 @@ public partial class MainWindow: Form {
                     Directory.CreateDirectory(dir);
                 }
 
-                ImageConverter.CreateFavicon(item, outputPath);
+                ImageConverter.CreateMultiSizeIco(item, outputPath, sizes);
             });
 
             _imageItems.RemoveAt(index);
@@ -462,14 +467,14 @@ public partial class MainWindow: Form {
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = null;
 
-            statusLabel.Text = _("Favicon created: {0}", Path.GetFileName(outputPath));
-            MessageBox.Show(_("Favicon created successfully:\n{0}", outputPath), _("Favicon Created"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            statusLabel.Text = _("Multi-size ICO created: {0}", Path.GetFileName(outputPath));
+            MessageBox.Show(_("Multi-size ICO created successfully:\n{0}", outputPath), _("ICO Created"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         } catch (Exception ex) {
-            Log.Error("Failed to create favicon for {FileName}: {Error}", item.FileName, ex.Message);
+            Log.Error("Failed to create multi-size ICO for {FileName}: {Error}", item.FileName, ex.Message);
             Invoke(() => {
                 imageListView.Items[index].SubItems[4].Text = _("Failed");
             });
-            MessageBox.Show(_("Failed to create favicon:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(_("Failed to create multi-size ICO:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         } finally {
             progressDialog?.Close();
             progressDialog?.Dispose();

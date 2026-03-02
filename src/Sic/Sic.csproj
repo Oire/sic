@@ -21,6 +21,7 @@
     <Company>Oire Software</Company>
     <Copyright>Copyright © 2026 Oire Software SARL. All rights reserved.</Copyright>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <ApplicationIcon>sic.ico</ApplicationIcon>
   </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
