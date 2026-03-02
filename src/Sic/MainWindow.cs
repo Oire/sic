@@ -289,11 +289,31 @@ public partial class MainWindow: Form {
         return true;
     }
 
+    private static string ValidateOutputFolder() {
+        var outputFolder = Config.General.OutputFolder;
+
+        if (!string.IsNullOrWhiteSpace(outputFolder)
+            && outputFolder != Utils.Constants.App.DefaultOutputFolder
+            && !Directory.Exists(outputFolder))
+        {
+            MessageBox.Show(
+                _("The output folder \"{0}\" no longer exists. The default folder will be used.", outputFolder),
+                _("Output Folder Not Found"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            outputFolder = Utils.Constants.App.DefaultOutputFolder;
+            Config.General.OutputFolder = outputFolder;
+            Config.Save();
+        }
+
+        return outputFolder;
+    }
+
     private async Task ConvertItemsAsync(List<int> indices) {
         if (!TryGetConversionParams(out var targetFormat, out var width, out var height, out var resizeMode))
             return;
 
-        var outputFolder = Config.General.OutputFolder;
+        var outputFolder = ValidateOutputFolder();
 
         convertButton.Enabled = false;
 
@@ -424,7 +444,7 @@ public partial class MainWindow: Form {
         var sizes = presetDialog.SelectedSizes;
         var index = imageListView.SelectedIndices[0];
         var item = _imageItems[index];
-        var outputFolder = Config.General.OutputFolder;
+        var outputFolder = ValidateOutputFolder();
         var outputPath = ImageConverter.GenerateOutputPath(item, "ICO", outputFolder);
 
         if (File.Exists(outputPath)) {

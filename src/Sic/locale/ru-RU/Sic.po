@@ -347,6 +347,10 @@ msgstr "Файл не найден: {0}"
 msgid "Filter:"
 msgstr "Фильтр:"
 
+#: ..\..\SettingsDialog.cs
+msgid "Folder Not Found"
+msgstr "Папка не найдена"
+
 #: ..\..\AddFolderDialog.Designer.cs:68
 msgid "Folder:"
 msgstr "Папка:"
@@ -464,6 +468,11 @@ msgstr "OK"
 #: ..\..\SettingsDialog.Designer.cs:64
 msgid "Output folder:"
 msgstr "Папка назначения:"
+
+#: ..\..\Program.cs
+#: ..\..\MainWindow.cs
+msgid "Output Folder Not Found"
+msgstr "Папка назначения не найдена"
 
 #: ..\..\Program.cs:78
 msgid "Output path must have a file extension (e.g. .jpg, .png)"
@@ -603,6 +612,16 @@ msgstr ""
 "Файл \"{0}\" уже существует.\n"
 "Что вы хотите сделать?"
 
+#: ..\..\Program.cs
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "The output folder \"{0}\" no longer exists. The default folder will be used."
+msgstr "Папка назначения \"{0}\" больше не существует. Будет использована папка по умолчанию."
+
+#: ..\..\SettingsDialog.cs
+msgid "The selected folder does not exist. Please choose an existing folder."
+msgstr "Выбранная папка не существует. Пожалуйста, выберите существующую папку."
+
 #: ..\..\MainWindow.cs:357
 msgid "The user guide is coming soon."
 msgstr "Руководство пользователя скоро появится."
@@ -653,6 +672,11 @@ msgstr "Версия {0}"
 #: ..\..\MainWindow.Designer.cs:299
 msgid "W:"
 msgstr "Ш:"
+
+#: ..\..\Program.cs
+#, csharp-format
+msgid "Warning: The output folder \"{0}\" no longer exists. Using default folder."
+msgstr "Предупреждение: папка назначения \"{0}\" больше не существует. Используется папка по умолчанию."
 
 #: ..\..\AddFolderDialog.cs:11
 msgid "WebP images (*.webp)"

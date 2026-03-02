@@ -335,6 +335,10 @@ msgstr ""
 msgid "Filter:"
 msgstr ""
 
+#: ..\..\SettingsDialog.cs
+msgid "Folder Not Found"
+msgstr ""
+
 #: ..\..\AddFolderDialog.Designer.cs:68
 msgid "Folder:"
 msgstr ""
@@ -449,6 +453,11 @@ msgstr ""
 
 #: ..\..\SettingsDialog.Designer.cs:64
 msgid "Output folder:"
+msgstr ""
+
+#: ..\..\Program.cs
+#: ..\..\MainWindow.cs
+msgid "Output Folder Not Found"
 msgstr ""
 
 #: ..\..\Program.cs:78
@@ -582,6 +591,16 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
+#: ..\..\Program.cs
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "The output folder \"{0}\" no longer exists. The default folder will be used."
+msgstr ""
+
+#: ..\..\SettingsDialog.cs
+msgid "The selected folder does not exist. Please choose an existing folder."
+msgstr ""
+
 #: ..\..\MainWindow.cs:357
 msgid "The user guide is coming soon."
 msgstr ""
@@ -631,6 +650,11 @@ msgstr ""
 
 #: ..\..\MainWindow.Designer.cs:299
 msgid "W:"
+msgstr ""
+
+#: ..\..\Program.cs
+#, csharp-format
+msgid "Warning: The output folder \"{0}\" no longer exists. Using default folder."
 msgstr ""
 
 #: ..\..\AddFolderDialog.cs:11
