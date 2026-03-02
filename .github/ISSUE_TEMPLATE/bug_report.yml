@@ -5,7 +5,7 @@ body:
   - type: dropdown
     id: category
     attributes:
-      label: What category best describes the bug:
+      label: What category best describes the bug
       options:
         - Image Formats, conversion
         - User Interface, visual design, wording, keyboard shortcuts
@@ -19,7 +19,7 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: Please describe the bug:
+      label: Please describe the bug
       description: What happened?
     validations:
       required: true
@@ -27,7 +27,7 @@ body:
   - type: textarea
     id: steps
     attributes:
-      label: Steps to Reproduce:
+      label: Steps to Reproduce
       description: How can we reproduce this?
       placeholder: |
         1. Open SIC!
@@ -41,7 +41,7 @@ body:
   - type: textarea
     id: expected
     attributes:
-      label: Expected Behavior:
+      label: Expected Behavior
       description: What did you expect to happen?
     validations:
       required: true
@@ -49,7 +49,7 @@ body:
   - type: dropdown
     id: mode
     attributes:
-      label: SIC! Mode:
+      label: SIC! Mode
       options:
         - Graphical User Interface
         - Command Line Interface
@@ -62,7 +62,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: SIC! Version (can be seen in the About SIC! dialog):
+      label: SIC! Version (can be seen in the About SIC! dialog)
     validations:
       required: true
 
@@ -76,11 +76,11 @@ body:
   - type: input
     id: windows-version
     attributes:
-      label: Windows Version:
+      label: Windows Version
       placeholder: "e.g., Windows 11 24H2"
 
   - type: input
     id: screen-reader
     attributes:
-      label: Screen reader and version you used, if applicable:
+      label: Screen reader and version you used, if applicable
       placeholder: "e.g., JAWS2026.2602.49"

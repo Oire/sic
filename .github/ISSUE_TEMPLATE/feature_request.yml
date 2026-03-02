@@ -5,7 +5,7 @@ body:
   - type: dropdown
     id: category
     attributes:
-      label: What category best describes this feature or improvement:
+      label: What category best describes this feature or improvement
       options:
         - Image Formats, Conversion
         - User Interface, visual design, wording, keyboard shortcuts
@@ -19,7 +19,7 @@ body:
   - type: textarea
     id: problem
     attributes:
-      label: Problem or Use Case:
+      label: Problem or Use Case
       description: What problem does this solve, or what workflow does it improve?
     validations:
       required: true
@@ -27,7 +27,7 @@ body:
   - type: textarea
     id: solution
     attributes:
-      label: Proposed Solution:
+      label: Proposed Solution
       description: How would you like this to work?
     validations:
       required: true
@@ -35,7 +35,7 @@ body:
   - type: dropdown
     id: mode
     attributes:
-      label: SIC! Mode:
+      label: SIC! Mode
       options:
         - Graphical User Interface
         - Command Line Interface
@@ -48,5 +48,5 @@ body:
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives Considered:
+      label: Alternatives Considered
       description: Any other approaches you've thought of?
