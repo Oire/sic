@@ -92,7 +92,20 @@ public partial class SettingsDialog: Form {
     }
 
     private void OkButton_Click(object? sender, EventArgs e) {
-        Config.General.OutputFolder = outputFolderTextBox.Text;
+        var folder = outputFolderTextBox.Text;
+
+        if (!string.IsNullOrWhiteSpace(folder)
+            && folder != App.DefaultOutputFolder
+            && !Directory.Exists(folder)) {
+            MessageBox.Show(
+                _("The selected folder does not exist. Please choose an existing folder."),
+                _("Folder Not Found"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            DialogResult = DialogResult.None;
+            return;
+        }
+
+        Config.General.OutputFolder = folder;
         var selectedDisplay = languageComboBox.SelectedItem as string;
         Config.General.Language = selectedDisplay != null && _languageMap.TryGetValue(selectedDisplay, out var code)
             ? code

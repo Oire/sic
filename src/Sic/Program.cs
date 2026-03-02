@@ -24,7 +24,7 @@ internal static class Program {
             ApplicationConfiguration.Initialize();
             Config.Load();
             Localization.SetLanguage(Config.General.Language);
-            EnsureOutputFolderExists();
+            EnsureOutputFolderExists(showGui: true);
 #if DEBUG
             Log.Debug("App Startup: Config loaded");
 #endif
@@ -51,16 +51,49 @@ internal static class Program {
         }
     }
 
-    private static void EnsureOutputFolderExists() {
+    private static void EnsureOutputFolderExists(bool showGui) {
         var outputFolder = Config.General.OutputFolder;
+
         if (string.IsNullOrWhiteSpace(outputFolder)) {
             return;
         }
 
+        // Default folder: always create silently
+        if (outputFolder == App.DefaultOutputFolder) {
+            try {
+                Directory.CreateDirectory(outputFolder);
+            } catch (Exception ex) {
+                Log.Warning("Failed to create default output folder {Folder}: {Error}", outputFolder, ex.Message);
+            }
+
+            return;
+        }
+
+        // Custom folder exists — nothing to do
+        if (Directory.Exists(outputFolder)) {
+            return;
+        }
+
+        // Custom folder is gone — warn and reset
+        Log.Warning("Custom output folder no longer exists: {Folder}", outputFolder);
+
+        if (showGui) {
+            MessageBox.Show(
+                _("The output folder \"{0}\" no longer exists. The default folder will be used.", outputFolder),
+                _("Output Folder Not Found"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        } else {
+            Console.Error.WriteLine(
+                _("Warning: The output folder \"{0}\" no longer exists. Using default folder.", outputFolder));
+        }
+
+        Config.General.OutputFolder = App.DefaultOutputFolder;
+        Config.Save();
+
         try {
-            Directory.CreateDirectory(outputFolder);
+            Directory.CreateDirectory(App.DefaultOutputFolder);
         } catch (Exception ex) {
-            Log.Warning("Failed to create output folder {Folder}: {Error}", outputFolder, ex.Message);
+            Log.Warning("Failed to create default output folder {Folder}: {Error}", App.DefaultOutputFolder, ex.Message);
         }
     }
 
@@ -68,7 +101,7 @@ internal static class Program {
         Config.Load();
         Localization.SetLanguage(Config.General.Language);
         Thread.CurrentThread.CurrentUICulture = Localization.GetCurrentCulture();
-        EnsureOutputFolderExists();
+        EnsureOutputFolderExists(showGui: false);
 
         var inputOption = new Option<string>("--input", "-i") { Required = true, Description = _("Path to the source image file") };
         var outputOption = new Option<string?>("--output", "-o") { Description = _("Path for the converted image (format inferred from extension)") };
