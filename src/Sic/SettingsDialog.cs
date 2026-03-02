@@ -96,8 +96,7 @@ public partial class SettingsDialog: Form {
 
         if (!string.IsNullOrWhiteSpace(folder)
             && folder != App.DefaultOutputFolder
-            && !Directory.Exists(folder))
-        {
+            && !Directory.Exists(folder)) {
             MessageBox.Show(
                 _("The selected folder does not exist. Please choose an existing folder."),
                 _("Folder Not Found"),

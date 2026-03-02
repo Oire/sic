@@ -294,8 +294,7 @@ public partial class MainWindow: Form {
 
         if (!string.IsNullOrWhiteSpace(outputFolder)
             && outputFolder != Utils.Constants.App.DefaultOutputFolder
-            && !Directory.Exists(outputFolder))
-        {
+            && !Directory.Exists(outputFolder)) {
             MessageBox.Show(
                 _("The output folder \"{0}\" no longer exists. The default folder will be used.", outputFolder),
                 _("Output Folder Not Found"),
