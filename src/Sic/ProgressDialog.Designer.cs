@@ -11,8 +11,9 @@ partial class ProgressDialog {
     /// </summary>
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing) {
-        if (disposing && (components != null)) {
-            components.Dispose();
+        if (disposing) {
+            components?.Dispose();
+            _cts.Dispose();
         }
         base.Dispose(disposing);
     }
@@ -27,6 +28,7 @@ partial class ProgressDialog {
         MainLayout = new TableLayoutPanel();
         MessageLabel = new Label();
         ProgressBar = new ProgressBar();
+        CancelOperationButton = new Button();
         MainLayout.SuspendLayout();
         SuspendLayout();
         //
@@ -36,14 +38,16 @@ partial class ProgressDialog {
         MainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
         MainLayout.Controls.Add(MessageLabel, 0, 0);
         MainLayout.Controls.Add(ProgressBar, 0, 1);
+        MainLayout.Controls.Add(CancelOperationButton, 0, 2);
         MainLayout.Dock = DockStyle.Fill;
         MainLayout.Location = new Point(0, 0);
         MainLayout.Name = "MainLayout";
         MainLayout.Padding = new Padding(20);
-        MainLayout.RowCount = 2;
-        MainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 60F));
+        MainLayout.RowCount = 3;
         MainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
-        MainLayout.Size = new Size(484, 161);
+        MainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
+        MainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
+        MainLayout.Size = new Size(484, 201);
         MainLayout.TabIndex = 0;
         //
         // MessageLabel
@@ -66,13 +70,24 @@ partial class ProgressDialog {
         ProgressBar.Size = new Size(438, 30);
         ProgressBar.Style = ProgressBarStyle.Marquee;
         ProgressBar.TabIndex = 1;
+        ProgressBar.TabStop = false;
         ProgressBar.MarqueeAnimationSpeed = 30;
+        //
+        // CancelOperationButton
+        //
+        CancelOperationButton.Anchor = AnchorStyles.None;
+        CancelOperationButton.AutoSize = true;
+        CancelOperationButton.Name = "CancelOperationButton";
+        CancelOperationButton.Size = new Size(90, 30);
+        CancelOperationButton.TabIndex = 2;
+        CancelOperationButton.Text = "Cancel";
+        CancelOperationButton.UseVisualStyleBackColor = true;
         //
         // ProgressDialog
         //
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(484, 161);
+        ClientSize = new Size(484, 201);
         ControlBox = false;
         Controls.Add(MainLayout);
         FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -80,8 +95,9 @@ partial class ProgressDialog {
         MinimizeBox = false;
         Name = "ProgressDialog";
         StartPosition = FormStartPosition.CenterParent;
-        Text = "Converting...";
+        Text = "Please wait...";
         AccessibleRole = AccessibleRole.Dialog;
+        CancelButton = CancelOperationButton;
         MainLayout.ResumeLayout(false);
         MainLayout.PerformLayout();
         ResumeLayout(false);
@@ -92,4 +108,5 @@ partial class ProgressDialog {
     private TableLayoutPanel MainLayout;
     private Label MessageLabel;
     private ProgressBar ProgressBar;
+    private Button CancelOperationButton;
 }

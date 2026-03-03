@@ -12,9 +12,12 @@ public partial class MainWindow: Form {
     private readonly List<ImageItem> _imageItems = [];
     private ImageItem? _selectedItem;
     private bool _isAutoFilling;
+    private bool _isLoadingFiles;
     private int _clipboardImageCount;
     private readonly System.Windows.Forms.Timer _previewDebounceTimer = new() { Interval = 300 };
     private readonly ObjectPropertiesStore _localizationStore = new();
+
+    private sealed record BatchAddResult(List<ImageItem> Items, List<string> Errors, int SkippedPlaceholders);
 
     public MainWindow() {
         InitializeComponent();
@@ -97,7 +100,7 @@ public partial class MainWindow: Form {
 
     // --- File menu handlers ---
 
-    private void AddImageMenuItem_Click(object? sender, EventArgs e) {
+    private async void AddImageMenuItem_Click(object? sender, EventArgs e) {
         using var dialog = new OpenFileDialog {
             Title = _("Select images to add"),
             Filter = _("Image files") + "|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.tiff;*.tif;*.webp;*.ico;*.avif|" + _("All files") + "|*.*",
@@ -107,18 +110,10 @@ public partial class MainWindow: Form {
         if (dialog.ShowDialog() != DialogResult.OK)
             return;
 
-        imageListView.BeginUpdate();
-        try {
-            foreach (var file in dialog.FileNames) {
-                AddImageFromFile(file);
-            }
-        } finally {
-            imageListView.EndUpdate();
-        }
-        UpdateMenuState();
+        await AddFilesAsync(dialog.FileNames);
     }
 
-    private void AddFolderMenuItem_Click(object? sender, EventArgs e) {
+    private async void AddFolderMenuItem_Click(object? sender, EventArgs e) {
         using var dialog = new AddFolderDialog();
 
         if (dialog.ShowDialog(this) != DialogResult.OK)
@@ -127,25 +122,15 @@ public partial class MainWindow: Form {
         var searchOption = dialog.IncludeSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
         var extensions = dialog.SelectedExtensions;
         var folder = dialog.SelectedFolder;
-        var addedCount = 0;
 
-        imageListView.BeginUpdate();
-        try {
-            foreach (var extension in extensions) {
-                var pattern = extension; // e.g. "*.jpg"
-                foreach (var file in Directory.EnumerateFiles(folder, pattern, searchOption)) {
-                    AddImageFromFile(file, folder);
-                    addedCount++;
-                }
-            }
-        } finally {
-            imageListView.EndUpdate();
-        }
-        UpdateMenuState();
+        var files = FileHelper.EnumerateImageFiles(folder, extensions, searchOption).ToArray();
 
-        if (addedCount == 0) {
+        if (files.Length == 0) {
             MessageBox.Show(_("No matching images found in the selected folder."), _("No images found"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
         }
+
+        await AddFilesAsync(files, folder);
     }
 
     private async void AddFromUrlMenuItem_Click(object? sender, EventArgs e) {
@@ -158,10 +143,12 @@ public partial class MainWindow: Form {
 
         try {
             progressDialog = new ProgressDialog(_("Downloading image..."));
+            progressDialog.Text = _("Downloading...");
             progressDialog.Show(this);
             Application.DoEvents();
 
-            var item = await ImageConverter.LoadFromUrl(dialog.Url);
+            var item = await ImageConverter.LoadFromUrl(dialog.Url)
+                .WaitAsync(progressDialog.CancellationToken);
 
             progressDialog.Close();
             progressDialog.Dispose();
@@ -170,6 +157,8 @@ public partial class MainWindow: Form {
             AddImageItem(item);
             UpdateMenuState();
             statusLabel.Text = _("Added {0} from URL", item.FileName);
+        } catch (OperationCanceledException) {
+            statusLabel.Text = _("Ready");
         } catch (Exception ex) {
             Log.Error("Failed to load image from URL {Url}: {Error}", dialog.Url, ex.Message);
             MessageBox.Show(_("Failed to load image from URL:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -319,22 +308,31 @@ public partial class MainWindow: Form {
         var totalCount = indices.Count;
         var converted = 0;
         var skipped = 0;
+        var failed = 0;
+        var wasCancelled = false;
         var convertedIndices = new List<int>();
         ProgressDialog? progressDialog = null;
 
         try {
             progressDialog = new ProgressDialog(_("Preparing to convert..."));
+            progressDialog.Text = _("Converting...");
             progressDialog.Show(this);
             Application.DoEvents();
 
             await Task.Run(() => {
                 for (var j = 0; j < totalCount; j++) {
+                    if (progressDialog!.IsCancelled) {
+                        wasCancelled = true;
+                        break;
+                    }
+
                     var i = indices[j];
                     var item = _imageItems[i];
 
                     Invoke(() => {
                         progressDialog!.UpdateMessage(
                             _("Converting {0} ({1}/{2})...", item.FileName, j + 1, totalCount));
+                        progressDialog!.UpdateProgress(j + 1, totalCount);
                         imageListView.Items[i].SubItems[4].Text = _("Converting...");
                     });
 
@@ -368,6 +366,7 @@ public partial class MainWindow: Form {
                         converted++;
                         convertedIndices.Add(i);
                     } catch (Exception ex) {
+                        failed++;
                         Log.Error("Failed to convert {FileName}: {Error}", item.FileName, ex.Message);
                         Invoke(() => {
                             imageListView.Items[i].SubItems[4].Text = _("Failed");
@@ -396,7 +395,6 @@ public partial class MainWindow: Form {
         previewPictureBox.Image = null;
         convertButton.Enabled = true;
 
-        var failed = totalCount - converted - skipped;
         var total = converted + skipped + failed;
         var summary = _n("Processed {0} image.", "Processed {0} images.", total, total);
         var parts = new List<string>();
@@ -408,6 +406,8 @@ public partial class MainWindow: Form {
             parts.Add(_("{0} failed", failed));
         if (parts.Count > 0)
             summary += " " + string.Join(_(", "), parts);
+        if (wasCancelled)
+            summary += " " + _("Cancelled.");
 
         statusLabel.Text = summary;
         MessageBox.Show(summary, _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -465,12 +465,11 @@ public partial class MainWindow: Form {
 
         try {
             progressDialog = new ProgressDialog(_("Creating multi-size ICO..."));
+            progressDialog.Text = _("Converting...");
             progressDialog.Show(this);
             Application.DoEvents();
 
-            Invoke(() => {
-                imageListView.Items[index].SubItems[4].Text = _("Converting...");
-            });
+            imageListView.Items[index].SubItems[4].Text = _("Converting...");
 
             await Task.Run(() => {
                 var dir = Path.GetDirectoryName(outputPath);
@@ -479,7 +478,7 @@ public partial class MainWindow: Form {
                 }
 
                 ImageConverter.CreateMultiSizeIco(item, outputPath, sizes);
-            });
+            }).WaitAsync(progressDialog.CancellationToken);
 
             _imageItems.RemoveAt(index);
             imageListView.Items.RemoveAt(index);
@@ -488,11 +487,12 @@ public partial class MainWindow: Form {
 
             statusLabel.Text = _("Multi-size ICO created: {0}", Path.GetFileName(outputPath));
             MessageBox.Show(_("Multi-size ICO created successfully:\n{0}", outputPath), _("ICO Created"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+        } catch (OperationCanceledException) {
+            imageListView.Items[index].SubItems[4].Text = "";
+            statusLabel.Text = _("Ready");
         } catch (Exception ex) {
             Log.Error("Failed to create multi-size ICO for {FileName}: {Error}", item.FileName, ex.Message);
-            Invoke(() => {
-                imageListView.Items[index].SubItems[4].Text = _("Failed");
-            });
+            imageListView.Items[index].SubItems[4].Text = _("Failed");
             MessageBox.Show(_("Failed to create multi-size ICO:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         } finally {
             progressDialog?.Close();
@@ -674,19 +674,11 @@ public partial class MainWindow: Form {
         }
     }
 
-    private void ImageListView_DragDrop(object? sender, DragEventArgs e) {
+    private async void ImageListView_DragDrop(object? sender, DragEventArgs e) {
         if (e.Data?.GetData(DataFormats.FileDrop) is not string[] files)
             return;
 
-        imageListView.BeginUpdate();
-        try {
-            foreach (var file in files) {
-                AddImageFromFile(file);
-            }
-        } finally {
-            imageListView.EndUpdate();
-        }
-        UpdateMenuState();
+        await AddFilesAsync(files);
     }
 
     private void MainWindow_KeyDown(object? sender, KeyEventArgs e) {
@@ -699,19 +691,18 @@ public partial class MainWindow: Form {
         }
     }
 
-    private void HandlePaste() {
+    private async void HandlePaste() {
         if (Clipboard.ContainsFileDropList()) {
             var files = Clipboard.GetFileDropList();
-            imageListView.BeginUpdate();
-            try {
-                foreach (var file in files) {
-                    if (file != null)
-                        AddImageFromFile(file);
-                }
-            } finally {
-                imageListView.EndUpdate();
+            var paths = new List<string>();
+            foreach (var file in files) {
+                if (file != null)
+                    paths.Add(file);
             }
-            UpdateMenuState();
+
+            if (paths.Count > 0) {
+                await AddFilesAsync(paths.ToArray());
+            }
         } else if (Clipboard.ContainsImage()) {
             var clipImage = Clipboard.GetImage();
             if (clipImage == null)
@@ -736,6 +727,177 @@ public partial class MainWindow: Form {
     }
 
     // --- Shared helpers ---
+
+    private async Task AddFilesAsync(string[] paths, string? basePath = null) {
+        if (_isLoadingFiles)
+            return;
+
+        if (paths.Length == 1) {
+            AddImageFromFile(paths[0], basePath);
+            UpdateMenuState();
+            return;
+        }
+
+        _isLoadingFiles = true;
+
+        try {
+            // Pre-scan for cloud placeholders (fast — attribute checks only)
+            var localPaths = new List<string>();
+            var cloudPaths = new List<string>();
+
+            foreach (var path in paths) {
+                if (FileHelper.IsCloudPlaceholder(path))
+                    cloudPaths.Add(path);
+                else
+                    localPaths.Add(path);
+            }
+
+            var skippedPlaceholders = 0;
+
+            if (cloudPaths.Count > 0) {
+                var answer = MessageBox.Show(
+                    _n(
+                        "{0} file is stored in the cloud and needs to be downloaded first.\nDownload it?",
+                        "{0} files are stored in the cloud and need to be downloaded first.\nDownload them?",
+                        cloudPaths.Count, cloudPaths.Count),
+                    _("Cloud Files"),
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (answer == DialogResult.Yes)
+                    localPaths.AddRange(cloudPaths);
+                else
+                    skippedPlaceholders = cloudPaths.Count;
+            }
+
+            if (localPaths.Count == 0) {
+                if (skippedPlaceholders > 0)
+                    ShowBatchAddSummary(new BatchAddResult([], [], skippedPlaceholders));
+                return;
+            }
+
+            var pathsToLoad = localPaths;
+            ProgressDialog? progressDialog = null;
+
+            try {
+                progressDialog = new ProgressDialog(
+                    _("Loading images ({0}/{1})...", 0, pathsToLoad.Count));
+                progressDialog.Text = _("Loading...");
+                progressDialog.Show(this);
+                Application.DoEvents();
+
+                var totalCount = pathsToLoad.Count;
+                var result = await Task.Run(() => {
+                    var items = new List<ImageItem>();
+                    var errors = new List<string>();
+                    var lastUpdateTick = Environment.TickCount64;
+
+                    for (var i = 0; i < totalCount; i++) {
+                        if (progressDialog!.IsCancelled)
+                            break;
+
+                        var path = pathsToLoad[i];
+                        var fileName = Path.GetFileName(path);
+
+                        var now = Environment.TickCount64;
+                        if (i == 0 || i == totalCount - 1 || now - lastUpdateTick >= 250) {
+                            lastUpdateTick = now;
+                            var current = i + 1;
+                            BeginInvoke(() => {
+                                progressDialog!.UpdateMessage(
+                                    _("Loading images ({0}/{1})...", current, totalCount));
+                                progressDialog!.UpdateProgress(current, totalCount);
+                            });
+                        }
+
+                        try {
+                            var item = ImageConverter.LoadFromFile(path);
+                            item.BasePath = basePath;
+                            items.Add(item);
+                        } catch (Exception ex) {
+                            Log.Error("Failed to load image {Path}: {Error}", path, ex.Message);
+                            errors.Add($"{fileName}: {ex.Message}");
+                        }
+                    }
+
+                    return new BatchAddResult(items, errors, skippedPlaceholders);
+                });
+
+                progressDialog.Close();
+                progressDialog.Dispose();
+                progressDialog = null;
+
+                // Batch-add to ListView without per-item overhead.
+                // AddImageItem calls AutoResizeColumns + sets Selected (firing
+                // SelectedIndexChanged → UpdatePreview → Magick.NET decode)
+                // per item, which freezes the UI on large batches.
+                imageListView.BeginUpdate();
+                try {
+                    foreach (var item in result.Items) {
+                        _imageItems.Add(item);
+
+                        var listItem = new ListViewItem(item.FileName);
+                        listItem.SubItems.Add(item.OriginalFormat);
+                        listItem.SubItems.Add(item.GetDimensionsDisplay());
+                        listItem.SubItems.Add(item.GetSizeDisplay());
+                        listItem.SubItems.Add("");
+                        imageListView.Items.Add(listItem);
+                    }
+                } finally {
+                    imageListView.EndUpdate();
+                }
+
+                if (result.Items.Count > 0) {
+                    imageListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    var lastIndex = imageListView.Items.Count - 1;
+                    imageListView.Items[lastIndex].Selected = true;
+                    imageListView.Items[lastIndex].Focused = true;
+                    imageListView.Items[lastIndex].EnsureVisible();
+                }
+
+                statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
+                UpdateMenuState();
+                imageListView.Focus();
+
+                if (result.Errors.Count > 0 || result.SkippedPlaceholders > 0) {
+                    ShowBatchAddSummary(result);
+                }
+            } finally {
+                if (progressDialog != null) {
+                    progressDialog.Close();
+                    progressDialog.Dispose();
+                }
+            }
+        } finally {
+            _isLoadingFiles = false;
+        }
+    }
+
+    private static void ShowBatchAddSummary(BatchAddResult result) {
+        var parts = new List<string>();
+
+        if (result.Items.Count > 0)
+            parts.Add(_n("{0} image loaded", "{0} images loaded", result.Items.Count, result.Items.Count));
+        if (result.SkippedPlaceholders > 0)
+            parts.Add(_n("{0} cloud-only file skipped", "{0} cloud-only files skipped", result.SkippedPlaceholders, result.SkippedPlaceholders));
+        if (result.Errors.Count > 0)
+            parts.Add(_n("{0} file failed to load", "{0} files failed to load", result.Errors.Count, result.Errors.Count));
+
+        var summary = string.Join("\n", parts);
+
+        if (result.Errors.Count > 0) {
+            summary += "\n\n" + _("Errors:") + "\n";
+            var errorLines = result.Errors.Take(20).ToList();
+            summary += string.Join("\n", errorLines);
+
+            if (result.Errors.Count > 20) {
+                summary += "\n" + _("...and {0} more", result.Errors.Count - 20);
+            }
+        }
+
+        var icon = result.Errors.Count > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information;
+        MessageBox.Show(summary, _("Add Images"), MessageBoxButtons.OK, icon);
+    }
 
     private void AddImageFromFile(string path, string? basePath = null) {
         try {
