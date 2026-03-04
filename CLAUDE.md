@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SIC! (Simple Image Converter) is a Windows Forms desktop application (.NET 8.0, x64-only) by Oire Software. It converts images between formats (JPG, PNG, WEBP, ICO, BMP, TIFF, GIF, AVIF) with optional resizing, using Magick.NET as the image processing backend. The app has both a GUI mode and a headless CLI mode.
 
-It uses structured logging (Serilog), file-based configuration (SharpConfig), and gettext-based localization (GetText.NET). Versioning is handled automatically via Nerdbank.GitVersioning from git history.
+It uses structured logging (Serilog), file-based configuration (SharpConfig), and gettext-based localization (GetText.NET). Versioning is handled automatically via GitVersion (GitVersion.MsBuild) from git history.
 
 ## Build Commands
 
@@ -46,9 +46,11 @@ There are no test projects or linting commands configured yet.
 
 ### Utilities (`src/Sic/Utils/`)
 
-- `Config.cs` — Static config manager using SharpConfig. Reads/writes `%APPDATA%/Oire/Sic/Sic.cfg` with a `[General]` section (Language, BrailleUiMode, OutputFolder). Empty OutputFolder = same folder as source.
-- `Localization.cs` — Wraps GetText.NET with convenience methods: `_()`, `_n()`, `_p()`, `_pn()` for translations. Loads `.mo` files from `./locale/`. Falls back through language parents to `en-US`.
+- `Config.cs` — Static config manager using SharpConfig. Reads/writes `%APPDATA%/Oire/Sic/Sic.cfg` with a `[General]` section (Language, OutputFolder, LastInputFolder). Accepts `isGui` parameter to route errors to MessageBox (GUI) or stderr (CLI).
+- `FileHelper.cs` — Cloud placeholder detection (OneDrive/SharePoint recall attributes) and image file enumeration with glob patterns.
+- `Localization.cs` — Wraps GetText.NET with convenience methods: `_()`, `_n()`, `_p()`, `_pn()` for translations. Loads `.mo` files from the `locale/` folder relative to the executable. Falls back through language parents to `en-US`.
 - `Constants/App.cs` — Application metadata, data folder paths (`%APPDATA%/Oire/Sic/`), file extensions.
+- `Constants/ExitCode.cs` — CLI exit code constants (`Success`, `Error`, `Canceled`).
 - `Constants/Logging.cs` — Log file paths and output templates. Logs go to `%APPDATA%/Oire/Sic/logs/`.
 
 ### Key dependencies
@@ -60,7 +62,7 @@ There are no test projects or linting commands configured yet.
 | Serilog (+File, +Compact) | Structured logging |
 | SharpConfig | INI-style config file |
 | GetText.NET | Localization |
-| Nerdbank.GitVersioning | Automatic versioning from git |
+| GitVersion.MsBuild | Automatic versioning from git |
 
 ## CLI Mode
 
@@ -72,7 +74,7 @@ sic --input photo.bmp --output photo.webp          # Convert BMP to WebP
 sic -i avatar.png -o avatar.ico --resize 128x128   # Convert + resize
 ```
 
-Options: `--input`/`-i` (required), `--output`/`-o` (required), `--resize`/`-r` (optional, WxH format).
+Options: `--input`/`-i` (required), `--output`/`-o` or `--format`/`-f` (one required), `--resize`/`-r` (optional, WxH/Wx/xH format), `--crop`/`-c` (optional, requires both W and H).
 
 ## Product Spec (v1)
 
@@ -112,4 +114,4 @@ SIC! is an accessible image format converter primarily aimed at blind and low-co
 - **.NET analyzers** at latest analysis level are enforced
 - Debug builds include full symbols and extra telemetry logging; Release builds are optimized with no symbols
 - Locale `.mo` files under `locale/` are copied to output via `<None Update>` in the csproj
-- The project uses a code formatter/linter — expect Allman brace style in committed code
+- The project uses a code formatter/linter — expect same-line opening braces (no newline before `{`, `else`, `catch`, `finally`) in committed code

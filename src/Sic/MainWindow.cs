@@ -288,7 +288,7 @@ public partial class MainWindow: Form {
             progressDialog = new ProgressDialog(_("Preparing to convert..."));
             progressDialog.Text = _("Converting...");
             progressDialog.Show(this);
-            Application.DoEvents();
+            await Task.Yield();
 
             await Task.Run(() => {
                 for (var j = 0; j < totalCount; j++) {
@@ -438,7 +438,7 @@ public partial class MainWindow: Form {
             progressDialog = new ProgressDialog(_("Creating multi-size ICO..."));
             progressDialog.Text = _("Converting...");
             progressDialog.Show(this);
-            Application.DoEvents();
+            await Task.Yield();
 
             imageListView.Items[index].SubItems[4].Text = _("Converting...");
 
@@ -711,7 +711,7 @@ public partial class MainWindow: Form {
             progressDialog = new ProgressDialog(_("Downloading image..."));
             progressDialog.Text = _("Downloading...");
             progressDialog.Show(this);
-            Application.DoEvents();
+            await Task.Yield();
 
             var progress = new Progress<(long BytesRead, long? TotalBytes)>(p => {
                 if (p.TotalBytes.HasValue && p.TotalBytes.Value > 0) {
@@ -806,7 +806,7 @@ public partial class MainWindow: Form {
                     _("Loading images ({0}/{1})...", 0, pathsToLoad.Count));
                 progressDialog.Text = _("Loading...");
                 progressDialog.Show(this);
-                Application.DoEvents();
+                await Task.Yield();
 
                 var totalCount = pathsToLoad.Count;
                 var result = await Task.Run(() => {

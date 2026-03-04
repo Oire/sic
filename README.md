@@ -59,8 +59,12 @@ sic -i avatar.png -o avatar.ico -r 128x128
 | Option | Short | Required | Description |
 |--------|-------|----------|-------------|
 | `--input` | `-i` | Yes | Path to the source image |
-| `--output` | `-o` | Yes | Path for the converted image (format inferred from extension) |
-| `--resize` | `-r` | No | Target dimensions as WxH (e.g. `128x128`) |
+| `--output` | `-o` | No* | Path for the converted image (format inferred from extension) |
+| `--format` | `-f` | No* | Target format (e.g. jpg, png, webp). Used when `--output` is omitted |
+| `--resize` | `-r` | No | Target dimensions as WxH, Wx, or xH (e.g. `128x128`, `128x`, `x128`) |
+| `--crop` | `-c` | No | Crop mode: scale to cover, then center-crop to exact dimensions |
+
+\* Either `--output` or `--format` must be specified.
 
 ## Configuration
 
@@ -83,21 +87,30 @@ dotnet publish -c Release # Single-file executable
 
 ```
 src/Sic/
-  Program.cs                  # Entry point (GUI or CLI dispatch)
-  MainWindow.cs/.Designer.cs  # Main application window
+  Program.cs                      # Entry point (GUI or CLI dispatch)
+  MainWindow.cs/.Designer.cs      # Main application window
   SettingsDialog.cs/.Designer.cs  # Settings form
+  AboutDialog.cs/.Designer.cs    # About dialog
+  AddUrlDialog.cs/.Designer.cs   # Add image from URL dialog
+  AddFolderDialog.cs/.Designer.cs # Add images from folder dialog
+  IcoPresetDialog.cs/.Designer.cs # Multi-size ICO preset picker
+  AddSizeDialog.cs/.Designer.cs   # Custom ICO size entry dialog
+  ProgressDialog.cs/.Designer.cs  # Progress dialog for batch operations
   Models/
-    ImageItem.cs              # Image queue item data model
+    ImageItem.cs                  # Image queue item data model
+    ResizeMode.cs                 # Resize mode enum (KeepProportions, Crop)
   Services/
-    ImageConverter.cs         # Magick.NET conversion engine
+    ImageConverter.cs             # Magick.NET conversion engine
   Utils/
-    Config.cs                 # SharpConfig-based settings
-    Localization.cs           # GetText.NET wrapper
+    Config.cs                     # SharpConfig-based settings
+    FileHelper.cs                 # Cloud placeholder detection, file enumeration
+    Localization.cs               # GetText.NET wrapper
     Constants/
-      App.cs                  # App metadata and paths
-      Logging.cs              # Log file paths and templates
+      App.cs                      # App metadata and paths
+      ExitCode.cs                 # CLI exit code constants
+      Logging.cs                  # Log file paths and templates
 ```
 
 ## License
 
-Copyright 2026 Oire Software SARL. All rights reserved.
+Copyright 2026 Oire Software SARL. Licensed under the [Apache License 2.0](LICENSE).

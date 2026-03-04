@@ -1,0 +1,667 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Sic\n"
+"POT-Creation-Date: 2026-02-20 19:45:01+0100\n"
+"PO-Revision-Date: 2026-03-04 13:25:10+01:00\n"
+"Last-Translator: \n"
+"Language-Team: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: GetText.NET Extractor\n"
+
+#: ..\..\MainWindow.cs:347
+msgid ", "
+msgstr ""
+
+#: ..\..\Models\ImageItem.cs:15
+#, csharp-format
+msgid "{0} ({1}, {2}, {3})"
+msgstr ""
+
+#: ..\..\Models\ImageItem.cs:22
+#, csharp-format
+msgid "{0} B"
+msgstr ""
+
+#: ..\..\MainWindow.cs:341
+#, csharp-format
+msgid "{0} converted"
+msgstr ""
+
+#: ..\..\MainWindow.cs:345
+#, csharp-format
+msgid "{0} failed"
+msgstr ""
+
+#: ..\..\Models\ImageItem.cs:23
+#, csharp-format
+msgid "{0} KB"
+msgstr ""
+
+#: ..\..\Models\ImageItem.cs:24
+#, csharp-format
+msgid "{0} MB"
+msgstr ""
+
+#: ..\..\MainWindow.cs:343
+#, csharp-format
+msgid "{0} skipped"
+msgstr ""
+
+#: ..\..\Models\ImageItem.cs:18
+#, csharp-format
+msgid "{0}x{1}"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "&About SIC!..."
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "&Convert"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "&Edit"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "&File"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "&Help"
+msgstr ""
+
+#: ..\..\AboutDialog.Designer.cs:80
+msgid "&OK"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:142
+msgid "&Options..."
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:126
+msgid "&Remove"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:167
+msgid "&User Guide"
+msgstr ""
+
+#: ..\..\AboutDialog.cs:9
+#, csharp-format
+msgid "© {0} Oire Software"
+msgstr ""
+
+#: ..\..\MainWindow.cs:177
+#: ..\..\MainWindow.cs:606
+#, csharp-format
+msgid "1 image in queue"
+msgid_plural "{0} images in queue"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ..\..\AboutDialog.Designer.cs:95
+msgid "About SIC!"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:105
+msgid "Add &Image..."
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:112
+msgid "Add F&older..."
+msgstr ""
+
+#: ..\..\AddFolderDialog.Designer.cs:141
+msgid "Add Folder"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:119
+msgid "Add from &URL..."
+msgstr ""
+
+#: ..\..\AddUrlDialog.Designer.cs:92
+msgid "Add Image from URL"
+msgstr ""
+
+#: ..\..\MainWindow.cs:154
+#, csharp-format
+msgid "Added {0} from URL"
+msgstr ""
+
+#: ..\..\MainWindow.cs:573
+msgid "Added image from clipboard"
+msgstr ""
+
+#: ..\..\MainWindow.cs:85
+msgid "All files"
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:8
+msgid "All supported images"
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:16
+msgid "AVIF images (*.avif)"
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:13
+msgid "BMP images (*.bmp)"
+msgstr ""
+
+#: ..\..\AddFolderDialog.Designer.cs:85
+#: ..\..\SettingsDialog.Designer.cs:81
+msgid "Browse..."
+msgstr ""
+
+#: ..\..\AddUrlDialog.Designer.cs:78
+#: ..\..\SettingsDialog.Designer.cs:123
+#: ..\..\AddFolderDialog.Designer.cs:128
+msgid "Cancel"
+msgstr ""
+
+#: ..\..\SettingsDialog.Designer.cs:89
+msgid "Clear"
+msgstr ""
+
+#: ..\..\MainWindow.cs:350
+msgid "Conversion Complete"
+msgstr ""
+
+#: ..\..\MainWindow.cs:311
+msgid "Conversion Error"
+msgstr ""
+
+#: ..\..\Program.cs:148
+#, csharp-format
+msgid "Conversion failed: {0}"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert &All"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert &Selected"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert All"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Convert Selected"
+msgstr ""
+
+#: ..\..\Program.cs:145
+#, csharp-format
+msgid "Converted: {0}"
+msgstr ""
+
+#: ..\..\MainWindow.cs:274
+#, csharp-format
+msgid "Converting {0} ({1}/{2})..."
+msgstr ""
+
+#: ..\..\ProgressDialog.Designer.cs:85
+#: ..\..\MainWindow.cs:275
+msgid "Converting..."
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Create &Favicon..."
+msgstr ""
+
+#: ..\..\MainWindow.cs
+msgid "Creating favicon..."
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Crop"
+msgstr ""
+
+#: ..\..\MainWindow.cs:230
+msgid "Crop mode requires a valid height (1–65535)."
+msgstr ""
+
+#: ..\..\MainWindow.cs:223
+msgid "Crop mode requires a valid width (1–65535)."
+msgstr ""
+
+#: ..\..\Program.cs:132
+msgid "Crop mode requires both width and height (e.g. --resize 128x128 --crop)"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:218
+msgid "Dimensions"
+msgstr ""
+
+#: ..\..\MainWindow.cs:142
+msgid "Downloading image..."
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:149
+msgid "E&xit"
+msgstr ""
+
+#: ..\..\Utils\Config.cs:41
+#: ..\..\Utils\Config.cs:48
+#: ..\..\Program.cs:40
+#: ..\..\Utils\Config.cs:63
+#: ..\..\MainWindow.cs:157
+#: ..\..\MainWindow.cs:576
+#: ..\..\MainWindow.cs:589
+msgid "Error"
+msgstr ""
+
+#: ..\..\MainWindow.cs:310
+msgid "Failed"
+msgstr ""
+
+#: ..\..\MainWindow.cs:311
+#, csharp-format
+msgid ""
+"Failed to convert {0}:\n"
+"{1}"
+msgstr ""
+
+#: ..\..\MainWindow.cs:576
+#, csharp-format
+msgid ""
+"Failed to load clipboard image:\n"
+"{0}"
+msgstr ""
+
+#: ..\..\MainWindow.cs:157
+#, csharp-format
+msgid ""
+"Failed to load image from URL:\n"
+"{0}"
+msgstr ""
+
+#: ..\..\MainWindow.cs:589
+#, csharp-format
+msgid ""
+"Failed to load image:\n"
+"{0}\n"
+"{1}"
+msgstr ""
+
+#: ..\..\MainWindow.cs
+msgid "Favicon Created"
+msgstr ""
+
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "Favicon created successfully:\n{0}"
+msgstr ""
+
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "Favicon created: {0}"
+msgstr ""
+
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "Failed to create favicon:\n{0}"
+msgstr ""
+
+#: ..\..\Program.cs:36
+#, csharp-format
+msgid "Fatal error: {0}"
+msgstr ""
+
+#: ..\..\MainWindow.cs
+msgid "File Already Exists"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:214
+msgid "File Name"
+msgstr ""
+
+#: ..\..\Program.cs:72
+#, csharp-format
+msgid "File not found: {0}"
+msgstr ""
+
+#: ..\..\AddFolderDialog.Designer.cs:92
+msgid "Filter:"
+msgstr ""
+
+#: ..\..\SettingsDialog.cs
+msgid "Folder Not Found"
+msgstr ""
+
+#: ..\..\AddFolderDialog.Designer.cs:68
+msgid "Folder:"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:216
+msgid "Format"
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:15
+msgid "GIF images (*.gif)"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:328
+msgid "H:"
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:12
+msgid "ICO icons (*.ico)"
+msgstr ""
+
+#: ..\..\MainWindow.cs:85
+msgid "Image files"
+msgstr ""
+
+#: ..\..\AddFolderDialog.Designer.cs:109
+msgid "Include all subfolders"
+msgstr ""
+
+#: ..\..\MainWindow.cs:240
+msgid "Invalid dimensions"
+msgstr ""
+
+#: ..\..\MainWindow.cs:230
+msgid "Invalid height"
+msgstr ""
+
+#: ..\..\Program.cs:116
+#, csharp-format
+msgid "Invalid height value: {0}"
+msgstr ""
+
+#: ..\..\Program.cs:121
+#, csharp-format
+msgid "Invalid resize format: {0}. At least one dimension is required."
+msgstr ""
+
+#: ..\..\Program.cs:100
+#, csharp-format
+msgid ""
+"Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, "
+"128)"
+msgstr ""
+
+#: ..\..\MainWindow.cs:223
+msgid "Invalid width"
+msgstr ""
+
+#: ..\..\Program.cs:111
+#, csharp-format
+msgid "Invalid width value: {0}"
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:9
+msgid "JPEG images (*.jpg, *.jpeg)"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:356
+msgid "Keep proportions"
+msgstr ""
+
+#: ..\..\SettingsDialog.Designer.cs:97
+msgid "Language:"
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:58
+msgid "No folder selected"
+msgstr ""
+
+#: ..\..\MainWindow.cs:208
+msgid "No format selected"
+msgstr ""
+
+#: ..\..\MainWindow.cs:129
+msgid "No images found"
+msgstr ""
+
+#: ..\..\MainWindow.cs:203
+msgid "No images to convert. Add some images first."
+msgstr ""
+
+#: ..\..\MainWindow.cs:129
+msgid "No matching images found in the selected folder."
+msgstr ""
+
+#: ..\..\AddUrlDialog.cs:16
+msgid "No URL entered"
+msgstr ""
+
+#: ..\..\MainWindow.cs:203
+msgid "Nothing to convert"
+msgstr ""
+
+#: ..\..\AboutDialog.Designer.cs:70
+msgid "Oire Software"
+msgstr ""
+
+#: ..\..\AddUrlDialog.Designer.cs:69
+#: ..\..\SettingsDialog.Designer.cs:114
+#: ..\..\AddFolderDialog.Designer.cs:119
+msgid "OK"
+msgstr ""
+
+#: ..\..\SettingsDialog.Designer.cs:64
+msgid "Output folder:"
+msgstr ""
+
+#: ..\..\Program.cs
+#: ..\..\MainWindow.cs
+msgid "Output Folder Not Found"
+msgstr ""
+
+#: ..\..\Program.cs:78
+msgid "Output path must have a file extension (e.g. .jpg, .png)"
+msgstr ""
+
+#: ..\..\MainWindow.cs:643
+msgid "Overwrite"
+msgstr ""
+
+#: ..\..\Program.cs:54
+msgid "Path for the converted image (format inferred from extension)"
+msgstr ""
+
+#: ..\..\Program.cs:53
+msgid "Path to the source image file"
+msgstr ""
+
+#: ..\..\AddUrlDialog.cs:16
+msgid "Please enter a URL."
+msgstr ""
+
+#: ..\..\MainWindow.cs:240
+msgid "Please enter at least one valid dimension (1–65535)."
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:58
+msgid "Please select a folder."
+msgstr ""
+
+#: ..\..\MainWindow.cs:208
+msgid "Please select a target format."
+msgstr ""
+
+#: ..\..\ProgressDialog.Designer.cs:60
+msgid "Please wait..."
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:10
+msgid "PNG images (*.png)"
+msgstr ""
+
+#: ..\..\MainWindow.cs:264
+msgid "Preparing to convert..."
+msgstr ""
+
+#: ..\..\MainWindow.cs:338
+#, csharp-format
+msgid "Processed {0} image."
+msgid_plural "Processed {0} images."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ..\..\MainWindow.cs:158
+#: ..\..\MainWindow.cs:186
+#: ..\..\MainWindow.Designer.cs:387
+msgid "Ready"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:134
+msgid "Remove &All"
+msgstr ""
+
+#: ..\..\MainWindow.cs:644
+msgid "Rename"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:289
+msgid "Resize"
+msgstr ""
+
+#: ..\..\Program.cs:55
+msgid "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)"
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:40
+msgid "Select folder containing images"
+msgstr ""
+
+#: ..\..\MainWindow.cs:84
+msgid "Select images to add"
+msgstr ""
+
+#: ..\..\SettingsDialog.cs:31
+msgid "Select output folder for converted images"
+msgstr ""
+
+#: ..\..\SettingsDialog.Designer.cs:137
+msgid "Settings"
+msgstr ""
+
+#: ..\..\AboutDialog.Designer.cs:49
+#: ..\..\Program.cs:58
+#: ..\..\MainWindow.Designer.cs:401
+msgid "SIC! — Simple Image Converter"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:220
+msgid "Size"
+msgstr ""
+
+#: ..\..\MainWindow.cs:645
+msgid "Skip"
+msgstr ""
+
+#: ..\..\MainWindow.cs:292
+msgid "Skipped"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:222
+msgid "Status"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "&Support Development..."
+msgstr ""
+
+#: ..\..\Program.cs:86
+#, csharp-format
+msgid "Supported formats: {0}"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs
+msgid "Target format:"
+msgstr ""
+
+#: ..\..\MainWindow.cs:633
+#, csharp-format
+msgid ""
+"The file \"{0}\" already exists.\n"
+"What would you like to do?"
+msgstr ""
+
+#: ..\..\Program.cs
+#: ..\..\MainWindow.cs
+#, csharp-format
+msgid "The output folder \"{0}\" no longer exists. The default folder will be used."
+msgstr ""
+
+#: ..\..\SettingsDialog.cs
+msgid "The selected folder does not exist. Please choose an existing folder."
+msgstr ""
+
+#: ..\..\MainWindow.cs:357
+msgid "The user guide is coming soon."
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:14
+msgid "TIFF images (*.tif, *.tiff)"
+msgstr ""
+
+#: ..\..\Utils\Config.cs:48
+msgid "Unable to load configuration. Please contact the developer."
+msgstr ""
+
+#: ..\..\Utils\Config.cs:41
+#: ..\..\Utils\Config.cs:63
+msgid "Unable to save configuration. Please contact the developer."
+msgstr ""
+
+#: ..\..\Program.cs:40
+msgid "Unable to start the program up. Please contact the developer."
+msgstr ""
+
+#: ..\..\Program.cs:85
+#, csharp-format
+msgid "Unsupported format: {0}"
+msgstr ""
+
+#: ..\..\AddUrlDialog.Designer.cs:53
+msgid "URL:"
+msgstr ""
+
+#: ..\..\Program.cs:56
+msgid "Use crop mode (scale to cover, then center-crop to exact dimensions)"
+msgstr ""
+
+#: ..\..\MainWindow.cs:357
+msgid "User Guide"
+msgstr ""
+
+#: ..\..\AboutDialog.Designer.cs:60
+msgid "Version"
+msgstr ""
+
+#: ..\..\AboutDialog.cs:8
+#, csharp-format
+msgid "Version {0}"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:299
+msgid "W:"
+msgstr ""
+
+#: ..\..\Program.cs
+#, csharp-format
+msgid "Warning: The output folder \"{0}\" no longer exists. Using default folder."
+msgstr ""
+
+#: ..\..\AddFolderDialog.cs:11
+msgid "WebP images (*.webp)"
+msgstr ""
+
+#: ..\..\MainWindow.Designer.cs:318
+msgid "x"
+msgstr ""
+

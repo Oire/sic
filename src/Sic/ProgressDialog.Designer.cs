@@ -25,63 +25,63 @@ partial class ProgressDialog {
     /// the contents of this method with the code editor.
     /// </summary>
     private void InitializeComponent() {
-        MainLayout = new TableLayoutPanel();
-        MessageLabel = new Label();
-        ProgressBar = new ProgressBar();
-        CancelOperationButton = new Button();
-        MainLayout.SuspendLayout();
+        mainLayout = new TableLayoutPanel();
+        messageLabel = new Label();
+        progressBar = new ProgressBar();
+        cancelOperationButton = new Button();
+        mainLayout.SuspendLayout();
         SuspendLayout();
         //
-        // MainLayout
+        // mainLayout
         //
-        MainLayout.ColumnCount = 1;
-        MainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-        MainLayout.Controls.Add(MessageLabel, 0, 0);
-        MainLayout.Controls.Add(ProgressBar, 0, 1);
-        MainLayout.Controls.Add(CancelOperationButton, 0, 2);
-        MainLayout.Dock = DockStyle.Fill;
-        MainLayout.Location = new Point(0, 0);
-        MainLayout.Name = "MainLayout";
-        MainLayout.Padding = new Padding(20);
-        MainLayout.RowCount = 3;
-        MainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
-        MainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-        MainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-        MainLayout.Size = new Size(484, 201);
-        MainLayout.TabIndex = 0;
+        mainLayout.ColumnCount = 1;
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        mainLayout.Controls.Add(messageLabel, 0, 0);
+        mainLayout.Controls.Add(progressBar, 0, 1);
+        mainLayout.Controls.Add(cancelOperationButton, 0, 2);
+        mainLayout.Dock = DockStyle.Fill;
+        mainLayout.Location = new Point(0, 0);
+        mainLayout.Name = "mainLayout";
+        mainLayout.Padding = new Padding(20);
+        mainLayout.RowCount = 3;
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
+        mainLayout.Size = new Size(484, 201);
+        mainLayout.TabIndex = 0;
         //
-        // MessageLabel
+        // messageLabel
         //
-        MessageLabel.Anchor = AnchorStyles.None;
-        MessageLabel.AutoSize = true;
-        MessageLabel.Font = new Font("Segoe UI", 12F);
-        MessageLabel.Location = new Point(191, 41);
-        MessageLabel.Name = "MessageLabel";
-        MessageLabel.Size = new Size(101, 21);
-        MessageLabel.TabIndex = 0;
-        MessageLabel.Text = "Please wait...";
-        MessageLabel.TextAlign = ContentAlignment.MiddleCenter;
+        messageLabel.Anchor = AnchorStyles.None;
+        messageLabel.AutoSize = true;
+        messageLabel.Font = new Font("Segoe UI", 12F);
+        messageLabel.Location = new Point(191, 41);
+        messageLabel.Name = "messageLabel";
+        messageLabel.Size = new Size(101, 21);
+        messageLabel.TabIndex = 0;
+        messageLabel.Text = "Please wait...";
+        messageLabel.TextAlign = ContentAlignment.MiddleCenter;
         //
-        // ProgressBar
+        // progressBar
         //
-        ProgressBar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-        ProgressBar.Location = new Point(23, 107);
-        ProgressBar.Name = "ProgressBar";
-        ProgressBar.Size = new Size(438, 30);
-        ProgressBar.Style = ProgressBarStyle.Marquee;
-        ProgressBar.TabIndex = 1;
-        ProgressBar.TabStop = false;
-        ProgressBar.MarqueeAnimationSpeed = 30;
+        progressBar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+        progressBar.Location = new Point(23, 107);
+        progressBar.Name = "progressBar";
+        progressBar.Size = new Size(438, 30);
+        progressBar.Style = ProgressBarStyle.Marquee;
+        progressBar.TabIndex = 1;
+        progressBar.TabStop = false;
+        progressBar.MarqueeAnimationSpeed = 30;
         //
-        // CancelOperationButton
+        // cancelOperationButton
         //
-        CancelOperationButton.Anchor = AnchorStyles.None;
-        CancelOperationButton.AutoSize = true;
-        CancelOperationButton.Name = "CancelOperationButton";
-        CancelOperationButton.Size = new Size(90, 30);
-        CancelOperationButton.TabIndex = 2;
-        CancelOperationButton.Text = "Cancel";
-        CancelOperationButton.UseVisualStyleBackColor = true;
+        cancelOperationButton.Anchor = AnchorStyles.None;
+        cancelOperationButton.AutoSize = true;
+        cancelOperationButton.Name = "cancelOperationButton";
+        cancelOperationButton.Size = new Size(90, 30);
+        cancelOperationButton.TabIndex = 2;
+        cancelOperationButton.Text = "Cancel";
+        cancelOperationButton.UseVisualStyleBackColor = true;
         //
         // ProgressDialog
         //
@@ -89,7 +89,7 @@ partial class ProgressDialog {
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(484, 201);
         ControlBox = false;
-        Controls.Add(MainLayout);
+        Controls.Add(mainLayout);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
@@ -97,16 +97,16 @@ partial class ProgressDialog {
         StartPosition = FormStartPosition.CenterParent;
         Text = "Please wait...";
         AccessibleRole = AccessibleRole.Dialog;
-        CancelButton = CancelOperationButton;
-        MainLayout.ResumeLayout(false);
-        MainLayout.PerformLayout();
+        CancelButton = cancelOperationButton;
+        mainLayout.ResumeLayout(false);
+        mainLayout.PerformLayout();
         ResumeLayout(false);
     }
 
     #endregion
 
-    private TableLayoutPanel MainLayout;
-    private Label MessageLabel;
-    private ProgressBar ProgressBar;
-    private Button CancelOperationButton;
+    private TableLayoutPanel mainLayout;
+    private Label messageLabel;
+    private ProgressBar progressBar;
+    private Button cancelOperationButton;
 }
