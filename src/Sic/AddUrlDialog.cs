@@ -15,8 +15,21 @@ public partial class AddUrlDialog: Form {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
 
-        if (DialogResult == DialogResult.OK && string.IsNullOrWhiteSpace(urlTextBox.Text)) {
+        if (DialogResult != DialogResult.OK)
+            return;
+
+        if (string.IsNullOrWhiteSpace(urlTextBox.Text)) {
             MessageBox.Show(_("Please enter a URL."), _("No URL entered"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            e.Cancel = true;
+            return;
+        }
+
+        if (!Uri.TryCreate(urlTextBox.Text.Trim(), UriKind.Absolute, out var uri)
+            || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)) {
+            MessageBox.Show(
+                _("Please enter a valid URL starting with http:// or https://."),
+                _("Invalid URL"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
             e.Cancel = true;
         }
     }
