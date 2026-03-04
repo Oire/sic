@@ -77,8 +77,6 @@ partial class MainWindow {
         statusStrip = new StatusStrip();
         statusLabel = new ToolStripStatusLabel();
 
-
-
         menuStrip.SuspendLayout();
         mainLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).BeginInit();
@@ -126,8 +124,8 @@ partial class MainWindow {
         //
         // addFromUrlMenuItem
         //
-        addFromUrlMenuItem.Text = "Add from &URL...";
-        addFromUrlMenuItem.ShortcutKeys = Keys.Control | Keys.U;
+        addFromUrlMenuItem.Text = "Add Image by &Link...";
+        addFromUrlMenuItem.ShortcutKeys = Keys.Control | Keys.L;
         addFromUrlMenuItem.Name = "addFromUrlMenuItem";
 
         //
@@ -149,8 +147,9 @@ partial class MainWindow {
         //
         // optionsMenuItem
         //
-        optionsMenuItem.Text = "&Options...";
+        optionsMenuItem.Text = "&Settings...";
         optionsMenuItem.ShortcutKeys = Keys.Control | Keys.Oemcomma;
+        optionsMenuItem.ShortcutKeyDisplayString = "Ctrl+,";
         optionsMenuItem.Name = "optionsMenuItem";
 
         //
@@ -203,6 +202,7 @@ partial class MainWindow {
         //
         createMultiSizeIcoMenuItem.Text = "Create Multi-size &ICO...";
         createMultiSizeIcoMenuItem.Name = "createMultiSizeIcoMenuItem";
+        createMultiSizeIcoMenuItem.ShortcutKeys = Keys.Control | Keys.Alt | Keys.F5;
         createMultiSizeIcoMenuItem.Enabled = false;
 
         //
@@ -218,17 +218,18 @@ partial class MainWindow {
         });
 
         //
-        // supportDevelopmentMenuItem
-        //
-        supportDevelopmentMenuItem.Text = "&Support Development...";
-        supportDevelopmentMenuItem.Name = "supportDevelopmentMenuItem";
-
-        //
         // userGuideMenuItem
         //
-        userGuideMenuItem.Text = "&User Guide";
+        userGuideMenuItem.Text = "Read User &Manual";
         userGuideMenuItem.ShortcutKeys = Keys.F1;
         userGuideMenuItem.Name = "userGuideMenuItem";
+
+        //
+        // supportDevelopmentMenuItem
+        //
+        supportDevelopmentMenuItem.Text = "Support &Development...";
+        supportDevelopmentMenuItem.Name = "supportDevelopmentMenuItem";
+        supportDevelopmentMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.D;
 
         //
         // aboutMenuItem
@@ -286,6 +287,7 @@ partial class MainWindow {
         imageListView.MultiSelect = false;
         imageListView.View = View.Details;
         imageListView.Name = "imageListView";
+        imageListView.AccessibleName = "Images list";
         imageListView.AllowDrop = true;
         imageListView.TabIndex = 0;
 
@@ -316,7 +318,7 @@ partial class MainWindow {
         //
         // formatLabel
         //
-        formatLabel.Text = "Target format:";
+        formatLabel.Text = "Target &Format:";
         formatLabel.AutoSize = true;
         formatLabel.Anchor = AnchorStyles.Left;
         formatLabel.Name = "formatLabel";
@@ -333,7 +335,7 @@ partial class MainWindow {
         //
         // resizeCheckBox
         //
-        resizeCheckBox.Text = "Resize";
+        resizeCheckBox.Text = "Resi&ze";
         resizeCheckBox.AutoSize = true;
         resizeCheckBox.Anchor = AnchorStyles.Left;
         resizeCheckBox.Name = "resizeCheckBox";
@@ -342,7 +344,7 @@ partial class MainWindow {
         //
         // resizeModeGroupBox
         //
-        resizeModeGroupBox.Text = "Resize mode";
+        resizeModeGroupBox.Text = "Resize &Mode:";
         resizeModeGroupBox.AutoSize = true;
         resizeModeGroupBox.Dock = DockStyle.Fill;
         resizeModeGroupBox.Name = "resizeModeGroupBox";
@@ -363,7 +365,7 @@ partial class MainWindow {
         //
         // widthLabel
         //
-        widthLabel.Text = "Width:";
+        widthLabel.Text = "&Width:";
         widthLabel.AutoSize = true;
         widthLabel.Anchor = AnchorStyles.Left;
         widthLabel.Name = "widthLabel";
@@ -382,7 +384,7 @@ partial class MainWindow {
         //
         // heightLabel
         //
-        heightLabel.Text = "Height:";
+        heightLabel.Text = "&Height:";
         heightLabel.AutoSize = true;
         heightLabel.Anchor = AnchorStyles.Left;
         heightLabel.Name = "heightLabel";
@@ -420,7 +422,7 @@ partial class MainWindow {
         //
         // convertSelectedButton
         //
-        convertSelectedButton.Text = "Convert Selected";
+        convertSelectedButton.Text = "Convert &Selected";
         convertSelectedButton.AutoSize = true;
         convertSelectedButton.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
         convertSelectedButton.Name = "convertSelectedButton";
@@ -430,7 +432,7 @@ partial class MainWindow {
         //
         // convertButton
         //
-        convertButton.Text = "Convert All";
+        convertButton.Text = "Convert &All";
         convertButton.AutoSize = true;
         convertButton.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         convertButton.Name = "convertButton";
@@ -440,7 +442,7 @@ partial class MainWindow {
         //
         // keepProportionsRadioButton
         //
-        keepProportionsRadioButton.Text = "Keep proportions";
+        keepProportionsRadioButton.Text = "&Keep proportions";
         keepProportionsRadioButton.AutoSize = true;
         keepProportionsRadioButton.Name = "keepProportionsRadioButton";
         keepProportionsRadioButton.Checked = true;
@@ -449,7 +451,7 @@ partial class MainWindow {
         //
         // cropRadioButton
         //
-        cropRadioButton.Text = "Crop";
+        cropRadioButton.Text = "&Crop";
         cropRadioButton.AutoSize = true;
         cropRadioButton.Name = "cropRadioButton";
         cropRadioButton.TabIndex = 1;
@@ -480,7 +482,7 @@ partial class MainWindow {
         Controls.Add(menuStrip);
         MainMenuStrip = menuStrip;
         Name = "MainWindow";
-        Text = "SIC! \u2014 Simple Image Converter";
+        Text = "SIC! — Simple Image Converter";
         MinimumSize = new Size(640, 400);
 
         menuStrip.ResumeLayout(false);
@@ -544,6 +546,4 @@ partial class MainWindow {
     private Button convertButton;
     private StatusStrip statusStrip;
     private ToolStripStatusLabel statusLabel;
-
-
 }

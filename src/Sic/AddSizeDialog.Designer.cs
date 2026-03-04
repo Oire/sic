@@ -48,7 +48,7 @@ partial class AddSizeDialog {
         //
         // sizeLabel
         //
-        sizeLabel.Text = "Size (16–512):";
+        sizeLabel.Text = "Si&ze (16–512):";
         sizeLabel.AutoSize = true;
         sizeLabel.Anchor = AnchorStyles.Left;
         sizeLabel.Name = "sizeLabel";
@@ -64,7 +64,7 @@ partial class AddSizeDialog {
         //
         // okButton
         //
-        okButton.Text = "OK";
+        okButton.Text = "&OK";
         okButton.Anchor = AnchorStyles.Left;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
@@ -73,7 +73,7 @@ partial class AddSizeDialog {
         //
         // cancelButton
         //
-        cancelButton.Text = "Cancel";
+        cancelButton.Text = "&Cancel";
         cancelButton.Anchor = AnchorStyles.Right;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
@@ -90,6 +90,7 @@ partial class AddSizeDialog {
         Text = "Add Size";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         StartPosition = FormStartPosition.CenterParent;
+        AccessibleRole = AccessibleRole.Dialog;
         MaximizeBox = false;
         MinimizeBox = false;
         AcceptButton = okButton;

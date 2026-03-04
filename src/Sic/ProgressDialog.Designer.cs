@@ -80,7 +80,7 @@ partial class ProgressDialog {
         cancelOperationButton.Name = "cancelOperationButton";
         cancelOperationButton.Size = new Size(90, 30);
         cancelOperationButton.TabIndex = 2;
-        cancelOperationButton.Text = "Cancel";
+        cancelOperationButton.Text = "&Cancel";
         cancelOperationButton.UseVisualStyleBackColor = true;
         //
         // ProgressDialog

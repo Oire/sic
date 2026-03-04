@@ -54,7 +54,7 @@ partial class AboutDialog {
         //
         // appNameLabel
         //
-        appNameLabel.Text = "SIC! \u2014 Simple Image Converter";
+        appNameLabel.Text = "SIC! — Simple Image Converter";
         appNameLabel.AutoSize = true;
         appNameLabel.Font = new Font(appNameLabel.Font.FontFamily, 14F, FontStyle.Bold);
         appNameLabel.Anchor = AnchorStyles.None;
@@ -75,7 +75,7 @@ partial class AboutDialog {
         //
         // copyrightLabel
         //
-        copyrightLabel.Text = "Oire Software";
+        copyrightLabel.Text = "Oire Software SARL";
         copyrightLabel.AutoSize = true;
         copyrightLabel.Anchor = AnchorStyles.None;
         copyrightLabel.Name = "copyrightLabel";
@@ -85,7 +85,7 @@ partial class AboutDialog {
         //
         // repoLink
         //
-        repoLink.Text = "GitHub repository";
+        repoLink.Text = "GitHub Repository";
         repoLink.AutoSize = true;
         repoLink.Anchor = AnchorStyles.None;
         repoLink.Name = "repoLink";

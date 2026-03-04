@@ -48,7 +48,7 @@ partial class AddUrlDialog {
         //
         // urlLabel
         //
-        urlLabel.Text = "URL:";
+        urlLabel.Text = "&Link:";
         urlLabel.AutoSize = true;
         urlLabel.Anchor = AnchorStyles.Left;
         urlLabel.Name = "urlLabel";
@@ -64,7 +64,7 @@ partial class AddUrlDialog {
         //
         // okButton
         //
-        okButton.Text = "OK";
+        okButton.Text = "&OK";
         okButton.Anchor = AnchorStyles.Left;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
@@ -73,7 +73,7 @@ partial class AddUrlDialog {
         //
         // cancelButton
         //
-        cancelButton.Text = "Cancel";
+        cancelButton.Text = "&Cancel";
         cancelButton.Anchor = AnchorStyles.Right;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
@@ -87,9 +87,10 @@ partial class AddUrlDialog {
         ClientSize = new Size(480, 100);
         Controls.Add(mainLayout);
         Name = "AddUrlDialog";
-        Text = "Add Image from URL";
+        Text = "Add Image by Link";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         StartPosition = FormStartPosition.CenterParent;
+        AccessibleRole = AccessibleRole.Dialog;
         MaximizeBox = false;
         MinimizeBox = false;
         AcceptButton = okButton;

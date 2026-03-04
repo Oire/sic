@@ -43,7 +43,7 @@ internal static class Program {
             DialogResult msg = MessageBox.Show(_("Unable to start the program up. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
             if (msg == DialogResult.OK) {
-                System.Windows.Forms.Application.Exit();
+                Environment.Exit(ExitCode.Error);
             }
 
             return ExitCode.Error;
@@ -85,7 +85,7 @@ internal static class Program {
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
         } else {
             Console.Error.WriteLine(
-                _("Warning: The output folder \"{0}\" no longer exists. Using default folder.", outputFolder));
+                _("Warning! The output folder \"{0}\" no longer exists. Using default folder.", outputFolder));
         }
 
         Config.General.OutputFolder = App.DefaultOutputFolder;
@@ -110,7 +110,7 @@ internal static class Program {
         var resizeOption = new Option<string?>("--resize", "-r") { Description = _("Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)") };
         var cropOption = new Option<bool>("--crop", "-c") { Description = _("Use crop mode (scale to cover, then center-crop to exact dimensions)") };
 
-        var rootCommand = new RootCommand(_("SIC! \u2014 Simple Image Converter")) {
+        var rootCommand = new RootCommand(_("SIC! — Simple Image Converter")) {
             inputOption,
             outputOption,
             formatOption,
