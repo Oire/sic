@@ -31,8 +31,8 @@ public partial class MainWindow: Form {
         // File menu
         addImageMenuItem.Click += AddImageMenuItem_Click;
         addFolderMenuItem.Click += AddFolderMenuItem_Click;
-        addFromUrlMenuItem.Click += AddFromUrlMenuItem_Click;
-        optionsMenuItem.Click += OptionsMenuItem_Click;
+        addByLinkMenuItem.Click += AddByLinkMenuItem_Click;
+        settingsMenuItem.Click += SettingsMenuItem_Click;
         exitMenuItem.Click += ExitMenuItem_Click;
 
         // Edit menu
@@ -45,7 +45,7 @@ public partial class MainWindow: Form {
         createMultiSizeIcoMenuItem.Click += CreateMultiSizeIcoMenuItem_Click;
 
         // Help menu
-        userGuideMenuItem.Click += UserGuideMenuItem_Click;
+        userManualMenuItem.Click += UserManualMenuItem_Click;
         supportDevelopmentMenuItem.Click += SupportDevelopmentMenuItem_Click;
         aboutMenuItem.Click += AboutMenuItem_Click;
 
@@ -133,7 +133,7 @@ public partial class MainWindow: Form {
         await AddFilesAsync(files, folder);
     }
 
-    private async void AddFromUrlMenuItem_Click(object? sender, EventArgs e) {
+    private async void AddByLinkMenuItem_Click(object? sender, EventArgs e) {
         using var dialog = new AddUrlDialog();
 
         if (dialog.ShowDialog() != DialogResult.OK)
@@ -173,7 +173,7 @@ public partial class MainWindow: Form {
         UpdateMenuState();
     }
 
-    private void OptionsMenuItem_Click(object? sender, EventArgs e) {
+    private void SettingsMenuItem_Click(object? sender, EventArgs e) {
         var previousLanguage = Config.General.Language;
         using var dialog = new SettingsDialog();
         dialog.ShowDialog(this);
@@ -483,7 +483,7 @@ public partial class MainWindow: Form {
 
     // --- Help menu handlers ---
 
-    private void UserGuideMenuItem_Click(object? sender, EventArgs e) {
+    private void UserManualMenuItem_Click(object? sender, EventArgs e) {
         MessageBox.Show(_("The user guide is coming soon."), _("User Guide"), MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 

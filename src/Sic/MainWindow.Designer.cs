@@ -31,8 +31,8 @@ partial class MainWindow {
         fileMenu = new ToolStripMenuItem();
         addImageMenuItem = new ToolStripMenuItem();
         addFolderMenuItem = new ToolStripMenuItem();
-        addFromUrlMenuItem = new ToolStripMenuItem();
-        optionsMenuItem = new ToolStripMenuItem();
+        addByLinkMenuItem = new ToolStripMenuItem();
+        settingsMenuItem = new ToolStripMenuItem();
         exitMenuItem = new ToolStripMenuItem();
 
         // Edit menu
@@ -48,7 +48,7 @@ partial class MainWindow {
 
         // Help menu
         helpMenu = new ToolStripMenuItem();
-        userGuideMenuItem = new ToolStripMenuItem();
+        userManualMenuItem = new ToolStripMenuItem();
         supportDevelopmentMenuItem = new ToolStripMenuItem();
         aboutMenuItem = new ToolStripMenuItem();
 
@@ -100,9 +100,9 @@ partial class MainWindow {
         fileMenu.DropDownItems.AddRange(new ToolStripItem[] {
             addImageMenuItem,
             addFolderMenuItem,
-            addFromUrlMenuItem,
+            addByLinkMenuItem,
             new ToolStripSeparator(),
-            optionsMenuItem,
+            settingsMenuItem,
             new ToolStripSeparator(),
             exitMenuItem,
         });
@@ -122,11 +122,11 @@ partial class MainWindow {
         addFolderMenuItem.Name = "addFolderMenuItem";
 
         //
-        // addFromUrlMenuItem
+        // addByLinkMenuItem
         //
-        addFromUrlMenuItem.Text = "Add Image by &Link...";
-        addFromUrlMenuItem.ShortcutKeys = Keys.Control | Keys.L;
-        addFromUrlMenuItem.Name = "addFromUrlMenuItem";
+        addByLinkMenuItem.Text = "Add Image by &Link...";
+        addByLinkMenuItem.ShortcutKeys = Keys.Control | Keys.L;
+        addByLinkMenuItem.Name = "addByLinkMenuItem";
 
         //
         // removeMenuItem
@@ -145,12 +145,12 @@ partial class MainWindow {
         removeAllMenuItem.Enabled = false;
 
         //
-        // optionsMenuItem
+        // settingsMenuItem
         //
-        optionsMenuItem.Text = "&Settings...";
-        optionsMenuItem.ShortcutKeys = Keys.Control | Keys.Oemcomma;
-        optionsMenuItem.ShortcutKeyDisplayString = "Ctrl+,";
-        optionsMenuItem.Name = "optionsMenuItem";
+        settingsMenuItem.Text = "&Settings...";
+        settingsMenuItem.ShortcutKeys = Keys.Control | Keys.Oemcomma;
+        settingsMenuItem.ShortcutKeyDisplayString = "Ctrl+,";
+        settingsMenuItem.Name = "settingsMenuItem";
 
         //
         // exitMenuItem
@@ -211,18 +211,18 @@ partial class MainWindow {
         helpMenu.Text = "&Help";
         helpMenu.Name = "helpMenu";
         helpMenu.DropDownItems.AddRange(new ToolStripItem[] {
-            userGuideMenuItem,
+            userManualMenuItem,
             new ToolStripSeparator(),
             supportDevelopmentMenuItem,
             aboutMenuItem,
         });
 
         //
-        // userGuideMenuItem
+        // userManualMenuItem
         //
-        userGuideMenuItem.Text = "Read User &Manual";
-        userGuideMenuItem.ShortcutKeys = Keys.F1;
-        userGuideMenuItem.Name = "userGuideMenuItem";
+        userManualMenuItem.Text = "Read User &Manual";
+        userManualMenuItem.ShortcutKeys = Keys.F1;
+        userManualMenuItem.Name = "userManualMenuItem";
 
         //
         // supportDevelopmentMenuItem
@@ -508,8 +508,8 @@ partial class MainWindow {
     private ToolStripMenuItem fileMenu;
     private ToolStripMenuItem addImageMenuItem;
     private ToolStripMenuItem addFolderMenuItem;
-    private ToolStripMenuItem addFromUrlMenuItem;
-    private ToolStripMenuItem optionsMenuItem;
+    private ToolStripMenuItem addByLinkMenuItem;
+    private ToolStripMenuItem settingsMenuItem;
     private ToolStripMenuItem exitMenuItem;
     private ToolStripMenuItem editMenu;
     private ToolStripMenuItem removeMenuItem;
@@ -519,7 +519,7 @@ partial class MainWindow {
     private ToolStripMenuItem convertAllMenuItem;
     private ToolStripMenuItem createMultiSizeIcoMenuItem;
     private ToolStripMenuItem helpMenu;
-    private ToolStripMenuItem userGuideMenuItem;
+    private ToolStripMenuItem userManualMenuItem;
     private ToolStripMenuItem supportDevelopmentMenuItem;
     private ToolStripMenuItem aboutMenuItem;
     private TableLayoutPanel mainLayout;
