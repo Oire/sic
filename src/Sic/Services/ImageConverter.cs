@@ -8,7 +8,11 @@ using App = Oire.Sic.Utils.Constants.App;
 namespace Oire.Sic.Services;
 
 public static class ImageConverter {
-    private static readonly HttpClient HttpClient = new();
+    private const long MaxDownloadSize = 100 * 1024 * 1024; // 100 MB
+
+    private static readonly HttpClient HttpClient = new() {
+        Timeout = TimeSpan.FromSeconds(30),
+    };
 
     private static readonly Dictionary<string, MagickFormat> FormatMap = new(StringComparer.OrdinalIgnoreCase) {
         ["JPG"] = MagickFormat.Jpeg,
@@ -92,9 +96,40 @@ public static class ImageConverter {
         };
     }
 
-    public static async Task<ImageItem> LoadFromUrl(string url) {
+    public static async Task<ImageItem> LoadFromUrl(string url, CancellationToken cancellationToken = default, IProgress<(long BytesRead, long? TotalBytes)>? progress = null) {
         var uri = new Uri(url);
-        var data = await HttpClient.GetByteArrayAsync(uri).ConfigureAwait(false);
+
+        if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps) {
+            throw new ArgumentException($"Only HTTP and HTTPS URLs are supported, got {uri.Scheme}://");
+        }
+
+        using var response = await HttpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
+        var contentLength = response.Content.Headers.ContentLength;
+
+        if (contentLength > MaxDownloadSize) {
+            throw new InvalidOperationException($"File is too large ({contentLength / (1024 * 1024)} MB). Maximum allowed size is {MaxDownloadSize / (1024 * 1024)} MB.");
+        }
+
+        using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        using var ms = new MemoryStream();
+        var buffer = new byte[81920];
+        long totalRead = 0;
+        int bytesRead;
+
+        while ((bytesRead = await responseStream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0) {
+            totalRead += bytesRead;
+
+            if (totalRead > MaxDownloadSize) {
+                throw new InvalidOperationException($"Download exceeded the maximum allowed size of {MaxDownloadSize / (1024 * 1024)} MB.");
+            }
+
+            ms.Write(buffer, 0, bytesRead);
+            progress?.Report((totalRead, contentLength));
+        }
+
+        var data = ms.ToArray();
         var fileName = Path.GetFileName(uri.LocalPath);
 
         if (string.IsNullOrWhiteSpace(fileName)) {

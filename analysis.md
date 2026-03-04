@@ -3,7 +3,7 @@
 **Date**: 2026-03-03
 **Status**: Pre-release audit
 
-The codebase is competently structured with solid conventions. The critical issues cluster around URL/network handling and Config class coupling to WinForms in a dual-mode app. The core conversion engine and UI architecture are solid.
+The codebase is competently structured with solid conventions. The remaining critical issue is Config class coupling to WinForms in a dual-mode app. The core conversion engine and UI architecture are solid.
 
 ---
 
@@ -20,35 +20,6 @@ The codebase is competently structured with solid conventions. The critical issu
 - Add a `bool isGui` parameter to `Load()` and use `Console.Error.WriteLine` + return in CLI mode
 - Throw a typed exception that `Program.cs` catches and routes appropriately
 - Use a callback/delegate for error reporting injected by the caller
-
-### C2. `LoadFromUrl` has no download size limit
-
-**Where**: `src/Sic/Services/ImageConverter.cs`, line 97
-
-`HttpClient.GetByteArrayAsync(uri)` has no limit on response size. A URL pointing to a multi-gigabyte file (or a server streaming indefinitely) will cause `OutOfMemoryException` and crash the app. This is a denial-of-service vector.
-
-**Fix**: Use `HttpClient.GetAsync` with `HttpCompletionOption.ResponseHeadersRead`, check `Content-Length` against a reasonable maximum (e.g., 100 MB), then read into a bounded `MemoryStream`. Also add a `CancellationToken` parameter so the download can be cancelled.
-
-### C3. `LoadFromUrl` accepts arbitrary URI schemes including `file://`
-
-**Where**: `src/Sic/Services/ImageConverter.cs`, lines 95-96
-
-The method constructs a `Uri` from user input but performs no scheme validation. A user could enter `file:///C:/Windows/System32/config/SAM` or `ftp://internal-server/secrets`. This is a Server-Side Request Forgery (SSRF) risk. Even in a desktop app, it is unexpected behavior.
-
-**Fix**: After constructing the `Uri`, validate `uri.Scheme` is `"http"` or `"https"`. Reject other schemes with a descriptive error message.
-
-### C4. No URL validation in `AddUrlDialog`
-
-**Where**: `src/Sic/AddUrlDialog.cs`, lines 15-22
-
-`OnFormClosing` only checks `string.IsNullOrWhiteSpace`. Malformed input like "hello world" passes through and throws `UriFormatException` in `LoadFromUrl`, producing a confusing error message: "Invalid URI: The format of the URI could not be determined."
-
-**Fix**: In `OnFormClosing`, validate with:
-```csharp
-Uri.TryCreate(urlTextBox.Text, UriKind.Absolute, out var uri)
-    && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
-```
-Show a meaningful error like "Please enter a valid URL starting with http:// or https://".
 
 ---
 
@@ -329,15 +300,11 @@ The GitHub Actions workflow runs `dotnet restore`, `dotnet format --verify-no-ch
 
 For a public release, adding shields.io badges for build status, latest release version, and license type at the top of README gives an immediate quality signal.
 
-### SG9. Configure `HttpClient` timeout
-
-The static `HttpClient` in `ImageConverter.cs` uses the default `Timeout` of 100 seconds. For downloading images, this may be too long (or too short for very large files on slow connections). Consider making it configurable or at least documenting the default.
-
-### SG10. Clean up premature `dependabot.yml` test dependency groups
+### SG9. Clean up premature `dependabot.yml` test dependency groups
 
 `dependabot.yml` defines a `test-dependencies` group with patterns for xunit, FluentAssertions, Moq, and coverlet. None of these packages are referenced yet. Harmless but premature — remove until a test project exists.
 
-### SG11. README license wording contradicts Apache 2.0
+### SG10. README license wording contradicts Apache 2.0
 
 **Where**: `README.md`, line 103
 
@@ -351,11 +318,11 @@ The static `HttpClient` in `ImageConverter.cs` uses the default `Timeout` of 100
 
 | Severity | Count | Key Themes |
 |----------|-------|------------|
-| CRITICAL | 4 | SSRF in URL loading, Config hangs CLI, no download size limit, no URL validation |
+| CRITICAL | 1 | Config hangs CLI |
 | SERIOUS | 9 | Resource leaks, doc drift, dead code, swallowed exceptions, outdated README |
 | MODERATE | 8 | Dead code, naming inconsistency, relative locale path, config overwrite |
 | NITPICK | 9 | Style, `const` vs `static readonly`, self-references, brace style doc mismatch |
-| SUGGESTIONS | 11 | Tests, `global.json`, sealed classes, CancellationToken, log rotation |
-| **TOTAL** | **41** | |
+| SUGGESTIONS | 10 | Tests, `global.json`, sealed classes, CancellationToken, log rotation |
+| **TOTAL** | **37** | |
 
-Fixing the 4 critical and 9 serious issues (13 total) would bring this to a confident v1.0.0 release. The moderate and nitpick items are polish that would distinguish a professional release from a "good enough" one.
+Fixing the 1 critical and 9 serious issues (10 total) would bring this to a confident v1.0.0 release. The moderate and nitpick items are polish that would distinguish a professional release from a "good enough" one.

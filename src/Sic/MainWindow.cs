@@ -139,36 +139,7 @@ public partial class MainWindow: Form {
         if (dialog.ShowDialog() != DialogResult.OK)
             return;
 
-        ProgressDialog? progressDialog = null;
-
-        try {
-            progressDialog = new ProgressDialog(_("Downloading image..."));
-            progressDialog.Text = _("Downloading...");
-            progressDialog.Show(this);
-            Application.DoEvents();
-
-            var item = await ImageConverter.LoadFromUrl(dialog.Url)
-                .WaitAsync(progressDialog.CancellationToken);
-
-            progressDialog.Close();
-            progressDialog.Dispose();
-            progressDialog = null;
-
-            AddImageItem(item);
-            UpdateMenuState();
-            statusLabel.Text = _("Added {0} from URL", item.FileName);
-        } catch (OperationCanceledException) {
-            statusLabel.Text = _("Ready");
-        } catch (Exception ex) {
-            Log.Error("Failed to load image from URL {Url}: {Error}", dialog.Url, ex.Message);
-            MessageBox.Show(_("Failed to load image from URL:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
-            statusLabel.Text = _("Ready");
-        } finally {
-            if (progressDialog != null) {
-                progressDialog.Close();
-                progressDialog.Dispose();
-            }
-        }
+        await PasteFromUrlAsync(dialog.Url);
     }
 
     private void RemoveMenuItem_Click(object? sender, EventArgs e) {
@@ -722,6 +693,57 @@ public partial class MainWindow: Form {
             } catch (Exception ex) {
                 Log.Error("Failed to load clipboard image: {Error}", ex.Message);
                 MessageBox.Show(_("Failed to load clipboard image:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        } else if (Clipboard.ContainsText()) {
+            var text = Clipboard.GetText().Trim();
+
+            if (Uri.TryCreate(text, UriKind.Absolute, out var uri)
+                && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)) {
+                await PasteFromUrlAsync(text);
+            }
+        }
+    }
+
+    private async Task PasteFromUrlAsync(string url) {
+        ProgressDialog? progressDialog = null;
+
+        try {
+            progressDialog = new ProgressDialog(_("Downloading image..."));
+            progressDialog.Text = _("Downloading...");
+            progressDialog.Show(this);
+            Application.DoEvents();
+
+            var progress = new Progress<(long BytesRead, long? TotalBytes)>(p => {
+                if (p.TotalBytes.HasValue && p.TotalBytes.Value > 0) {
+                    var current = (int)(p.BytesRead * 100 / p.TotalBytes.Value);
+                    progressDialog!.UpdateProgress(current, 100);
+                    progressDialog!.UpdateMessage(
+                        _("Downloading image... {0}%", current));
+                } else {
+                    progressDialog!.UpdateMessage(
+                        _("Downloading image... ({0} KB)", p.BytesRead / 1024));
+                }
+            });
+
+            var item = await ImageConverter.LoadFromUrl(url, progressDialog.CancellationToken, progress);
+
+            progressDialog.Close();
+            progressDialog.Dispose();
+            progressDialog = null;
+
+            AddImageItem(item);
+            UpdateMenuState();
+            statusLabel.Text = _("Added {0} from URL", item.FileName);
+        } catch (OperationCanceledException) {
+            statusLabel.Text = _("Ready");
+        } catch (Exception ex) {
+            Log.Error("Failed to load image from URL {Url}: {Error}", url, ex.Message);
+            MessageBox.Show(_("Failed to load image from URL:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            statusLabel.Text = _("Ready");
+        } finally {
+            if (progressDialog != null) {
+                progressDialog.Close();
+                progressDialog.Dispose();
             }
         }
     }
