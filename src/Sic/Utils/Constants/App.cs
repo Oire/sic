@@ -14,6 +14,7 @@ public static class App {
             Name
         );
     public static readonly string DefaultOutputFolder = Path.Combine(DataFolder, "Converted");
+    public const string RepoUrl = "https://github.com/Oire/sic";
     public const string SystemLanguageName = "System";
     public static readonly string LocalesFolder = Path.Combine(AppContext.BaseDirectory, "locale");
 }
