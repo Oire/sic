@@ -35,11 +35,12 @@ There are no test projects or linting commands configured yet.
 
 ### UI
 
-**`src/Sic/MainWindow.cs` + `MainWindow.Designer.cs`** — Main application window. `TableLayoutPanel`-based layout with:
+**`src/Sic/MainWindow.cs` + `MainWindow.Designer.cs`** — Main application window. Menu bar (File, Edit, Convert, Help) + `TableLayoutPanel`-based layout with:
 - `ListView` (batch queue) + `PictureBox` (image preview) in the top row
-- Format dropdown, resize checkbox + width/height fields in the controls row
-- Action buttons (Add File, Add URL, Remove, Settings, Convert) in the button row
-- `StatusStrip` with progress bar at the bottom
+- Format dropdown, resize checkbox + resize mode / width / height fields in the controls rows
+- Convert Selected + Convert All buttons
+- `StatusStrip` with status label at the bottom
+- Batch operations show a separate `ProgressDialog` with progress bar
 - Supports drag & drop, Ctrl+V paste (file drops and bitmap clipboard), Delete key to remove
 
 **`src/Sic/SettingsDialog.cs` + `SettingsDialog.Designer.cs`** — Settings form. Flat `TableLayoutPanel` layout with output folder (textbox + browse + clear), language dropdown, OK/Cancel.
@@ -87,7 +88,7 @@ SIC! is an accessible image format converter primarily aimed at blind and low-co
    - Drag & drop files onto the list
    - Ctrl+V paste (both clipboard files like Outlook attachments, and raw bitmap data like PrintScreen screenshots)
    - "Open file" button/dialog
-   - Open by URL (downloads and converts in one step, no original kept)
+   - Add by link (downloads the image and adds it to the queue)
 3. **Pick target format** from a dropdown (JPG, PNG, WEBP, ICO, BMP, TIFF, GIF, AVIF).
 4. **Optional resize** — checkbox that reveals width/height fields (critical for blind users who get told "upload a 128x128 photo").
 5. **Hit Convert** — processes all items in the list to the chosen format.
@@ -99,7 +100,7 @@ SIC! is an accessible image format converter primarily aimed at blind and low-co
 - **Use `TableLayoutPanel` throughout** — the developer is blind and needs to adjust layouts without counting pixel coordinates. Use flat layouts (no nesting) with percentage-based column styles where possible.
 - **Image preview panel** — sighted users should see a preview of the selected image. This is not a blind-only tool; it should look and feel like a proper app a sighted person would also choose to use.
 - **Resize controls** — consider visual resize handles or interactive controls for sighted users in addition to the WxH text fields.
-- **Accessibility first** — proper tab order, meaningful labels. Do **not** set `AccessibleName` on controls — it overrides the `Text` property that screen readers already use, causing JAWS to read verbose descriptions instead of the actual button/menu text.
+- **Accessibility first** — proper tab order, meaningful labels, keyboard accelerators (underlined letters via `&`) on all interactive controls. Do **not** set `AccessibleName` on controls that already have a meaningful `Text` property — it overrides what screen readers use. Only set `AccessibleName` on controls without descriptive text (e.g., `ListView`).
 
 ### Settings (via SharpConfig, stored in `%APPDATA%/Oire/Sic/Sic.cfg`)
 

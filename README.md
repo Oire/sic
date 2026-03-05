@@ -9,7 +9,7 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 - **Batch conversion** — queue multiple images and convert them all at once
 - **8 formats** — JPG, PNG, WebP, ICO, BMP, TIFF, GIF, AVIF
 - **Resize** — specify target dimensions (useful when you're told "upload a 128x128 photo")
-- **Multiple input methods** — file dialog, drag & drop, Ctrl+V paste (files or screenshots), download from URL
+- **Multiple input methods** — file dialog, drag & drop, Ctrl+V paste (files or screenshots), download by link
 - **Filename conflict handling** — always asks: overwrite, rename (`_1` suffix), or skip
 - **CLI mode** — headless conversion from the command line, no UI needed
 - **Accessible** — logical tab order, keyboard shortcuts, screen-reader friendly
@@ -91,7 +91,7 @@ src/Sic/
   MainWindow.cs/.Designer.cs      # Main application window
   SettingsDialog.cs/.Designer.cs  # Settings form
   AboutDialog.cs/.Designer.cs    # About dialog
-  AddUrlDialog.cs/.Designer.cs   # Add image from URL dialog
+  AddUrlDialog.cs/.Designer.cs   # Add image by link dialog
   AddFolderDialog.cs/.Designer.cs # Add images from folder dialog
   IcoPresetDialog.cs/.Designer.cs # Multi-size ICO preset picker
   AddSizeDialog.cs/.Designer.cs   # Custom ICO size entry dialog
