@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIC! &#8212; Руководство пользователя</title>
+<style>
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.6;
+    max-width: 50em;
+    margin: 0 auto;
+    padding: 1em 2em;
+    color: #1a1a1a;
+    background: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+    body { color: #e0e0e0; background: #1a1a1a; }
+    a { color: #6db3f2; }
+    a:visited { color: #b39ddb; }
+    kbd { background: #333; border-color: #555; }
+    table, th, td { border-color: #444; }
+    th { background: #333; }
+}
+
+h1, h2, h3 { line-height: 1.2; }
+h1 { border-bottom: 2px solid currentColor; padding-bottom: 0.3em; }
+h2 { margin-top: 1.5em; }
+
+nav {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 1em;
+    margin-bottom: 2em;
+}
+
+@media (prefers-color-scheme: dark) {
+    nav { background: #252525; border-color: #444; }
+}
+
+nav ul { margin: 0; padding-left: 1.5em; }
+nav li { margin: 0.3em 0; }
+
+kbd {
+    display: inline-block;
+    padding: 0.1em 0.4em;
+    font-size: 0.9em;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 0.5em 0.8em;
+    text-align: left;
+}
+
+th { background: #f5f5f5; }
+
+dl dt { font-weight: bold; margin-top: 0.8em; }
+dl dd { margin-left: 1.5em; }
+</style>
+</head>
+<body>
+<h1>SIC! &mdash; Simple Image Converter</h1>
+<p>Руководство пользователя</p>
+
+<nav aria-label="Содержание">
+<h2>Содержание</h2>
+<ul>
+    <li><a href="#overview">Обзор</a></li>
+    <li><a href="#adding-images">Добавление изображений</a></li>
+    <li><a href="#converting">Конвертация изображений</a></li>
+    <li><a href="#resizing">Изменение размера</a></li>
+    <li><a href="#multi-size-ico">Создание многоразмерных ICO-файлов</a></li>
+    <li><a href="#settings">Настройки</a></li>
+    <li><a href="#cli">Использование из командной строки</a></li>
+    <li><a href="#keyboard-shortcuts">Сочетания клавиш</a></li>
+    <li><a href="#supported-formats">Поддерживаемые форматы</a></li>
+    <li><a href="#troubleshooting">Устранение неполадок</a></li>
+</ul>
+</nav>
+
+<h2 id="overview">Обзор</h2>
+<p>SIC! &mdash; это простой и доступный конвертер форматов изображений. Он позволяет конвертировать изображения между популярными форматами, при необходимости изменять их размер и обрабатывать несколько изображений одновременно.</p>
+<p>Главное окно содержит список изображений (очередь обработки), панель предварительного просмотра, элементы управления форматом и размером, а также кнопки конвертации.</p>
+
+<h2 id="adding-images">Добавление изображений</h2>
+<p>Существует несколько способов добавить изображения в очередь:</p>
+<dl>
+    <dt>Открыть файлы</dt>
+    <dd>Используйте <strong>Файл &gt; Добавить изображение</strong> (<kbd>Ctrl+N</kbd>), чтобы открыть окно выбора файлов. Можно выбрать несколько файлов одновременно.</dd>
+
+    <dt>Добавить папку</dt>
+    <dd>Используйте <strong>Файл &gt; Добавить папку</strong> (<kbd>Ctrl+Shift+N</kbd>), чтобы добавить все изображения из папки. Можно выбрать типы файлов и включить поиск в подпапках.</dd>
+
+    <dt>Добавить по ссылке</dt>
+    <dd>Используйте <strong>Файл &gt; Добавить изображение по ссылке</strong> (<kbd>Ctrl+L</kbd>), чтобы загрузить изображение по URL-адресу и добавить его в очередь.</dd>
+
+    <dt>Перетаскивание</dt>
+    <dd>Перетащите файлы изображений из Проводника и отпустите их на список изображений.</dd>
+
+    <dt>Вставка из буфера обмена</dt>
+    <dd>Нажмите <kbd>Ctrl+V</kbd> для вставки. SIC! поддерживает вставку файлов (например, скопированных из Проводника или Outlook), растровых данных (например, после нажатия Print Screen) и URL-адресов из буфера обмена.</dd>
+</dl>
+
+<h2 id="converting">Конвертация изображений</h2>
+<ol>
+    <li>Добавьте одно или несколько изображений в очередь.</li>
+    <li>Выберите нужный целевой формат из выпадающего списка <strong>Целевой формат</strong>.</li>
+    <li>Нажмите <strong>Конвертировать все</strong> (<kbd>Ctrl+Shift+F5</kbd>), чтобы конвертировать все изображения в очереди, или выберите нужные изображения и нажмите <strong>Конвертировать выбранные</strong> (<kbd>F5</kbd>).</li>
+</ol>
+<p>По умолчанию конвертированные файлы сохраняются в ту же папку, что и оригиналы, с расширением, соответствующим новому формату. Вы можете задать пользовательскую папку для сохранения в <a href="#settings">Настройках</a>.</p>
+<p>Если файл с таким именем уже существует, SIC! предложит выбор: перезаписать, переименовать (добавив суффикс <code>_1</code>) или пропустить этот файл.</p>
+
+<h2 id="resizing">Изменение размера</h2>
+<p>Установите флажок <strong>Изменить размер</strong>, чтобы включить изменение размера при конвертации. Доступны два режима:</p>
+<dl>
+    <dt>Сохранять пропорции (по умолчанию)</dt>
+    <dd>Введите ширину, высоту или оба значения. Изображение будет масштабировано с сохранением пропорций. Если указано только одно измерение, второе вычисляется автоматически.</dd>
+
+    <dt>Обрезка</dt>
+    <dd>Требуются и ширина, и высота. Изображение масштабируется до покрытия целевых размеров, а затем обрезается до точного размера.</dd>
+</dl>
+<p>Когда вы выбираете изображение в списке при включённом изменении размера, поля ширины и высоты автоматически заполняются текущими размерами изображения.</p>
+
+<h2 id="multi-size-ico">Создание многоразмерных ICO-файлов</h2>
+<p>Чтобы создать ICO-файл с несколькими размерами (полезно для значков приложений):</p>
+<ol>
+    <li>Выберите изображение в списке.</li>
+    <li>Выберите <strong>Конвертация &gt; Создать многоразмерный ICO</strong> (<kbd>Ctrl+Alt+F5</kbd>).</li>
+    <li>Выберите нужные размеры в диалоге настроек.</li>
+</ol>
+
+<h2 id="settings">Настройки</h2>
+<p>Откройте <strong>Файл &gt; Настройки</strong> (<kbd>Ctrl+,</kbd>) для настройки:</p>
+<dl>
+    <dt>Папка сохранения</dt>
+    <dd>Задайте пользовательскую папку, в которую будут сохраняться все конвертированные файлы. Оставьте пустой, чтобы сохранять рядом с оригиналами.</dd>
+
+    <dt>Язык</dt>
+    <dd>Выберите язык интерфейса. Выберите <em>System</em>, чтобы использовать язык системы Windows.</dd>
+</dl>
+<p>Настройки хранятся в файле <code>%APPDATA%\Oire\Sic\Sic.cfg</code>.</p>
+
+<h2 id="cli">Использование из командной строки</h2>
+<p>SIC! можно также использовать из командной строки без открытия графического интерфейса. Это удобно для скриптов и пакетной обработки.</p>
+<pre>sic -i input.png -o output.jpg
+sic --input photo.bmp --output photo.webp
+sic -i avatar.png -o avatar.ico --resize 128x128
+sic -i photo.jpg -f png --resize 800x</pre>
+<dl>
+    <dt><code>--input</code>, <code>-i</code> (обязательный)</dt>
+    <dd>Путь к исходному изображению.</dd>
+
+    <dt><code>--output</code>, <code>-o</code></dt>
+    <dd>Путь к выходному файлу. Целевой формат определяется по расширению файла.</dd>
+
+    <dt><code>--format</code>, <code>-f</code></dt>
+    <dd>Название целевого формата (например, <code>png</code>, <code>jpg</code>). Используйте вместо <code>--output</code> для автоматического создания пути.</dd>
+
+    <dt><code>--resize</code>, <code>-r</code></dt>
+    <dd>Изменить размер изображения. Формат: <code>ШxВ</code>, <code>Шx</code> (только ширина) или <code>xВ</code> (только высота).</dd>
+
+    <dt><code>--crop</code>, <code>-c</code></dt>
+    <dd>Обрезать вместо пропорционального масштабирования. Требуются и ширина, и высота в <code>--resize</code>.</dd>
+</dl>
+<p>Необходимо указать либо <code>--output</code>, либо <code>--format</code> (но не оба).</p>
+
+<h2 id="keyboard-shortcuts">Сочетания клавиш</h2>
+<table>
+<thead>
+    <tr><th>Действие</th><th>Сочетание</th></tr>
+</thead>
+<tbody>
+    <tr><td>Добавить изображение</td><td><kbd>Ctrl+N</kbd></td></tr>
+    <tr><td>Добавить папку</td><td><kbd>Ctrl+Shift+N</kbd></td></tr>
+    <tr><td>Добавить изображение по ссылке</td><td><kbd>Ctrl+L</kbd></td></tr>
+    <tr><td>Настройки</td><td><kbd>Ctrl+,</kbd></td></tr>
+    <tr><td>Удалить выбранное изображение</td><td><kbd>Delete</kbd></td></tr>
+    <tr><td>Удалить все изображения</td><td><kbd>Ctrl+Shift+Delete</kbd></td></tr>
+    <tr><td>Вставить из буфера обмена</td><td><kbd>Ctrl+V</kbd></td></tr>
+    <tr><td>Конвертировать выбранные</td><td><kbd>F5</kbd></td></tr>
+    <tr><td>Конвертировать все</td><td><kbd>Ctrl+Shift+F5</kbd></td></tr>
+    <tr><td>Создать многоразмерный ICO</td><td><kbd>Ctrl+Alt+F5</kbd></td></tr>
+    <tr><td>Руководство пользователя</td><td><kbd>F1</kbd></td></tr>
+    <tr><td>О программе SIC!</td><td><kbd>Shift+F1</kbd></td></tr>
+    <tr><td>Поддержать разработку</td><td><kbd>Ctrl+Shift+D</kbd></td></tr>
+    <tr><td>Выход</td><td><kbd>Alt+F4</kbd></td></tr>
+</tbody>
+</table>
+
+<h2 id="supported-formats">Поддерживаемые форматы</h2>
+<table>
+<thead>
+    <tr><th>Формат</th><th>Расширения</th><th>Примечания</th></tr>
+</thead>
+<tbody>
+    <tr><td>JPEG</td><td>.jpg, .jpeg</td><td>Широко поддерживается, сжатие с потерями</td></tr>
+    <tr><td>PNG</td><td>.png</td><td>Без потерь, поддерживает прозрачность</td></tr>
+    <tr><td>WebP</td><td>.webp</td><td>Современный формат, хорошее сжатие</td></tr>
+    <tr><td>ICO</td><td>.ico</td><td>Формат значков Windows</td></tr>
+    <tr><td>BMP</td><td>.bmp</td><td>Несжатый растровый формат</td></tr>
+    <tr><td>TIFF</td><td>.tiff, .tif</td><td>Без потерь, используется в печати и сканировании</td></tr>
+    <tr><td>GIF</td><td>.gif</td><td>Ограничен 256 цветами</td></tr>
+    <tr><td>AVIF</td><td>.avif</td><td>Современный формат, отличное сжатие</td></tr>
+</tbody>
+</table>
+
+<h2 id="troubleshooting">Устранение неполадок</h2>
+<dl>
+    <dt>Облачный файл не удаётся загрузить</dt>
+    <dd>Файлы, хранящиеся в OneDrive или SharePoint и не загруженные локально, отображаются как облачные заполнители. SIC! обнаружит это и предложит сначала загрузить их.</dd>
+
+    <dt>Конвертация не удаётся для определённого файла</dt>
+    <dd>Убедитесь, что файл является корректным изображением и не повреждён. SIC! записывает подробные ошибки в <code>%APPDATA%\Oire\Sic\logs\</code>.</dd>
+
+    <dt>Папка сохранения больше не существует</dt>
+    <dd>Если пользовательская папка для сохранения была удалена или перемещена, SIC! предупредит об этом и будет использовать папку по умолчанию.</dd>
+</dl>
+
+<hr>
+<p><small>&copy; Oire Software. <a href="https://oire.org">oire.org</a></small></p>
+</body>
+</html>

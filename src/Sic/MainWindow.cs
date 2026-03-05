@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using GetText.WindowsForms;
 using Oire.Sic.Models;
@@ -475,7 +476,7 @@ public partial class MainWindow: Form {
     }
 
     private void SupportDevelopmentMenuItem_Click(object? sender, EventArgs e) {
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo {
+        Process.Start(new ProcessStartInfo {
             FileName = "https://oire.org/donate",
             UseShellExecute = true,
         });
@@ -484,7 +485,27 @@ public partial class MainWindow: Form {
     // --- Help menu handlers ---
 
     private void UserManualMenuItem_Click(object? sender, EventArgs e) {
-        MessageBox.Show(_("The user guide is coming soon."), _("User Guide"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+        var culture = Localization.GetCurrentCulture();
+        var helpFolder = Utils.Constants.App.HelpFolder;
+        var manualPath = Path.Combine(helpFolder, culture.Name, "manual.html");
+
+        if (!File.Exists(manualPath)) {
+            manualPath = Path.Combine(helpFolder, culture.TwoLetterISOLanguageName, "manual.html");
+        }
+
+        if (!File.Exists(manualPath)) {
+            manualPath = Path.Combine(helpFolder, "en", "manual.html");
+        }
+
+        if (!File.Exists(manualPath)) {
+            MessageBox.Show(_("The user manual file could not be found."), _("User Manual"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        Process.Start(new ProcessStartInfo {
+            FileName = manualPath,
+            UseShellExecute = true,
+        });
     }
 
     private void AboutMenuItem_Click(object? sender, EventArgs e) {

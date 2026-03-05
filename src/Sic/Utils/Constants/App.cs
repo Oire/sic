@@ -17,4 +17,5 @@ public static class App {
     public const string RepoUrl = "https://github.com/Oire/sic";
     public const string SystemLanguageName = "System";
     public static readonly string LocalesFolder = Path.Combine(AppContext.BaseDirectory, "locale");
+    public static readonly string HelpFolder = Path.Combine(AppContext.BaseDirectory, "help");
 }
