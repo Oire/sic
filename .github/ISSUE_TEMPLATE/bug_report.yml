@@ -59,10 +59,15 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: version
+  - type: textarea
+    id: version-info
     attributes:
-      label: SIC! Version (can be seen in the About SIC! dialog)
+      label: Version Info
+      description: Open SIC!, go to Help → About SIC!, click "Copy Info", and paste the result here.
+      placeholder: |
+        SIC! version: ...
+        .NET version: ...
+        Windows version: ...
     validations:
       required: true
 
@@ -74,13 +79,7 @@ body:
       placeholder: "e.g., PNG -> ICO"
 
   - type: input
-    id: windows-version
-    attributes:
-      label: Windows Version
-      placeholder: "e.g., Windows 11 24H2"
-
-  - type: input
     id: screen-reader
     attributes:
       label: Screen reader and version you used, if applicable
-      placeholder: "e.g., JAWS2026.2602.49"
+      placeholder: "e.g., JAWS 2026.2602.49"
