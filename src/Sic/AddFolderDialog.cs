@@ -1,5 +1,6 @@
 using GetText.WindowsForms;
 using Oire.Sic.Utils;
+using Serilog;
 using static Oire.Sic.Utils.Localization;
 
 namespace Oire.Sic;
@@ -57,6 +58,7 @@ public partial class AddFolderDialog: Form {
 
         if (DialogResult == DialogResult.OK) {
             if (string.IsNullOrWhiteSpace(folderTextBox.Text)) {
+                Log.Debug("AddFolderDialog: No folder selected");
                 MessageBox.Show(_("Please select a folder."), _("No folder selected"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 e.Cancel = true;
                 return;

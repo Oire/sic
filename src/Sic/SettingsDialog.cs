@@ -1,6 +1,7 @@
 using System.Globalization;
 using GetText.WindowsForms;
 using Oire.Sic.Utils;
+using Serilog;
 using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
 
@@ -51,7 +52,7 @@ public partial class SettingsDialog: Form {
                     var displayName = culture.TextInfo.ToTitleCase(culture.NativeName);
                     detectedLanguages[displayName] = dirName;
                 } catch (CultureNotFoundException) {
-                    // Skip directories with invalid culture names
+                    Log.Debug("Settings: Skipping locale directory with invalid culture name: {DirName}", dirName);
                 }
             }
 
@@ -97,6 +98,7 @@ public partial class SettingsDialog: Form {
         if (!string.IsNullOrWhiteSpace(folder)
             && folder != App.DefaultOutputFolder
             && !Directory.Exists(folder)) {
+            Log.Warning("Settings: Selected output folder does not exist: {Folder}", folder);
             MessageBox.Show(
                 _("The selected folder does not exist. Please choose an existing folder."),
                 _("Folder Not Found"),

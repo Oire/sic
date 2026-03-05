@@ -127,6 +127,7 @@ public partial class MainWindow: Form {
         var files = FileHelper.EnumerateImageFiles(folder, extensions, searchOption).ToArray();
 
         if (files.Length == 0) {
+            Log.Debug("AddFolderMenuItem_Click: No matching images in folder {Folder}", folder);
             MessageBox.Show(_("No matching images found in the selected folder."), _("No images found"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
@@ -203,6 +204,7 @@ public partial class MainWindow: Form {
         resizeMode = Models.ResizeMode.KeepProportions;
 
         if (formatComboBox.SelectedItem is not string format) {
+            Log.Debug("TryGetConversionParams: No format selected");
             MessageBox.Show(_("Please select a target format."), _("No format selected"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
@@ -217,6 +219,7 @@ public partial class MainWindow: Form {
 
             if (resizeMode == Models.ResizeMode.Crop) {
                 if (!hasWidth) {
+                    Log.Debug("TryGetConversionParams: Invalid crop width: {Input}", widthTextBox.Text);
                     MessageBox.Show(_("Crop mode requires a valid width (1\u201365535)."), _("Invalid width"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
@@ -224,6 +227,7 @@ public partial class MainWindow: Form {
                 }
 
                 if (!hasHeight) {
+                    Log.Debug("TryGetConversionParams: Invalid crop height: {Input}", heightTextBox.Text);
                     MessageBox.Show(_("Crop mode requires a valid height (1\u201365535)."), _("Invalid height"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     heightTextBox.Focus();
                     heightTextBox.SelectAll();
@@ -234,6 +238,7 @@ public partial class MainWindow: Form {
                 height = h;
             } else {
                 if (!hasWidth && !hasHeight) {
+                    Log.Debug("TryGetConversionParams: No valid resize dimensions entered");
                     MessageBox.Show(_("Please enter at least one valid dimension (1\u201365535)."), _("Invalid dimensions"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
@@ -256,6 +261,7 @@ public partial class MainWindow: Form {
         if (!string.IsNullOrWhiteSpace(outputFolder)
             && outputFolder != Utils.Constants.App.DefaultOutputFolder
             && !Directory.Exists(outputFolder)) {
+            Log.Warning("Custom output folder no longer exists: {Folder}", outputFolder);
             MessageBox.Show(
                 _("The output folder \"{0}\" no longer exists. The default folder will be used.", outputFolder),
                 _("Output Folder Not Found"),
@@ -388,6 +394,7 @@ public partial class MainWindow: Form {
 
     private async void ConvertButton_Click(object? sender, EventArgs e) {
         if (_imageItems.Count == 0) {
+            Log.Debug("ConvertButton_Click: Attempted to convert with empty queue");
             MessageBox.Show(_("No images to convert. Add some images first."), _("Nothing to convert"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
@@ -498,6 +505,7 @@ public partial class MainWindow: Form {
         }
 
         if (!File.Exists(manualPath)) {
+            Log.Warning("User manual file not found at {Path}", manualPath);
             MessageBox.Show(_("The user manual file could not be found."), _("User Manual"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }

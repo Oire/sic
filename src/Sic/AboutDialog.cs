@@ -3,6 +3,7 @@ using GetText.WindowsForms;
 using Microsoft.Win32;
 using Oire.Sic.Utils;
 using Oire.Sic.Utils.Constants;
+using Serilog;
 using static Oire.Sic.Utils.Localization;
 
 namespace Oire.Sic;
@@ -63,8 +64,8 @@ public partial class AboutDialog: Form {
                     return parts;
                 }
             }
-        } catch {
-            // Fall through to default
+        } catch (Exception ex) {
+            Log.Warning("Failed to read OS version from registry: {Error}", ex.Message);
         }
         return Environment.OSVersion.ToString();
     }

@@ -1,5 +1,6 @@
 using GetText.WindowsForms;
 using Oire.Sic.Utils;
+using Serilog;
 using static Oire.Sic.Utils.Localization;
 
 namespace Oire.Sic;
@@ -24,6 +25,7 @@ public partial class AddSizeDialog: Form {
         var text = sizeTextBox.Text.Trim();
 
         if (!uint.TryParse(text, out var value) || value < MinSize || value > MaxSize) {
+            Log.Debug("AddSizeDialog: Invalid size entered: {Input}", text);
             MessageBox.Show(
                 _("Please enter a number between {0} and {1}.", MinSize, MaxSize),
                 _("Invalid Size"),
