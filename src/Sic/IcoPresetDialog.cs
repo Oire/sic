@@ -79,7 +79,7 @@ public partial class IcoPresetDialog: Form {
             Log.Debug("IcoPresetDialog: Duplicate size {Size} rejected", size);
             MessageBox.Show(
                 _("Size {0} is already in the list.", size),
-                _("Duplicate Size"),
+                _("Existing size"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
             return;
