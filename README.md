@@ -83,6 +83,34 @@ dotnet build -c Release   # Release build
 dotnet publish -c Release # Single-file executable
 ```
 
+## Building the Installer
+
+The `installer/` directory contains an [Inno Setup](https://jrsoftware.org/isdl.php) script that builds a Windows installer with automatic .NET 8 Desktop Runtime detection and installation.
+
+### Quick start
+
+Double-click `installer/build-installer.bat` — it builds the app in Release mode and compiles the installer.
+
+### PowerShell options
+
+```powershell
+.\installer\build-installer.ps1                  # Build app + installer
+.\installer\build-installer.ps1 -SkipBuild       # Installer only (use existing binaries)
+.\installer\build-installer.ps1 -OpenOutput      # Open output folder when done
+.\installer\build-installer.ps1 -InnoSetupPath "C:\Path\To\ISCC.exe"  # Custom compiler path
+```
+
+The installer is created in `installer/Output/` as `SIC!-V{version}-Setup.exe`.
+
+### What the installer includes
+
+- `Sic.exe` (single-file executable)
+- `Magick.Native-Q16-x64.dll`
+- `help/` (user manual, per language)
+- `locale/` (translation `.mo` files)
+
+User data (`%APPDATA%\Oire\Sic`) is not bundled — it is created at runtime. On uninstall, the user is offered the option to remove it.
+
 ## Project Structure
 
 ```
