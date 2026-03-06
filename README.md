@@ -21,7 +21,7 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 
 ## Installation
 
-Download the latest release, or build from source:
+Download the latest release from [GitHub Releases](https://github.com/Oire/sic/releases) or the official [Oire Software website](https://oire.org/). Alternatively, build from source:
 
 ```bash
 git clone https://github.com/Oire/sic.git
