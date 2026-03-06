@@ -1,5 +1,6 @@
 using GetText.WindowsForms;
 using Oire.Sic.Utils;
+using Serilog;
 using static Oire.Sic.Utils.Localization;
 
 namespace Oire.Sic;
@@ -75,9 +76,10 @@ public partial class IcoPresetDialog: Form {
         var size = addDialog.EnteredSize;
 
         if (_customSizes.Contains(size)) {
+            Log.Debug("IcoPresetDialog: Duplicate size {Size} rejected", size);
             MessageBox.Show(
                 _("Size {0} is already in the list.", size),
-                _("Duplicate Size"),
+                _("Existing size"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
             return;
@@ -116,6 +118,7 @@ public partial class IcoPresetDialog: Form {
             return;
 
         if (customRadioButton.Checked && _customSizes.Count == 0) {
+            Log.Debug("IcoPresetDialog: No custom sizes added");
             MessageBox.Show(
                 _("Please add at least one size to the list."),
                 _("No Sizes"),

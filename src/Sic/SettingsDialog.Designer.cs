@@ -59,7 +59,7 @@ partial class SettingsDialog {
         //
         // outputFolderLabel
         //
-        outputFolderLabel.Text = "Output folder:";
+        outputFolderLabel.Text = "Output &Folder:";
         outputFolderLabel.AutoSize = true;
         outputFolderLabel.Anchor = AnchorStyles.Left;
         outputFolderLabel.Name = "outputFolderLabel";
@@ -76,7 +76,7 @@ partial class SettingsDialog {
         //
         // browseButton
         //
-        browseButton.Text = "Browse...";
+        browseButton.Text = "&Browse...";
         browseButton.Dock = DockStyle.Fill;
         browseButton.Name = "browseButton";
         browseButton.TabIndex = 2;
@@ -84,7 +84,7 @@ partial class SettingsDialog {
         //
         // clearOutputFolderButton
         //
-        clearOutputFolderButton.Text = "Reset";
+        clearOutputFolderButton.Text = "&Reset";
         clearOutputFolderButton.Dock = DockStyle.Fill;
         clearOutputFolderButton.Name = "clearOutputFolderButton";
         clearOutputFolderButton.TabIndex = 3;
@@ -92,7 +92,7 @@ partial class SettingsDialog {
         //
         // languageLabel
         //
-        languageLabel.Text = "Language:";
+        languageLabel.Text = "&Language:";
         languageLabel.AutoSize = true;
         languageLabel.Anchor = AnchorStyles.Left;
         languageLabel.Name = "languageLabel";
@@ -109,7 +109,7 @@ partial class SettingsDialog {
         //
         // okButton
         //
-        okButton.Text = "OK";
+        okButton.Text = "&OK";
         okButton.Dock = DockStyle.Fill;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
@@ -118,7 +118,7 @@ partial class SettingsDialog {
         //
         // cancelButton
         //
-        cancelButton.Text = "Cancel";
+        cancelButton.Text = "&Cancel";
         cancelButton.Dock = DockStyle.Fill;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
@@ -135,6 +135,7 @@ partial class SettingsDialog {
         Text = "Settings";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         StartPosition = FormStartPosition.CenterParent;
+        AccessibleRole = AccessibleRole.Dialog;
         MaximizeBox = false;
         MinimizeBox = false;
         AcceptButton = okButton;

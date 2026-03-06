@@ -1,13 +1,10 @@
-﻿using System;
-
 namespace Oire.Sic.Utils.Constants;
 
 public static class App {
-    public static readonly string Name = "Sic";
-    public static readonly string ManufacturerNameShort = "Oire";
-    public static readonly string ManufacturerNameFull = "Oire Software";
-    public static readonly string ConfigFileExtension = "cfg";
-    public static readonly string DatabaseFileExtension = "oidb";
+    public const string Name = "Sic";
+    public const string ManufacturerNameShort = "Oire";
+    public const string ManufacturerNameFull = "Oire Software";
+    public const string ConfigFileExtension = "cfg";
     public static readonly bool IsPortable = Directory.Exists(Path.Combine(AppContext.BaseDirectory, "userdata"));
     public static readonly string DataFolder = IsPortable
         ? Path.Combine(AppContext.BaseDirectory, "userdata")
@@ -17,7 +14,10 @@ public static class App {
             Name
         );
     public static readonly string DefaultOutputFolder = Path.Combine(DataFolder, "Converted");
-    public static readonly string SystemLanguageName = "System";
-    public static readonly string LocalesFolder = "./locale";
-    public static readonly string DatabaseName = Path.Combine(App.DataFolder, String.Format("{0}.{1}", App.Name, App.DatabaseFileExtension));
+    public const string RepoUrl = "https://github.com/Oire/sic";
+    public const string AppcastUrl = "https://oire.org/updates/sic/appcast.xml";
+    public const string UpdatePublicKey = "1Q9hfqwf3i6ZcncHvt08rqAO17iDrhHTvrjHAdCXw68=";
+    public const string SystemLanguageName = "System";
+    public static readonly string LocalesFolder = Path.Combine(AppContext.BaseDirectory, "locale");
+    public static readonly string HelpFolder = Path.Combine(AppContext.BaseDirectory, "help");
 }

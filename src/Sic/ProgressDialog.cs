@@ -13,20 +13,20 @@ public partial class ProgressDialog: Form {
     public ProgressDialog(string message) {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
-        MessageLabel.Text = message;
-        CancelOperationButton.Click += CancelOperationButton_Click;
+        messageLabel.Text = message;
+        cancelOperationButton.Click += cancelOperationButton_Click;
     }
 
-    private void CancelOperationButton_Click(object? sender, EventArgs e) {
+    private void cancelOperationButton_Click(object? sender, EventArgs e) {
         _cts.Cancel();
-        CancelOperationButton.Enabled = false;
+        cancelOperationButton.Enabled = false;
     }
 
     public void UpdateMessage(string message) {
         if (InvokeRequired) {
-            Invoke(() => MessageLabel.Text = message);
+            Invoke(() => messageLabel.Text = message);
         } else {
-            MessageLabel.Text = message;
+            messageLabel.Text = message;
         }
     }
 
@@ -39,11 +39,11 @@ public partial class ProgressDialog: Form {
     }
 
     private void SetProgress(int current, int total) {
-        if (ProgressBar.Style != ProgressBarStyle.Continuous) {
-            ProgressBar.Style = ProgressBarStyle.Continuous;
+        if (progressBar.Style != ProgressBarStyle.Continuous) {
+            progressBar.Style = ProgressBarStyle.Continuous;
         }
 
-        ProgressBar.Maximum = total;
-        ProgressBar.Value = Math.Min(current, total);
+        progressBar.Maximum = total;
+        progressBar.Value = Math.Min(current, total);
     }
 }

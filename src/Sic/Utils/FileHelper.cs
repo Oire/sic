@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace Oire.Sic.Utils;
 
 public static class FileHelper {
@@ -9,8 +11,11 @@ public static class FileHelper {
             var attributes = (int)File.GetAttributes(path);
             return (attributes & FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0
                 || (attributes & FILE_ATTRIBUTE_RECALL_ON_OPEN) != 0;
-        } catch {
+        } catch (FileNotFoundException) {
             return true;
+        } catch (Exception ex) {
+            Log.Warning("Failed to check cloud placeholder status for {Path}: {Error}", path, ex.Message);
+            return false;
         }
     }
 

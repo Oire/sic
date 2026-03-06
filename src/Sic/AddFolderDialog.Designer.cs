@@ -63,7 +63,7 @@ partial class AddFolderDialog {
         //
         // folderLabel
         //
-        folderLabel.Text = "Folder:";
+        folderLabel.Text = "&Folder:";
         folderLabel.AutoSize = true;
         folderLabel.Anchor = AnchorStyles.Left;
         folderLabel.Name = "folderLabel";
@@ -80,14 +80,14 @@ partial class AddFolderDialog {
         //
         // browseButton
         //
-        browseButton.Text = "Browse...";
+        browseButton.Text = "&Browse...";
         browseButton.Name = "browseButton";
         browseButton.TabIndex = 2;
 
         //
         // filterLabel
         //
-        filterLabel.Text = "Filter:";
+        filterLabel.Text = "Fi&lter:";
         filterLabel.AutoSize = true;
         filterLabel.Anchor = AnchorStyles.Left;
         filterLabel.Name = "filterLabel";
@@ -104,7 +104,7 @@ partial class AddFolderDialog {
         //
         // includeSubfoldersCheckBox
         //
-        includeSubfoldersCheckBox.Text = "Include all subfolders";
+        includeSubfoldersCheckBox.Text = "Include &All Subfolders";
         includeSubfoldersCheckBox.AutoSize = true;
         includeSubfoldersCheckBox.Anchor = AnchorStyles.Left;
         includeSubfoldersCheckBox.Name = "includeSubfoldersCheckBox";
@@ -114,7 +114,7 @@ partial class AddFolderDialog {
         //
         // okButton
         //
-        okButton.Text = "OK";
+        okButton.Text = "&OK";
         okButton.Anchor = AnchorStyles.Right;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
@@ -123,7 +123,7 @@ partial class AddFolderDialog {
         //
         // cancelButton
         //
-        cancelButton.Text = "Cancel";
+        cancelButton.Text = "&Cancel";
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
         cancelButton.TabIndex = 7;
@@ -139,6 +139,7 @@ partial class AddFolderDialog {
         Text = "Add Folder";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         StartPosition = FormStartPosition.CenterParent;
+        AccessibleRole = AccessibleRole.Dialog;
         MaximizeBox = false;
         MinimizeBox = false;
         AcceptButton = okButton;

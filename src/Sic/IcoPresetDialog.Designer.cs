@@ -67,7 +67,7 @@ partial class IcoPresetDialog {
         //
         // presetGroupBox
         //
-        presetGroupBox.Text = "Preset";
+        presetGroupBox.Text = "Pre&set:";
         presetGroupBox.AutoSize = true;
         presetGroupBox.Dock = DockStyle.Fill;
         presetGroupBox.Name = "presetGroupBox";
@@ -88,7 +88,7 @@ partial class IcoPresetDialog {
         //
         // faviconRadioButton
         //
-        faviconRadioButton.Text = "Favicon";
+        faviconRadioButton.Text = "&Favicon";
         faviconRadioButton.AutoSize = true;
         faviconRadioButton.Checked = true;
         faviconRadioButton.Name = "faviconRadioButton";
@@ -97,7 +97,7 @@ partial class IcoPresetDialog {
         //
         // appIconRadioButton
         //
-        appIconRadioButton.Text = "Application Icon";
+        appIconRadioButton.Text = "Application &Icon";
         appIconRadioButton.AutoSize = true;
         appIconRadioButton.Name = "appIconRadioButton";
         appIconRadioButton.TabIndex = 1;
@@ -105,7 +105,7 @@ partial class IcoPresetDialog {
         //
         // customRadioButton
         //
-        customRadioButton.Text = "Custom";
+        customRadioButton.Text = "C&ustom";
         customRadioButton.AutoSize = true;
         customRadioButton.Name = "customRadioButton";
         customRadioButton.TabIndex = 2;
@@ -113,7 +113,7 @@ partial class IcoPresetDialog {
         //
         // sizesLabel
         //
-        sizesLabel.Text = "Sizes:";
+        sizesLabel.Text = "Si&zes:";
         sizesLabel.AutoSize = true;
         sizesLabel.Anchor = AnchorStyles.Left | AnchorStyles.Top;
         sizesLabel.Name = "sizesLabel";
@@ -132,7 +132,7 @@ partial class IcoPresetDialog {
         //
         // addSizeButton
         //
-        addSizeButton.Text = "Add...";
+        addSizeButton.Text = "&Add...";
         addSizeButton.AutoSize = true;
         addSizeButton.Anchor = AnchorStyles.Left | AnchorStyles.Top;
         addSizeButton.Name = "addSizeButton";
@@ -142,7 +142,7 @@ partial class IcoPresetDialog {
         //
         // removeSizeButton
         //
-        removeSizeButton.Text = "Remove";
+        removeSizeButton.Text = "&Remove";
         removeSizeButton.AutoSize = true;
         removeSizeButton.Anchor = AnchorStyles.Left | AnchorStyles.Top;
         removeSizeButton.Name = "removeSizeButton";
@@ -152,7 +152,7 @@ partial class IcoPresetDialog {
         //
         // okButton
         //
-        okButton.Text = "OK";
+        okButton.Text = "&OK";
         okButton.Dock = DockStyle.Fill;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
@@ -161,7 +161,7 @@ partial class IcoPresetDialog {
         //
         // cancelButton
         //
-        cancelButton.Text = "Cancel";
+        cancelButton.Text = "&Cancel";
         cancelButton.Dock = DockStyle.Fill;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
@@ -177,6 +177,7 @@ partial class IcoPresetDialog {
         Name = "IcoPresetDialog";
         Text = "Create Multi-size ICO";
         FormBorderStyle = FormBorderStyle.FixedDialog;
+        AccessibleRole = AccessibleRole.Dialog;
         StartPosition = FormStartPosition.CenterParent;
         MaximizeBox = false;
         MinimizeBox = false;

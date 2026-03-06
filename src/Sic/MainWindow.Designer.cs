@@ -11,8 +11,10 @@ partial class MainWindow {
     /// </summary>
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing) {
-        if (disposing && (components != null)) {
-            components.Dispose();
+        if (disposing) {
+            components?.Dispose();
+            _previewDebounceTimer?.Dispose();
+            _updateService?.Dispose();
         }
         base.Dispose(disposing);
     }
@@ -30,8 +32,8 @@ partial class MainWindow {
         fileMenu = new ToolStripMenuItem();
         addImageMenuItem = new ToolStripMenuItem();
         addFolderMenuItem = new ToolStripMenuItem();
-        addFromUrlMenuItem = new ToolStripMenuItem();
-        optionsMenuItem = new ToolStripMenuItem();
+        addByLinkMenuItem = new ToolStripMenuItem();
+        settingsMenuItem = new ToolStripMenuItem();
         exitMenuItem = new ToolStripMenuItem();
 
         // Edit menu
@@ -47,7 +49,8 @@ partial class MainWindow {
 
         // Help menu
         helpMenu = new ToolStripMenuItem();
-        userGuideMenuItem = new ToolStripMenuItem();
+        userManualMenuItem = new ToolStripMenuItem();
+        checkForUpdatesMenuItem = new ToolStripMenuItem();
         supportDevelopmentMenuItem = new ToolStripMenuItem();
         aboutMenuItem = new ToolStripMenuItem();
 
@@ -76,8 +79,6 @@ partial class MainWindow {
         statusStrip = new StatusStrip();
         statusLabel = new ToolStripStatusLabel();
 
-
-
         menuStrip.SuspendLayout();
         mainLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).BeginInit();
@@ -101,9 +102,9 @@ partial class MainWindow {
         fileMenu.DropDownItems.AddRange(new ToolStripItem[] {
             addImageMenuItem,
             addFolderMenuItem,
-            addFromUrlMenuItem,
+            addByLinkMenuItem,
             new ToolStripSeparator(),
-            optionsMenuItem,
+            settingsMenuItem,
             new ToolStripSeparator(),
             exitMenuItem,
         });
@@ -123,11 +124,11 @@ partial class MainWindow {
         addFolderMenuItem.Name = "addFolderMenuItem";
 
         //
-        // addFromUrlMenuItem
+        // addByLinkMenuItem
         //
-        addFromUrlMenuItem.Text = "Add from &URL...";
-        addFromUrlMenuItem.ShortcutKeys = Keys.Control | Keys.U;
-        addFromUrlMenuItem.Name = "addFromUrlMenuItem";
+        addByLinkMenuItem.Text = "Add Image by &Link...";
+        addByLinkMenuItem.ShortcutKeys = Keys.Control | Keys.L;
+        addByLinkMenuItem.Name = "addByLinkMenuItem";
 
         //
         // removeMenuItem
@@ -146,11 +147,12 @@ partial class MainWindow {
         removeAllMenuItem.Enabled = false;
 
         //
-        // optionsMenuItem
+        // settingsMenuItem
         //
-        optionsMenuItem.Text = "&Options...";
-        optionsMenuItem.ShortcutKeys = Keys.Control | Keys.Oemcomma;
-        optionsMenuItem.Name = "optionsMenuItem";
+        settingsMenuItem.Text = "&Settings...";
+        settingsMenuItem.ShortcutKeys = Keys.Control | Keys.Oemcomma;
+        settingsMenuItem.ShortcutKeyDisplayString = "Ctrl+,";
+        settingsMenuItem.Name = "settingsMenuItem";
 
         //
         // exitMenuItem
@@ -202,6 +204,7 @@ partial class MainWindow {
         //
         createMultiSizeIcoMenuItem.Text = "Create Multi-size &ICO...";
         createMultiSizeIcoMenuItem.Name = "createMultiSizeIcoMenuItem";
+        createMultiSizeIcoMenuItem.ShortcutKeys = Keys.Control | Keys.Alt | Keys.F5;
         createMultiSizeIcoMenuItem.Enabled = false;
 
         //
@@ -210,24 +213,32 @@ partial class MainWindow {
         helpMenu.Text = "&Help";
         helpMenu.Name = "helpMenu";
         helpMenu.DropDownItems.AddRange(new ToolStripItem[] {
-            userGuideMenuItem,
+            userManualMenuItem,
+            checkForUpdatesMenuItem,
             new ToolStripSeparator(),
             supportDevelopmentMenuItem,
             aboutMenuItem,
         });
 
         //
-        // supportDevelopmentMenuItem
+        // userManualMenuItem
         //
-        supportDevelopmentMenuItem.Text = "&Support Development...";
-        supportDevelopmentMenuItem.Name = "supportDevelopmentMenuItem";
+        userManualMenuItem.Text = "Read User &Manual";
+        userManualMenuItem.ShortcutKeys = Keys.F1;
+        userManualMenuItem.Name = "userManualMenuItem";
 
         //
-        // userGuideMenuItem
+        // checkForUpdatesMenuItem
         //
-        userGuideMenuItem.Text = "&User Guide";
-        userGuideMenuItem.ShortcutKeys = Keys.F1;
-        userGuideMenuItem.Name = "userGuideMenuItem";
+        checkForUpdatesMenuItem.Text = "Check for &Updates...";
+        checkForUpdatesMenuItem.Name = "checkForUpdatesMenuItem";
+
+        //
+        // supportDevelopmentMenuItem
+        //
+        supportDevelopmentMenuItem.Text = "Support &Development...";
+        supportDevelopmentMenuItem.Name = "supportDevelopmentMenuItem";
+        supportDevelopmentMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.D;
 
         //
         // aboutMenuItem
@@ -285,6 +296,7 @@ partial class MainWindow {
         imageListView.MultiSelect = false;
         imageListView.View = View.Details;
         imageListView.Name = "imageListView";
+        imageListView.AccessibleName = "Images list";
         imageListView.AllowDrop = true;
         imageListView.TabIndex = 0;
 
@@ -315,7 +327,7 @@ partial class MainWindow {
         //
         // formatLabel
         //
-        formatLabel.Text = "Target format:";
+        formatLabel.Text = "Target &Format:";
         formatLabel.AutoSize = true;
         formatLabel.Anchor = AnchorStyles.Left;
         formatLabel.Name = "formatLabel";
@@ -332,7 +344,7 @@ partial class MainWindow {
         //
         // resizeCheckBox
         //
-        resizeCheckBox.Text = "Resize";
+        resizeCheckBox.Text = "Resi&ze";
         resizeCheckBox.AutoSize = true;
         resizeCheckBox.Anchor = AnchorStyles.Left;
         resizeCheckBox.Name = "resizeCheckBox";
@@ -341,7 +353,7 @@ partial class MainWindow {
         //
         // resizeModeGroupBox
         //
-        resizeModeGroupBox.Text = "Resize mode";
+        resizeModeGroupBox.Text = "Resize &Mode:";
         resizeModeGroupBox.AutoSize = true;
         resizeModeGroupBox.Dock = DockStyle.Fill;
         resizeModeGroupBox.Name = "resizeModeGroupBox";
@@ -362,7 +374,7 @@ partial class MainWindow {
         //
         // widthLabel
         //
-        widthLabel.Text = "Width:";
+        widthLabel.Text = "&Width:";
         widthLabel.AutoSize = true;
         widthLabel.Anchor = AnchorStyles.Left;
         widthLabel.Name = "widthLabel";
@@ -381,7 +393,7 @@ partial class MainWindow {
         //
         // heightLabel
         //
-        heightLabel.Text = "Height:";
+        heightLabel.Text = "&Height:";
         heightLabel.AutoSize = true;
         heightLabel.Anchor = AnchorStyles.Left;
         heightLabel.Name = "heightLabel";
@@ -419,7 +431,7 @@ partial class MainWindow {
         //
         // convertSelectedButton
         //
-        convertSelectedButton.Text = "Convert Selected";
+        convertSelectedButton.Text = "Convert &Selected";
         convertSelectedButton.AutoSize = true;
         convertSelectedButton.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
         convertSelectedButton.Name = "convertSelectedButton";
@@ -429,7 +441,7 @@ partial class MainWindow {
         //
         // convertButton
         //
-        convertButton.Text = "Convert All";
+        convertButton.Text = "Convert &All";
         convertButton.AutoSize = true;
         convertButton.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         convertButton.Name = "convertButton";
@@ -439,7 +451,7 @@ partial class MainWindow {
         //
         // keepProportionsRadioButton
         //
-        keepProportionsRadioButton.Text = "Keep proportions";
+        keepProportionsRadioButton.Text = "&Keep proportions";
         keepProportionsRadioButton.AutoSize = true;
         keepProportionsRadioButton.Name = "keepProportionsRadioButton";
         keepProportionsRadioButton.Checked = true;
@@ -448,7 +460,7 @@ partial class MainWindow {
         //
         // cropRadioButton
         //
-        cropRadioButton.Text = "Crop";
+        cropRadioButton.Text = "&Crop";
         cropRadioButton.AutoSize = true;
         cropRadioButton.Name = "cropRadioButton";
         cropRadioButton.TabIndex = 1;
@@ -479,7 +491,7 @@ partial class MainWindow {
         Controls.Add(menuStrip);
         MainMenuStrip = menuStrip;
         Name = "MainWindow";
-        Text = "SIC! \u2014 Simple Image Converter";
+        Text = "SIC! — Simple Image Converter";
         MinimumSize = new Size(640, 400);
 
         menuStrip.ResumeLayout(false);
@@ -505,8 +517,8 @@ partial class MainWindow {
     private ToolStripMenuItem fileMenu;
     private ToolStripMenuItem addImageMenuItem;
     private ToolStripMenuItem addFolderMenuItem;
-    private ToolStripMenuItem addFromUrlMenuItem;
-    private ToolStripMenuItem optionsMenuItem;
+    private ToolStripMenuItem addByLinkMenuItem;
+    private ToolStripMenuItem settingsMenuItem;
     private ToolStripMenuItem exitMenuItem;
     private ToolStripMenuItem editMenu;
     private ToolStripMenuItem removeMenuItem;
@@ -516,7 +528,8 @@ partial class MainWindow {
     private ToolStripMenuItem convertAllMenuItem;
     private ToolStripMenuItem createMultiSizeIcoMenuItem;
     private ToolStripMenuItem helpMenu;
-    private ToolStripMenuItem userGuideMenuItem;
+    private ToolStripMenuItem userManualMenuItem;
+    private ToolStripMenuItem checkForUpdatesMenuItem;
     private ToolStripMenuItem supportDevelopmentMenuItem;
     private ToolStripMenuItem aboutMenuItem;
     private TableLayoutPanel mainLayout;
@@ -543,6 +556,4 @@ partial class MainWindow {
     private Button convertButton;
     private StatusStrip statusStrip;
     private ToolStripStatusLabel statusLabel;
-
-
 }

@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using GetText.WindowsForms;
 using Oire.Sic.Models;
+using Oire.Sic.Services;
 using Oire.Sic.Utils;
 using static Oire.Sic.Utils.Localization;
 using Serilog;
@@ -16,6 +18,7 @@ public partial class MainWindow: Form {
     private int _clipboardImageCount;
     private readonly System.Windows.Forms.Timer _previewDebounceTimer = new() { Interval = 300 };
     private readonly ObjectPropertiesStore _localizationStore = new();
+    private readonly UpdateService _updateService = new();
 
     private sealed record BatchAddResult(List<ImageItem> Items, List<string> Errors, int SkippedPlaceholders);
 
@@ -31,8 +34,8 @@ public partial class MainWindow: Form {
         // File menu
         addImageMenuItem.Click += AddImageMenuItem_Click;
         addFolderMenuItem.Click += AddFolderMenuItem_Click;
-        addFromUrlMenuItem.Click += AddFromUrlMenuItem_Click;
-        optionsMenuItem.Click += OptionsMenuItem_Click;
+        addByLinkMenuItem.Click += AddByLinkMenuItem_Click;
+        settingsMenuItem.Click += SettingsMenuItem_Click;
         exitMenuItem.Click += ExitMenuItem_Click;
 
         // Edit menu
@@ -45,7 +48,8 @@ public partial class MainWindow: Form {
         createMultiSizeIcoMenuItem.Click += CreateMultiSizeIcoMenuItem_Click;
 
         // Help menu
-        userGuideMenuItem.Click += UserGuideMenuItem_Click;
+        userManualMenuItem.Click += UserManualMenuItem_Click;
+        checkForUpdatesMenuItem.Click += CheckForUpdatesMenuItem_Click;
         supportDevelopmentMenuItem.Click += SupportDevelopmentMenuItem_Click;
         aboutMenuItem.Click += AboutMenuItem_Click;
 
@@ -126,6 +130,7 @@ public partial class MainWindow: Form {
         var files = FileHelper.EnumerateImageFiles(folder, extensions, searchOption).ToArray();
 
         if (files.Length == 0) {
+            Log.Debug("AddFolderMenuItem_Click: No matching images in folder {Folder}", folder);
             MessageBox.Show(_("No matching images found in the selected folder."), _("No images found"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
@@ -133,7 +138,7 @@ public partial class MainWindow: Form {
         await AddFilesAsync(files, folder);
     }
 
-    private async void AddFromUrlMenuItem_Click(object? sender, EventArgs e) {
+    private async void AddByLinkMenuItem_Click(object? sender, EventArgs e) {
         using var dialog = new AddUrlDialog();
 
         if (dialog.ShowDialog() != DialogResult.OK)
@@ -173,7 +178,7 @@ public partial class MainWindow: Form {
         UpdateMenuState();
     }
 
-    private void OptionsMenuItem_Click(object? sender, EventArgs e) {
+    private void SettingsMenuItem_Click(object? sender, EventArgs e) {
         var previousLanguage = Config.General.Language;
         using var dialog = new SettingsDialog();
         dialog.ShowDialog(this);
@@ -202,6 +207,7 @@ public partial class MainWindow: Form {
         resizeMode = Models.ResizeMode.KeepProportions;
 
         if (formatComboBox.SelectedItem is not string format) {
+            Log.Debug("TryGetConversionParams: No format selected");
             MessageBox.Show(_("Please select a target format."), _("No format selected"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
@@ -216,6 +222,7 @@ public partial class MainWindow: Form {
 
             if (resizeMode == Models.ResizeMode.Crop) {
                 if (!hasWidth) {
+                    Log.Debug("TryGetConversionParams: Invalid crop width: {Input}", widthTextBox.Text);
                     MessageBox.Show(_("Crop mode requires a valid width (1\u201365535)."), _("Invalid width"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
@@ -223,6 +230,7 @@ public partial class MainWindow: Form {
                 }
 
                 if (!hasHeight) {
+                    Log.Debug("TryGetConversionParams: Invalid crop height: {Input}", heightTextBox.Text);
                     MessageBox.Show(_("Crop mode requires a valid height (1\u201365535)."), _("Invalid height"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     heightTextBox.Focus();
                     heightTextBox.SelectAll();
@@ -233,6 +241,7 @@ public partial class MainWindow: Form {
                 height = h;
             } else {
                 if (!hasWidth && !hasHeight) {
+                    Log.Debug("TryGetConversionParams: No valid resize dimensions entered");
                     MessageBox.Show(_("Please enter at least one valid dimension (1\u201365535)."), _("Invalid dimensions"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
@@ -255,6 +264,7 @@ public partial class MainWindow: Form {
         if (!string.IsNullOrWhiteSpace(outputFolder)
             && outputFolder != Utils.Constants.App.DefaultOutputFolder
             && !Directory.Exists(outputFolder)) {
+            Log.Warning("Custom output folder no longer exists: {Folder}", outputFolder);
             MessageBox.Show(
                 _("The output folder \"{0}\" no longer exists. The default folder will be used.", outputFolder),
                 _("Output Folder Not Found"),
@@ -288,7 +298,7 @@ public partial class MainWindow: Form {
             progressDialog = new ProgressDialog(_("Preparing to convert..."));
             progressDialog.Text = _("Converting...");
             progressDialog.Show(this);
-            Application.DoEvents();
+            await Task.Yield();
 
             await Task.Run(() => {
                 for (var j = 0; j < totalCount; j++) {
@@ -387,6 +397,7 @@ public partial class MainWindow: Form {
 
     private async void ConvertButton_Click(object? sender, EventArgs e) {
         if (_imageItems.Count == 0) {
+            Log.Debug("ConvertButton_Click: Attempted to convert with empty queue");
             MessageBox.Show(_("No images to convert. Add some images first."), _("Nothing to convert"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
@@ -438,7 +449,7 @@ public partial class MainWindow: Form {
             progressDialog = new ProgressDialog(_("Creating multi-size ICO..."));
             progressDialog.Text = _("Converting...");
             progressDialog.Show(this);
-            Application.DoEvents();
+            await Task.Yield();
 
             imageListView.Items[index].SubItems[4].Text = _("Converting...");
 
@@ -475,7 +486,7 @@ public partial class MainWindow: Form {
     }
 
     private void SupportDevelopmentMenuItem_Click(object? sender, EventArgs e) {
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo {
+        Process.Start(new ProcessStartInfo {
             FileName = "https://oire.org/donate",
             UseShellExecute = true,
         });
@@ -483,8 +494,33 @@ public partial class MainWindow: Form {
 
     // --- Help menu handlers ---
 
-    private void UserGuideMenuItem_Click(object? sender, EventArgs e) {
-        MessageBox.Show(_("The user guide is coming soon."), _("User Guide"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+    private void UserManualMenuItem_Click(object? sender, EventArgs e) {
+        var culture = Localization.GetCurrentCulture();
+        var helpFolder = Utils.Constants.App.HelpFolder;
+        var manualPath = Path.Combine(helpFolder, culture.Name, "manual.html");
+
+        if (!File.Exists(manualPath)) {
+            manualPath = Path.Combine(helpFolder, culture.TwoLetterISOLanguageName, "manual.html");
+        }
+
+        if (!File.Exists(manualPath)) {
+            manualPath = Path.Combine(helpFolder, "en", "manual.html");
+        }
+
+        if (!File.Exists(manualPath)) {
+            Log.Warning("User manual file not found at {Path}", manualPath);
+            MessageBox.Show(_("The user manual file could not be found."), _("User Manual"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        Process.Start(new ProcessStartInfo {
+            FileName = manualPath,
+            UseShellExecute = true,
+        });
+    }
+
+    private async void CheckForUpdatesMenuItem_Click(object? sender, EventArgs e) {
+        await _updateService.CheckForUpdatesAsync();
     }
 
     private void AboutMenuItem_Click(object? sender, EventArgs e) {
@@ -711,7 +747,7 @@ public partial class MainWindow: Form {
             progressDialog = new ProgressDialog(_("Downloading image..."));
             progressDialog.Text = _("Downloading...");
             progressDialog.Show(this);
-            Application.DoEvents();
+            await Task.Yield();
 
             var progress = new Progress<(long BytesRead, long? TotalBytes)>(p => {
                 if (p.TotalBytes.HasValue && p.TotalBytes.Value > 0) {
@@ -806,7 +842,7 @@ public partial class MainWindow: Form {
                     _("Loading images ({0}/{1})...", 0, pathsToLoad.Count));
                 progressDialog.Text = _("Loading...");
                 progressDialog.Show(this);
-                Application.DoEvents();
+                await Task.Yield();
 
                 var totalCount = pathsToLoad.Count;
                 var result = await Task.Run(() => {

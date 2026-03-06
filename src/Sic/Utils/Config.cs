@@ -1,18 +1,15 @@
-﻿using System;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Windows.Forms;
 using SharpConfig;
+using Serilog;
 using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
 
 namespace Oire.Sic.Utils;
 
 public class Config {
-    private static readonly string ConfigFileName = Path.Combine(App.DataFolder, String.Format("{0}.{1}", App.Name, App.ConfigFileExtension));
+    private static readonly string ConfigFileName = Path.Combine(App.DataFolder, $"{App.Name}.{App.ConfigFileExtension}");
 
-    public static Config.SectionGeneral General = new();
-    public static Configuration Cfg = new();
+    public static SectionGeneral General { get; private set; } = new();
+    private static Configuration Cfg { get; set; } = new();
 
     #region Config Section Classes
     public class SectionGeneral {
@@ -23,7 +20,7 @@ public class Config {
 
     #endregion
 
-    public static void Load() {
+    public static void Load(bool isGui = true) {
         try {
             Cfg = Configuration.LoadFromFile(ConfigFileName);
             General = Cfg["General"].ToObject<SectionGeneral>();
@@ -33,7 +30,7 @@ public class Config {
             }
         } catch (FileNotFoundException) {
             Cfg = new Configuration();
-            General = new Config.SectionGeneral();
+            General = new SectionGeneral();
             Cfg.Add(Section.FromObject("General", General));
 
             try {
@@ -41,34 +38,33 @@ public class Config {
                     Directory.CreateDirectory(App.DataFolder);
                 }
                 Cfg.SaveToFile(ConfigFileName);
-            } catch (Exception) {
-                DialogResult msg = MessageBox.Show(_("Unable to save configuration. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-
-                if (msg == DialogResult.OK) {
-                    System.Windows.Forms.Application.Exit();
-                }
+            } catch (Exception ex) {
+                Log.Error("Failed to save initial config: {Error}", ex.Message);
+                ReportError(_("Unable to save configuration: {0}", ex.Message), isGui);
             }
-        } catch (Exception) {
-            DialogResult msg = MessageBox.Show(_("Unable to load configuration. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-
-            if (msg == DialogResult.OK) {
-                System.Windows.Forms.Application.Exit();
-            }
+        } catch (Exception ex) {
+            Log.Error("Failed to load config: {Error}", ex.Message);
+            ReportError(_("Unable to load configuration: {0}", ex.Message), isGui);
         }
     }
 
     public static void Save() {
-        Cfg = new Configuration();
-        Cfg.Add(Section.FromObject("General", Config.General));
+        Cfg.Remove("General");
+        Cfg.Add(Section.FromObject("General", General));
 
         try {
             Cfg.SaveToFile(ConfigFileName);
-        } catch (Exception) {
-            DialogResult msg = MessageBox.Show(_("Unable to save configuration. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        } catch (Exception ex) {
+            Log.Error("Failed to save config: {Error}", ex.Message);
+            ReportError(_("Unable to save configuration: {0}", ex.Message), isGui: true);
+        }
+    }
 
-            if (msg == DialogResult.OK) {
-                System.Windows.Forms.Application.Exit();
-            }
+    private static void ReportError(string message, bool isGui) {
+        if (isGui) {
+            MessageBox.Show(message, _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        } else {
+            Console.Error.WriteLine(message);
         }
     }
 }

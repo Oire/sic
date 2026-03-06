@@ -6,6 +6,7 @@ using ImageConverter = Oire.Sic.Services.ImageConverter;
 using Serilog;
 using Serilog.Formatting.Compact;
 using App = Oire.Sic.Utils.Constants.App;
+using ExitCode = Oire.Sic.Utils.Constants.ExitCode;
 using LogConstants = Oire.Sic.Utils.Constants.Logging;
 using LogLevel = Serilog.Events.LogEventLevel;
 
@@ -24,28 +25,29 @@ internal static class Program {
             ApplicationConfiguration.Initialize();
             Config.Load();
             Localization.SetLanguage(Config.General.Language);
+            Thread.CurrentThread.CurrentUICulture = Localization.GetCurrentCulture();
             EnsureOutputFolderExists(showGui: true);
 #if DEBUG
             Log.Debug("App Startup: Config loaded");
 #endif
 
             Application.Run(new MainWindow());
-            return 0;
+            return ExitCode.Success;
         } catch (Exception ex) {
             Log.Fatal("App Startup: Unable to initialize application: {0}", ex.Message);
 
             if (args.Length > 0) {
                 Console.Error.WriteLine(_("Fatal error: {0}", ex.Message));
-                return 1;
+                return ExitCode.Error;
             }
 
             DialogResult msg = MessageBox.Show(_("Unable to start the program up. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
             if (msg == DialogResult.OK) {
-                System.Windows.Forms.Application.Exit();
+                Environment.Exit(ExitCode.Error);
             }
 
-            return 1;
+            return ExitCode.Error;
         } finally {
             Log.CloseAndFlush();
         }
@@ -84,7 +86,7 @@ internal static class Program {
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
         } else {
             Console.Error.WriteLine(
-                _("Warning: The output folder \"{0}\" no longer exists. Using default folder.", outputFolder));
+                _("Warning! The output folder \"{0}\" no longer exists. Using default folder.", outputFolder));
         }
 
         Config.General.OutputFolder = App.DefaultOutputFolder;
@@ -98,18 +100,18 @@ internal static class Program {
     }
 
     private static int RunCli(string[] args) {
-        Config.Load();
+        Config.Load(isGui: false);
         Localization.SetLanguage(Config.General.Language);
         Thread.CurrentThread.CurrentUICulture = Localization.GetCurrentCulture();
         EnsureOutputFolderExists(showGui: false);
 
-        var inputOption = new Option<string>("--input", "-i") { Required = true, Description = _("Path to the source image file") };
+        var inputOption = new Option<string>("--input", "-i") { Required = true, Description = _("Path to the source image file or a URL") };
         var outputOption = new Option<string?>("--output", "-o") { Description = _("Path for the converted image (format inferred from extension)") };
         var formatOption = new Option<string?>("--format", "-f") { Description = _("Target format (e.g. jpg, png, webp). Used when --output is omitted.") };
         var resizeOption = new Option<string?>("--resize", "-r") { Description = _("Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)") };
         var cropOption = new Option<bool>("--crop", "-c") { Description = _("Use crop mode (scale to cover, then center-crop to exact dimensions)") };
 
-        var rootCommand = new RootCommand(_("SIC! \u2014 Simple Image Converter")) {
+        var rootCommand = new RootCommand(_("SIC! — Simple Image Converter")) {
             inputOption,
             outputOption,
             formatOption,
@@ -124,23 +126,30 @@ internal static class Program {
             var resize = parseResult.GetValue(resizeOption);
             var crop = parseResult.GetValue(cropOption);
 
-            if (!File.Exists(input)) {
+            var isUrl = Uri.TryCreate(input, UriKind.Absolute, out var inputUri)
+                && (inputUri.Scheme == Uri.UriSchemeHttp || inputUri.Scheme == Uri.UriSchemeHttps);
+
+            if (!isUrl && !File.Exists(input)) {
+                Log.Error("CLI: Input file not found: {Input}", input);
                 Console.Error.WriteLine(_("File not found: {0}", input));
-                return 1;
+                return ExitCode.Error;
             }
 
             string targetFormat;
             if (!string.IsNullOrWhiteSpace(output)) {
                 var extension = Path.GetExtension(output).TrimStart('.').ToUpperInvariant();
                 if (string.IsNullOrWhiteSpace(extension)) {
+                    Log.Error("CLI: Output path has no file extension: {Output}", output);
                     Console.Error.WriteLine(_("Output path must have a file extension (e.g. .jpg, .png)"));
-                    return 1;
+                    return ExitCode.Error;
                 }
                 targetFormat = extension == "JPEG" ? "JPG" : extension == "TIF" ? "TIFF" : extension;
             } else if (!string.IsNullOrWhiteSpace(format)) {
                 targetFormat = format.TrimStart('.').ToUpperInvariant();
                 targetFormat = targetFormat == "JPEG" ? "JPG" : targetFormat == "TIF" ? "TIFF" : targetFormat;
-                var baseName = Path.GetFileNameWithoutExtension(input);
+                var baseName = isUrl
+                    ? Path.GetFileNameWithoutExtension(inputUri!.AbsolutePath)
+                    : Path.GetFileNameWithoutExtension(input);
                 var ext = ImageConverter.GetFileExtension(targetFormat);
                 var outputFolder = Config.General.OutputFolder;
                 if (string.IsNullOrWhiteSpace(outputFolder)) {
@@ -149,15 +158,17 @@ internal static class Program {
                 Directory.CreateDirectory(outputFolder);
                 output = Path.Combine(outputFolder, baseName + ext);
             } else {
+                Log.Error("CLI: Neither --output nor --format specified");
                 Console.Error.WriteLine(_("Either --output or --format must be specified."));
-                return 1;
+                return ExitCode.Error;
             }
 
             var supportedFormats = ImageConverter.GetSupportedFormats();
             if (!supportedFormats.Any(f => f.Equals(targetFormat, StringComparison.OrdinalIgnoreCase))) {
+                Log.Error("CLI: Unsupported format: {Format}", targetFormat);
                 Console.Error.WriteLine(_("Unsupported format: {0}", targetFormat));
                 Console.Error.WriteLine(_("Supported formats: {0}", string.Join(", ", supportedFormats)));
-                return 1;
+                return ExitCode.Error;
             }
 
             int? width = null, height = null;
@@ -170,8 +181,9 @@ internal static class Program {
                 if (normalized.Contains('x')) {
                     parts = normalized.Split('x');
                     if (parts.Length != 2) {
+                        Log.Error("CLI: Invalid resize format: {Resize}", resize);
                         Console.Error.WriteLine(_("Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, 128)", resize));
-                        return 1;
+                        return ExitCode.Error;
                     }
                 } else {
                     parts = [normalized, ""];
@@ -181,18 +193,21 @@ internal static class Program {
                 var hasHeight = int.TryParse(parts[1], out var h) && h >= 1;
 
                 if (!hasWidth && !string.IsNullOrEmpty(parts[0])) {
+                    Log.Error("CLI: Invalid width value: {Width}", parts[0]);
                     Console.Error.WriteLine(_("Invalid width value: {0}", parts[0]));
-                    return 1;
+                    return ExitCode.Error;
                 }
 
                 if (!hasHeight && !string.IsNullOrEmpty(parts[1])) {
+                    Log.Error("CLI: Invalid height value: {Height}", parts[1]);
                     Console.Error.WriteLine(_("Invalid height value: {0}", parts[1]));
-                    return 1;
+                    return ExitCode.Error;
                 }
 
                 if (!hasWidth && !hasHeight) {
+                    Log.Error("CLI: Invalid resize format (no dimensions): {Resize}", resize);
                     Console.Error.WriteLine(_("Invalid resize format: {0}. At least one dimension is required.", resize));
-                    return 1;
+                    return ExitCode.Error;
                 }
 
                 if (hasWidth)
@@ -202,12 +217,15 @@ internal static class Program {
             }
 
             if (crop && (!width.HasValue || !height.HasValue)) {
+                Log.Error("CLI: Crop mode requires both width and height, got {Resize}", resize);
                 Console.Error.WriteLine(_("Crop mode requires both width and height (e.g. --resize 128x128 --crop)"));
-                return 1;
+                return ExitCode.Error;
             }
 
             try {
-                var item = ImageConverter.LoadFromFile(input);
+                var item = isUrl
+                    ? ImageConverter.LoadFromUrl(input).GetAwaiter().GetResult()
+                    : ImageConverter.LoadFromFile(input);
 
                 var dir = Path.GetDirectoryName(output!);
                 if (dir != null && !Directory.Exists(dir)) {
@@ -216,10 +234,11 @@ internal static class Program {
 
                 ImageConverter.Convert(item, targetFormat, output!, width, height, resizeMode);
                 Console.WriteLine(_("Converted: {0}", output));
-                return 0;
+                return ExitCode.Success;
             } catch (Exception ex) {
+                Log.Error("CLI: Conversion failed for {Input}: {Error}", input, ex.Message);
                 Console.Error.WriteLine(_("Conversion failed: {0}", ex.Message));
-                return 1;
+                return ExitCode.Error;
             }
         }));
 

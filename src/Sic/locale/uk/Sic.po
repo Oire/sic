@@ -2,11 +2,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
 "POT-Creation-Date: 2026-03-06 20:26:59+0100\n"
-"PO-Revision-Date: 2026-03-06 20:26:59+0100\n"
+"PO-Revision-Date: 2026-03-04 13:25:56+01:00\n"
 "Last-Translator: \n"
-"Language-Team: \n"
+"Language-Team: uk\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: GetText.NET Extractor\n"
 
@@ -99,17 +99,13 @@ msgstr ""
 msgid "&Add..."
 msgstr ""
 
-#: ..\..\AddFolderDialog.Designer.cs:83
-#: ..\..\SettingsDialog.Designer.cs:79
+#: ..\..\AddFolderDialog.Designer.cs:83 ..\..\SettingsDialog.Designer.cs:79
 msgid "&Browse..."
 msgstr ""
 
-#: ..\..\ProgressDialog.Designer.cs:83
-#: ..\..\AddUrlDialog.Designer.cs:76
-#: ..\..\IcoPresetDialog.Designer.cs:164
-#: ..\..\AddSizeDialog.Designer.cs:76
-#: ..\..\AddFolderDialog.Designer.cs:126
-#: ..\..\SettingsDialog.Designer.cs:121
+#: ..\..\ProgressDialog.Designer.cs:83 ..\..\AddUrlDialog.Designer.cs:76
+#: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\AddSizeDialog.Designer.cs:76
+#: ..\..\AddFolderDialog.Designer.cs:126 ..\..\SettingsDialog.Designer.cs:121
 msgid "&Cancel"
 msgstr ""
 
@@ -161,17 +157,13 @@ msgstr ""
 msgid "&Link:"
 msgstr ""
 
-#: ..\..\AddUrlDialog.Designer.cs:67
-#: ..\..\IcoPresetDialog.Designer.cs:155
-#: ..\..\AddSizeDialog.Designer.cs:67
-#: ..\..\AddFolderDialog.Designer.cs:117
-#: ..\..\AboutDialog.Designer.cs:117
-#: ..\..\SettingsDialog.Designer.cs:112
+#: ..\..\AddUrlDialog.Designer.cs:67 ..\..\IcoPresetDialog.Designer.cs:155
+#: ..\..\AddSizeDialog.Designer.cs:67 ..\..\AddFolderDialog.Designer.cs:117
+#: ..\..\AboutDialog.Designer.cs:117 ..\..\SettingsDialog.Designer.cs:112
 msgid "&OK"
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:136
-#: ..\..\IcoPresetDialog.Designer.cs:145
+#: ..\..\MainWindow.Designer.cs:136 ..\..\IcoPresetDialog.Designer.cs:145
 msgid "&Remove"
 msgstr ""
 
@@ -192,9 +184,7 @@ msgstr ""
 msgid "© {0} Oire Software"
 msgstr ""
 
-#: ..\..\MainWindow.cs:168
-#: ..\..\MainWindow.cs:916
-#: ..\..\MainWindow.cs:985
+#: ..\..\MainWindow.cs:168 ..\..\MainWindow.cs:916 ..\..\MainWindow.cs:985
 #, csharp-format
 msgid "1 image in queue"
 msgid_plural "{0} images in queue"
@@ -275,13 +265,11 @@ msgstr ""
 msgid "Conversion failed: {0}"
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:197
-#: ..\..\MainWindow.Designer.cs:444
+#: ..\..\MainWindow.Designer.cs:197 ..\..\MainWindow.Designer.cs:444
 msgid "Convert &All"
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:189
-#: ..\..\MainWindow.Designer.cs:434
+#: ..\..\MainWindow.Designer.cs:189 ..\..\MainWindow.Designer.cs:434
 msgid "Convert &Selected"
 msgstr ""
 
@@ -295,9 +283,7 @@ msgstr ""
 msgid "Converting {0} ({1}/{2})..."
 msgstr ""
 
-#: ..\..\MainWindow.cs:299
-#: ..\..\MainWindow.cs:317
-#: ..\..\MainWindow.cs:450
+#: ..\..\MainWindow.cs:299 ..\..\MainWindow.cs:317 ..\..\MainWindow.cs:450
 #: ..\..\MainWindow.cs:454
 msgid "Converting..."
 msgstr ""
@@ -356,12 +342,8 @@ msgstr ""
 msgid "Either --output or --format must be specified."
 msgstr ""
 
-#: ..\..\Program.cs:44
-#: ..\..\Utils\Config.cs:65
-#: ..\..\MainWindow.cs:478
-#: ..\..\MainWindow.cs:731
-#: ..\..\MainWindow.cs:777
-#: ..\..\MainWindow.cs:967
+#: ..\..\Program.cs:44 ..\..\Utils\Config.cs:65 ..\..\MainWindow.cs:478
+#: ..\..\MainWindow.cs:731 ..\..\MainWindow.cs:777 ..\..\MainWindow.cs:967
 msgid "Error"
 msgstr ""
 
@@ -373,8 +355,7 @@ msgstr ""
 msgid "Existing size"
 msgstr ""
 
-#: ..\..\MainWindow.cs:353
-#: ..\..\MainWindow.cs:477
+#: ..\..\MainWindow.cs:353 ..\..\MainWindow.cs:477
 msgid "Failed"
 msgstr ""
 
@@ -514,8 +495,7 @@ msgstr ""
 msgid "JPEG images (*.jpg, *.jpeg)"
 msgstr ""
 
-#: ..\..\MainWindow.cs:842
-#: ..\..\MainWindow.cs:866
+#: ..\..\MainWindow.cs:842 ..\..\MainWindow.cs:866
 #, csharp-format
 msgid "Loading images ({0}/{1})..."
 msgstr ""
@@ -576,8 +556,7 @@ msgstr ""
 msgid "Output &Folder:"
 msgstr ""
 
-#: ..\..\Program.cs:85
-#: ..\..\MainWindow.cs:270
+#: ..\..\Program.cs:85 ..\..\MainWindow.cs:270
 msgid "Output Folder Not Found"
 msgstr ""
 
@@ -653,12 +632,9 @@ msgstr[1] ""
 msgid "Read User &Manual"
 msgstr ""
 
-#: ..\..\MainWindow.cs:177
-#: ..\..\MainWindow.cs:194
-#: ..\..\MainWindow.Designer.cs:480
-#: ..\..\MainWindow.cs:474
-#: ..\..\MainWindow.cs:774
-#: ..\..\MainWindow.cs:778
+#: ..\..\MainWindow.cs:177 ..\..\MainWindow.cs:194
+#: ..\..\MainWindow.Designer.cs:480 ..\..\MainWindow.cs:474
+#: ..\..\MainWindow.cs:774 ..\..\MainWindow.cs:778
 msgid "Ready"
 msgstr ""
 
@@ -702,8 +678,7 @@ msgstr ""
 msgid "Si&zes:"
 msgstr ""
 
-#: ..\..\AboutDialog.Designer.cs:57
-#: ..\..\Program.cs:114
+#: ..\..\AboutDialog.Designer.cs:57 ..\..\Program.cs:114
 msgid "SIC! — Simple Image Converter"
 msgstr ""
 
@@ -756,8 +731,7 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: ..\..\Program.cs:84
-#: ..\..\MainWindow.cs:269
+#: ..\..\Program.cs:84 ..\..\MainWindow.cs:269
 #, csharp-format
 msgid ""
 "The output folder \"{0}\" no longer exists. The default folder will be used."
@@ -780,8 +754,7 @@ msgstr ""
 msgid "Unable to load configuration: {0}"
 msgstr ""
 
-#: ..\..\Utils\Config.cs:43
-#: ..\..\Utils\Config.cs:59
+#: ..\..\Utils\Config.cs:43 ..\..\Utils\Config.cs:59
 #, csharp-format
 msgid "Unable to save configuration: {0}"
 msgstr ""
@@ -821,4 +794,3 @@ msgstr ""
 #: ..\..\AddFolderDialog.cs:13
 msgid "WebP images (*.webp)"
 msgstr ""
-

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIC! User Manual</title>
+<style>
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.6;
+    max-width: 50em;
+    margin: 0 auto;
+    padding: 1em 2em;
+    color: #1a1a1a;
+    background: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+    body { color: #e0e0e0; background: #1a1a1a; }
+    a { color: #6db3f2; }
+    a:visited { color: #b39ddb; }
+    kbd { background: #333; border-color: #555; }
+    table, th, td { border-color: #444; }
+    th { background: #333; }
+    nav { background: #252525; border-color: #444; }
+    header { border-color: #444; }
+    footer { border-color: #444; }
+}
+
+h1, h2, h3 { line-height: 1.2; }
+h2 { margin-top: 1.5em; }
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    border-bottom: 2px solid currentColor;
+    padding-bottom: 0.5em;
+    margin-bottom: 1.5em;
+}
+
+header img {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+header div h1 {
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
+header div p {
+    margin: 0.2em 0 0;
+}
+
+nav {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 1em;
+    margin-bottom: 2em;
+}
+
+nav ul { margin: 0; padding-left: 1.5em; }
+nav li { margin: 0.3em 0; }
+
+kbd {
+    display: inline-block;
+    padding: 0.1em 0.4em;
+    font-size: 0.9em;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 0.5em 0.8em;
+    text-align: left;
+}
+
+th { background: #f5f5f5; }
+
+dl dt { font-weight: bold; margin-top: 0.8em; }
+dl dd { margin-left: 1.5em; }
+
+footer {
+    border-top: 1px solid #ddd;
+    margin-top: 2em;
+    padding-top: 0.5em;
+}
+</style>
+</head>
+<body>
+<header>
+    <img src="../logo.png" alt="SIC! logo" width="48" height="48">
+    <div>
+        <h1>SIC! — Simple Image Converter</h1>
+        <p>User Manual</p>
+    </div>
+</header>
+
+<main>
+<nav aria-label="Table of contents">
+<h2>Contents</h2>
+<ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#installation">Installation modes</a></li>
+    <li><a href="#adding-images">Adding images</a></li>
+    <li><a href="#converting">Converting images</a></li>
+    <li><a href="#resizing">Resizing</a></li>
+    <li><a href="#multi-size-ico">Creating multi-size ICO files</a></li>
+    <li><a href="#settings">Settings</a></li>
+    <li><a href="#cli">Command-line usage</a></li>
+    <li><a href="#keyboard-shortcuts">Keyboard shortcuts</a></li>
+    <li><a href="#supported-formats">Supported formats</a></li>
+    <li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</nav>
+
+<h2 id="overview">Overview</h2>
+<p>SIC! is a simple and accessible image format converter. It lets you convert images between popular formats, optionally resize them, and process multiple images at once.</p>
+
+<h3>Main window</h3>
+<p>The main window consists of the following areas:</p>
+<dl>
+    <dt>Menu bar</dt>
+    <dd>Four menus at the top of the window:
+        <ul>
+            <li><strong>File</strong> — add images (from files, folders, or links), open Settings, or exit the application.</li>
+            <li><strong>Edit</strong> — remove selected or all images from the queue. This menu is disabled when the queue is empty.</li>
+            <li><strong>Convert</strong> — run conversion or create a multi-size ICO. This menu is disabled when the queue is empty.</li>
+            <li><strong>Help</strong> — open this manual, support development, or view the About dialog.</li>
+        </ul>
+    </dd>
+
+    <dt>Image list</dt>
+    <dd>The left half of the window shows the batch queue as a table with columns: File Name, Format, Dimensions, Size, and Status.</dd>
+
+    <dt>Preview panel</dt>
+    <dd>The right half of the window displays a preview of the currently selected image.</dd>
+
+    <dt>Controls area</dt>
+    <dd>Below the image list and preview:
+        <ul>
+            <li><strong>Target Format</strong> dropdown — choose the output format.</li>
+            <li><strong>Resize</strong> checkbox — when checked, reveals the resize mode (Keep proportions or Crop) and Width/Height fields.</li>
+        </ul>
+    </dd>
+
+    <dt>Conversion buttons</dt>
+    <dd><strong>Convert Selected</strong> converts only the highlighted image; <strong>Convert All</strong> processes every image in the queue.</dd>
+
+    <dt>Status bar</dt>
+    <dd>At the bottom of the window, shows status messages such as conversion progress and results.</dd>
+</dl>
+
+<h2 id="installation">Installation modes</h2>
+<p>SIC! can run in two modes:</p>
+<dl>
+    <dt>Installer (default)</dt>
+    <dd>When installed normally, SIC! stores its configuration, converted files, and logs in <code>%APPDATA%\Oire\Sic\</code>. The default output folder is <code>%APPDATA%\Oire\Sic\Converted\</code>.</dd>
+
+    <dt>Portable</dt>
+    <dd>If a <code>userdata</code> folder exists next to the executable, SIC! runs in portable mode. All data (configuration, converted files, logs) is stored in that <code>userdata</code> folder instead of <code>%APPDATA%</code>. This lets you run SIC! from a USB drive or any folder without leaving traces on the system.</dd>
+</dl>
+
+<h2 id="adding-images">Adding images</h2>
+<p>There are several ways to add images to the queue:</p>
+<dl>
+    <dt>Open files</dt>
+    <dd>Use <strong>File > Add Image</strong> (<kbd>Ctrl+N</kbd>) to open a file picker. You can select multiple files at once.</dd>
+
+    <dt>Add a folder</dt>
+    <dd>Use <strong>File > Add Folder</strong> (<kbd>Ctrl+Shift+N</kbd>) to add all images from a folder. You can choose which file types to include and whether to scan subfolders.</dd>
+
+    <dt>Add by link</dt>
+    <dd>Use <strong>File > Add Image by Link</strong> (<kbd>Ctrl+L</kbd>) to download an image from a URL and add it to the queue.</dd>
+
+    <dt>Drag and drop</dt>
+    <dd>Drag image files from File Explorer and drop them onto the image list.</dd>
+
+    <dt>Paste from clipboard</dt>
+    <dd>Press <kbd>Ctrl+V</kbd> to paste. SIC! supports pasting files (e.g., copied from File Explorer or Outlook), raw bitmap data (e.g., from Print Screen), and URLs from the clipboard.</dd>
+</dl>
+
+<h2 id="converting">Converting images</h2>
+<ol>
+    <li>Add one or more images to the queue.</li>
+    <li>Select the desired target format from the <strong>Target Format</strong> dropdown.</li>
+    <li>Click <strong>Convert All</strong> (<kbd>Ctrl+Shift+F5</kbd>) to convert every image in the queue, or select specific images and click <strong>Convert Selected</strong> (<kbd>F5</kbd>).</li>
+</ol>
+<p>By default, converted files are saved to a <code>Converted</code> folder inside the application data directory. You can change this in <a href="#settings">Settings</a>.</p>
+<p>If a file with the same name already exists, SIC! will ask you whether to overwrite, rename (by adding a <code>_1</code> suffix), or skip that file.</p>
+
+<h2 id="resizing">Resizing</h2>
+<p>Check the <strong>Resize</strong> checkbox to enable resizing during conversion. Two modes are available:</p>
+<dl>
+    <dt>Keep proportions (default)</dt>
+    <dd>Enter a width, a height, or both. The image will be scaled to fit within the given dimensions while preserving its aspect ratio. If you enter only one dimension, the other is calculated automatically.</dd>
+
+    <dt>Crop</dt>
+    <dd>Both width and height are required. The image is resized to cover the target dimensions, then cropped to the exact size.</dd>
+</dl>
+<p>When you select an image in the list with resize enabled, the width and height fields are pre-filled with the image's current dimensions.</p>
+
+<h2 id="multi-size-ico">Creating multi-size ICO files</h2>
+<p>To create an ICO file that contains multiple sizes (useful for application icons):</p>
+<ol>
+    <li>Select an image in the list.</li>
+    <li>Choose <strong>Convert > Create Multi-size ICO</strong> (<kbd>Ctrl+Alt+F5</kbd>).</li>
+    <li>Pick a preset or configure custom sizes in the dialog that appears.</li>
+</ol>
+<p>The following presets are available:</p>
+<dl>
+    <dt>Favicon</dt>
+    <dd>Generates sizes 16, 32, 48, and 64 pixels. A favicon is the small icon displayed in browser tabs, bookmarks, and address bars. This preset covers all the sizes commonly expected by web browsers.</dd>
+
+    <dt>Application icon</dt>
+    <dd>Generates sizes 16, 20, 24, 32, 40, 48, 64, and 256 pixels. This covers the full range of sizes Windows uses for application icons — from small taskbar icons to the large tiles shown in Explorer.</dd>
+
+    <dt>Custom</dt>
+    <dd>Lets you build your own list of sizes. Starts with the previously selected preset as a base, then you can add or remove individual sizes.</dd>
+</dl>
+
+<h2 id="settings">Settings</h2>
+<p>Open <strong>File > Settings</strong> (<kbd>Ctrl+,</kbd>) to configure:</p>
+<dl>
+    <dt>Output folder</dt>
+    <dd>Set a custom folder where all converted files will be saved. Click <strong>Reset</strong> to restore the default <code>Converted</code> folder inside the application data directory.</dd>
+
+    <dt>Language</dt>
+    <dd>Choose the interface language. Select <em>System</em> to follow your Windows language setting.</dd>
+</dl>
+<p>Settings are stored in <code>Sic.cfg</code> inside the application data directory (see <a href="#installation">Installation modes</a> for the exact location).</p>
+
+<h2 id="cli">Command-line usage</h2>
+<p>SIC! can also be used from the command line without opening the graphical interface. This is useful for scripting or batch processing.</p>
+<pre>sic -i input.png -o output.jpg
+sic --input photo.bmp --output photo.webp
+sic -i avatar.png -o avatar.ico --resize 128x128
+sic -i photo.jpg -f png --resize 800x</pre>
+<dl>
+    <dt><code>--input</code>, <code>-i</code> (required)</dt>
+    <dd>Path to the source image.</dd>
+
+    <dt><code>--output</code>, <code>-o</code></dt>
+    <dd>Path to the output file. The target format is inferred from the file extension.</dd>
+
+    <dt><code>--format</code>, <code>-f</code></dt>
+    <dd>Target format name (e.g., <code>png</code>, <code>jpg</code>). Use this instead of <code>--output</code> to auto-generate the output path.</dd>
+
+    <dt><code>--resize</code>, <code>-r</code></dt>
+    <dd>Resize the image. Format: <code>WxH</code>, <code>Wx</code> (width only), or <code>xH</code> (height only).</dd>
+
+    <dt><code>--crop</code>, <code>-c</code></dt>
+    <dd>Crop instead of scaling proportionally. Requires both width and height in <code>--resize</code>.</dd>
+</dl>
+<p>Either <code>--output</code> or <code>--format</code> must be provided (but not both).</p>
+
+<h2 id="keyboard-shortcuts">Keyboard shortcuts</h2>
+<table>
+<thead>
+    <tr><th>Action</th><th>Shortcut</th></tr>
+</thead>
+<tbody>
+    <tr><td>Add image</td><td><kbd>Ctrl+N</kbd></td></tr>
+    <tr><td>Add folder</td><td><kbd>Ctrl+Shift+N</kbd></td></tr>
+    <tr><td>Add image by link</td><td><kbd>Ctrl+L</kbd></td></tr>
+    <tr><td>Settings</td><td><kbd>Ctrl+,</kbd></td></tr>
+    <tr><td>Remove selected image</td><td><kbd>Delete</kbd></td></tr>
+    <tr><td>Remove all images</td><td><kbd>Ctrl+Shift+Delete</kbd></td></tr>
+    <tr><td>Paste from clipboard</td><td><kbd>Ctrl+V</kbd></td></tr>
+    <tr><td>Convert selected</td><td><kbd>F5</kbd></td></tr>
+    <tr><td>Convert all</td><td><kbd>Ctrl+Shift+F5</kbd></td></tr>
+    <tr><td>Create multi-size ICO</td><td><kbd>Ctrl+Alt+F5</kbd></td></tr>
+    <tr><td>User manual</td><td><kbd>F1</kbd></td></tr>
+    <tr><td>About SIC!</td><td><kbd>Shift+F1</kbd></td></tr>
+    <tr><td>Support development</td><td><kbd>Ctrl+Shift+D</kbd></td></tr>
+    <tr><td>Exit</td><td><kbd>Alt+F4</kbd></td></tr>
+</tbody>
+</table>
+
+<h2 id="supported-formats">Supported formats</h2>
+<table>
+<thead>
+    <tr><th>Format</th><th>Extensions</th><th>Notes</th></tr>
+</thead>
+<tbody>
+    <tr><td>JPEG</td><td>.jpg, .jpeg</td><td>Widely supported, lossy compression</td></tr>
+    <tr><td>PNG</td><td>.png</td><td>Lossless, supports transparency</td></tr>
+    <tr><td>WebP</td><td>.webp</td><td>Modern format, good compression</td></tr>
+    <tr><td>ICO</td><td>.ico</td><td>Windows icon format</td></tr>
+    <tr><td>BMP</td><td>.bmp</td><td>Uncompressed bitmap</td></tr>
+    <tr><td>TIFF</td><td>.tiff, .tif</td><td>Lossless, used in print/scanning</td></tr>
+    <tr><td>GIF</td><td>.gif</td><td>Limited to 256 colors</td></tr>
+    <tr><td>AVIF</td><td>.avif</td><td>Modern format, excellent compression</td></tr>
+</tbody>
+</table>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<dl>
+    <dt>A cloud file cannot be loaded</dt>
+    <dd>Files stored in OneDrive or SharePoint that haven't been downloaded locally appear as cloud placeholders. SIC! will detect this and ask if you want to download them first.</dd>
+
+    <dt>Conversion fails for a specific file</dt>
+    <dd>Check that the file is a valid image and not corrupted. SIC! logs detailed errors to the <code>logs</code> folder inside the application data directory.</dd>
+
+    <dt>The output folder no longer exists</dt>
+    <dd>If the custom output folder has been deleted or moved, SIC! will warn you and fall back to the default <code>Converted</code> folder.</dd>
+</dl>
+</main>
+
+<footer>
+    <p><small>© Oire Software. Licensed under the <a href="https://github.com/Oire/sic/blob/master/LICENSE">Apache License 2.0</a>.</small></p>
+    <p><small><a href="https://github.com/Oire/sic">GitHub</a> · <a href="https://oire.org">oire.org</a> · <a href="https://oire.org/donate">Support development</a></small></p>
+</footer>
+</body>
+</html>
