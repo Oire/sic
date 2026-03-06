@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using GetText.WindowsForms;
 using Oire.Sic.Models;
+using Oire.Sic.Services;
 using Oire.Sic.Utils;
 using static Oire.Sic.Utils.Localization;
 using Serilog;
@@ -17,6 +18,7 @@ public partial class MainWindow: Form {
     private int _clipboardImageCount;
     private readonly System.Windows.Forms.Timer _previewDebounceTimer = new() { Interval = 300 };
     private readonly ObjectPropertiesStore _localizationStore = new();
+    private readonly UpdateService _updateService = new();
 
     private sealed record BatchAddResult(List<ImageItem> Items, List<string> Errors, int SkippedPlaceholders);
 
@@ -47,6 +49,7 @@ public partial class MainWindow: Form {
 
         // Help menu
         userManualMenuItem.Click += UserManualMenuItem_Click;
+        checkForUpdatesMenuItem.Click += CheckForUpdatesMenuItem_Click;
         supportDevelopmentMenuItem.Click += SupportDevelopmentMenuItem_Click;
         aboutMenuItem.Click += AboutMenuItem_Click;
 
@@ -514,6 +517,10 @@ public partial class MainWindow: Form {
             FileName = manualPath,
             UseShellExecute = true,
         });
+    }
+
+    private async void CheckForUpdatesMenuItem_Click(object? sender, EventArgs e) {
+        await _updateService.CheckForUpdatesAsync();
     }
 
     private void AboutMenuItem_Click(object? sender, EventArgs e) {

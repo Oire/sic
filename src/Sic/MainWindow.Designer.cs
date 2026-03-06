@@ -14,6 +14,7 @@ partial class MainWindow {
         if (disposing) {
             components?.Dispose();
             _previewDebounceTimer?.Dispose();
+            _updateService?.Dispose();
         }
         base.Dispose(disposing);
     }
@@ -49,6 +50,7 @@ partial class MainWindow {
         // Help menu
         helpMenu = new ToolStripMenuItem();
         userManualMenuItem = new ToolStripMenuItem();
+        checkForUpdatesMenuItem = new ToolStripMenuItem();
         supportDevelopmentMenuItem = new ToolStripMenuItem();
         aboutMenuItem = new ToolStripMenuItem();
 
@@ -212,6 +214,7 @@ partial class MainWindow {
         helpMenu.Name = "helpMenu";
         helpMenu.DropDownItems.AddRange(new ToolStripItem[] {
             userManualMenuItem,
+            checkForUpdatesMenuItem,
             new ToolStripSeparator(),
             supportDevelopmentMenuItem,
             aboutMenuItem,
@@ -223,6 +226,12 @@ partial class MainWindow {
         userManualMenuItem.Text = "Read User &Manual";
         userManualMenuItem.ShortcutKeys = Keys.F1;
         userManualMenuItem.Name = "userManualMenuItem";
+
+        //
+        // checkForUpdatesMenuItem
+        //
+        checkForUpdatesMenuItem.Text = "Check for &Updates...";
+        checkForUpdatesMenuItem.Name = "checkForUpdatesMenuItem";
 
         //
         // supportDevelopmentMenuItem
@@ -520,6 +529,7 @@ partial class MainWindow {
     private ToolStripMenuItem createMultiSizeIcoMenuItem;
     private ToolStripMenuItem helpMenu;
     private ToolStripMenuItem userManualMenuItem;
+    private ToolStripMenuItem checkForUpdatesMenuItem;
     private ToolStripMenuItem supportDevelopmentMenuItem;
     private ToolStripMenuItem aboutMenuItem;
     private TableLayoutPanel mainLayout;

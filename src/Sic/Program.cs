@@ -25,6 +25,7 @@ internal static class Program {
             ApplicationConfiguration.Initialize();
             Config.Load();
             Localization.SetLanguage(Config.General.Language);
+            Thread.CurrentThread.CurrentUICulture = Localization.GetCurrentCulture();
             EnsureOutputFolderExists(showGui: true);
 #if DEBUG
             Log.Debug("App Startup: Config loaded");

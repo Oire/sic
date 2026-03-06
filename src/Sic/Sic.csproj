@@ -41,6 +41,8 @@
         <PackageReference Include="GitVersion.MsBuild" Version="6.6.0">
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="3.0.4" />
+        <PackageReference Include="NetSparkleUpdater.UI.WinForms.NetCore" Version="3.0.4" />
         <PackageReference Include="Serilog" Version="4.3.1" />
         <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
