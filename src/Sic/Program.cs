@@ -25,7 +25,6 @@ internal static class Program {
             ApplicationConfiguration.Initialize();
             Config.Load();
             Localization.SetLanguage(Config.General.Language);
-            Thread.CurrentThread.CurrentUICulture = Localization.GetCurrentCulture();
             EnsureOutputFolderExists(showGui: true);
 #if DEBUG
             Log.Debug("App Startup: Config loaded");
@@ -102,7 +101,6 @@ internal static class Program {
     private static int RunCli(string[] args) {
         Config.Load(isGui: false);
         Localization.SetLanguage(Config.General.Language);
-        Thread.CurrentThread.CurrentUICulture = Localization.GetCurrentCulture();
         EnsureOutputFolderExists(showGui: false);
 
         var inputOption = new Option<string>("--input", "-i") { Required = true, Description = _("Path to the source image file or a URL") };

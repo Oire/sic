@@ -19,6 +19,10 @@ internal static class Localization {
         lock (_lock) {
             _stringsCatalog = null;
         }
+
+        var culture = GetCurrentCulture();
+        Thread.CurrentThread.CurrentUICulture = culture;
+        Thread.CurrentThread.CurrentCulture = culture;
     }
 
     public static CultureInfo GetCurrentCulture() {
