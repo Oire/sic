@@ -51,7 +51,7 @@ partial class MainWindow {
         helpMenu = new ToolStripMenuItem();
         userManualMenuItem = new ToolStripMenuItem();
         checkForUpdatesMenuItem = new ToolStripMenuItem();
-        supportDevelopmentMenuItem = new ToolStripMenuItem();
+        donateMenuItem = new ToolStripMenuItem();
         aboutMenuItem = new ToolStripMenuItem();
 
         mainLayout = new TableLayoutPanel();
@@ -216,7 +216,7 @@ partial class MainWindow {
             userManualMenuItem,
             checkForUpdatesMenuItem,
             new ToolStripSeparator(),
-            supportDevelopmentMenuItem,
+            donateMenuItem,
             aboutMenuItem,
         });
 
@@ -234,11 +234,11 @@ partial class MainWindow {
         checkForUpdatesMenuItem.Name = "checkForUpdatesMenuItem";
 
         //
-        // supportDevelopmentMenuItem
+        // donateMenuItem
         //
-        supportDevelopmentMenuItem.Text = "Support &Development...";
-        supportDevelopmentMenuItem.Name = "supportDevelopmentMenuItem";
-        supportDevelopmentMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.D;
+        donateMenuItem.Text = "&Donate...";
+        donateMenuItem.Name = "donateMenuItem";
+        donateMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.D;
 
         //
         // aboutMenuItem
@@ -530,7 +530,7 @@ partial class MainWindow {
     private ToolStripMenuItem helpMenu;
     private ToolStripMenuItem userManualMenuItem;
     private ToolStripMenuItem checkForUpdatesMenuItem;
-    private ToolStripMenuItem supportDevelopmentMenuItem;
+    private ToolStripMenuItem donateMenuItem;
     private ToolStripMenuItem aboutMenuItem;
     private TableLayoutPanel mainLayout;
     private ListView imageListView;

@@ -22,12 +22,6 @@ Write-Host "SIC! Installer Build Script" -ForegroundColor Green
 Write-Host "=================================" -ForegroundColor Green
 Write-Host ""
 
-# Clean output directory
-if (Test-Path $OutputDir) {
-    Write-Host "Cleaning installer output directory..." -ForegroundColor Yellow
-    Remove-Item -Path $OutputDir -Recurse -Force
-}
-
 # Clean build output (only when not skipping build)
 $BuildOutputPath = Join-Path $RepoRoot "src\Sic\bin\x64\Release"
 if (!$SkipBuild -and (Test-Path $BuildOutputPath)) {

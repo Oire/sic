@@ -56,7 +56,7 @@ public partial class MainWindow: Form {
         // Help menu
         userManualMenuItem.Click += UserManualMenuItem_Click;
         checkForUpdatesMenuItem.Click += CheckForUpdatesMenuItem_Click;
-        supportDevelopmentMenuItem.Click += SupportDevelopmentMenuItem_Click;
+        donateMenuItem.Click += DonateMenuItem_Click;
         aboutMenuItem.Click += AboutMenuItem_Click;
 
         // Controls
@@ -491,7 +491,7 @@ public partial class MainWindow: Form {
         UpdateMenuState();
     }
 
-    private void SupportDevelopmentMenuItem_Click(object? sender, EventArgs e) {
+    private void DonateMenuItem_Click(object? sender, EventArgs e) {
         Process.Start(new ProcessStartInfo {
             FileName = "https://oire.org/donate",
             UseShellExecute = true,
