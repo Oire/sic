@@ -7,7 +7,7 @@
 #
 
 param(
-    [string]$BaseUrl = "https://oire.org/updates/sic/releases",
+    [string]$BaseUrl = "https://oire.org/software/sic/releases",
     [string]$KeyPath = "",
     [string]$ChangeLog = "",
     [switch]$OpenOutput = $false
@@ -16,7 +16,6 @@ param(
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $ScriptDir
 $OutputDir = Join-Path $ScriptDir "Output"
-$AppcastDir = Join-Path $OutputDir "appcast"
 
 if ([string]::IsNullOrEmpty($ChangeLog)) {
     $ChangeLog = Join-Path $RepoRoot "changelogs"
@@ -27,7 +26,7 @@ Write-Host "=================================" -ForegroundColor Green
 Write-Host ""
 
 # Find the installer exe in Output/
-$InstallerFiles = Get-ChildItem -Path $OutputDir -Filter "SIC!-V*-Setup.exe" -ErrorAction SilentlyContinue |
+$InstallerFiles = Get-ChildItem -Path $OutputDir -Filter "sic-v*-setup.exe" -ErrorAction SilentlyContinue |
     Sort-Object LastWriteTime -Descending
 
 if ($InstallerFiles.Count -eq 0) {
@@ -40,8 +39,8 @@ Write-Host "Found installer: $($Installer.Name)" -ForegroundColor Yellow
 $FileSize = [math]::Round($Installer.Length / 1MB, 2)
 Write-Host "  Size: $FileSize MB" -ForegroundColor Gray
 
-# Extract version from filename: SIC!-V1.0.0.24-Setup.exe -> 1.0.0.24
-if ($Installer.Name -match 'V([\d.]+)-Setup') {
+# Extract version from filename: sic-v1.0.0.24-setup.exe -> 1.0.0.24
+if ($Installer.Name -match 'v([\d.]+)-setup') {
     $Version = $Matches[1]
     Write-Host "  Version: $Version" -ForegroundColor Gray
 } else {
@@ -78,18 +77,13 @@ if ($null -eq $AppcastTool) {
     exit 1
 }
 
-# Create appcast output directory
-if (!(Test-Path $AppcastDir)) {
-    New-Item -ItemType Directory -Path $AppcastDir -Force | Out-Null
-}
-
 # Generate appcast
 Write-Host "Generating signed appcast..." -ForegroundColor Yellow
 
 $AppcastArgs = @(
     "--single-file", $Installer.FullName,
     "--key-path", $KeyPath,
-    "--appcast-output-directory", $AppcastDir,
+    "--appcast-output-directory", $OutputDir,
     "--os", "windows",
     "--base-url", $BaseUrl,
     "--file-version", $Version,
@@ -113,7 +107,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Verify output
-$AppcastFile = Join-Path $AppcastDir "appcast.xml"
+$AppcastFile = Join-Path $OutputDir "appcast.xml"
 if (!(Test-Path $AppcastFile)) {
     Write-Error "appcast.xml was not created"
     exit 1
@@ -124,14 +118,14 @@ Write-Host "Appcast generated successfully!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Output files:" -ForegroundColor Green
 
-Get-ChildItem -Path $AppcastDir | ForEach-Object {
+Get-ChildItem -Path $OutputDir | ForEach-Object {
     Write-Host "  $($_.Name)" -ForegroundColor White
 }
 
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Upload the installer to: $BaseUrl/" -ForegroundColor White
-Write-Host "  2. Upload appcast.xml and appcast.xml.signature to: https://oire.org/updates/sic/" -ForegroundColor White
+Write-Host "  2. Upload appcast.xml and appcast.xml.signature to: https://oire.org/software/sic/" -ForegroundColor White
 
 if ($OpenOutput) {
     Start-Process -FilePath "explorer.exe" -ArgumentList "/select,`"$AppcastFile`""

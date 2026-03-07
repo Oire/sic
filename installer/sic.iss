@@ -5,7 +5,8 @@
 #define MyAppPublisher "Oire Software SARL"
 #define MyAppCompany "Oire"
 #define MyAppFolderName "Sic"
-#define MyAppURL "https://oire.org/"
+#define MyAppURL "https://oire.org/software/sic"
+#define MyAppSupportURL "https://github.com/Oire/sic/issues"
 #define MyAppExeName "sic.exe"
 #define MyAppDescription "Simple Image Converter"
 
@@ -23,7 +24,7 @@ AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
+AppSupportURL={#MyAppSupportURL}
 AppUpdatesURL={#MyAppURL}
 AppCopyright=Copyright © 2026 {#MyAppPublisher}.
 
@@ -34,7 +35,7 @@ AllowNoIcons=yes
 
 ; Output configuration
 OutputDir=Output
-OutputBaseFilename={#MyAppName}-V{#MyAppVersion}-Setup
+OutputBaseFilename=sic-v{#MyAppVersion}-setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -64,7 +65,7 @@ ShowLanguageDialog=yes
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl,Languages\Custom.en.isl"
 Name: "fr"; MessagesFile: "compiler:Languages\French.isl,Languages\Custom.fr.isl"
-Name: "de"; MessagesFile: "compiler:Languages\German.isl,Languages\Custom.de.isl"  
+Name: "de"; MessagesFile: "compiler:Languages\German.isl,Languages\Custom.de.isl"
 Name: "uk"; MessagesFile: "compiler:Languages\Ukrainian.isl,Languages\Custom.uk.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl,Languages\Custom.ru.isl"
 
@@ -98,7 +99,7 @@ var
 begin
   Result := '';
   if GetVersionNumbers(FileName, MS, LS) then
-    Result := IntToStr(MS shr 16) + '.' + IntToStr(MS and $FFFF) + '.' + 
+    Result := IntToStr(MS shr 16) + '.' + IntToStr(MS and $FFFF) + '.' +
               IntToStr(LS shr 16) + '.' + IntToStr(LS and $FFFF);
   if Result = '' then
     Result := '0.0.0.0';
@@ -114,7 +115,7 @@ begin
   Result := 0;
   S1 := V1;
   S2 := V2;
-  
+
   while (S1 <> '') or (S2 <> '') do
   begin
     // Extract next version component
@@ -122,11 +123,11 @@ begin
     if P1 = 0 then P1 := Length(S1) + 1;
     P2 := Pos('.', S2);
     if P2 = 0 then P2 := Length(S2) + 1;
-    
+
     // Convert to numbers
     N1 := StrToIntDef(Copy(S1, 1, P1 - 1), 0);
     N2 := StrToIntDef(Copy(S2, 1, P2 - 1), 0);
-    
+
     // Compare
     if N1 > N2 then
     begin
@@ -138,7 +139,7 @@ begin
       Result := -1;
       Exit;
     end;
-    
+
     // Remove processed component
     Delete(S1, 1, P1);
     Delete(S2, 1, P2);
@@ -149,10 +150,10 @@ function InitializeSetup: Boolean;
 begin
   // Force x64 dependencies since our app is 64-bit only
   Dependency_ForceX86 := False;
-  
+
   // Add .NET 8.0 Desktop Runtime dependency
   Dependency_AddDotNet80Desktop;
-  
+
   Result := True;
 end;
 
@@ -173,7 +174,7 @@ begin
     UserDataPath := ExpandConstant('{userappdata}\{#MyAppCompany}\{#MyAppFolderName}');
     if DirExists(UserDataPath) then
     begin
-      if MsgBox(CustomMessage('RemoveUserData'), 
+      if MsgBox(CustomMessage('RemoveUserData'),
                 mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
       begin
         DelTree(UserDataPath, True, True, True);
