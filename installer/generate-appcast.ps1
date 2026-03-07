@@ -7,7 +7,7 @@
 #
 
 param(
-    [string]$BaseUrl = "https://oire.org/updates/sic/releases",
+    [string]$BaseUrl = "https://oire.org/software/sic/releases",
     [string]$KeyPath = "",
     [string]$ChangeLog = "",
     [switch]$OpenOutput = $false
@@ -27,7 +27,7 @@ Write-Host "=================================" -ForegroundColor Green
 Write-Host ""
 
 # Find the installer exe in Output/
-$InstallerFiles = Get-ChildItem -Path $OutputDir -Filter "SIC!-V*-Setup.exe" -ErrorAction SilentlyContinue |
+$InstallerFiles = Get-ChildItem -Path $OutputDir -Filter "sic-v*-setup.exe" -ErrorAction SilentlyContinue |
     Sort-Object LastWriteTime -Descending
 
 if ($InstallerFiles.Count -eq 0) {
@@ -40,8 +40,8 @@ Write-Host "Found installer: $($Installer.Name)" -ForegroundColor Yellow
 $FileSize = [math]::Round($Installer.Length / 1MB, 2)
 Write-Host "  Size: $FileSize MB" -ForegroundColor Gray
 
-# Extract version from filename: SIC!-V1.0.0.24-Setup.exe -> 1.0.0.24
-if ($Installer.Name -match 'V([\d.]+)-Setup') {
+# Extract version from filename: sic-v1.0.0.24-setup.exe -> 1.0.0.24
+if ($Installer.Name -match 'v([\d.]+)-setup') {
     $Version = $Matches[1]
     Write-Host "  Version: $Version" -ForegroundColor Gray
 } else {
@@ -131,7 +131,7 @@ Get-ChildItem -Path $AppcastDir | ForEach-Object {
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Upload the installer to: $BaseUrl/" -ForegroundColor White
-Write-Host "  2. Upload appcast.xml and appcast.xml.signature to: https://oire.org/updates/sic/" -ForegroundColor White
+Write-Host "  2. Upload appcast.xml and appcast.xml.signature to: https://oire.org/software/sic/" -ForegroundColor White
 
 if ($OpenOutput) {
     Start-Process -FilePath "explorer.exe" -ArgumentList "/select,`"$AppcastFile`""
