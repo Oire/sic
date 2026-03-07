@@ -7,7 +7,7 @@
 #
 
 param(
-    [string]$BaseUrl = "https://oire.org/software/sic/releases",
+    [string]$BaseUrl = "https://oire.org/software/sic",
     [string]$KeyPath = "",
     [string]$ChangeLog = "",
     [switch]$OpenOutput = $false
