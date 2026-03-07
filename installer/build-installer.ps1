@@ -22,6 +22,19 @@ Write-Host "SIC! Installer Build Script" -ForegroundColor Green
 Write-Host "=================================" -ForegroundColor Green
 Write-Host ""
 
+# Clean output directory
+if (Test-Path $OutputDir) {
+    Write-Host "Cleaning installer output directory..." -ForegroundColor Yellow
+    Remove-Item -Path $OutputDir -Recurse -Force
+}
+
+# Clean build output (only when not skipping build)
+$BuildOutputPath = Join-Path $RepoRoot "src\Sic\bin\x64\Release"
+if (!$SkipBuild -and (Test-Path $BuildOutputPath)) {
+    Write-Host "Cleaning release build directory..." -ForegroundColor Yellow
+    Remove-Item -Path $BuildOutputPath -Recurse -Force
+}
+
 # Check if solution file exists
 if (!(Test-Path $SolutionPath)) {
     Write-Error "Solution file not found at: $SolutionPath"
@@ -81,14 +94,14 @@ if (!$SkipBuild) {
 }
 
 # Verify required files exist in build output
-$BuildOutputPath = Join-Path $RepoRoot "src\Sic\bin\x64\Release\win-x64\publish"
+$PublishOutputPath = Join-Path $BuildOutputPath "win-x64\publish"
 $RequiredFiles = @(
     "sic.exe"
 )
 
 Write-Host "Verifying build output..." -ForegroundColor Yellow
 foreach ($File in $RequiredFiles) {
-    $FilePath = Join-Path $BuildOutputPath $File
+    $FilePath = Join-Path $PublishOutputPath $File
     if (!(Test-Path $FilePath)) {
         Write-Error "Required file not found: $FilePath"
         exit 1

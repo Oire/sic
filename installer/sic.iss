@@ -36,7 +36,7 @@ AllowNoIcons=yes
 ; Output configuration
 OutputDir=Output
 OutputBaseFilename=sic-v{#MyAppVersion}-setup
-Compression=lzma
+Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
 
@@ -58,6 +58,7 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 ; Privileges
 PrivilegesRequired=admin
 DisableProgramGroupPage=yes
+DisableReadyPage=yes
 
 ; Language options
 ShowLanguageDialog=yes
@@ -182,4 +183,14 @@ begin
       end;
     end;
   end;
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  if CurPageID in [wpSelectProgramGroup, wpReady] then
+    WizardForm.NextButton.Caption := SetupMessage(msgButtonInstall)
+  else if CurPageID = wpFinished then
+    WizardForm.NextButton.Caption := SetupMessage(msgButtonFinish)
+  else
+    WizardForm.NextButton.Caption := SetupMessage(msgButtonNext);
 end;
