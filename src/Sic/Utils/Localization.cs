@@ -23,6 +23,8 @@ internal static class Localization {
         var culture = GetCurrentCulture();
         Thread.CurrentThread.CurrentUICulture = culture;
         Thread.CurrentThread.CurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        CultureInfo.DefaultThreadCurrentCulture = culture;
     }
 
     public static CultureInfo GetCurrentCulture() {
