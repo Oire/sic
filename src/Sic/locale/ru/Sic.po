@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-03-06 20:26:59+0100\n"
-"PO-Revision-Date: 2026-03-06 21:15+0100\n"
+"POT-Creation-Date: 2026-03-07 15:02:06+0100\n"
+"PO-Revision-Date: 2026-03-07 19:15+0100\n"
 "Last-Translator: \n"
 "Language-Team: ru-RU\n"
 "Language: ru_RU\n"
@@ -113,7 +113,7 @@ msgstr "&Добавить..."
 msgid "&Browse..."
 msgstr "О&бзор..."
 
-#: ..\..\ProgressDialog.Designer.cs:83 ..\..\AddUrlDialog.Designer.cs:76
+#: ..\..\AddUrlDialog.Designer.cs:76 ..\..\ProgressDialog.Designer.cs:83
 #: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\AddSizeDialog.Designer.cs:76
 #: ..\..\AddFolderDialog.Designer.cs:126 ..\..\SettingsDialog.Designer.cs:121
 msgid "&Cancel"
@@ -168,12 +168,12 @@ msgid "&Link:"
 msgstr "Сс&ылка:"
 
 #: ..\..\AddUrlDialog.Designer.cs:67 ..\..\IcoPresetDialog.Designer.cs:155
-#: ..\..\AddSizeDialog.Designer.cs:67 ..\..\AddFolderDialog.Designer.cs:117
-#: ..\..\AboutDialog.Designer.cs:117 ..\..\SettingsDialog.Designer.cs:112
+#: ..\..\AboutDialog.Designer.cs:117 ..\..\AddSizeDialog.Designer.cs:67
+#: ..\..\AddFolderDialog.Designer.cs:117 ..\..\SettingsDialog.Designer.cs:112
 msgid "&OK"
 msgstr "&ОК"
 
-#: ..\..\MainWindow.Designer.cs:136 ..\..\IcoPresetDialog.Designer.cs:145
+#: ..\..\IcoPresetDialog.Designer.cs:145 ..\..\MainWindow.Designer.cs:136
 msgid "&Remove"
 msgstr "&Удалить"
 
@@ -271,7 +271,7 @@ msgstr "Конвертация завершена"
 msgid "Conversion Error"
 msgstr "Ошибка конвертации"
 
-#: ..\..\Program.cs:240
+#: ..\..\Program.cs:238
 #, csharp-format
 msgid "Conversion failed: {0}"
 msgstr "Ошибка конвертации: {0}"
@@ -284,7 +284,7 @@ msgstr "Конвертировать &всё"
 msgid "Convert &Selected"
 msgstr "Конвертировать &выбранное"
 
-#: ..\..\Program.cs:236
+#: ..\..\Program.cs:234
 #, csharp-format
 msgid "Converted: {0}"
 msgstr "Сконвертировано: {0}"
@@ -319,7 +319,7 @@ msgstr "Для обрезки необходима допустимая высо
 msgid "Crop mode requires a valid width (1–65535)."
 msgstr "Для обрезки необходима допустимая ширина (1–65535)."
 
-#: ..\..\Program.cs:221
+#: ..\..\Program.cs:219
 msgid "Crop mode requires both width and height (e.g. --resize 128x128 --crop)"
 msgstr ""
 "Для обрезки необходимы и ширина, и высота (например, --resize 128x128 --crop)"
@@ -350,11 +350,11 @@ msgstr "Загрузка..."
 msgid "E&xit"
 msgstr "В&ыход"
 
-#: ..\..\Program.cs:162
+#: ..\..\Program.cs:160
 msgid "Either --output or --format must be specified."
 msgstr "Необходимо указать либо --output, либо --format."
 
-#: ..\..\Program.cs:44 ..\..\Utils\Config.cs:65 ..\..\MainWindow.cs:478
+#: ..\..\Program.cs:43 ..\..\MainWindow.cs:478 ..\..\Utils\Config.cs:65
 #: ..\..\MainWindow.cs:731 ..\..\MainWindow.cs:777 ..\..\MainWindow.cs:967
 msgid "Error"
 msgstr "Ошибка"
@@ -418,7 +418,7 @@ msgstr ""
 "{0}\n"
 "{1}"
 
-#: ..\..\Program.cs:40
+#: ..\..\Program.cs:39
 #, csharp-format
 msgid "Fatal error: {0}"
 msgstr "Критическая ошибка: {0}"
@@ -435,7 +435,7 @@ msgstr "Файл уже существует"
 msgid "File Name"
 msgstr "Имя файла"
 
-#: ..\..\Program.cs:134
+#: ..\..\Program.cs:132
 #, csharp-format
 msgid "File not found: {0}"
 msgstr "Файл не найден: {0}"
@@ -480,7 +480,7 @@ msgstr "Недопустимые размеры"
 msgid "Invalid height"
 msgstr "Недопустимая высота"
 
-#: ..\..\Program.cs:203
+#: ..\..\Program.cs:201
 #, csharp-format
 msgid "Invalid height value: {0}"
 msgstr "Недопустимое значение высоты: {0}"
@@ -489,14 +489,14 @@ msgstr "Недопустимое значение высоты: {0}"
 msgid "Invalid link"
 msgstr "Недопустимая ссылка"
 
-#: ..\..\Program.cs:209
+#: ..\..\Program.cs:207
 #, csharp-format
 msgid "Invalid resize format: {0}. At least one dimension is required."
 msgstr ""
 "Недопустимый формат изменения размера: {0}. Необходимо указать хотя бы одно "
 "измерение."
 
-#: ..\..\Program.cs:185
+#: ..\..\Program.cs:183
 #, csharp-format
 msgid ""
 "Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, "
@@ -513,7 +513,7 @@ msgstr "Недопустимый размер"
 msgid "Invalid width"
 msgstr "Недопустимая ширина"
 
-#: ..\..\Program.cs:197
+#: ..\..\Program.cs:195
 #, csharp-format
 msgid "Invalid width value: {0}"
 msgstr "Недопустимое значение ширины: {0}"
@@ -585,11 +585,11 @@ msgstr "Oire Software SARL"
 msgid "Output &Folder:"
 msgstr "Папка назна&чения:"
 
-#: ..\..\Program.cs:85 ..\..\MainWindow.cs:270
+#: ..\..\Program.cs:84 ..\..\MainWindow.cs:270
 msgid "Output Folder Not Found"
 msgstr "Папка назначения не найдена"
 
-#: ..\..\Program.cs:143
+#: ..\..\Program.cs:141
 msgid "Output path must have a file extension (e.g. .jpg, .png)"
 msgstr ""
 "Путь назначения должен содержать расширение файла (например, .jpg, .png)"
@@ -598,12 +598,12 @@ msgstr ""
 msgid "Overwrite"
 msgstr "Перезаписать"
 
-#: ..\..\Program.cs:109
+#: ..\..\Program.cs:107
 msgid "Path for the converted image (format inferred from extension)"
 msgstr ""
 "Путь для сконвертированного изображения (формат определяется по расширению)"
 
-#: ..\..\Program.cs:108
+#: ..\..\Program.cs:106
 msgid "Path to the source image file or a URL"
 msgstr "Путь к исходному файлу изображения или ссылка"
 
@@ -687,7 +687,7 @@ msgstr "Изменить ра&змер"
 msgid "Resize &Mode:"
 msgstr "Ре&жим изменения размера:"
 
-#: ..\..\Program.cs:111
+#: ..\..\Program.cs:109
 msgid "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)"
 msgstr "Размеры в формате ШxВ, Шx или xВ (например, 128x128, 128x, x128)"
 
@@ -711,7 +711,7 @@ msgstr "Ра&змер (от 16 до 512):"
 msgid "Si&zes:"
 msgstr "Ра&змеры:"
 
-#: ..\..\AboutDialog.Designer.cs:57 ..\..\Program.cs:114
+#: ..\..\AboutDialog.Designer.cs:57 ..\..\Program.cs:112
 msgid "SIC! — Simple Image Converter"
 msgstr "SIC! — Простой конвертер изображений"
 
@@ -732,6 +732,11 @@ msgstr "Пропустить"
 msgid "Skipped"
 msgstr "Пропущено"
 
+#: ..\..\Services\UpdateService.cs:38 ..\..\Services\UpdateService.cs:44
+#: ..\..\Services\UpdateService.cs:50
+msgid "Software Update"
+msgstr "Обновление программного обеспечения"
+
 #: ..\..\MainWindow.Designer.cs:314
 msgid "Status"
 msgstr "Состояние"
@@ -740,7 +745,7 @@ msgstr "Состояние"
 msgid "Support &Development..."
 msgstr "Под&держать разработку..."
 
-#: ..\..\Program.cs:170
+#: ..\..\Program.cs:168
 #, csharp-format
 msgid "Supported formats: {0}"
 msgstr "Поддерживаемые форматы: {0}"
@@ -753,7 +758,7 @@ msgstr "Системный"
 msgid "Target &Format:"
 msgstr "Целевой &формат:"
 
-#: ..\..\Program.cs:110
+#: ..\..\Program.cs:108
 msgid "Target format (e.g. jpg, png, webp). Used when --output is omitted."
 msgstr ""
 "Целевой формат (например, jpg, png, webp). Используется, когда параметр --"
@@ -768,7 +773,11 @@ msgstr ""
 "Файл «{0}» уже существует.\n"
 "Что вы хотите сделать?"
 
-#: ..\..\Program.cs:84 ..\..\MainWindow.cs:269
+#: ..\..\Services\UpdateService.cs:43
+msgid "The latest available update was previously skipped."
+msgstr "Последнее доступное обновление было ранее пропущено."
+
+#: ..\..\Program.cs:83 ..\..\MainWindow.cs:269
 #, csharp-format
 msgid ""
 "The output folder \"{0}\" no longer exists. The default folder will be used."
@@ -789,6 +798,10 @@ msgstr "Файл руководства пользователя не найде
 msgid "TIFF images (*.tif, *.tiff)"
 msgstr "Изображения TIFF (*.tif, *.tiff)"
 
+#: ..\..\Services\UpdateService.cs:49
+msgid "Unable to check for updates. Please try again later."
+msgstr "Невозможно проверить наличие обновлений. Повторите попытку позже."
+
 #: ..\..\Utils\Config.cs:47
 #, csharp-format
 msgid "Unable to load configuration: {0}"
@@ -799,16 +812,16 @@ msgstr "Не удалось загрузить конфигурацию: {0}"
 msgid "Unable to save configuration: {0}"
 msgstr "Не удалось сохранить конфигурацию: {0}"
 
-#: ..\..\Program.cs:44
+#: ..\..\Program.cs:43
 msgid "Unable to start the program up. Please contact the developer."
 msgstr "Не удалось запустить программу. Пожалуйста, обратитесь к разработчику."
 
-#: ..\..\Program.cs:169
+#: ..\..\Program.cs:167
 #, csharp-format
 msgid "Unsupported format: {0}"
 msgstr "Неподдерживаемый формат: {0}"
 
-#: ..\..\Program.cs:112
+#: ..\..\Program.cs:110
 msgid "Use crop mode (scale to cover, then center-crop to exact dimensions)"
 msgstr ""
 "Режим обрезки (масштабировать с заполнением, затем обрезать по центру до "
@@ -827,7 +840,7 @@ msgstr "Версия"
 msgid "Version {0}"
 msgstr "Версия {0}"
 
-#: ..\..\Program.cs:89
+#: ..\..\Program.cs:88
 #, csharp-format
 msgid ""
 "Warning! The output folder \"{0}\" no longer exists. Using default folder."
@@ -838,6 +851,10 @@ msgstr ""
 #: ..\..\AddFolderDialog.cs:13
 msgid "WebP images (*.webp)"
 msgstr "Изображения WebP (*.webp)"
+
+#: ..\..\Services\UpdateService.cs:37
+msgid "Your current version is up to date."
+msgstr "Ваша текущая версия является актуальной."
 
 #~ msgid "&Options..."
 #~ msgstr "&Параметры..."

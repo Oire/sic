@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-03-06 20:26:59+0100\n"
-"PO-Revision-Date: 2026-03-06 20:26:59+0100\n"
+"POT-Creation-Date: 2026-03-07 15:02:06+0100\n"
+"PO-Revision-Date: 2026-03-07 15:02:07+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -104,8 +104,8 @@ msgstr ""
 msgid "&Browse..."
 msgstr ""
 
-#: ..\..\ProgressDialog.Designer.cs:83
 #: ..\..\AddUrlDialog.Designer.cs:76
+#: ..\..\ProgressDialog.Designer.cs:83
 #: ..\..\IcoPresetDialog.Designer.cs:164
 #: ..\..\AddSizeDialog.Designer.cs:76
 #: ..\..\AddFolderDialog.Designer.cs:126
@@ -163,15 +163,15 @@ msgstr ""
 
 #: ..\..\AddUrlDialog.Designer.cs:67
 #: ..\..\IcoPresetDialog.Designer.cs:155
+#: ..\..\AboutDialog.Designer.cs:117
 #: ..\..\AddSizeDialog.Designer.cs:67
 #: ..\..\AddFolderDialog.Designer.cs:117
-#: ..\..\AboutDialog.Designer.cs:117
 #: ..\..\SettingsDialog.Designer.cs:112
 msgid "&OK"
 msgstr ""
 
-#: ..\..\MainWindow.Designer.cs:136
 #: ..\..\IcoPresetDialog.Designer.cs:145
+#: ..\..\MainWindow.Designer.cs:136
 msgid "&Remove"
 msgstr ""
 
@@ -270,7 +270,7 @@ msgstr ""
 msgid "Conversion Error"
 msgstr ""
 
-#: ..\..\Program.cs:240
+#: ..\..\Program.cs:238
 #, csharp-format
 msgid "Conversion failed: {0}"
 msgstr ""
@@ -285,7 +285,7 @@ msgstr ""
 msgid "Convert &Selected"
 msgstr ""
 
-#: ..\..\Program.cs:236
+#: ..\..\Program.cs:234
 #, csharp-format
 msgid "Converted: {0}"
 msgstr ""
@@ -322,7 +322,7 @@ msgstr ""
 msgid "Crop mode requires a valid width (1–65535)."
 msgstr ""
 
-#: ..\..\Program.cs:221
+#: ..\..\Program.cs:219
 msgid "Crop mode requires both width and height (e.g. --resize 128x128 --crop)"
 msgstr ""
 
@@ -352,13 +352,13 @@ msgstr ""
 msgid "E&xit"
 msgstr ""
 
-#: ..\..\Program.cs:162
+#: ..\..\Program.cs:160
 msgid "Either --output or --format must be specified."
 msgstr ""
 
-#: ..\..\Program.cs:44
-#: ..\..\Utils\Config.cs:65
+#: ..\..\Program.cs:43
 #: ..\..\MainWindow.cs:478
+#: ..\..\Utils\Config.cs:65
 #: ..\..\MainWindow.cs:731
 #: ..\..\MainWindow.cs:777
 #: ..\..\MainWindow.cs:967
@@ -414,7 +414,7 @@ msgid ""
 "{1}"
 msgstr ""
 
-#: ..\..\Program.cs:40
+#: ..\..\Program.cs:39
 #, csharp-format
 msgid "Fatal error: {0}"
 msgstr ""
@@ -431,7 +431,7 @@ msgstr ""
 msgid "File Name"
 msgstr ""
 
-#: ..\..\Program.cs:134
+#: ..\..\Program.cs:132
 #, csharp-format
 msgid "File not found: {0}"
 msgstr ""
@@ -476,7 +476,7 @@ msgstr ""
 msgid "Invalid height"
 msgstr ""
 
-#: ..\..\Program.cs:203
+#: ..\..\Program.cs:201
 #, csharp-format
 msgid "Invalid height value: {0}"
 msgstr ""
@@ -485,12 +485,12 @@ msgstr ""
 msgid "Invalid link"
 msgstr ""
 
-#: ..\..\Program.cs:209
+#: ..\..\Program.cs:207
 #, csharp-format
 msgid "Invalid resize format: {0}. At least one dimension is required."
 msgstr ""
 
-#: ..\..\Program.cs:185
+#: ..\..\Program.cs:183
 #, csharp-format
 msgid ""
 "Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, "
@@ -505,7 +505,7 @@ msgstr ""
 msgid "Invalid width"
 msgstr ""
 
-#: ..\..\Program.cs:197
+#: ..\..\Program.cs:195
 #, csharp-format
 msgid "Invalid width value: {0}"
 msgstr ""
@@ -576,12 +576,12 @@ msgstr ""
 msgid "Output &Folder:"
 msgstr ""
 
-#: ..\..\Program.cs:85
+#: ..\..\Program.cs:84
 #: ..\..\MainWindow.cs:270
 msgid "Output Folder Not Found"
 msgstr ""
 
-#: ..\..\Program.cs:143
+#: ..\..\Program.cs:141
 msgid "Output path must have a file extension (e.g. .jpg, .png)"
 msgstr ""
 
@@ -589,11 +589,11 @@ msgstr ""
 msgid "Overwrite"
 msgstr ""
 
-#: ..\..\Program.cs:109
+#: ..\..\Program.cs:107
 msgid "Path for the converted image (format inferred from extension)"
 msgstr ""
 
-#: ..\..\Program.cs:108
+#: ..\..\Program.cs:106
 msgid "Path to the source image file or a URL"
 msgstr ""
 
@@ -678,7 +678,7 @@ msgstr ""
 msgid "Resize &Mode:"
 msgstr ""
 
-#: ..\..\Program.cs:111
+#: ..\..\Program.cs:109
 msgid "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)"
 msgstr ""
 
@@ -703,7 +703,7 @@ msgid "Si&zes:"
 msgstr ""
 
 #: ..\..\AboutDialog.Designer.cs:57
-#: ..\..\Program.cs:114
+#: ..\..\Program.cs:112
 msgid "SIC! — Simple Image Converter"
 msgstr ""
 
@@ -724,6 +724,12 @@ msgstr ""
 msgid "Skipped"
 msgstr ""
 
+#: ..\..\Services\UpdateService.cs:38
+#: ..\..\Services\UpdateService.cs:44
+#: ..\..\Services\UpdateService.cs:50
+msgid "Software Update"
+msgstr ""
+
 #: ..\..\MainWindow.Designer.cs:314
 msgid "Status"
 msgstr ""
@@ -732,7 +738,7 @@ msgstr ""
 msgid "Support &Development..."
 msgstr ""
 
-#: ..\..\Program.cs:170
+#: ..\..\Program.cs:168
 #, csharp-format
 msgid "Supported formats: {0}"
 msgstr ""
@@ -745,7 +751,7 @@ msgstr ""
 msgid "Target &Format:"
 msgstr ""
 
-#: ..\..\Program.cs:110
+#: ..\..\Program.cs:108
 msgid "Target format (e.g. jpg, png, webp). Used when --output is omitted."
 msgstr ""
 
@@ -756,7 +762,11 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: ..\..\Program.cs:84
+#: ..\..\Services\UpdateService.cs:43
+msgid "The latest available update was previously skipped."
+msgstr ""
+
+#: ..\..\Program.cs:83
 #: ..\..\MainWindow.cs:269
 #, csharp-format
 msgid ""
@@ -775,6 +785,10 @@ msgstr ""
 msgid "TIFF images (*.tif, *.tiff)"
 msgstr ""
 
+#: ..\..\Services\UpdateService.cs:49
+msgid "Unable to check for updates. Please try again later."
+msgstr ""
+
 #: ..\..\Utils\Config.cs:47
 #, csharp-format
 msgid "Unable to load configuration: {0}"
@@ -786,16 +800,16 @@ msgstr ""
 msgid "Unable to save configuration: {0}"
 msgstr ""
 
-#: ..\..\Program.cs:44
+#: ..\..\Program.cs:43
 msgid "Unable to start the program up. Please contact the developer."
 msgstr ""
 
-#: ..\..\Program.cs:169
+#: ..\..\Program.cs:167
 #, csharp-format
 msgid "Unsupported format: {0}"
 msgstr ""
 
-#: ..\..\Program.cs:112
+#: ..\..\Program.cs:110
 msgid "Use crop mode (scale to cover, then center-crop to exact dimensions)"
 msgstr ""
 
@@ -812,7 +826,7 @@ msgstr ""
 msgid "Version {0}"
 msgstr ""
 
-#: ..\..\Program.cs:89
+#: ..\..\Program.cs:88
 #, csharp-format
 msgid ""
 "Warning! The output folder \"{0}\" no longer exists. Using default folder."
@@ -820,5 +834,9 @@ msgstr ""
 
 #: ..\..\AddFolderDialog.cs:13
 msgid "WebP images (*.webp)"
+msgstr ""
+
+#: ..\..\Services\UpdateService.cs:37
+msgid "Your current version is up to date."
 msgstr ""
 
