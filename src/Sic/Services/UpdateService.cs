@@ -18,38 +18,52 @@ internal sealed class UpdateService: IDisposable {
             RelaunchAfterUpdate = false,
         };
 
-        _sparkle.StartLoop(true, true, TimeSpan.FromHours(24));
+        try {
+            _sparkle.StartLoop(true, true, TimeSpan.FromHours(24));
+        } catch (Exception ex) {
+            Log.Error(ex, "UpdateService: Failed to start update loop");
+        }
+
         Log.Information("UpdateService: Initialized with appcast URL {Url}", App.AppcastUrl);
     }
 
     public async Task CheckForUpdatesAsync() {
         Log.Information("UpdateService: Manual update check requested");
-        var result = await _sparkle.CheckForUpdatesQuietly();
-        var status = result?.Status ?? UpdateStatus.CouldNotDetermine;
-        Log.Information("UpdateService: Update check result: {Status}", status);
 
-        switch (status) {
-            case UpdateStatus.UpdateAvailable:
-                _sparkle.ShowUpdateNeededUI(result!.Updates);
-                break;
-            case UpdateStatus.UpdateNotAvailable:
-                MessageBox.Show(
-                    _("Your current version is up to date."),
-                    _("Software Update"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                break;
-            case UpdateStatus.UserSkipped:
-                MessageBox.Show(
-                    _("The latest available update was previously skipped."),
-                    _("Software Update"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                break;
-            case UpdateStatus.CouldNotDetermine:
-                MessageBox.Show(
-                    _("Unable to check for updates. Please try again later."),
-                    _("Software Update"),
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                break;
+        try {
+            var result = await _sparkle.CheckForUpdatesQuietly();
+            var status = result?.Status ?? UpdateStatus.CouldNotDetermine;
+            Log.Information("UpdateService: Update check result: {Status}", status);
+
+            switch (status) {
+                case UpdateStatus.UpdateAvailable:
+                    _sparkle.ShowUpdateNeededUI(result!.Updates);
+                    break;
+                case UpdateStatus.UpdateNotAvailable:
+                    MessageBox.Show(
+                        _("Your current version is up to date."),
+                        _("Software Update"),
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+                case UpdateStatus.UserSkipped:
+                    MessageBox.Show(
+                        _("The latest available update was previously skipped."),
+                        _("Software Update"),
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+                case UpdateStatus.CouldNotDetermine:
+                    MessageBox.Show(
+                        _("Unable to check for updates. Please try again later."),
+                        _("Software Update"),
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    break;
+            }
+        } catch (Exception ex) {
+            Log.Error(ex, "UpdateService: Update check failed");
+            MessageBox.Show(
+                _("Unable to check for updates. Please try again later."),
+                _("Software Update"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 

@@ -17,6 +17,17 @@ internal static class Program {
     static int Main(string[] args) {
         ConfigureLogging();
 
+        AppDomain.CurrentDomain.UnhandledException += (_, e) => {
+            if (e.ExceptionObject is Exception ex) {
+                Log.Fatal(ex, "Unhandled exception on background thread");
+            }
+        };
+
+        TaskScheduler.UnobservedTaskException += (_, e) => {
+            Log.Error(e.Exception, "Unobserved task exception");
+            e.SetObserved();
+        };
+
         try {
             if (args.Length > 0) {
                 return RunCli(args);

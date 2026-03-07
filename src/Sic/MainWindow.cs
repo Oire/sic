@@ -18,7 +18,7 @@ public partial class MainWindow: Form {
     private int _clipboardImageCount;
     private readonly System.Windows.Forms.Timer _previewDebounceTimer = new() { Interval = 300 };
     private readonly ObjectPropertiesStore _localizationStore = new();
-    private readonly UpdateService _updateService = new();
+    private readonly UpdateService? _updateService;
 
     private sealed record BatchAddResult(List<ImageItem> Items, List<string> Errors, int SkippedPlaceholders);
 
@@ -28,6 +28,12 @@ public partial class MainWindow: Form {
         SetupEventHandlers();
         PopulateFormatComboBox();
         UpdateMenuState();
+
+        try {
+            _updateService = new UpdateService();
+        } catch (Exception ex) {
+            Log.Error(ex, "Failed to initialize update service");
+        }
     }
 
     private void SetupEventHandlers() {
@@ -520,6 +526,14 @@ public partial class MainWindow: Form {
     }
 
     private async void CheckForUpdatesMenuItem_Click(object? sender, EventArgs e) {
+        if (_updateService == null) {
+            MessageBox.Show(
+                _("Unable to check for updates. Please try again later."),
+                _("Software Update"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
         await _updateService.CheckForUpdatesAsync();
     }
 
