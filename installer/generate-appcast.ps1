@@ -16,7 +16,6 @@ param(
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $ScriptDir
 $OutputDir = Join-Path $ScriptDir "Output"
-$AppcastDir = Join-Path $OutputDir "appcast"
 
 if ([string]::IsNullOrEmpty($ChangeLog)) {
     $ChangeLog = Join-Path $RepoRoot "changelogs"
@@ -78,18 +77,13 @@ if ($null -eq $AppcastTool) {
     exit 1
 }
 
-# Create appcast output directory
-if (!(Test-Path $AppcastDir)) {
-    New-Item -ItemType Directory -Path $AppcastDir -Force | Out-Null
-}
-
 # Generate appcast
 Write-Host "Generating signed appcast..." -ForegroundColor Yellow
 
 $AppcastArgs = @(
     "--single-file", $Installer.FullName,
     "--key-path", $KeyPath,
-    "--appcast-output-directory", $AppcastDir,
+    "--appcast-output-directory", $OutputDir,
     "--os", "windows",
     "--base-url", $BaseUrl,
     "--file-version", $Version,
@@ -113,7 +107,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Verify output
-$AppcastFile = Join-Path $AppcastDir "appcast.xml"
+$AppcastFile = Join-Path $OutputDir "appcast.xml"
 if (!(Test-Path $AppcastFile)) {
     Write-Error "appcast.xml was not created"
     exit 1
@@ -124,7 +118,7 @@ Write-Host "Appcast generated successfully!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Output files:" -ForegroundColor Green
 
-Get-ChildItem -Path $AppcastDir | ForEach-Object {
+Get-ChildItem -Path $OutputDir | ForEach-Object {
     Write-Host "  $($_.Name)" -ForegroundColor White
 }
 
