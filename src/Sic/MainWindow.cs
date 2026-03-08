@@ -197,7 +197,30 @@ public partial class MainWindow: Form {
     private void ApplyLocalization() {
         Localizer.Revert(this, _localizationStore);
         Localizer.Localize(this, Localization.Catalog, _localizationStore);
+        RefreshShortcutKeys(menuStrip);
         statusLabel.Text = _("Ready");
+    }
+
+    private static void RefreshShortcutKeys(MenuStrip menu) {
+        foreach (ToolStripItem item in menu.Items) {
+            if (item is ToolStripMenuItem menuItem) {
+                RefreshShortcutKeys(menuItem);
+            }
+        }
+    }
+
+    private static void RefreshShortcutKeys(ToolStripMenuItem item) {
+        if (item.ShortcutKeys != Keys.None) {
+            var keys = item.ShortcutKeys;
+            item.ShortcutKeys = Keys.None;
+            item.ShortcutKeys = keys;
+        }
+
+        foreach (ToolStripItem sub in item.DropDownItems) {
+            if (sub is ToolStripMenuItem menuItem) {
+                RefreshShortcutKeys(menuItem);
+            }
+        }
     }
 
     private void ExitMenuItem_Click(object? sender, EventArgs e) {
