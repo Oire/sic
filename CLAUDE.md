@@ -109,7 +109,7 @@ SIC! is an accessible image format converter primarily aimed at blind and low-co
 3. **Pick target format** from a dropdown (JPG, PNG, WEBP, ICO, BMP, TIFF, GIF, AVIF).
 4. **Optional resize** — checkbox that reveals width/height fields (critical for blind users who get told "upload a 128x128 photo").
 5. **Hit Convert** — processes all items in the list to the chosen format.
-6. **Output location** — by default, same folder as original, same name with new extension. Configurable in settings to use a custom output folder.
+6. **Output location** — by default, `%APPDATA%\Oire\Sic\Converted\` (or `userdata\Converted\` in portable mode), same name with new extension. Configurable in settings to use a custom output folder.
 7. **Filename conflict** — always ask (overwrite / rename to `_1` suffix / skip). Never silently overwrite.
 
 ### UI guidelines
@@ -121,8 +121,45 @@ SIC! is an accessible image format converter primarily aimed at blind and low-co
 
 ### Settings (via SharpConfig, stored in `%APPDATA%/Oire/Sic/Sic.cfg`)
 
-- Output folder (default: same as source)
+- Output folder (default: `Converted` subfolder in the data directory)
 - Language
+- Confirm exit when images are in the queue
+
+## Auto-Updates (NetSparkleUpdater)
+
+The app uses [NetSparkleUpdater](https://github.com/NetSparkleUpdater/NetSparkle) with Ed25519 signature verification for automatic updates.
+
+### Key setup
+
+Updates are signed with an Ed25519 key pair. The public key is embedded in `src/Sic/Utils/Constants/App.cs` (`UpdatePublicKey`). The private key is **not** checked into the repo — it lives in a `keys/` directory at the repo root (gitignored).
+
+To generate a new key pair (only needed once, or if forking the project):
+
+```bash
+# Install the appcast tool globally
+dotnet tool install --global NetSparkleUpdater.Tools.AppCastGenerator
+
+# Generate keys into the keys/ directory
+netsparkle-generate-appcast --generate-keys --key-path keys
+```
+
+This creates `keys/NetSparkle_Ed25519.priv` and `keys/NetSparkle_Ed25519.pub`. After generating, update the `UpdatePublicKey` constant in `App.cs` with the contents of the `.pub` file, and update `AppcastUrl` if hosting elsewhere.
+
+### Generating an appcast
+
+After building the installer (`installer/build-installer.ps1`), generate the signed appcast:
+
+```powershell
+.\installer\generate-appcast.ps1                           # Uses keys/ directory by default
+.\installer\generate-appcast.ps1 -KeyPath "C:\path\to\keys" # Custom key location
+.\installer\generate-appcast.ps1 -ChangeLog "changelogs"    # Include release notes
+```
+
+The script produces `appcast.xml` and `appcast.xml.signature` in `installer/Output/`. Upload both along with the installer to the URL specified in `App.AppcastUrl`.
+
+### Release notes
+
+Per-version changelogs go in a `changelogs/` directory at the repo root (e.g., `changelogs/1.0.0.md`). The appcast generator embeds them in the appcast XML.
 
 ## Code Conventions
 

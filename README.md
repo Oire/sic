@@ -8,10 +8,15 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 
 - **Batch conversion** — queue multiple images and convert them all at once
 - **8 formats** — JPG, PNG, WebP, ICO, BMP, TIFF, GIF, AVIF
-- **Resize** — specify target dimensions (useful when you're told "upload a 128x128 photo")
-- **Multiple input methods** — file dialog, drag & drop, Ctrl+V paste (files or screenshots), download by link
+- **Resize and crop** — specify target dimensions with two modes: keep proportions or crop to exact size
+- **Multi-size ICO** — create `.ico` files with multiple embedded sizes using built-in presets or custom dimensions
+- **Multiple input methods** — file dialog, folder import, drag & drop, Ctrl+V paste (files, screenshots, or URLs), download by link
 - **Filename conflict handling** — always asks: overwrite, rename (`_1` suffix), or skip
+- **Cloud file detection** — warns about OneDrive/SharePoint placeholder files that haven't been downloaded yet
 - **CLI mode** — headless conversion from the command line, no UI needed
+- **Automatic updates** — checks for new versions in the background with Ed25519 signature verification
+- **Portable mode** — place an empty `userdata` folder next to `Sic.exe` to keep all data alongside the executable
+- **Localized** — English, German, French, Russian, Ukrainian
 - **Accessible** — logical tab order, keyboard shortcuts, screen-reader friendly
 
 ## Requirements
@@ -41,12 +46,31 @@ dotnet publish -c Release
 
 Launch the app without arguments to open the graphical interface:
 
-1. Add images using the **Add File** button, drag & drop, or **Ctrl+V**
+1. Add images using **File > Add Image**, drag & drop, or **Ctrl+V**
 2. Select a target format from the dropdown
 3. Optionally check **Resize** and enter target dimensions
-4. Click **Convert**
+4. Click **Convert Selected** or **Convert All**
 
-Converted files are saved next to the originals by default. Change this in **Settings**.
+Converted files are saved to `%APPDATA%\Oire\Sic\Converted\` by default (or `userdata\Converted\` in portable mode). Change this in **Settings**.
+
+### Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| Ctrl+N | Add image |
+| Ctrl+Shift+N | Add folder |
+| Ctrl+L | Add image by link |
+| Ctrl+V | Paste (files, screenshots, or URLs) |
+| Delete | Remove selected image |
+| Ctrl+Shift+Delete | Remove all images |
+| F5 | Convert selected |
+| Ctrl+Shift+F5 | Convert all |
+| Ctrl+Alt+F5 | Create multi-size ICO |
+| Ctrl+, | Settings |
+| F1 | Open user manual |
+| Ctrl+Shift+D | Donate |
+| Shift+F1 | About |
+| Escape | Close the application |
 
 ### Command Line
 
@@ -68,10 +92,15 @@ sic -i avatar.png -o avatar.ico -r 128x128
 
 ## Configuration
 
-Settings are stored in `%APPDATA%/Oire/Sic/Sic.cfg`:
+Settings are stored in `%APPDATA%\Oire\Sic\Sic.cfg` (or `userdata\Sic.cfg` in portable mode):
 
-- **Output folder** — where converted files are saved (default: same folder as source)
+- **Output folder** — where converted files are saved (default: `Converted` subfolder in the data directory)
 - **Language** — UI language (default: system language)
+- **Confirm exit** — warn when closing with images still in the queue (default: enabled)
+
+### Portable Mode
+
+To run SIC! in portable mode, create an empty `userdata` folder next to `Sic.exe`. When this folder is present, all application data — configuration, converted images, and logs — is stored there instead of in `%APPDATA%`. This is useful for running from a USB drive or keeping everything self-contained.
 
 ## Building
 
