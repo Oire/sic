@@ -118,6 +118,7 @@ footer {
     <li><a href="#resizing">Größe ändern</a></li>
     <li><a href="#multi-size-ico">Mehrgrößen-ICO-Dateien erstellen</a></li>
     <li><a href="#settings">Einstellungen</a></li>
+    <li><a href="#updates">Softwareaktualisierungen</a></li>
     <li><a href="#cli">Kommandozeilenverwendung</a></li>
     <li><a href="#keyboard-shortcuts">Tastenkombinationen</a></li>
     <li><a href="#supported-formats">Unterstützte Formate</a></li>
@@ -137,7 +138,7 @@ footer {
             <li><strong>Datei</strong> — Bilder hinzufügen (aus Dateien, Ordnern oder per Link), Einstellungen öffnen oder die Anwendung beenden.</li>
             <li><strong>Bearbeiten</strong> — Ausgewählte oder alle Bilder aus der Warteschlange entfernen. Dieses Menü ist deaktiviert, wenn die Warteschlange leer ist.</li>
             <li><strong>Konvertieren</strong> — Konvertierung starten oder ein Mehrgrößen-ICO erstellen. Dieses Menü ist deaktiviert, wenn die Warteschlange leer ist.</li>
-            <li><strong>Hilfe</strong> — Dieses Handbuch öffnen, spenden oder den Info-Dialog anzeigen.</li>
+            <li><strong>Hilfe</strong> — Dieses Handbuch öffnen, nach Softwareaktualisierungen suchen, spenden oder den Info-Dialog anzeigen.</li>
         </ul>
     </dd>
 
@@ -238,8 +239,15 @@ footer {
 
     <dt>Sprache</dt>
     <dd>Wählen Sie die Sprache der Benutzeroberfläche. Wählen Sie <em>System</em>, um der Windows-Spracheinstellung zu folgen.</dd>
+
+    <dt>Beenden bestätigen, wenn die Warteschlange nicht leer ist</dt>
+    <dd>Wenn aktiviert (Standardeinstellung), fragt SIC! vor dem Schließen nach einer Bestätigung, sofern sich noch Bilder in der Warteschlange befinden. Deaktivieren Sie diese Option, um ohne Nachfrage zu beenden.</dd>
 </dl>
 <p>Einstellungen werden in <code>Sic.cfg</code> innerhalb des Anwendungsdatenverzeichnisses gespeichert (den genauen Speicherort finden Sie unter <a href="#installation">Installationsmodi</a>).</p>
+
+<h2 id="updates">Softwareaktualisierungen</h2>
+<p>SIC! kann automatisch nach neuen Versionen suchen. Eine Aktualisierungsprüfung erfolgt beim Start und dann alle 24 Stunden, solange die Anwendung läuft. Sie können auch manuell über <strong>Hilfe > Nach Updates suchen</strong> prüfen.</p>
+<p>Wenn eine Aktualisierung verfügbar ist, zeigt SIC! einen Dialog mit der neuen Versionsnummer an. Sie können wählen, ob Sie aktualisieren, diese Version überspringen oder später erinnert werden möchten. Wenn Sie auf <strong>Aktualisieren</strong> klicken, wird die neue Version automatisch heruntergeladen. Nach Abschluss des Downloads erscheint ein Bestätigungsdialog mit den Schaltflächen <strong>Installieren</strong> und <strong>Abbrechen</strong>. Durch Klicken auf <strong>Installieren</strong> wird die Installation gestartet.</p>
 
 <h2 id="cli">Kommandozeilenverwendung</h2>
 <p>SIC! kann auch über die Kommandozeile ohne Öffnen der grafischen Oberfläche verwendet werden. Dies ist nützlich für Skripte oder Stapelverarbeitung.</p>
@@ -284,7 +292,7 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <tr><td>Benutzerhandbuch</td><td><kbd>F1</kbd></td></tr>
     <tr><td>Über SIC!</td><td><kbd>Umschalt+F1</kbd></td></tr>
     <tr><td>Spenden</td><td><kbd>Strg+Umschalt+D</kbd></td></tr>
-    <tr><td>Beenden</td><td><kbd>Alt+F4</kbd></td></tr>
+    <tr><td>Beenden</td><td><kbd>Escape</kbd> / <kbd>Alt+F4</kbd></td></tr>
 </tbody>
 </table>
 

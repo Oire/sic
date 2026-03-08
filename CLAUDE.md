@@ -18,6 +18,23 @@ dotnet publish -c Release # Publish as single-file executable
 
 There are no test projects or linting commands configured yet.
 
+### Localization scripts
+
+Translation scripts live in `src/Sic/locale/scripts/`. Run them with PowerShell:
+
+```bash
+# Compile .po files to .mo (required after editing translations)
+powershell -ExecutionPolicy Bypass -File src/Sic/locale/scripts/compile-translations.ps1
+
+# Extract new translatable strings from source into messages.pot
+powershell -ExecutionPolicy Bypass -File src/Sic/locale/scripts/Extract-Strings.ps1
+
+# Merge new strings into existing .po files (preserves existing translations)
+powershell -ExecutionPolicy Bypass -File src/Sic/locale/scripts/Update-Translations.ps1
+```
+
+After editing `.po` files, always run `compile-translations.ps1` to regenerate the `.mo` binaries.
+
 ## Architecture
 
 **Entry point:** `src/Sic/Program.cs` — Sets up Serilog logging. If CLI arguments are present, runs headless conversion via `System.CommandLine`; otherwise loads config and launches the WinForms `MainWindow`.

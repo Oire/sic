@@ -118,6 +118,7 @@ footer {
     <li><a href="#resizing">Redimensionnement</a></li>
     <li><a href="#multi-size-ico">Créer des fichiers ICO multi-tailles</a></li>
     <li><a href="#settings">Paramètres</a></li>
+    <li><a href="#updates">Mises à jour logicielles</a></li>
     <li><a href="#cli">Utilisation en ligne de commande</a></li>
     <li><a href="#keyboard-shortcuts">Raccourcis clavier</a></li>
     <li><a href="#supported-formats">Formats pris en charge</a></li>
@@ -137,7 +138,7 @@ footer {
             <li><strong>Fichier</strong> — ajouter des images (depuis des fichiers, dossiers ou liens), ouvrir les paramètres ou quitter l'application.</li>
             <li><strong>Édition</strong> — supprimer les images sélectionnées ou toutes les images de la file. Ce menu est désactivé lorsque la file est vide.</li>
             <li><strong>Convertir</strong> — lancer la conversion ou créer un ICO multi-tailles. Ce menu est désactivé lorsque la file est vide.</li>
-            <li><strong>Aide</strong> — ouvrir ce manuel, faire un don ou afficher la boîte de dialogue À propos.</li>
+            <li><strong>Aide</strong> — ouvrir ce manuel, vérifier les mises à jour logicielles, faire un don ou afficher la boîte de dialogue À propos.</li>
         </ul>
     </dd>
 
@@ -238,8 +239,15 @@ footer {
 
     <dt>Langue</dt>
     <dd>Choisissez la langue de l'interface. Sélectionnez <em>Système</em> pour suivre le paramètre de langue de Windows.</dd>
+
+    <dt>Confirmer la fermeture avec une file non vide</dt>
+    <dd>Lorsque cette option est activée (par défaut), SIC! demande une confirmation avant de se fermer s'il reste des images dans la file. Décochez cette option pour quitter sans confirmation.</dd>
 </dl>
 <p>Les paramètres sont stockés dans <code>Sic.cfg</code> à l'intérieur du répertoire de données de l'application (voir <a href="#installation">Modes d'installation</a> pour l'emplacement exact).</p>
+
+<h2 id="updates">Mises à jour logicielles</h2>
+<p>SIC! peut vérifier automatiquement la disponibilité de nouvelles versions. Une vérification est effectuée au démarrage, puis toutes les 24 heures tant que l'application est en cours d'exécution. Vous pouvez également vérifier manuellement via <strong>Aide > Vérifier les mises à jour</strong>.</p>
+<p>Lorsqu'une mise à jour est disponible, SIC! affiche une boîte de dialogue avec le numéro de la nouvelle version. Vous pouvez choisir de mettre à jour, d'ignorer cette version ou d'être rappelé plus tard. Si vous cliquez sur <strong>Mettre à jour</strong>, la nouvelle version est téléchargée automatiquement. Une fois le téléchargement terminé, une boîte de dialogue de confirmation apparaît avec les boutons <strong>Installer</strong> et <strong>Annuler</strong>. Cliquer sur <strong>Installer</strong> lance l'installation.</p>
 
 <h2 id="cli">Utilisation en ligne de commande</h2>
 <p>SIC! peut également être utilisé depuis la ligne de commande sans ouvrir l'interface graphique. C'est utile pour les scripts ou le traitement par lots.</p>
@@ -284,7 +292,7 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <tr><td>Manuel utilisateur</td><td><kbd>F1</kbd></td></tr>
     <tr><td>À propos de SIC!</td><td><kbd>Maj+F1</kbd></td></tr>
     <tr><td>Faire un don</td><td><kbd>Ctrl+Maj+D</kbd></td></tr>
-    <tr><td>Quitter</td><td><kbd>Alt+F4</kbd></td></tr>
+    <tr><td>Quitter</td><td><kbd>Escape</kbd> / <kbd>Alt+F4</kbd></td></tr>
 </tbody>
 </table>
 

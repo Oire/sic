@@ -16,6 +16,7 @@ public class Config {
         public string Language { get; set; } = "System";
         public string OutputFolder { get; set; } = App.DefaultOutputFolder;
         public string LastInputFolder { get; set; } = "";
+        public bool ConfirmExitWithQueue { get; set; } = true;
     }
 
     #endregion
