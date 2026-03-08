@@ -23,6 +23,7 @@ public partial class SettingsDialog: Form {
 
     private void LoadSettings() {
         outputFolderTextBox.Text = Config.General.OutputFolder;
+        confirmExitCheckBox.Checked = Config.General.ConfirmExitWithQueue;
 
         // "System" always first — uses the OS language
         var systemDisplayName = _("System");
@@ -108,6 +109,7 @@ public partial class SettingsDialog: Form {
         }
 
         Config.General.OutputFolder = folder;
+        Config.General.ConfirmExitWithQueue = confirmExitCheckBox.Checked;
         var selectedDisplay = languageComboBox.SelectedItem as string;
         Config.General.Language = selectedDisplay != null && _languageMap.TryGetValue(selectedDisplay, out var code)
             ? code

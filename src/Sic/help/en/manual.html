@@ -118,6 +118,7 @@ footer {
     <li><a href="#resizing">Resizing</a></li>
     <li><a href="#multi-size-ico">Creating multi-size ICO files</a></li>
     <li><a href="#settings">Settings</a></li>
+    <li><a href="#updates">Software updates</a></li>
     <li><a href="#cli">Command-line usage</a></li>
     <li><a href="#keyboard-shortcuts">Keyboard shortcuts</a></li>
     <li><a href="#supported-formats">Supported formats</a></li>
@@ -137,7 +138,7 @@ footer {
             <li><strong>File</strong> — add images (from files, folders, or links), open Settings, or exit the application.</li>
             <li><strong>Edit</strong> — remove selected or all images from the queue. This menu is disabled when the queue is empty.</li>
             <li><strong>Convert</strong> — run conversion or create a multi-size ICO. This menu is disabled when the queue is empty.</li>
-            <li><strong>Help</strong> — open this manual, donate, or view the About dialog.</li>
+            <li><strong>Help</strong> — open this manual, check for software updates, donate, or view the About dialog.</li>
         </ul>
     </dd>
 
@@ -238,8 +239,15 @@ footer {
 
     <dt>Language</dt>
     <dd>Choose the interface language. Select <em>System</em> to follow your Windows language setting.</dd>
+
+    <dt>Confirm on exit with non-empty queue</dt>
+    <dd>When enabled (the default), SIC! asks for confirmation before closing if there are images remaining in the queue. Uncheck this option to exit without a prompt.</dd>
 </dl>
 <p>Settings are stored in <code>Sic.cfg</code> inside the application data directory (see <a href="#installation">Installation modes</a> for the exact location).</p>
+
+<h2 id="updates">Software updates</h2>
+<p>SIC! can check for new versions automatically. An update check runs on startup and then every 24 hours while the application is running. You can also check manually via <strong>Help > Check for Updates</strong>.</p>
+<p>When an update is available, SIC! shows a dialog with the new version number. You can choose to update, skip this version, or be reminded later. If you click <strong>Update</strong>, the new version is downloaded automatically. Once the download finishes, a confirmation dialog appears with <strong>Install</strong> and <strong>Cancel</strong> buttons. Clicking <strong>Install</strong> starts the installation.</p>
 
 <h2 id="cli">Command-line usage</h2>
 <p>SIC! can also be used from the command line without opening the graphical interface. This is useful for scripting or batch processing.</p>
@@ -284,7 +292,7 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <tr><td>User manual</td><td><kbd>F1</kbd></td></tr>
     <tr><td>About SIC!</td><td><kbd>Shift+F1</kbd></td></tr>
     <tr><td>Donate</td><td><kbd>Ctrl+Shift+D</kbd></td></tr>
-    <tr><td>Exit</td><td><kbd>Alt+F4</kbd></td></tr>
+    <tr><td>Exit</td><td><kbd>Escape</kbd> / <kbd>Alt+F4</kbd></td></tr>
 </tbody>
 </table>
 

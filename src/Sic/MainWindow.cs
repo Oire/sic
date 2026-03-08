@@ -81,6 +81,9 @@ public partial class MainWindow: Form {
         // Keyboard
         KeyPreview = true;
         KeyDown += MainWindow_KeyDown;
+
+        // Closing
+        FormClosing += MainWindow_FormClosing;
     }
 
     private void PopulateFormatComboBox() {
@@ -726,12 +729,29 @@ public partial class MainWindow: Form {
     }
 
     private void MainWindow_KeyDown(object? sender, KeyEventArgs e) {
-        if (e.KeyCode == Keys.Delete && imageListView.Focused) {
+        if (e.KeyCode == Keys.Escape) {
+            Close();
+            e.Handled = true;
+        } else if (e.KeyCode == Keys.Delete && imageListView.Focused) {
             RemoveMenuItem_Click(sender, e);
             e.Handled = true;
         } else if (e.Control && e.KeyCode == Keys.V) {
             HandlePaste();
             e.Handled = true;
+        }
+    }
+
+    private void MainWindow_FormClosing(object? sender, FormClosingEventArgs e) {
+        if (_imageItems.Count > 0 && Config.General.ConfirmExitWithQueue) {
+            var result = MessageBox.Show(
+                _("There are images in the queue. Are you sure you want to exit?"),
+                _("Confirm Exit"),
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.No) {
+                e.Cancel = true;
+            }
         }
     }
 

@@ -34,7 +34,8 @@ partial class SettingsDialog {
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
-        mainLayout.RowCount = 3;
+        mainLayout.RowCount = 4;
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -52,9 +53,14 @@ partial class SettingsDialog {
         mainLayout.Controls.Add(languageLabel, 0, 1);
         mainLayout.Controls.Add(languageComboBox, 1, 1);
 
-        // Row 2: OK / Cancel (right-aligned in cols 2-3)
-        mainLayout.Controls.Add(okButton, 2, 2);
-        mainLayout.Controls.Add(cancelButton, 3, 2);
+        // Row 2: Confirm exit with non-empty queue
+        confirmExitCheckBox = new CheckBox();
+        mainLayout.Controls.Add(confirmExitCheckBox, 0, 2);
+        mainLayout.SetColumnSpan(confirmExitCheckBox, 4);
+
+        // Row 3: OK / Cancel (right-aligned in cols 2-3)
+        mainLayout.Controls.Add(okButton, 2, 3);
+        mainLayout.Controls.Add(cancelButton, 3, 3);
 
         //
         // outputFolderLabel
@@ -107,13 +113,22 @@ partial class SettingsDialog {
         languageComboBox.TabIndex = 5;
 
         //
+        // confirmExitCheckBox
+        //
+        confirmExitCheckBox.Text = "Confirm on exit with non-empty &queue";
+        confirmExitCheckBox.AutoSize = true;
+        confirmExitCheckBox.Anchor = AnchorStyles.Left;
+        confirmExitCheckBox.Name = "confirmExitCheckBox";
+        confirmExitCheckBox.TabIndex = 6;
+
+        //
         // okButton
         //
         okButton.Text = "&OK";
         okButton.Dock = DockStyle.Fill;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
-        okButton.TabIndex = 6;
+        okButton.TabIndex = 7;
 
         //
         // cancelButton
@@ -122,14 +137,14 @@ partial class SettingsDialog {
         cancelButton.Dock = DockStyle.Fill;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
-        cancelButton.TabIndex = 7;
+        cancelButton.TabIndex = 8;
 
         //
         // SettingsDialog
         //
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(450, 160);
+        ClientSize = new Size(450, 190);
         Controls.Add(mainLayout);
         Name = "SettingsDialog";
         Text = "Settings";
@@ -156,6 +171,7 @@ partial class SettingsDialog {
     private Button clearOutputFolderButton;
     private Label languageLabel;
     private ComboBox languageComboBox;
+    private CheckBox confirmExitCheckBox;
     private Button okButton;
     private Button cancelButton;
 }
