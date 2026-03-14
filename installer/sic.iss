@@ -5,7 +5,7 @@
 #define MyAppPublisher "Oire Software SARL"
 #define MyAppCompany "Oire"
 #define MyAppFolderName "Sic"
-#define MyAppURL "https://oire.org/software/sic"
+#define MyAppURL "https://sic.oire.dev"
 #define MyAppSupportURL "https://github.com/Oire/sic/issues"
 #define MyAppExeName "sic.exe"
 #define MyAppDescription "Simple Image Converter"

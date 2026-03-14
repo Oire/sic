@@ -7,7 +7,7 @@
 #
 
 param(
-    [string]$BaseUrl = "https://oire.org/software/sic",
+    [string]$BaseUrl = "https://sic.oire.dev",
     [string]$KeyPath = "",
     [string]$ChangeLog = "",
     [switch]$OpenOutput = $false
@@ -124,8 +124,7 @@ Get-ChildItem -Path $OutputDir | ForEach-Object {
 
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "  1. Upload the installer to: $BaseUrl/" -ForegroundColor White
-Write-Host "  2. Upload appcast.xml and appcast.xml.signature to: https://oire.org/software/sic/" -ForegroundColor White
+Write-Host "  Upload the installer and appcast to: $BaseUrl/" -ForegroundColor White
 
 if ($OpenOutput) {
     Start-Process -FilePath "explorer.exe" -ArgumentList "/select,`"$AppcastFile`""
