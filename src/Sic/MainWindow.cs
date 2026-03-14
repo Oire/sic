@@ -119,7 +119,8 @@ public partial class MainWindow: Form {
     }
 
     private void ShowPlaceholder() {
-        if (_placeholderItem != null) return;
+        if (_placeholderItem != null)
+            return;
         _placeholderItem = new ListViewItem(_("Add your images here")) {
             ForeColor = SystemColors.GrayText
         };
@@ -127,7 +128,8 @@ public partial class MainWindow: Form {
     }
 
     private void HidePlaceholder() {
-        if (_placeholderItem == null) return;
+        if (_placeholderItem == null)
+            return;
         imageListView.Items.Remove(_placeholderItem);
         _placeholderItem = null;
     }
