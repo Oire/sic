@@ -59,6 +59,13 @@ public partial class MainWindow: Form {
         donateMenuItem.Click += DonateMenuItem_Click;
         aboutMenuItem.Click += AboutMenuItem_Click;
 
+        // Window events
+        Shown += (_, _) => {
+            if (imageListView.Items.Count == 0) {
+                formatComboBox.Focus();
+            }
+        };
+
         // Controls
         convertSelectedButton.Click += ConvertSelectedMenuItem_Click;
         convertButton.Click += ConvertButton_Click;
