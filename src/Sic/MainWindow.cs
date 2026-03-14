@@ -13,6 +13,7 @@ namespace Oire.Sic;
 public partial class MainWindow: Form {
     private readonly List<ImageItem> _imageItems = [];
     private ImageItem? _selectedItem;
+    private ListViewItem? _placeholderItem;
     private bool _isAutoFilling;
     private bool _isLoadingFiles;
     private int _clipboardImageCount;
@@ -59,13 +60,6 @@ public partial class MainWindow: Form {
         donateMenuItem.Click += DonateMenuItem_Click;
         aboutMenuItem.Click += AboutMenuItem_Click;
 
-        // Window events
-        Shown += (_, _) => {
-            if (imageListView.Items.Count == 0) {
-                formatComboBox.Focus();
-            }
-        };
-
         // Controls
         convertSelectedButton.Click += ConvertSelectedMenuItem_Click;
         convertButton.Click += ConvertButton_Click;
@@ -105,7 +99,7 @@ public partial class MainWindow: Form {
 
     private void UpdateMenuState() {
         var hasItems = _imageItems.Count > 0;
-        var hasSelection = imageListView.SelectedIndices.Count > 0;
+        var hasSelection = hasItems && imageListView.SelectedIndices.Count > 0;
 
         editMenu.Enabled = hasItems;
         removeMenuItem.Enabled = hasSelection;
@@ -116,6 +110,26 @@ public partial class MainWindow: Form {
         convertSelectedMenuItem.Enabled = hasSelection;
         convertAllMenuItem.Enabled = hasItems;
         createMultiSizeIcoMenuItem.Enabled = hasSelection;
+
+        if (hasItems) {
+            HidePlaceholder();
+        } else {
+            ShowPlaceholder();
+        }
+    }
+
+    private void ShowPlaceholder() {
+        if (_placeholderItem != null) return;
+        _placeholderItem = new ListViewItem(_("Add your images here")) {
+            ForeColor = SystemColors.GrayText
+        };
+        imageListView.Items.Insert(0, _placeholderItem);
+    }
+
+    private void HidePlaceholder() {
+        if (_placeholderItem == null) return;
+        imageListView.Items.Remove(_placeholderItem);
+        _placeholderItem = null;
     }
 
     // --- File menu handlers ---
@@ -702,6 +716,11 @@ public partial class MainWindow: Form {
     }
 
     private void ImageListView_SelectedIndexChanged(object? sender, EventArgs e) {
+        if (_placeholderItem != null && _placeholderItem.Selected) {
+            _placeholderItem.Selected = false;
+            return;
+        }
+
         UpdateMenuState();
 
         if (imageListView.SelectedIndices.Count == 0) {
@@ -953,6 +972,7 @@ public partial class MainWindow: Form {
                 // AddImageItem calls AutoResizeColumns + sets Selected (firing
                 // SelectedIndexChanged → UpdatePreview → Magick.NET decode)
                 // per item, which freezes the UI on large batches.
+                HidePlaceholder();
                 imageListView.BeginUpdate();
                 try {
                     foreach (var item in result.Items) {
@@ -1033,6 +1053,7 @@ public partial class MainWindow: Form {
     }
 
     private void AddImageItem(ImageItem item) {
+        HidePlaceholder();
         _imageItems.Add(item);
 
         var listItem = new ListViewItem(item.FileName);
