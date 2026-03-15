@@ -2,13 +2,20 @@
 # SIC! Installer Build Script
 # Copyright © 2026 Oire Software SARL.
 #
-# This script builds SIC! in Release x64 configuration and creates an installer
+# Builds SIC! in Release x64 configuration and creates an installer.
+# Optionally generates a signed appcast.xml for NetSparkle auto-updates.
 #
 
+[CmdletBinding(PositionalBinding=$false)]
 param(
+    [switch]$SkipBuild,
+    [switch]$Appcast,
+    [switch]$OpenOutput,
     [string]$InnoSetupPath = "",
-    [switch]$SkipBuild = $false,
-    [switch]$OpenOutput = $false
+    [string]$AppcastBaseUrl = "https://sic.oire.dev",
+    [string]$DownloadBaseUrl = "https://github.com/Oire/sic/releases/download",
+    [string]$KeyPath = "",
+    [string]$ChangeLog = ""
 )
 
 # Script directory and paths
@@ -78,8 +85,7 @@ if (!$SkipBuild) {
         }
 
         Write-Host "Build completed successfully!" -ForegroundColor Green
-    }
-    catch {
+    } catch {
         Write-Error "Build failed: $_"
         exit 1
     }
@@ -120,29 +126,139 @@ try {
     }
 
     Write-Host "Installer created successfully!" -ForegroundColor Green
-
-    # Find the created installer file
-    $InstallerFiles = Get-ChildItem -Path $OutputDir -Filter "*.exe" | Sort-Object LastWriteTime -Descending
-    if ($InstallerFiles.Count -gt 0) {
-        $InstallerPath = $InstallerFiles[0].FullName
-        $FileSize = [math]::Round((Get-Item $InstallerPath).Length / 1MB, 2)
-
-        Write-Host ""
-        Write-Host "Installer Details:" -ForegroundColor Green
-        Write-Host "  File: $($InstallerFiles[0].Name)" -ForegroundColor White
-        Write-Host "  Size: $FileSize MB" -ForegroundColor White
-        Write-Host "  Path: $InstallerPath" -ForegroundColor White
-
-        if ($OpenOutput) {
-            Write-Host "Opening output directory..." -ForegroundColor Yellow
-            Start-Process -FilePath "explorer.exe" -ArgumentList "/select,`"$InstallerPath`""
-        }
-    }
-}
-catch {
+} catch {
     Write-Error "Installer compilation failed: $_"
     exit 1
 }
 
+# Find the created installer file and extract version
+$InstallerFiles = Get-ChildItem -Path $OutputDir -Filter "sic-v*-setup.exe" |
+    Sort-Object LastWriteTime -Descending
+
+if ($InstallerFiles.Count -eq 0) {
+    Write-Error "No installer file found in $OutputDir after compilation."
+    exit 1
+}
+
+$Installer = $InstallerFiles[0]
+$FileSize = [math]::Round($Installer.Length / 1MB, 2)
+
+if ($Installer.Name -match 'v([\d.]+)-setup') {
+    $Version = $Matches[1]
+} else {
+    Write-Error "Could not extract version from filename: $($Installer.Name)"
+    exit 1
+}
+
+Write-Host ""
+Write-Host "Installer Details:" -ForegroundColor Green
+Write-Host "  File: $($Installer.Name)" -ForegroundColor White
+Write-Host "  Size: $FileSize MB" -ForegroundColor White
+Write-Host "  Version: $Version" -ForegroundColor White
+Write-Host "  Path: $($Installer.FullName)" -ForegroundColor White
+
+# Generate appcast if requested
+if ($Appcast) {
+    Write-Host ""
+    Write-Host "Generating appcast..." -ForegroundColor Green
+    Write-Host "=================================" -ForegroundColor Green
+    Write-Host ""
+
+    # Find key path
+    if ([string]::IsNullOrEmpty($KeyPath)) {
+        $KeyPath = Join-Path $RepoRoot "keys"
+    }
+
+    $PrivKeyFile = Join-Path $KeyPath "NetSparkle_Ed25519.priv"
+    $PubKeyFile = Join-Path $KeyPath "NetSparkle_Ed25519.pub"
+
+    if (!(Test-Path $PrivKeyFile)) {
+        Write-Error "Private key not found at: $PrivKeyFile"
+        Write-Host "Generate keys with: netsparkle-generate-appcast --generate-keys --key-path `"$KeyPath`""
+        exit 1
+    }
+
+    if (!(Test-Path $PubKeyFile)) {
+        Write-Error "Public key not found at: $PubKeyFile"
+        exit 1
+    }
+
+    Write-Host "Using keys from: $KeyPath" -ForegroundColor Yellow
+
+    # Ensure netsparkle-generate-appcast is available
+    $AppcastTool = Get-Command netsparkle-generate-appcast -ErrorAction SilentlyContinue
+    if ($null -eq $AppcastTool) {
+        Write-Error "netsparkle-generate-appcast not found. Install it with:"
+        Write-Host "  dotnet tool install --global NetSparkleUpdater.Tools.AppCastGenerator"
+        exit 1
+    }
+
+    if ([string]::IsNullOrEmpty($ChangeLog)) {
+        $ChangeLog = Join-Path $RepoRoot "changelogs"
+    }
+
+    $DownloadUrl = "$DownloadBaseUrl/v$Version"
+
+    Write-Host "Download URL: $DownloadUrl" -ForegroundColor Yellow
+
+    # Generate appcast
+    Write-Host "Generating signed appcast..." -ForegroundColor Yellow
+
+    $AppcastArgs = @(
+        "--single-file", $Installer.FullName,
+        "--key-path", $KeyPath,
+        "--appcast-output-directory", $OutputDir,
+        "--os", "windows",
+        "--base-url", $DownloadUrl,
+        "--file-version", $Version,
+        "--product-name", "SIC!",
+        "--reparse-existing"
+    )
+
+    if (Test-Path $ChangeLog) {
+        $AppcastArgs += @("--change-log-path", $ChangeLog)
+        Write-Host "Using changelogs from: $ChangeLog" -ForegroundColor Yellow
+    } else {
+        Write-Host "No changelogs directory found at $ChangeLog, skipping release notes" -ForegroundColor Gray
+        Write-Host "  Create per-version files like: changelogs/1.0.0.md" -ForegroundColor Gray
+    }
+
+    & netsparkle-generate-appcast @AppcastArgs
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Appcast generation failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
+    }
+
+    # Verify output
+    $AppcastFile = Join-Path $OutputDir "appcast.xml"
+    if (!(Test-Path $AppcastFile)) {
+        Write-Error "appcast.xml was not created"
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "Appcast generated successfully!" -ForegroundColor Green
+}
+
+Write-Host ""
+Write-Host "Output files:" -ForegroundColor Green
+
+Get-ChildItem -Path $OutputDir | ForEach-Object {
+    Write-Host "  $($_.Name)" -ForegroundColor White
+}
+
 Write-Host ""
 Write-Host "Build completed successfully!" -ForegroundColor Green
+
+if ($Appcast) {
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Cyan
+    Write-Host "  1. Create a GitHub release tagged v$Version and upload $($Installer.Name)" -ForegroundColor White
+    Write-Host "  2. Upload appcast.xml and appcast.xml.signature to: $AppcastBaseUrl/" -ForegroundColor White
+}
+
+if ($OpenOutput) {
+    $SelectFile = if ($Appcast) { Join-Path $OutputDir "appcast.xml" } else { $Installer.FullName }
+    Start-Process -FilePath "explorer.exe" -ArgumentList "/select,`"$SelectFile`""
+}
