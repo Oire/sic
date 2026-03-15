@@ -8,6 +8,15 @@ using App = Oire.Sic.Utils.Constants.App;
 
 namespace Oire.Sic.Services;
 
+/// <summary>
+/// Routes NetSparkle log output through Serilog so it ends up in our log files.
+/// </summary>
+file sealed class SerilogSparkleLogWriter: NetSparkleUpdater.Interfaces.ILogger {
+    public void PrintMessage(string message, params object[]? arguments) {
+        Log.Information("NetSparkle: " + message, arguments);
+    }
+}
+
 internal sealed class UpdateService: IDisposable {
     private readonly SparkleUpdater _sparkle;
     private bool _disposed;
@@ -16,6 +25,8 @@ internal sealed class UpdateService: IDisposable {
         _sparkle = new SparkleUpdater(App.AppcastUrl, new Ed25519Checker(SecurityMode.Strict, App.UpdatePublicKey)) {
             UIFactory = new UIFactory(null),
             RelaunchAfterUpdate = false,
+            LogWriter = new SerilogSparkleLogWriter(),
+            TmpDownloadFileNameWithExtension = $"sic-update-{Guid.NewGuid()}.exe",
         };
 
         try {

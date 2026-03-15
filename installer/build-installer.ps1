@@ -12,8 +12,7 @@ param(
     [switch]$Appcast,
     [switch]$OpenOutput,
     [string]$InnoSetupPath = "",
-    [string]$AppcastBaseUrl = "https://sic.oire.dev",
-    [string]$DownloadBaseUrl = "https://github.com/Oire/sic/releases/download",
+    [string]$BaseUrl = "https://sic.oire.dev",
     [string]$KeyPath = "",
     [string]$ChangeLog = ""
 )
@@ -197,9 +196,7 @@ if ($Appcast) {
         $ChangeLog = Join-Path $RepoRoot "changelogs"
     }
 
-    $DownloadUrl = "$DownloadBaseUrl/v$Version"
-
-    Write-Host "Download URL: $DownloadUrl" -ForegroundColor Yellow
+    Write-Host "Download base URL: $BaseUrl" -ForegroundColor Yellow
 
     # Generate appcast
     Write-Host "Generating signed appcast..." -ForegroundColor Yellow
@@ -209,7 +206,7 @@ if ($Appcast) {
         "--key-path", $KeyPath,
         "--appcast-output-directory", $OutputDir,
         "--os", "windows",
-        "--base-url", $DownloadUrl,
+        "--base-url", $BaseUrl,
         "--file-version", $Version,
         "--product-name", "SIC!",
         "--reparse-existing"
@@ -254,8 +251,7 @@ Write-Host "Build completed successfully!" -ForegroundColor Green
 if ($Appcast) {
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Cyan
-    Write-Host "  1. Create a GitHub release tagged v$Version and upload $($Installer.Name)" -ForegroundColor White
-    Write-Host "  2. Upload appcast.xml and appcast.xml.signature to: $AppcastBaseUrl/" -ForegroundColor White
+    Write-Host "  Upload $($Installer.Name), appcast.xml, and appcast.xml.signature to: $BaseUrl/" -ForegroundColor White
 }
 
 if ($OpenOutput) {
