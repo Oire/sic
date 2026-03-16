@@ -425,3 +425,6 @@ keys/
 
 # Installer output (built installers and appcast)
 installer/Output/
+
+# Deploy configuration (contains SSH host/path)
+installer/deploy.json

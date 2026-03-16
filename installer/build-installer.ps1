@@ -3,13 +3,17 @@
 # Copyright © 2026 Oire Software SARL.
 #
 # Builds SIC! in Release x64 configuration and creates an installer.
+# Also creates a portable ZIP archive (use -NoPortable to skip).
 # Optionally generates a signed appcast.xml for NetSparkle auto-updates.
+# Optionally deploys release files to the hosting server via SCP (-Deploy).
 #
 
 [CmdletBinding(PositionalBinding=$false)]
 param(
     [switch]$SkipBuild,
     [switch]$Appcast,
+    [switch]$NoPortable,
+    [switch]$Deploy,
     [switch]$OpenOutput,
     [string]$InnoSetupPath = "",
     [string]$BaseUrl = "https://sic.oire.dev",
@@ -156,6 +160,93 @@ Write-Host "  Size: $FileSize MB" -ForegroundColor White
 Write-Host "  Version: $Version" -ForegroundColor White
 Write-Host "  Path: $($Installer.FullName)" -ForegroundColor White
 
+# Create portable ZIP archive
+if (!$NoPortable) {
+    Write-Host ""
+    Write-Host "Creating portable ZIP archive..." -ForegroundColor Yellow
+
+    # Find 7-Zip
+    $SevenZipPath = ""
+    $SevenZipCmd = Get-Command 7z -ErrorAction SilentlyContinue
+
+    if ($null -ne $SevenZipCmd) {
+        $SevenZipPath = $SevenZipCmd.Source
+    } else {
+        $PossiblePaths = @(
+            "${env:ProgramFiles}\7-Zip\7z.exe",
+            "${env:ProgramFiles(x86)}\7-Zip\7z.exe",
+            "${env:LOCALAPPDATA}\7-Zip\7z.exe"
+        )
+
+        foreach ($Path in $PossiblePaths) {
+            if (Test-Path $Path) {
+                $SevenZipPath = $Path
+                break
+            }
+        }
+    }
+
+    $Use7Zip = ![string]::IsNullOrEmpty($SevenZipPath)
+    if ($Use7Zip) {
+        Write-Host "Using 7-Zip: $SevenZipPath" -ForegroundColor Yellow
+    } else {
+        Write-Warning "7-Zip not found. Using built-in Compress-Archive (larger file size). Install 7-Zip for better compression."
+    }
+
+    $PortableName = "sic-v$Version-portable"
+    $PortableZip = Join-Path $OutputDir "$PortableName.zip"
+    $PortableTempDir = Join-Path $env:TEMP $PortableName
+
+    # Clean up any previous temp directory
+    if (Test-Path $PortableTempDir) {
+        Remove-Item -Path $PortableTempDir -Recurse -Force
+    }
+
+    # Copy publish output to temp directory
+    Copy-Item -Path $PublishOutputPath -Destination $PortableTempDir -Recurse
+
+    # Remove debug symbols
+    $PdbFiles = Get-ChildItem -Path $PortableTempDir -Filter "*.pdb" -Recurse
+    foreach ($Pdb in $PdbFiles) {
+        Remove-Item -Path $Pdb.FullName -Force
+        Write-Host "  Removed: $($Pdb.Name)" -ForegroundColor Gray
+    }
+
+    # Create empty userdata folder (marks as portable mode)
+    New-Item -ItemType Directory -Path (Join-Path $PortableTempDir "userdata") -Force | Out-Null
+    Write-Host "  Created: userdata/" -ForegroundColor Gray
+
+    # Remove existing ZIP if present
+    if (Test-Path $PortableZip) {
+        Remove-Item -Path $PortableZip -Force
+    }
+
+    # Create ZIP archive
+    if ($Use7Zip) {
+        & "$SevenZipPath" a -tzip -mx=9 -mfb=258 -mpass=15 "$PortableZip" "$PortableTempDir\*"
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "7-Zip compression failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+        }
+    } else {
+        Compress-Archive -Path "$PortableTempDir\*" -DestinationPath $PortableZip -CompressionLevel Optimal
+    }
+
+    # Clean up temp directory
+    Remove-Item -Path $PortableTempDir -Recurse -Force
+
+    $PortableSize = [math]::Round((Get-Item $PortableZip).Length / 1MB, 2)
+    Write-Host ""
+    Write-Host "Portable ZIP Details:" -ForegroundColor Green
+    Write-Host "  File: $PortableName.zip" -ForegroundColor White
+    Write-Host "  Size: $PortableSize MB" -ForegroundColor White
+    Write-Host "  Path: $PortableZip" -ForegroundColor White
+} else {
+    Write-Host ""
+    Write-Host "Skipping portable ZIP (-NoPortable specified)..." -ForegroundColor Yellow
+}
+
 # Generate appcast if requested
 if ($Appcast) {
     Write-Host ""
@@ -248,10 +339,78 @@ Get-ChildItem -Path $OutputDir | ForEach-Object {
 Write-Host ""
 Write-Host "Build completed successfully!" -ForegroundColor Green
 
-if ($Appcast) {
+# Deploy via SCP if requested
+if ($Deploy) {
+    Write-Host ""
+    Write-Host "Deploying release files..." -ForegroundColor Green
+    Write-Host "=================================" -ForegroundColor Green
+    Write-Host ""
+
+    # Load deploy configuration
+    $DeployConfigPath = Join-Path $ScriptDir "deploy.json"
+    $DeployExamplePath = Join-Path $ScriptDir "deploy.example.json"
+
+    if (!(Test-Path $DeployConfigPath)) {
+        Write-Error "Deploy configuration not found at: $DeployConfigPath"
+        if (Test-Path $DeployExamplePath) {
+            Write-Host "Copy $DeployExamplePath to $DeployConfigPath and fill in your SSH details." -ForegroundColor Yellow
+        }
+        exit 1
+    }
+
+    $DeployConfig = Get-Content $DeployConfigPath -Raw | ConvertFrom-Json
+
+    if ([string]::IsNullOrEmpty($DeployConfig.SshHost) -or [string]::IsNullOrEmpty($DeployConfig.RemotePath)) {
+        Write-Error "deploy.json must contain 'SshHost' and 'RemotePath' fields."
+        exit 1
+    }
+
+    $SshHost = $DeployConfig.SshHost
+    $RemotePath = $DeployConfig.RemotePath
+
+    # Collect files to upload
+    $FilesToUpload = @($Installer.FullName)
+
+    if (!$NoPortable -and (Test-Path $PortableZip)) {
+        $FilesToUpload += $PortableZip
+    }
+
+    $AppcastFile = Join-Path $OutputDir "appcast.xml"
+    $AppcastSig = Join-Path $OutputDir "appcast.xml.signature"
+
+    if (Test-Path $AppcastFile) {
+        $FilesToUpload += $AppcastFile
+    }
+
+    if (Test-Path $AppcastSig) {
+        $FilesToUpload += $AppcastSig
+    }
+
+    Write-Host "Uploading to ${SshHost}:${RemotePath}" -ForegroundColor Yellow
+    foreach ($File in $FilesToUpload) {
+        Write-Host "  $(Split-Path -Leaf $File)" -ForegroundColor White
+    }
+
+    Write-Host ""
+
+    & scp -o BatchMode=yes @FilesToUpload "${SshHost}:${RemotePath}"
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "SCP upload failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
+    }
+
+    Write-Host ""
+    Write-Host "Deploy completed successfully!" -ForegroundColor Green
+} elseif ($Appcast) {
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Cyan
-    Write-Host "  Upload $($Installer.Name), appcast.xml, and appcast.xml.signature to: $BaseUrl/" -ForegroundColor White
+    $UploadFiles = "$($Installer.Name), appcast.xml, and appcast.xml.signature"
+    if (!$NoPortable) {
+        $UploadFiles = "$($Installer.Name), $PortableName.zip, appcast.xml, and appcast.xml.signature"
+    }
+    Write-Host "  Upload $UploadFiles to: $BaseUrl/" -ForegroundColor White
+    Write-Host "  Or re-run with -Deploy to upload automatically." -ForegroundColor White
 }
 
 if ($OpenOutput) {

@@ -145,17 +145,37 @@ netsparkle-generate-appcast --generate-keys --key-path keys
 
 This creates `keys/NetSparkle_Ed25519.priv` and `keys/NetSparkle_Ed25519.pub`. After generating, update the `UpdatePublicKey` constant in `App.cs` with the contents of the `.pub` file, and update `AppcastUrl` if hosting elsewhere.
 
-### Generating an appcast
+### Building a release
 
-After building the installer (`installer/build-installer.ps1`), generate the signed appcast:
+The `installer/Build-Installer.ps1` script handles the full release pipeline:
 
 ```powershell
-.\installer\generate-appcast.ps1                           # Uses keys/ directory by default
-.\installer\generate-appcast.ps1 -KeyPath "C:\path\to\keys" # Custom key location
-.\installer\generate-appcast.ps1 -ChangeLog "changelogs"    # Include release notes
+.\installer\Build-Installer.ps1                        # Build app + installer only
+.\installer\Build-Installer.ps1 -Appcast               # Also generate signed appcast
+.\installer\Build-Installer.ps1 -Appcast -Deploy       # Build, appcast, and deploy via SCP
+.\installer\Build-Installer.ps1 -Appcast -NoPortable   # Skip portable ZIP (e.g., for beta releases)
+.\installer\Build-Installer.ps1 -SkipBuild             # Installer only (use existing binaries)
 ```
 
-The script produces `appcast.xml` and `appcast.xml.signature` in `installer/Output/`. Upload both along with the installer to the URL specified in `App.AppcastUrl`.
+The script produces in `installer/Output/`:
+- `sic-v{version}-setup.exe` — Inno Setup installer
+- `sic-v{version}-portable.zip` — portable archive (unless `-NoPortable`)
+- `appcast.xml` and `appcast.xml.signature` (if `-Appcast`)
+
+The portable ZIP is compressed with 7-Zip (ultra settings) if available, otherwise falls back to built-in `Compress-Archive` with a warning.
+
+### Deploying
+
+The `-Deploy` switch uploads release files to the hosting server via SCP. It reads SSH connection details from `installer/deploy.json` (gitignored). Copy `installer/deploy.example.json` to get started:
+
+```json
+{
+    "SshHost": "your-ssh-host-alias",
+    "RemotePath": "/path/to/your/remote/folder/"
+}
+```
+
+`SshHost` should reference a host alias defined in your SSH config (`~/.ssh/config`).
 
 ### Release notes
 

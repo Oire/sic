@@ -123,13 +123,26 @@ Double-click `installer/build-installer.bat` — it builds the app in Release mo
 ### PowerShell options
 
 ```powershell
-.\installer\build-installer.ps1                  # Build app + installer
-.\installer\build-installer.ps1 -SkipBuild       # Installer only (use existing binaries)
-.\installer\build-installer.ps1 -OpenOutput      # Open output folder when done
-.\installer\build-installer.ps1 -InnoSetupPath "C:\Path\To\ISCC.exe"  # Custom compiler path
+.\installer\Build-Installer.ps1                        # Build app + installer + portable ZIP
+.\installer\Build-Installer.ps1 -Appcast               # Also generate signed appcast
+.\installer\Build-Installer.ps1 -Appcast -Deploy       # Build everything and deploy via SCP
+.\installer\Build-Installer.ps1 -NoPortable            # Skip portable ZIP (e.g., for beta releases)
+.\installer\Build-Installer.ps1 -SkipBuild             # Installer only (use existing binaries)
+.\installer\Build-Installer.ps1 -OpenOutput            # Open output folder when done
+.\installer\Build-Installer.ps1 -InnoSetupPath "C:\Path\To\ISCC.exe"  # Custom Inno Setup path
 ```
 
-The installer is created in `installer/Output/` as `SIC!-V{version}-Setup.exe`.
+Output files are created in `installer/Output/`:
+
+- `sic-v{version}-setup.exe` — Windows installer
+- `sic-v{version}-portable.zip` — portable archive with `userdata/` folder (unless `-NoPortable`)
+- `appcast.xml` and `appcast.xml.signature` — auto-update manifest (if `-Appcast`)
+
+The portable ZIP is compressed with [7-Zip](https://www.7-zip.org/) if available (auto-detected), otherwise falls back to built-in compression with a warning.
+
+### Deploying
+
+The `-Deploy` switch uploads release files to the hosting server via SCP. It reads connection details from `installer/deploy.json` (gitignored). Copy `installer/deploy.example.json` and fill in your SSH host alias and remote path to get started.
 
 ### What the installer includes
 

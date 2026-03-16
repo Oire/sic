@@ -1,0 +1,4 @@
+{
+    "SshHost": "your-ssh-host-alias",
+    "RemotePath": "/path/to/your/remote/folder/"
+}
