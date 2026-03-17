@@ -32,6 +32,11 @@ Write-Host "SIC! Installer Build Script" -ForegroundColor Green
 Write-Host "=================================" -ForegroundColor Green
 Write-Host ""
 
+# -Deploy implies -Appcast (deploying without an appcast would be pointless)
+if ($Deploy) {
+    $Appcast = $true
+}
+
 # Clean build output (only when not skipping build)
 $BuildOutputPath = Join-Path $RepoRoot "src\Sic\bin\x64\Release"
 if (!$SkipBuild -and (Test-Path $BuildOutputPath)) {
@@ -111,8 +116,11 @@ foreach ($File in $RequiredFiles) {
     }
 }
 
-# Create output directory
-if (!(Test-Path $OutputDir)) {
+# Clean and (re)create output directory
+if (Test-Path $OutputDir) {
+    Write-Host "Cleaning output directory..." -ForegroundColor Yellow
+    Remove-Item -Path "$OutputDir\*" -Recurse -Force
+} else {
     New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
 }
 
@@ -299,8 +307,7 @@ if ($Appcast) {
         "--os", "windows",
         "--base-url", $BaseUrl,
         "--file-version", $Version,
-        "--product-name", "SIC!",
-        "--reparse-existing"
+        "--product-name", "SIC!"
     )
 
     if (Test-Path $ChangeLog) {
