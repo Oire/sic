@@ -181,6 +181,16 @@ The `-Deploy` switch uploads release files to the hosting server via SCP. It rea
 
 Per-version changelogs go in a `changelogs/` directory at the repo root (e.g., `changelogs/1.0.0.md`). The appcast generator embeds them in the appcast XML.
 
+### Updating winget manifests
+
+The app is published to winget as `Oire.Sic`. After a new GitHub release, update the manifest with `wingetcreate`. Because the app is x64-only but wingetcreate misdetects Inno Setup installers as x86, you **must** append `|x64` to the URL to override the architecture:
+
+```bash
+wingetcreate update -u 'https://github.com/Oire/sic/releases/download/v<VERSION>/sic-v<VERSION>-setup.exe|x64' -v <VERSION> --submit --token "$(gh auth token)" Oire.Sic
+```
+
+Without the `|x64` suffix the command fails with a "Multiple matches" error.
+
 ## Code Conventions
 
 - **Namespaces:** `Oire.Sic`, `Oire.Sic.Models`, `Oire.Sic.Services`, `Oire.Sic.Utils`, `Oire.Sic.Utils.Constants`
