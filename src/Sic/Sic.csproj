@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -36,9 +36,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="GetText.NET.WindowsForms" Version="10.0.1" NoWarn="NU1701" />
-        <PackageReference Include="Magick.NET-Q16-x64" Version="14.10.4" />
-        <PackageReference Include="GitVersion.MsBuild" Version="6.6.0">
+        <PackageReference Include="GetText.NET.WindowsForms" Version="10.0.1" />
+        <PackageReference Include="Magick.NET-Q16-x64" Version="14.11.1" />
+        <PackageReference Include="GitVersion.MsBuild" Version="6.7.0">
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="3.0.4" />
@@ -47,10 +47,10 @@
         <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="GetText.NET" Version="10.0.1" />
-        <PackageReference Include="System.CommandLine" Version="2.0.3" />
+        <PackageReference Include="System.CommandLine" Version="2.0.5" />
         <PackageReference Include="sharpconfig-huanlin" Version="4.2.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.103" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.201" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>

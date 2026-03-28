@@ -152,8 +152,8 @@ begin
   // Force x64 dependencies since our app is 64-bit only
   Dependency_ForceX86 := False;
 
-  // Add .NET 8.0 Desktop Runtime dependency
-  Dependency_AddDotNet80Desktop;
+  // Add .NET 10 Desktop Runtime dependency
+  Dependency_AddDotNet100Desktop;
 
   Result := True;
 end;
