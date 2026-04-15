@@ -19,7 +19,7 @@
     <Product>SIC!</Product>
     <Description>SIC! — Simple Image Converter</Description>
     <Company>Oire Software</Company>
-    <Copyright>Copyright © 2026 Oire Software SARL. All rights reserved.</Copyright>
+    <Copyright>Copyright © 2026 Oire Software SARL.</Copyright>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <ApplicationIcon>sic.ico</ApplicationIcon>
   </PropertyGroup>
