@@ -33,7 +33,7 @@ internal static class Program {
         // dispinfo and item-removal notifications). For other UI-thread exceptions,
         // log and keep the app alive with a non-fatal dialog rather than killing
         // the process.
-        Application.ThreadException += (_, e) => {
+        Application.ThreadException += (s, e) => {
             if (IsWinFormsInternalNullReference(e.Exception)) {
                 Log.Warning(e.Exception, "Suppressed WinForms internal NullReferenceException in {Method}",
                     e.Exception.TargetSite?.Name ?? "<unknown>");
@@ -42,8 +42,8 @@ internal static class Program {
 
             Log.Error(e.Exception, "Unhandled UI thread exception");
             MessageBox.Show(
-                Localization._("An unexpected error occurred:\n{0}\n\nThe application will continue running.", e.Exception.Message),
-                Localization._("Error"),
+                _("An unexpected error occurred:\n{0}\n\nThe application will continue running.", e.Exception.Message),
+                _("Error"),
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         };
 
