@@ -12,7 +12,14 @@
       "Bash(gh run view:*)",
       "Bash(gh pr checks:*)",
       "WebFetch(domain:api.codecov.io)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gitversion.net)",
+      "WebFetch(domain:dotnet.github.io)",
+      "WebFetch(domain:jrsoftware.org)",
+      "WebFetch(domain:www.simonmourier.com)",
+      "Bash(gh run:*)"
     ],
     "deny": []
   }
