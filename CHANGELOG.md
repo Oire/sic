@@ -2,7 +2,20 @@
 
 All notable changes to SIC! (Simple Image Converter) will be documented in this file.
 
-## [1.0.1] — 2026-03-15
+## [1.0.2.2] — 2026-04-17
+
+### Bug Fixes
+
+- Fix app crash when converting or deleting the last image in the queue ([#41](https://github.com/Oire/sic/pull/41))
+- Screen readers now announce the empty-list state after the list is cleared, and when the list is focused at startup ([#41](https://github.com/Oire/sic/pull/41))
+- Log unhandled UI thread exceptions and show a non-fatal dialog instead of crashing ([#41](https://github.com/Oire/sic/pull/41))
+
+### Other
+
+- Mention WinGet installation and update official website link to sic.oire.dev in the user manual
+- Bump Microsoft.CodeAnalysis.NetAnalyzers to 10.0.202 and System.CommandLine to 2.0.6 ([#38](https://github.com/Oire/sic/pull/38))
+
+## [1.0.1.6] — 2026-03-15
 
 ### Bug Fixes
 
