@@ -28,6 +28,25 @@ internal static class Program {
             e.SetObserved();
         };
 
+        // Swallow stray NullReferenceExceptions raised inside WinForms internals
+        // (notably ListView.WndProc / ListView.Unhook races with accessibility,
+        // dispinfo and item-removal notifications). For other UI-thread exceptions,
+        // log and keep the app alive with a non-fatal dialog rather than killing
+        // the process.
+        Application.ThreadException += (_, e) => {
+            if (IsWinFormsInternalNullReference(e.Exception)) {
+                Log.Warning(e.Exception, "Suppressed WinForms internal NullReferenceException in {Method}",
+                    e.Exception.TargetSite?.Name ?? "<unknown>");
+                return;
+            }
+
+            Log.Error(e.Exception, "Unhandled UI thread exception");
+            MessageBox.Show(
+                Localization._("An unexpected error occurred:\n{0}\n\nThe application will continue running.", e.Exception.Message),
+                Localization._("Error"),
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+        };
+
         try {
             if (args.Length > 0) {
                 return RunCli(args);
@@ -61,6 +80,21 @@ internal static class Program {
         } finally {
             Log.CloseAndFlush();
         }
+    }
+
+    private static bool IsWinFormsInternalNullReference(Exception ex) {
+        if (ex is not NullReferenceException)
+            return false;
+
+        var declaringNamespace = ex.TargetSite?.DeclaringType?.Namespace;
+        if (declaringNamespace?.StartsWith("System.Windows.Forms", StringComparison.Ordinal) == true)
+            return true;
+
+        // Fallback: TargetSite can be null for some optimized frames. If every
+        // frame in the stack belongs to System.Windows.Forms, it's still a
+        // framework-internal race and safe to suppress.
+        var stack = ex.StackTrace;
+        return stack != null && stack.Contains("System.Windows.Forms.", StringComparison.Ordinal);
     }
 
     private static void EnsureOutputFolderExists(bool showGui) {

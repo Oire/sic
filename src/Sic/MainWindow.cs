@@ -29,6 +29,7 @@ public partial class MainWindow: Form {
         SetupEventHandlers();
         PopulateFormatComboBox();
         UpdateMenuState();
+        UpdatePlaceholderState();
 
         try {
             _updateService = new UpdateService();
@@ -110,8 +111,14 @@ public partial class MainWindow: Form {
         convertSelectedMenuItem.Enabled = hasSelection;
         convertAllMenuItem.Enabled = hasItems;
         createMultiSizeIcoMenuItem.Enabled = hasSelection;
+    }
 
-        if (hasItems) {
+    // Placeholder management is split out of UpdateMenuState because Items.Insert/Remove
+    // must NOT run from inside ListView event handlers (SelectedIndexChanged fires from
+    // inside ListView.WndProc during removal — mutating Items there causes internal
+    // NullReferenceExceptions). Call this only from user-initiated add/remove flows.
+    private void UpdatePlaceholderState() {
+        if (_imageItems.Count > 0) {
             HidePlaceholder();
         } else {
             ShowPlaceholder();
@@ -125,6 +132,11 @@ public partial class MainWindow: Form {
             ForeColor = SystemColors.GrayText
         };
         imageListView.Items.Insert(0, _placeholderItem);
+        // Select + focus so a screen reader announces the empty-list text.
+        // The convert/remove handlers guard against _imageItems being empty,
+        // so nothing acts on this fake selection.
+        _placeholderItem.Selected = true;
+        _placeholderItem.Focused = true;
     }
 
     private void HidePlaceholder() {
@@ -180,7 +192,7 @@ public partial class MainWindow: Form {
     }
 
     private void RemoveMenuItem_Click(object? sender, EventArgs e) {
-        if (imageListView.SelectedIndices.Count == 0)
+        if (_imageItems.Count == 0 || imageListView.SelectedIndices.Count == 0)
             return;
 
         var index = imageListView.SelectedIndices[0];
@@ -199,15 +211,19 @@ public partial class MainWindow: Form {
 
         statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
         UpdateMenuState();
+        UpdatePlaceholderState();
     }
 
     private void RemoveAllMenuItem_Click(object? sender, EventArgs e) {
+        imageListView.SelectedIndices.Clear();
+        imageListView.FocusedItem = null;
         _imageItems.Clear();
         imageListView.Items.Clear();
         previewPictureBox.Image?.Dispose();
         previewPictureBox.Image = null;
         statusLabel.Text = _("Ready");
         UpdateMenuState();
+        UpdatePlaceholderState();
     }
 
     private void SettingsMenuItem_Click(object? sender, EventArgs e) {
@@ -416,9 +432,15 @@ public partial class MainWindow: Form {
             progressDialog?.Dispose();
         }
 
-        // Remove successfully converted items from queue (in reverse order to preserve indices)
+        // Remove successfully converted items from queue (in reverse order to preserve indices).
+        // Clearing selection/focus before removal avoids a ListView.WndProc NRE that can fire
+        // when the native control dispatches pending accessibility/dispinfo messages referencing
+        // an item that's just been removed.
         imageListView.BeginUpdate();
         try {
+            imageListView.SelectedIndices.Clear();
+            imageListView.FocusedItem = null;
+
             foreach (var index in convertedIndices.OrderByDescending(i => i)) {
                 _imageItems.RemoveAt(index);
                 imageListView.Items.RemoveAt(index);
@@ -446,8 +468,11 @@ public partial class MainWindow: Form {
             summary += " " + _("Cancelled.");
 
         statusLabel.Text = summary;
-        MessageBox.Show(summary, _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+        // Must run before MessageBox so the placeholder row is inserted before the
+        // MessageBox pump dispatches any queued ListView notifications.
         UpdateMenuState();
+        UpdatePlaceholderState();
+        MessageBox.Show(summary, _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
     private async void ConvertButton_Click(object? sender, EventArgs e) {
@@ -462,7 +487,7 @@ public partial class MainWindow: Form {
     }
 
     private async void ConvertSelectedMenuItem_Click(object? sender, EventArgs e) {
-        if (imageListView.SelectedIndices.Count == 0)
+        if (_imageItems.Count == 0 || imageListView.SelectedIndices.Count == 0)
             return;
 
         var selectedIndices = imageListView.SelectedIndices.Cast<int>().ToList();
@@ -470,7 +495,7 @@ public partial class MainWindow: Form {
     }
 
     private async void CreateMultiSizeIcoMenuItem_Click(object? sender, EventArgs e) {
-        if (imageListView.SelectedIndices.Count == 0)
+        if (_imageItems.Count == 0 || imageListView.SelectedIndices.Count == 0)
             return;
 
         using var presetDialog = new IcoPresetDialog();
@@ -517,13 +542,18 @@ public partial class MainWindow: Form {
                 ImageConverter.CreateMultiSizeIco(item, outputPath, sizes);
             }).WaitAsync(progressDialog.CancellationToken);
 
+            imageListView.SelectedIndices.Clear();
+            imageListView.FocusedItem = null;
             _imageItems.RemoveAt(index);
             imageListView.Items.RemoveAt(index);
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = null;
 
             statusLabel.Text = _("Multi-size ICO created: {0}", Path.GetFileName(outputPath));
+            UpdateMenuState();
+            UpdatePlaceholderState();
             MessageBox.Show(_("Multi-size ICO created successfully:\n{0}", outputPath), _("ICO Created"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
         } catch (OperationCanceledException) {
             imageListView.Items[index].SubItems[4].Text = "";
             statusLabel.Text = _("Ready");
@@ -538,6 +568,7 @@ public partial class MainWindow: Form {
         }
 
         UpdateMenuState();
+        UpdatePlaceholderState();
     }
 
     private void DonateMenuItem_Click(object? sender, EventArgs e) {
@@ -718,14 +749,12 @@ public partial class MainWindow: Form {
     }
 
     private void ImageListView_SelectedIndexChanged(object? sender, EventArgs e) {
-        if (_placeholderItem != null && _placeholderItem.Selected) {
-            _placeholderItem.Selected = false;
-            return;
-        }
-
         UpdateMenuState();
 
-        if (imageListView.SelectedIndices.Count == 0) {
+        // Treat placeholder selection (or any selection when _imageItems is empty)
+        // as "no real selection" — clear preview state but leave the placeholder
+        // focused so screen readers can announce it.
+        if (imageListView.SelectedIndices.Count == 0 || _imageItems.Count == 0) {
             _selectedItem = null;
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = null;
@@ -810,6 +839,7 @@ public partial class MainWindow: Form {
                 var item = ImageConverter.LoadFromBytes(data, $"clipboard_image{suffix}.png");
                 AddImageItem(item);
                 UpdateMenuState();
+                UpdatePlaceholderState();
                 statusLabel.Text = _("Added image from clipboard");
             } catch (Exception ex) {
                 Log.Error("Failed to load clipboard image: {Error}", ex.Message);
@@ -854,6 +884,7 @@ public partial class MainWindow: Form {
 
             AddImageItem(item);
             UpdateMenuState();
+            UpdatePlaceholderState();
             statusLabel.Text = _("Added {0} from URL", item.FileName);
         } catch (OperationCanceledException) {
             statusLabel.Text = _("Ready");
@@ -878,6 +909,7 @@ public partial class MainWindow: Form {
         if (paths.Length == 1) {
             AddImageFromFile(paths[0], basePath);
             UpdateMenuState();
+            UpdatePlaceholderState();
             return;
         }
 
@@ -1001,6 +1033,7 @@ public partial class MainWindow: Form {
 
                 statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
                 UpdateMenuState();
+                UpdatePlaceholderState();
                 imageListView.Focus();
 
                 if (result.Errors.Count > 0 || result.SkippedPlaceholders > 0) {
