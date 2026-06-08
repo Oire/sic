@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -16,7 +16,6 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>NU1901;NU1902</NoWarn>
     <Product>SIC!</Product>
     <Description>SIC! — Simple Image Converter</Description>
     <Company>Oire Software</Company>
@@ -38,20 +37,20 @@
 
     <ItemGroup>
         <PackageReference Include="GetText.NET.WindowsForms" Version="10.0.1" NoWarn="NU1701" />
-        <PackageReference Include="Magick.NET-Q16-x64" Version="14.12.0" />
+        <PackageReference Include="Magick.NET-Q16-x64" Version="14.14.0" />
         <PackageReference Include="GitVersion.MsBuild" Version="6.7.0">
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="3.0.4" />
-        <PackageReference Include="NetSparkleUpdater.UI.WinForms.NetCore" Version="3.0.4" />
+        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="3.1.0" />
+        <PackageReference Include="NetSparkleUpdater.UI.WinForms.NetCore" Version="3.1.0" />
         <PackageReference Include="Serilog" Version="4.3.1" />
         <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="GetText.NET" Version="10.0.1" />
-        <PackageReference Include="System.CommandLine" Version="2.0.6" />
+        <PackageReference Include="System.CommandLine" Version="2.0.8" />
         <PackageReference Include="sharpconfig-huanlin" Version="4.2.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.202" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.300" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>

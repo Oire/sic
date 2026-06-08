@@ -22,7 +22,7 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 ## Requirements
 
 - Windows 10/11 (x64)
-- [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 10.0 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
 
 ## Installation
 
@@ -112,7 +112,7 @@ To run SIC! in portable mode, create an empty `userdata` folder next to `Sic.exe
 
 ## Building
 
-Requires [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
+Requires [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 
 ```bash
 dotnet build              # Debug build (x64)

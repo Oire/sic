@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SIC! (Simple Image Converter) is a Windows Forms desktop application (.NET 8.0, x64-only) by Oire Software. It converts images between formats (JPG, PNG, WEBP, ICO, BMP, TIFF, GIF, AVIF) with optional resizing, using Magick.NET as the image processing backend. The app has both a GUI mode and a headless CLI mode.
+SIC! (Simple Image Converter) is a Windows Forms desktop application (.NET 10.0, x64-only) by Oire Software. It converts images between formats (JPG, PNG, WEBP, ICO, BMP, TIFF, GIF, AVIF) with optional resizing, using Magick.NET as the image processing backend. The app has both a GUI mode and a headless CLI mode.
 
 It uses structured logging (Serilog), file-based configuration (SharpConfig), and gettext-based localization (GetText.NET). Versioning is handled automatically via GitVersion (GitVersion.MsBuild) from git history.
 
