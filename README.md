@@ -14,7 +14,7 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 - **Filename conflict handling** — always asks: overwrite, rename (`_1` suffix), or skip
 - **Cloud file detection** — warns about OneDrive/SharePoint placeholder files that haven't been downloaded yet
 - **CLI mode** — headless conversion from the command line, no UI needed
-- **Automatic updates** — checks for new versions in the background with Ed25519 signature verification
+- **Automatic updates** — checks for new versions in the background with Ed25519 signature verification, with adjustable frequency (or off) in Settings
 - **Portable mode** — place an empty `userdata` folder next to `Sic.exe` to keep all data alongside the executable
 - **Localized** — English, German, French, Russian, Ukrainian
 - **Accessible** — logical tab order, keyboard shortcuts, screen-reader friendly
@@ -105,6 +105,8 @@ Settings are stored in `%APPDATA%\Oire\Sic\Sic.cfg` (or `userdata\Sic.cfg` in po
 - **Output folder** — where converted files are saved (default: `Converted` subfolder in the data directory)
 - **Language** — UI language (default: system language)
 - **Confirm exit** — warn when closing with images still in the queue (default: enabled)
+- **Check for updates on startup** — perform a single silent update check shortly after launch (default: enabled)
+- **Check for updates in the background** — how often to check for updates while running: once a day, every 3 days, once a week, once a month, or never (default: once a day)
 
 ### Portable Mode
 

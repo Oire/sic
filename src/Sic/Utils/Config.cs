@@ -1,5 +1,6 @@
 using SharpConfig;
 using Serilog;
+using Oire.Sic.Utils.Enums;
 using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
 
@@ -17,6 +18,16 @@ public class Config {
         public string OutputFolder { get; set; } = App.DefaultOutputFolder;
         public string LastInputFolder { get; set; } = "";
         public bool ConfirmExitWithQueue { get; set; } = true;
+
+        /// <summary>When <c>true</c>, the app performs a single silent update check shortly
+        /// after the main window opens. A check that fails (no network, server down) is
+        /// logged and otherwise ignored — it never interrupts startup or shows an error.</summary>
+        public bool CheckForUpdatesOnStartup { get; set; } = true;
+
+        /// <summary>How often the app checks for updates in the background while it runs.
+        /// <see cref="UpdateCheckInterval.Never"/> disables the background loop. Independent of
+        /// <see cref="CheckForUpdatesOnStartup"/>: either, both, or neither may be active.</summary>
+        public UpdateCheckInterval UpdateCheckInterval { get; set; } = UpdateCheckInterval.Daily;
     }
 
     #endregion

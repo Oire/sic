@@ -60,16 +60,17 @@ After editing `.po` files, always run `compile-translations.ps1` to regenerate t
 - Batch operations show a separate `ProgressDialog` with progress bar
 - Supports drag & drop, Ctrl+V paste (file drops and bitmap clipboard), Delete key to remove
 
-**`src/Sic/SettingsDialog.cs` + `SettingsDialog.Designer.cs`** — Settings form. Flat `TableLayoutPanel` layout with output folder (textbox + browse + clear), language dropdown, OK/Cancel.
+**`src/Sic/SettingsDialog.cs` + `SettingsDialog.Designer.cs`** — Settings form. Flat `TableLayoutPanel` layout with output folder (textbox + browse + clear), language dropdown, confirm-exit checkbox, a "check for updates on startup" checkbox, a background update-frequency dropdown, and OK/Cancel. Exposes `UpdatePeriodicCheckChanged` so `MainWindow` can re-arm the background update loop live (without a restart) when the frequency changes.
 
 ### Utilities (`src/Sic/Utils/`)
 
-- `Config.cs` — Static config manager using SharpConfig. Reads/writes `%APPDATA%/Oire/Sic/Sic.cfg` with a `[General]` section (Language, OutputFolder, LastInputFolder). Accepts `isGui` parameter to route errors to MessageBox (GUI) or stderr (CLI).
+- `Config.cs` — Static config manager using SharpConfig. Reads/writes `%APPDATA%/Oire/Sic/Sic.cfg` with a `[General]` section (Language, OutputFolder, LastInputFolder, ConfirmExitWithQueue, CheckForUpdatesOnStartup, UpdateCheckInterval). Accepts `isGui` parameter to route errors to MessageBox (GUI) or stderr (CLI).
 - `FileHelper.cs` — Cloud placeholder detection (OneDrive/SharePoint recall attributes) and image file enumeration with glob patterns.
 - `Localization.cs` — Wraps GetText.NET with convenience methods: `_()`, `_n()`, `_p()`, `_pn()` for translations. Loads `.mo` files from the `locale/` folder relative to the executable. Falls back through language parents to `en-US`.
 - `Constants/App.cs` — Application metadata, data folder paths (`%APPDATA%/Oire/Sic/`), file extensions.
 - `Constants/ExitCode.cs` — CLI exit code constants (`Success`, `Error`, `Canceled`).
 - `Constants/Logging.cs` — Log file paths and output templates. Logs go to `%APPDATA%/Oire/Sic/logs/`.
+- `Enums/UpdateCheckInterval.cs` — Background update-check frequency (`Daily`, `EveryThreeDays`, `Weekly`, `Monthly`, `Never`). Declared most-frequent-first so `Daily` is the default zero value and the order matches the Settings combo box.
 
 ### Key dependencies
 
@@ -127,6 +128,8 @@ SIC! is an accessible image format converter primarily aimed at blind and low-co
 - Output folder (default: `Converted` subfolder in the data directory)
 - Language
 - Confirm exit when images are in the queue
+- Check for updates on startup (default: enabled) — a single silent check shortly after launch
+- Background update-check frequency (`UpdateCheckInterval`: Daily / EveryThreeDays / Weekly / Monthly / Never; default Daily)
 
 ## Auto-Updates (NetSparkleUpdater)
 

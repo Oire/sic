@@ -243,11 +243,17 @@ footer {
 
     <dt>Confirm on exit with non-empty queue</dt>
     <dd>When enabled (the default), SIC! asks for confirmation before closing if there are images remaining in the queue. Uncheck this option to exit without a prompt.</dd>
+
+    <dt>Check for updates on startup</dt>
+    <dd>When enabled (the default), SIC! performs a single silent update check shortly after it starts. If the check cannot reach the network, it is ignored — it never interrupts startup or shows an error. Uncheck this option to skip the check at launch.</dd>
+
+    <dt>Check for updates in the background</dt>
+    <dd>Choose how often SIC! checks for updates while it is running: <em>Once a day</em> (the default), <em>Every 3 days</em>, <em>Once a week</em>, <em>Once a month</em>, or <em>Never</em>. Select <em>Never</em> to turn background checks off entirely. This setting is independent of the startup check — you can have either, both, or neither. A change takes effect immediately, without restarting the application.</dd>
 </dl>
 <p>Settings are stored in <code>Sic.cfg</code> inside the application data directory (see <a href="#installation">Installation modes</a> for the exact location).</p>
 
 <h2 id="updates">Software updates</h2>
-<p>SIC! can check for new versions automatically. An update check runs on startup and then every 24 hours while the application is running. You can also check manually via <strong>Help > Check for Updates</strong>.</p>
+<p>SIC! can check for new versions automatically. By default an update check runs on startup and then once a day while the application is running, but both behaviors are configurable in <a href="#settings">Settings</a> — you can turn the startup check off and choose the background frequency (or disable background checks entirely). You can always check manually via <strong>Help > Check for Updates</strong>.</p>
 <p>When an update is available, SIC! shows a dialog with the new version number. You can choose to update, skip this version, or be reminded later. If you click <strong>Update</strong>, the new version is downloaded automatically. Once the download finishes, a confirmation dialog appears with <strong>Install</strong> and <strong>Cancel</strong> buttons. Clicking <strong>Install</strong> starts the installation.</p>
 
 <h2 id="cli">Command-line usage</h2>

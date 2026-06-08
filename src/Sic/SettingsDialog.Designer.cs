@@ -20,6 +20,10 @@ partial class SettingsDialog {
         clearOutputFolderButton = new Button();
         languageLabel = new Label();
         languageComboBox = new ComboBox();
+        confirmExitCheckBox = new CheckBox();
+        checkUpdatesOnStartupCheckBox = new CheckBox();
+        updateIntervalLabel = new Label();
+        updateIntervalComboBox = new ComboBox();
         okButton = new Button();
         cancelButton = new Button();
 
@@ -34,7 +38,10 @@ partial class SettingsDialog {
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
-        mainLayout.RowCount = 4;
+        mainLayout.RowCount = 7;
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -54,13 +61,25 @@ partial class SettingsDialog {
         mainLayout.Controls.Add(languageComboBox, 1, 1);
 
         // Row 2: Confirm exit with non-empty queue
-        confirmExitCheckBox = new CheckBox();
         mainLayout.Controls.Add(confirmExitCheckBox, 0, 2);
         mainLayout.SetColumnSpan(confirmExitCheckBox, 4);
 
-        // Row 3: OK / Cancel (right-aligned in cols 2-3)
-        mainLayout.Controls.Add(okButton, 2, 3);
-        mainLayout.Controls.Add(cancelButton, 3, 3);
+        // Row 3: Check for updates on startup
+        mainLayout.Controls.Add(checkUpdatesOnStartupCheckBox, 0, 3);
+        mainLayout.SetColumnSpan(checkUpdatesOnStartupCheckBox, 4);
+
+        // Row 4: Background update check frequency — label on its own row (full width),
+        // combo beneath it, so the long label never clips the narrow first column.
+        mainLayout.Controls.Add(updateIntervalLabel, 0, 4);
+        mainLayout.SetColumnSpan(updateIntervalLabel, 4);
+
+        // Row 5: frequency combo (spans the two left columns)
+        mainLayout.Controls.Add(updateIntervalComboBox, 0, 5);
+        mainLayout.SetColumnSpan(updateIntervalComboBox, 2);
+
+        // Row 6: OK / Cancel (right-aligned in cols 2-3)
+        mainLayout.Controls.Add(okButton, 2, 6);
+        mainLayout.Controls.Add(cancelButton, 3, 6);
 
         //
         // outputFolderLabel
@@ -122,13 +141,39 @@ partial class SettingsDialog {
         confirmExitCheckBox.TabIndex = 6;
 
         //
+        // checkUpdatesOnStartupCheckBox
+        //
+        checkUpdatesOnStartupCheckBox.Text = "Check for &updates on startup";
+        checkUpdatesOnStartupCheckBox.AutoSize = true;
+        checkUpdatesOnStartupCheckBox.Anchor = AnchorStyles.Left;
+        checkUpdatesOnStartupCheckBox.Name = "checkUpdatesOnStartupCheckBox";
+        checkUpdatesOnStartupCheckBox.TabIndex = 7;
+
+        //
+        // updateIntervalLabel
+        //
+        updateIntervalLabel.Text = "Check for updates in the back&ground:";
+        updateIntervalLabel.AutoSize = true;
+        updateIntervalLabel.Anchor = AnchorStyles.Left;
+        updateIntervalLabel.Name = "updateIntervalLabel";
+        updateIntervalLabel.TabIndex = 8;
+
+        //
+        // updateIntervalComboBox
+        //
+        updateIntervalComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+        updateIntervalComboBox.Dock = DockStyle.Fill;
+        updateIntervalComboBox.Name = "updateIntervalComboBox";
+        updateIntervalComboBox.TabIndex = 9;
+
+        //
         // okButton
         //
         okButton.Text = "&OK";
         okButton.Dock = DockStyle.Fill;
         okButton.DialogResult = DialogResult.OK;
         okButton.Name = "okButton";
-        okButton.TabIndex = 7;
+        okButton.TabIndex = 10;
 
         //
         // cancelButton
@@ -137,14 +182,14 @@ partial class SettingsDialog {
         cancelButton.Dock = DockStyle.Fill;
         cancelButton.DialogResult = DialogResult.Cancel;
         cancelButton.Name = "cancelButton";
-        cancelButton.TabIndex = 8;
+        cancelButton.TabIndex = 11;
 
         //
         // SettingsDialog
         //
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(450, 190);
+        ClientSize = new Size(450, 260);
         Controls.Add(mainLayout);
         Name = "SettingsDialog";
         Text = "Settings";
@@ -172,6 +217,9 @@ partial class SettingsDialog {
     private Label languageLabel;
     private ComboBox languageComboBox;
     private CheckBox confirmExitCheckBox;
+    private CheckBox checkUpdatesOnStartupCheckBox;
+    private Label updateIntervalLabel;
+    private ComboBox updateIntervalComboBox;
     private Button okButton;
     private Button cancelButton;
 }
