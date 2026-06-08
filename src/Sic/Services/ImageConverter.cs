@@ -27,6 +27,43 @@ public static class ImageConverter {
 
     public static IReadOnlyList<string> GetSupportedFormats() => FormatMap.Keys.ToList();
 
+    /// <summary>
+    /// Maps an arbitrary format name (a SIC! format key like "JPG", or a Magick.NET
+    /// format name like "Jpeg"/"Bmp3") to one of the canonical SIC! format keys.
+    /// Returns <c>null</c> for unknown formats.
+    /// </summary>
+    private static string? GetCanonicalFormat(string formatName) {
+        return formatName.ToUpperInvariant() switch {
+            "JPG" or "JPEG" or "PJPEG" => "JPG",
+            "PNG" or "PNG8" or "PNG24" or "PNG32" or "PNG48" or "PNG64" or "PNG00" => "PNG",
+            "WEBP" => "WEBP",
+            "ICO" or "ICON" => "ICO",
+            "BMP" or "BMP2" or "BMP3" => "BMP",
+            "TIFF" or "TIF" or "TIFF64" => "TIFF",
+            "GIF" or "GIF87" => "GIF",
+            "AVIF" => "AVIF",
+            _ => null,
+        };
+    }
+
+    /// <summary>
+    /// Returns <c>true</c> when the source image is already in the requested target format,
+    /// regardless of variant naming (e.g. "Jpeg" vs "JPG", "Bmp3" vs "BMP").
+    /// </summary>
+    public static bool IsSameFormat(ImageItem item, string targetFormat) {
+        var source = GetCanonicalFormat(item.OriginalFormat);
+        var target = GetCanonicalFormat(targetFormat);
+        return source is not null && source == target;
+    }
+
+    /// <summary>
+    /// Determines whether converting the item to the target format would be a no-op that only
+    /// degrades quality: the source is already in the target format and no resize/crop is requested.
+    /// </summary>
+    public static bool ShouldSkipConversion(ImageItem item, string targetFormat, int? width, int? height) {
+        return !width.HasValue && !height.HasValue && IsSameFormat(item, targetFormat);
+    }
+
     public static ImageItem LoadFromFile(string path) {
         var fileInfo = new FileInfo(path);
 
@@ -155,6 +192,12 @@ public static class ImageConverter {
 
         using var image = LoadMagickImage(item);
 
+        // Capture the source's encoding quality before any transform. When the target format
+        // matches the source, a resize/crop forces one unavoidable re-encode; reapplying the
+        // original quality keeps it from being re-compressed harder than the source.
+        var sourceQuality = image.Quality;
+        var preserveQuality = IsSameFormat(item, targetFormat);
+
         if (width.HasValue || height.HasValue) {
             if (mode == ResizeMode.Crop && width.HasValue && height.HasValue) {
                 var scaleX = (double)width.Value / image.Width;
@@ -177,6 +220,11 @@ public static class ImageConverter {
         }
 
         image.Format = magickFormat;
+
+        if (preserveQuality) {
+            image.Quality = sourceQuality;
+        }
+
         image.Write(outputPath);
 
         Log.Information("Converted {FileName} to {Format} at {OutputPath}", item.FileName, targetFormat, outputPath);
