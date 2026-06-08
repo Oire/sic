@@ -270,6 +270,12 @@ internal static class Program {
                     ? ImageConverter.LoadFromUrl(input).GetAwaiter().GetResult()
                     : ImageConverter.LoadFromFile(input);
 
+                if (ImageConverter.ShouldSkipConversion(item, targetFormat, width, height)) {
+                    Log.Information("CLI: Skipped {Input}: already in {Format} format", input, targetFormat);
+                    Console.WriteLine(_("Skipped: {0} is already in {1} format.", input, targetFormat));
+                    return ExitCode.Success;
+                }
+
                 var dir = Path.GetDirectoryName(output!);
                 if (dir != null && !Directory.Exists(dir)) {
                     Directory.CreateDirectory(dir);

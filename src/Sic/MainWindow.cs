@@ -388,6 +388,15 @@ public partial class MainWindow: Form {
                         imageListView.Items[i].SubItems[4].Text = _("Converting...");
                     });
 
+                    if (ImageConverter.ShouldSkipConversion(item, targetFormat, width, height)) {
+                        skipped++;
+                        Log.Information("Skipped {FileName}: already in {Format} format", item.FileName, targetFormat);
+                        Invoke(() => {
+                            imageListView.Items[i].SubItems[4].Text = _("Skipped (same format)");
+                        });
+                        continue;
+                    }
+
                     var outputPath = ImageConverter.GenerateOutputPath(item, targetFormat, outputFolder);
 
                     if (File.Exists(outputPath)) {
