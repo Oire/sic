@@ -243,11 +243,17 @@ footer {
 
     <dt>Confirmer la fermeture avec une file non vide</dt>
     <dd>Lorsque cette option est activée (par défaut), SIC! demande une confirmation avant de se fermer s'il reste des images dans la file. Décochez cette option pour quitter sans confirmation.</dd>
+
+    <dt>Rechercher les mises à jour au démarrage</dt>
+    <dd>Lorsque cette option est activée (par défaut), SIC! effectue une seule vérification silencieuse des mises à jour peu après son démarrage. Si la vérification ne peut pas accéder au réseau, elle est ignorée — elle n'interrompt jamais le démarrage et n'affiche aucune erreur. Décochez cette option pour ignorer la vérification au démarrage.</dd>
+
+    <dt>Rechercher les mises à jour en arrière-plan</dt>
+    <dd>Choisissez la fréquence à laquelle SIC! recherche les mises à jour pendant son exécution : <em>Une fois par jour</em> (par défaut), <em>Tous les 3 jours</em>, <em>Une fois par semaine</em>, <em>Une fois par mois</em> ou <em>Jamais</em>. Sélectionnez <em>Jamais</em> pour désactiver complètement les vérifications en arrière-plan. Ce paramètre est indépendant de la vérification au démarrage — vous pouvez activer l'un, l'autre, les deux ou aucun. Une modification prend effet immédiatement, sans redémarrer l'application.</dd>
 </dl>
 <p>Les paramètres sont stockés dans <code>Sic.cfg</code> à l'intérieur du répertoire de données de l'application (voir <a href="#installation">Modes d'installation</a> pour l'emplacement exact).</p>
 
 <h2 id="updates">Mises à jour logicielles</h2>
-<p>SIC! peut vérifier automatiquement la disponibilité de nouvelles versions. Une vérification est effectuée au démarrage, puis toutes les 24 heures tant que l'application est en cours d'exécution. Vous pouvez également vérifier manuellement via <strong>Aide > Vérifier les mises à jour</strong>.</p>
+<p>SIC! peut vérifier automatiquement la disponibilité de nouvelles versions. Par défaut, une vérification est effectuée au démarrage, puis une fois par jour tant que l'application est en cours d'exécution, mais ces deux comportements sont configurables dans les <a href="#settings">Paramètres</a> — vous pouvez désactiver la vérification au démarrage et choisir la fréquence en arrière-plan (ou désactiver entièrement les vérifications en arrière-plan). Vous pouvez à tout moment vérifier manuellement via <strong>Aide > Vérifier les mises à jour</strong>.</p>
 <p>Lorsqu'une mise à jour est disponible, SIC! affiche une boîte de dialogue avec le numéro de la nouvelle version. Vous pouvez choisir de mettre à jour, d'ignorer cette version ou d'être rappelé plus tard. Si vous cliquez sur <strong>Mettre à jour</strong>, la nouvelle version est téléchargée automatiquement. Une fois le téléchargement terminé, une boîte de dialogue de confirmation apparaît avec les boutons <strong>Installer</strong> et <strong>Annuler</strong>. Cliquer sur <strong>Installer</strong> lance l'installation.</p>
 
 <h2 id="cli">Utilisation en ligne de commande</h2>

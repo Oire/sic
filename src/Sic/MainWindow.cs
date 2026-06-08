@@ -19,7 +19,9 @@ public partial class MainWindow: Form {
     private int _clipboardImageCount;
     private readonly System.Windows.Forms.Timer _previewDebounceTimer = new() { Interval = 300 };
     private readonly ObjectPropertiesStore _localizationStore = new();
-    private readonly UpdateService? _updateService;
+    // Created in OnShown (after the window handle exists, which NetSparkle's update UI needs).
+    // Disposed in MainWindow.Designer's Dispose.
+    private UpdateService? _updateService;
 
     private sealed record BatchAddResult(List<ImageItem> Items, List<string> Errors, int SkippedPlaceholders);
 
@@ -30,11 +32,42 @@ public partial class MainWindow: Form {
         PopulateFormatComboBox();
         UpdateMenuState();
         UpdatePlaceholderState();
+    }
+
+    /// <summary>
+    /// Stands up the <see cref="UpdateService"/> once the window handle exists (NetSparkle's
+    /// update UI needs it) and applies the user's two update preferences: an optional one-shot
+    /// silent check now, and an optional background loop at the configured frequency. Both are
+    /// independently toggled in Settings. A check that can't reach the network is logged and
+    /// ignored — it never interrupts startup.
+    /// </summary>
+    protected override void OnShown(EventArgs e) {
+        base.OnShown(e);
+        InitializeUpdates();
+    }
+
+    private void InitializeUpdates() {
+        if (_updateService is not null) {
+            return;
+        }
 
         try {
             _updateService = new UpdateService();
         } catch (Exception ex) {
             Log.Error(ex, "Failed to initialize update service");
+            return;
+        }
+
+        _updateService.ConfigurePeriodicChecks(Config.General.UpdateCheckInterval);
+
+        if (Config.General.CheckForUpdatesOnStartup) {
+            // Fire-and-forget: CheckForUpdatesAsync swallows its own exceptions, so the
+            // discarded task can never surface a fault. announceNoUpdate: false keeps a
+            // "you're up to date" or offline result silent — only an available update pops UI.
+            // Named local instead of `_ = ...` because `_` is the GetText method here
+            // (using static Localization).
+            var discard = _updateService.CheckForUpdatesAsync(announceNoUpdate: false);
+            GC.KeepAlive(discard);
         }
     }
 
@@ -230,6 +263,10 @@ public partial class MainWindow: Form {
         var previousLanguage = Config.General.Language;
         using var dialog = new SettingsDialog();
         dialog.ShowDialog(this);
+
+        if (dialog.UpdatePeriodicCheckChanged) {
+            _updateService?.ConfigurePeriodicChecks(Config.General.UpdateCheckInterval);
+        }
 
         if (Config.General.Language != previousLanguage) {
             ApplyLocalization();
@@ -623,7 +660,7 @@ public partial class MainWindow: Form {
             return;
         }
 
-        await _updateService.CheckForUpdatesAsync();
+        await _updateService.CheckForUpdatesAsync(announceNoUpdate: true);
     }
 
     private void AboutMenuItem_Click(object? sender, EventArgs e) {

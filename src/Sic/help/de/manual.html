@@ -243,11 +243,17 @@ footer {
 
     <dt>Beenden bestätigen, wenn die Warteschlange nicht leer ist</dt>
     <dd>Wenn aktiviert (Standardeinstellung), fragt SIC! vor dem Schließen nach einer Bestätigung, sofern sich noch Bilder in der Warteschlange befinden. Deaktivieren Sie diese Option, um ohne Nachfrage zu beenden.</dd>
+
+    <dt>Beim Start nach Updates suchen</dt>
+    <dd>Wenn aktiviert (Standardeinstellung), führt SIC! kurz nach dem Start eine einzelne stille Aktualisierungsprüfung durch. Kann die Prüfung das Netzwerk nicht erreichen, wird sie ignoriert — sie unterbricht niemals den Start und zeigt keinen Fehler. Deaktivieren Sie diese Option, um die Prüfung beim Start zu überspringen.</dd>
+
+    <dt>Im Hintergrund nach Updates suchen</dt>
+    <dd>Wählen Sie, wie oft SIC! während des Betriebs nach Updates sucht: <em>Einmal täglich</em> (Standard), <em>Alle 3 Tage</em>, <em>Einmal wöchentlich</em>, <em>Einmal monatlich</em> oder <em>Nie</em>. Wählen Sie <em>Nie</em>, um Hintergrundprüfungen vollständig zu deaktivieren. Diese Einstellung ist unabhängig von der Prüfung beim Start — Sie können eine, beide oder keine aktivieren. Eine Änderung wird sofort wirksam, ohne die Anwendung neu zu starten.</dd>
 </dl>
 <p>Einstellungen werden in <code>Sic.cfg</code> innerhalb des Anwendungsdatenverzeichnisses gespeichert (den genauen Speicherort finden Sie unter <a href="#installation">Installationsmodi</a>).</p>
 
 <h2 id="updates">Softwareaktualisierungen</h2>
-<p>SIC! kann automatisch nach neuen Versionen suchen. Eine Aktualisierungsprüfung erfolgt beim Start und dann alle 24 Stunden, solange die Anwendung läuft. Sie können auch manuell über <strong>Hilfe > Nach Updates suchen</strong> prüfen.</p>
+<p>SIC! kann automatisch nach neuen Versionen suchen. Standardmäßig erfolgt eine Aktualisierungsprüfung beim Start und dann einmal täglich, solange die Anwendung läuft, aber beide Verhaltensweisen lassen sich in den <a href="#settings">Einstellungen</a> konfigurieren — Sie können die Prüfung beim Start deaktivieren und die Häufigkeit der Hintergrundprüfung wählen (oder Hintergrundprüfungen ganz abschalten). Sie können jederzeit manuell über <strong>Hilfe > Nach Updates suchen</strong> prüfen.</p>
 <p>Wenn eine Aktualisierung verfügbar ist, zeigt SIC! einen Dialog mit der neuen Versionsnummer an. Sie können wählen, ob Sie aktualisieren, diese Version überspringen oder später erinnert werden möchten. Wenn Sie auf <strong>Aktualisieren</strong> klicken, wird die neue Version automatisch heruntergeladen. Nach Abschluss des Downloads erscheint ein Bestätigungsdialog mit den Schaltflächen <strong>Installieren</strong> und <strong>Abbrechen</strong>. Durch Klicken auf <strong>Installieren</strong> wird die Installation gestartet.</p>
 
 <h2 id="cli">Kommandozeilenverwendung</h2>
