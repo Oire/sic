@@ -190,7 +190,10 @@ footer {
     <dd>Drag image files from File Explorer and drop them onto the image list.</dd>
 
     <dt>Paste from clipboard</dt>
-    <dd>Press <kbd>Ctrl+V</kbd> to paste. SIC! supports pasting files (e.g., copied from File Explorer or Outlook), raw bitmap data (e.g., from Print Screen), and URLs from the clipboard.</dd>
+    <dd>Press <kbd>Ctrl+V</kbd> to paste. SIC! supports pasting files (e.g., copied from File Explorer or Outlook), raw bitmap data (e.g., from Print Screen), and image links from the clipboard. If the clipboard holds text that isn't a valid link, SIC! tells you so instead of doing nothing.</dd>
+
+    <dt>Automatic clipboard detection</dt>
+    <dd>SIC! can watch the clipboard and offer to add an image, image files, or an image link automatically whenever its window opens or regains focus. This is off by default; turn on <strong>Detect images in clipboard</strong> in <a href="#settings">Settings</a>. A Yes/No prompt always asks before anything is added, and the same clipboard content is offered only once, so it never nags you.</dd>
 </dl>
 
 <h2 id="converting">Converting images</h2>
@@ -233,11 +236,10 @@ footer {
 </dl>
 
 <h2 id="settings">Settings</h2>
-<p>Open <strong>File > Settings</strong> (<kbd>Ctrl+,</kbd>) to configure:</p>
-<dl>
-    <dt>Output folder</dt>
-    <dd>Set a custom folder where all converted files will be saved. Click <strong>Reset</strong> to restore the default <code>Converted</code> folder inside the application data directory.</dd>
+<p>Open <strong>File > Settings</strong> (<kbd>Ctrl+,</kbd>) to configure SIC!. The dialog is organized into two tabs, <strong>General</strong> and <strong>Images</strong>. Press <kbd>Ctrl+Tab</kbd> to move between tabs.</p>
 
+<h3>General tab</h3>
+<dl>
     <dt>Language</dt>
     <dd>Choose the interface language. Select <em>System</em> to follow your Windows language setting.</dd>
 
@@ -249,6 +251,15 @@ footer {
 
     <dt>Check for updates in the background</dt>
     <dd>Choose how often SIC! checks for updates while it is running: <em>Once a day</em> (the default), <em>Every 3 days</em>, <em>Once a week</em>, <em>Once a month</em>, or <em>Never</em>. Select <em>Never</em> to turn background checks off entirely. This setting is independent of the startup check — you can have either, both, or neither. A change takes effect immediately, without restarting the application.</dd>
+</dl>
+
+<h3>Images tab</h3>
+<dl>
+    <dt>Output folder</dt>
+    <dd>Set a custom folder where all converted files will be saved. Click <strong>Reset</strong> to restore the default <code>Converted</code> folder inside the application data directory.</dd>
+
+    <dt>Detect images in clipboard</dt>
+    <dd>When enabled, SIC! offers to add usable clipboard content — an image, image files, or an image link — whenever its window opens or regains focus. A Yes/No prompt always asks before anything is added, and the same clipboard content is offered only once, so it never nags you. This option is off by default. See <a href="#adding-images">Adding images</a> for details.</dd>
 </dl>
 <p>Settings are stored in <code>Sic.cfg</code> inside the application data directory (see <a href="#installation">Installation modes</a> for the exact location).</p>
 

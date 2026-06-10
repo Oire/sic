@@ -25,13 +25,43 @@ public partial class SettingsDialog: Form {
         clearOutputFolderButton.Click += ClearOutputFolderButton_Click;
         okButton.Click += OkButton_Click;
         outputFolderTextBox.TextChanged += (_, _) => UpdateClearButtonState();
+        tabControl.Selected += TabControl_Selected;
         UpdateClearButtonState();
+
+        // Land on the first field of the first tab when the dialog opens, instead of leaving
+        // focus on the tab strip. Tab switches are handled by TabControl_Selected.
+        ActiveControl = languageComboBox;
+    }
+
+    /// <summary>
+    /// Moves focus to the first focusable control on the newly selected tab, so keyboard and
+    /// screen-reader users who switch tabs with Ctrl+Tab land on a usable field rather than on
+    /// the tab page itself.
+    /// <para>
+    /// Restricted to Ctrl-modified switches (Ctrl+Tab, Ctrl+Shift+Tab, Ctrl+PgUp/PgDn). When the
+    /// strip is focused and the user browses tabs with the bare arrow keys, no modifier is held,
+    /// so we leave focus on the strip and the arrows keep moving between tabs instead of diving
+    /// into a field. <see cref="Control.ModifierKeys"/> is read synchronously here, while the
+    /// originating key is still down.
+    /// </para>
+    /// <para>
+    /// Deferred via <see cref="Control.BeginInvoke(Delegate)"/> because Ctrl+Tab places focus on
+    /// the tab strip <em>after</em> this event fires; selecting synchronously here would be
+    /// immediately overridden, leaving the user stranded on the tab strip.
+    /// </para>
+    /// </summary>
+    private void TabControl_Selected(object? sender, TabControlEventArgs e) {
+        var page = e.TabPage;
+        if (page == null || (ModifierKeys & Keys.Control) == 0)
+            return;
+        BeginInvoke(() => page.SelectNextControl(null, forward: true, tabStopOnly: true, nested: true, wrap: true));
     }
 
     private void LoadSettings() {
         outputFolderTextBox.Text = Config.General.OutputFolder;
         confirmExitCheckBox.Checked = Config.General.ConfirmExitWithQueue;
         checkUpdatesOnStartupCheckBox.Checked = Config.General.CheckForUpdatesOnStartup;
+        detectClipboardCheckBox.Checked = Config.General.DetectClipboardData;
         SelectUpdateInterval(Config.General.UpdateCheckInterval);
 
         // "System" always first — uses the OS language
@@ -148,6 +178,7 @@ public partial class SettingsDialog: Form {
         Config.General.OutputFolder = folder;
         Config.General.ConfirmExitWithQueue = confirmExitCheckBox.Checked;
         Config.General.CheckForUpdatesOnStartup = checkUpdatesOnStartupCheckBox.Checked;
+        Config.General.DetectClipboardData = detectClipboardCheckBox.Checked;
         Config.General.UpdateCheckInterval = SelectedUpdateInterval();
         var selectedDisplay = languageComboBox.SelectedItem as string;
         Config.General.Language = selectedDisplay != null && _languageMap.TryGetValue(selectedDisplay, out var code)

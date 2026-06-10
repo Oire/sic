@@ -173,7 +173,10 @@ public static class ImageConverter {
             fileName = "downloaded_image";
         }
 
-        using var image = new MagickImage(data);
+        // The link resolved and downloaded, but the bytes may be an HTML page or some other
+        // non-image resource. Translate Magick's decode failure into a clear domain error so
+        // the UI can say "not an image" rather than leaking a raw "no decode delegate" message.
+        using var image = DecodeImage(data);
 
         return new ImageItem {
             ImageData = data,
@@ -183,6 +186,17 @@ public static class ImageConverter {
             Height = (int)image.Height,
             FileSize = data.Length,
         };
+    }
+
+    /// <summary>Decodes raw bytes into a <see cref="MagickImage"/>, re-throwing a Magick decode
+    /// failure as an <see cref="UnsupportedImageException"/> so callers don't have to depend on
+    /// Magick.NET to tell "this isn't an image" apart from a real processing fault.</summary>
+    private static MagickImage DecodeImage(byte[] data) {
+        try {
+            return new MagickImage(data);
+        } catch (MagickException ex) {
+            throw new UnsupportedImageException("The content is not a supported image.", ex);
+        }
     }
 
     public static void Convert(ImageItem item, string targetFormat, string outputPath, int? width, int? height, ResizeMode mode = ResizeMode.KeepProportions) {

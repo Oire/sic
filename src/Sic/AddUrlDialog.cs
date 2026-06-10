@@ -26,8 +26,7 @@ public partial class AddUrlDialog: Form {
             return;
         }
 
-        if (!Uri.TryCreate(urlTextBox.Text.Trim(), UriKind.Absolute, out var uri)
-            || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)) {
+        if (!UrlHelper.IsValidHttpUrl(urlTextBox.Text, out var parsedUrl)) {
             Log.Debug("AddUrlDialog: Invalid URL submitted: {Url}", urlTextBox.Text.Trim());
             MessageBox.Show(
                 _("Please enter a valid link starting with http:// or https://."),

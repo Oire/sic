@@ -24,6 +24,12 @@ public class Config {
         /// logged and otherwise ignored — it never interrupts startup or shows an error.</summary>
         public bool CheckForUpdatesOnStartup { get; set; } = true;
 
+        /// <summary>When <c>true</c>, SIC! offers (via a prompt) to add usable clipboard
+        /// content — raw image data, image files, or an image link — whenever the window opens
+        /// or regains focus. Each distinct clipboard payload is offered at most once, so
+        /// re-focusing never re-prompts for the same data. Opt-in; off by default.</summary>
+        public bool DetectClipboardData { get; set; }
+
         /// <summary>How often the app checks for updates in the background while it runs.
         /// <see cref="UpdateCheckInterval.Never"/> disables the background loop. Independent of
         /// <see cref="CheckForUpdatesOnStartup"/>: either, both, or neither may be active.</summary>

@@ -190,7 +190,10 @@ footer {
     <dd>Ziehen Sie Bilddateien aus dem Datei-Explorer und legen Sie sie auf der Bildliste ab.</dd>
 
     <dt>Aus Zwischenablage einfügen</dt>
-    <dd>Drücken Sie <kbd>Strg+V</kbd> zum Einfügen. SIC! unterstützt das Einfügen von Dateien (z. B. aus dem Datei-Explorer oder Outlook kopiert), Bitmap-Rohdaten (z. B. von Bildschirmaufnahmen) und URLs aus der Zwischenablage.</dd>
+    <dd>Drücken Sie <kbd>Strg+V</kbd> zum Einfügen. SIC! unterstützt das Einfügen von Dateien (z. B. aus dem Datei-Explorer oder Outlook kopiert), Bitmap-Rohdaten (z. B. von Bildschirmaufnahmen) und Bildlinks aus der Zwischenablage. Enthält die Zwischenablage Text, der kein gültiger Link ist, weist SIC! Sie darauf hin, anstatt nichts zu tun.</dd>
+
+    <dt>Automatische Zwischenablageerkennung</dt>
+    <dd>SIC! kann die Zwischenablage überwachen und anbieten, automatisch ein Bild, Bilddateien oder einen Bildlink hinzuzufügen, sobald sein Fenster geöffnet wird oder den Fokus erhält. Dies ist standardmäßig deaktiviert; aktivieren Sie <strong>Bilder in der Zwischenablage erkennen</strong> in den <a href="#settings">Einstellungen</a>. Vor dem Hinzufügen werden Sie stets mit einer Ja/Nein-Abfrage gefragt, und derselbe Inhalt der Zwischenablage wird nur einmal angeboten, sodass Sie nie belästigt werden.</dd>
 </dl>
 
 <h2 id="converting">Bilder konvertieren</h2>
@@ -233,11 +236,10 @@ footer {
 </dl>
 
 <h2 id="settings">Einstellungen</h2>
-<p>Öffnen Sie <strong>Datei > Einstellungen</strong> (<kbd>Strg+,</kbd>) zum Konfigurieren:</p>
-<dl>
-    <dt>Ausgabeordner</dt>
-    <dd>Legen Sie einen benutzerdefinierten Ordner fest, in dem alle konvertierten Dateien gespeichert werden. Klicken Sie auf <strong>Zurücksetzen</strong>, um den Standard-Ordner <code>Converted</code> innerhalb des Anwendungsdatenverzeichnisses wiederherzustellen.</dd>
+<p>Öffnen Sie <strong>Datei > Einstellungen</strong> (<kbd>Strg+,</kbd>), um SIC! zu konfigurieren. Der Dialog ist in zwei Registerkarten gegliedert: <strong>Allgemein</strong> und <strong>Bilder</strong>. Drücken Sie <kbd>Strg+Tab</kbd>, um zwischen den Registerkarten zu wechseln.</p>
 
+<h3>Registerkarte „Allgemein“</h3>
+<dl>
     <dt>Sprache</dt>
     <dd>Wählen Sie die Sprache der Benutzeroberfläche. Wählen Sie <em>System</em>, um der Windows-Spracheinstellung zu folgen.</dd>
 
@@ -249,6 +251,15 @@ footer {
 
     <dt>Im Hintergrund nach Updates suchen</dt>
     <dd>Wählen Sie, wie oft SIC! während des Betriebs nach Updates sucht: <em>Einmal täglich</em> (Standard), <em>Alle 3 Tage</em>, <em>Einmal wöchentlich</em>, <em>Einmal monatlich</em> oder <em>Nie</em>. Wählen Sie <em>Nie</em>, um Hintergrundprüfungen vollständig zu deaktivieren. Diese Einstellung ist unabhängig von der Prüfung beim Start — Sie können eine, beide oder keine aktivieren. Eine Änderung wird sofort wirksam, ohne die Anwendung neu zu starten.</dd>
+</dl>
+
+<h3>Registerkarte „Bilder“</h3>
+<dl>
+    <dt>Ausgabeordner</dt>
+    <dd>Legen Sie einen benutzerdefinierten Ordner fest, in dem alle konvertierten Dateien gespeichert werden. Klicken Sie auf <strong>Zurücksetzen</strong>, um den Standard-Ordner <code>Converted</code> innerhalb des Anwendungsdatenverzeichnisses wiederherzustellen.</dd>
+
+    <dt>Bilder in der Zwischenablage erkennen</dt>
+    <dd>Wenn aktiviert, bietet SIC! an, verwendbare Inhalte der Zwischenablage — ein Bild, Bilddateien oder einen Bildlink — hinzuzufügen, sobald sein Fenster geöffnet wird oder den Fokus erhält. Vor dem Hinzufügen werden Sie stets mit einer Ja/Nein-Abfrage gefragt, und derselbe Inhalt wird nur einmal angeboten, sodass Sie nie belästigt werden. Diese Option ist standardmäßig deaktiviert. Weitere Informationen finden Sie unter <a href="#adding-images">Bilder hinzufügen</a>.</dd>
 </dl>
 <p>Einstellungen werden in <code>Sic.cfg</code> innerhalb des Anwendungsdatenverzeichnisses gespeichert (den genauen Speicherort finden Sie unter <a href="#installation">Installationsmodi</a>).</p>
 
