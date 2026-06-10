@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using GetText.WindowsForms;
 using Oire.Sic.Models;
 using Oire.Sic.Services;
@@ -17,6 +19,25 @@ public partial class MainWindow: Form {
     private bool _isAutoFilling;
     private bool _isLoadingFiles;
     private int _clipboardImageCount;
+
+    // Clipboard auto-detection (issue #36). _clipboardWatchArmed gates the watcher until the
+    // window is first shown, so no prompt appears before the form is visible. Detection uses two
+    // gates: Win32's monotonic sequence number is a cheap "did anything change at all" check,
+    // and a content signature (hash of the image bytes / sorted file paths / link) suppresses
+    // re-prompts when the user re-copies the *same* content (which bumps the sequence number but
+    // not the signature). _clipboardPromptOpen guards against a second prompt opening while one
+    // is already up.
+    private uint _lastClipboardSequence;
+    private string? _lastClipboardSignature;
+    private bool _clipboardWatchArmed;
+    private bool _clipboardPromptOpen;
+
+    private static readonly string[] ClipboardImageExtensions =
+        [".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".webp", ".ico", ".avif"];
+
+    [DllImport("user32.dll")]
+    private static extern uint GetClipboardSequenceNumber();
+
     private readonly System.Windows.Forms.Timer _previewDebounceTimer = new() { Interval = 300 };
     private readonly ObjectPropertiesStore _localizationStore = new();
     // Created in OnShown (after the window handle exists, which NetSparkle's update UI needs).
@@ -44,6 +65,11 @@ public partial class MainWindow: Form {
     protected override void OnShown(EventArgs e) {
         base.OnShown(e);
         InitializeUpdates();
+
+        // Now that the window is visible, the clipboard watcher is safe to run; do the
+        // initial "on opening" check here. The Activated handler covers later focus gains.
+        _clipboardWatchArmed = true;
+        CheckClipboardForImport();
     }
 
     private void InitializeUpdates() {
@@ -116,6 +142,9 @@ public partial class MainWindow: Form {
         // Keyboard
         KeyPreview = true;
         KeyDown += MainWindow_KeyDown;
+
+        // Clipboard auto-detection on focus (issue #36)
+        Activated += MainWindow_Activated;
 
         // Closing
         FormClosing += MainWindow_FormClosing;
@@ -858,7 +887,106 @@ public partial class MainWindow: Form {
         }
     }
 
+    private void MainWindow_Activated(object? sender, EventArgs e) {
+        if (_clipboardWatchArmed)
+            CheckClipboardForImport();
+    }
+
+    /// <summary>
+    /// Offers to import usable clipboard content (raw image, image files, or an image link)
+    /// when the setting is on. A cheap sequence-number gate skips work when nothing changed; a
+    /// content-signature gate skips re-prompting when the user re-copied the same content. On
+    /// "Yes" it reuses the normal paste path so behavior matches an explicit Ctrl+V.
+    /// </summary>
+    private void CheckClipboardForImport() {
+        if (!Config.General.DetectClipboardData || _clipboardPromptOpen)
+            return;
+
+        // Cheap first gate: the sequence number changes on every clipboard write, so an
+        // unchanged number means nothing has happened since we last looked.
+        var sequence = GetClipboardSequenceNumber();
+        if (sequence == _lastClipboardSequence)
+            return;
+        _lastClipboardSequence = sequence;
+
+        var import = DescribeClipboardImport();
+        if (import is null)
+            return;
+
+        // Content gate: re-copying the same image/files/link bumps the sequence number but
+        // yields an identical signature, so we don't pester the user about it again.
+        if (import.Signature == _lastClipboardSignature)
+            return;
+        _lastClipboardSignature = import.Signature;
+
+        _clipboardPromptOpen = true;
+        try {
+            var answer = MessageBox.Show(
+                import.Prompt, _("Clipboard Content Detected"),
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (answer == DialogResult.Yes)
+                HandlePaste();
+        } finally {
+            _clipboardPromptOpen = false;
+        }
+    }
+
+    /// <summary>
+    /// Describes importable clipboard content as a localized prompt plus a content signature
+    /// (used to dedupe re-copies), or <c>null</c> when the clipboard holds nothing SIC! can add.
+    /// Mirrors the source priority of <see cref="HandlePaste"/> (files, then raw image, then a
+    /// link), but only offers links whose path looks like an image — passive detection should
+    /// not pop up for every random URL on the clipboard.
+    /// </summary>
+    private static ClipboardImport? DescribeClipboardImport() {
+        if (Clipboard.ContainsFileDropList()) {
+            var imageFiles = Clipboard.GetFileDropList()
+                .Cast<string?>()
+                .Where(f => f is not null
+                    && ClipboardImageExtensions.Contains(Path.GetExtension(f), StringComparer.OrdinalIgnoreCase))
+                .Select(f => f!)
+                .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (imageFiles.Count > 0) {
+                var prompt = _n(
+                    "The clipboard contains an image file. Add it to the queue?",
+                    "The clipboard contains {0} image files. Add them to the queue?",
+                    imageFiles.Count, imageFiles.Count);
+                return new ClipboardImport(prompt, "files:" + string.Join("|", imageFiles));
+            }
+        } else if (Clipboard.ContainsImage()) {
+            using var image = Clipboard.GetImage();
+            if (image is null)
+                return null;
+
+            using var ms = new MemoryStream();
+            image.Save(ms, ImageFormat.Png);
+            var signature = "image:" + Convert.ToHexString(SHA256.HashData(ms.ToArray()));
+            return new ClipboardImport(_("The clipboard contains an image. Add it to the queue?"), signature);
+        } else if (Clipboard.ContainsText()) {
+            if (UrlHelper.IsValidHttpUrl(Clipboard.GetText(), out var url)
+                && ClipboardImageExtensions.Contains(
+                    Path.GetExtension(new Uri(url).AbsolutePath), StringComparer.OrdinalIgnoreCase)) {
+                return new ClipboardImport(
+                    _("The clipboard contains a link:\n{0}\n\nDownload the image and add it to the queue?", url),
+                    "url:" + url);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>A pending clipboard import: the localized prompt to show and a signature that
+    /// uniquely identifies the content, so re-copying the same thing isn't offered twice.</summary>
+    private sealed record ClipboardImport(string Prompt, string Signature);
+
     private async void HandlePaste() {
+        // Record the payload we're about to consume so the auto-detect watcher doesn't
+        // immediately re-offer the same content the next time the window regains focus.
+        _lastClipboardSequence = GetClipboardSequenceNumber();
+
         if (Clipboard.ContainsFileDropList()) {
             var files = Clipboard.GetFileDropList();
             var paths = new List<string>();
@@ -893,10 +1021,20 @@ public partial class MainWindow: Form {
             }
         } else if (Clipboard.ContainsText()) {
             var text = Clipboard.GetText().Trim();
+            if (text.Length == 0)
+                return;
 
-            if (Uri.TryCreate(text, UriKind.Absolute, out var uri)
-                && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)) {
-                await PasteFromUrlAsync(text);
+            // The only thing SIC! can do with pasted text is treat it as an image link, so an
+            // invalid one is an error worth surfacing — not a silent no-op. Same validation the
+            // "Add by link" dialog uses.
+            if (UrlHelper.IsValidHttpUrl(text, out var url)) {
+                await PasteFromUrlAsync(url);
+            } else {
+                Log.Debug("Paste: clipboard text is not a valid http/https link");
+                MessageBox.Show(
+                    _("The pasted text is not a valid link.\nLinks must start with http:// or https://."),
+                    _("Invalid link"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }
@@ -933,6 +1071,13 @@ public partial class MainWindow: Form {
             UpdatePlaceholderState();
             statusLabel.Text = _("Added {0} from URL", item.FileName);
         } catch (OperationCanceledException) {
+            statusLabel.Text = _("Ready");
+        } catch (UnsupportedImageException) {
+            Log.Information("URL did not point to a supported image: {Url}", url);
+            MessageBox.Show(
+                _("The link does not point to a supported image."),
+                _("Error"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
             statusLabel.Text = _("Ready");
         } catch (Exception ex) {
             Log.Error("Failed to load image from URL {Url}: {Error}", url, ex.Message);

@@ -190,7 +190,10 @@ footer {
     <dd>Faites glisser des fichiers image depuis l'Explorateur de fichiers et déposez-les sur la liste des images.</dd>
 
     <dt>Coller depuis le presse-papiers</dt>
-    <dd>Appuyez sur <kbd>Ctrl+V</kbd> pour coller. SIC! prend en charge le collage de fichiers (par exemple copiés depuis l'Explorateur de fichiers ou Outlook), de données bitmap brutes (par exemple depuis Impr. écran) et d'URL depuis le presse-papiers.</dd>
+    <dd>Appuyez sur <kbd>Ctrl+V</kbd> pour coller. SIC! prend en charge le collage de fichiers (par exemple copiés depuis l'Explorateur de fichiers ou Outlook), de données bitmap brutes (par exemple depuis Impr. écran) et de liens d'image depuis le presse-papiers. Si le presse-papiers contient du texte qui n'est pas un lien valide, SIC! vous en informe au lieu de ne rien faire.</dd>
+
+    <dt>Détection automatique du presse-papiers</dt>
+    <dd>SIC! peut surveiller le presse-papiers et proposer d'ajouter automatiquement une image, des fichiers image ou un lien d'image dès que sa fenêtre s'ouvre ou reçoit le focus. Cette option est désactivée par défaut ; activez <strong>Détecter les images dans le presse-papiers</strong> dans les <a href="#settings">Paramètres</a>. Une confirmation Oui/Non vous est toujours demandée avant tout ajout, et le même contenu du presse-papiers n'est proposé qu'une seule fois, afin de ne jamais vous importuner.</dd>
 </dl>
 
 <h2 id="converting">Convertir des images</h2>
@@ -233,11 +236,10 @@ footer {
 </dl>
 
 <h2 id="settings">Paramètres</h2>
-<p>Ouvrez <strong>Fichier > Paramètres</strong> (<kbd>Ctrl+,</kbd>) pour configurer :</p>
-<dl>
-    <dt>Dossier de sortie</dt>
-    <dd>Définissez un dossier personnalisé où tous les fichiers convertis seront enregistrés. Cliquez sur <strong>Réinitialiser</strong> pour restaurer le dossier par défaut <code>Converted</code> à l'intérieur du répertoire de données de l'application.</dd>
+<p>Ouvrez <strong>Fichier > Paramètres</strong> (<kbd>Ctrl+,</kbd>) pour configurer SIC!. La fenêtre est organisée en deux onglets, <strong>Général</strong> et <strong>Images</strong>. Appuyez sur <kbd>Ctrl+Tab</kbd> pour passer d'un onglet à l'autre.</p>
 
+<h3>Onglet Général</h3>
+<dl>
     <dt>Langue</dt>
     <dd>Choisissez la langue de l'interface. Sélectionnez <em>Système</em> pour suivre le paramètre de langue de Windows.</dd>
 
@@ -249,6 +251,15 @@ footer {
 
     <dt>Rechercher les mises à jour en arrière-plan</dt>
     <dd>Choisissez la fréquence à laquelle SIC! recherche les mises à jour pendant son exécution : <em>Une fois par jour</em> (par défaut), <em>Tous les 3 jours</em>, <em>Une fois par semaine</em>, <em>Une fois par mois</em> ou <em>Jamais</em>. Sélectionnez <em>Jamais</em> pour désactiver complètement les vérifications en arrière-plan. Ce paramètre est indépendant de la vérification au démarrage — vous pouvez activer l'un, l'autre, les deux ou aucun. Une modification prend effet immédiatement, sans redémarrer l'application.</dd>
+</dl>
+
+<h3>Onglet Images</h3>
+<dl>
+    <dt>Dossier de sortie</dt>
+    <dd>Définissez un dossier personnalisé où tous les fichiers convertis seront enregistrés. Cliquez sur <strong>Réinitialiser</strong> pour restaurer le dossier par défaut <code>Converted</code> à l'intérieur du répertoire de données de l'application.</dd>
+
+    <dt>Détecter les images dans le presse-papiers</dt>
+    <dd>Lorsque cette option est activée, SIC! propose d'ajouter le contenu utilisable du presse-papiers — une image, des fichiers image ou un lien d'image — dès que sa fenêtre s'ouvre ou reçoit le focus. Une confirmation Oui/Non vous est toujours demandée avant tout ajout, et le même contenu n'est proposé qu'une seule fois, afin de ne jamais vous importuner. Cette option est désactivée par défaut. Voir <a href="#adding-images">Ajouter des images</a> pour plus de détails.</dd>
 </dl>
 <p>Les paramètres sont stockés dans <code>Sic.cfg</code> à l'intérieur du répertoire de données de l'application (voir <a href="#installation">Modes d'installation</a> pour l'emplacement exact).</p>
 

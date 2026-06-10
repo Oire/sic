@@ -50,6 +50,8 @@ After editing `.po` files, always run `compile-translations.ps1` to regenerate t
 - `GenerateOutputPath`, `GetConflictRenamePath` — output path logic with conflict resolution
 - Note: The class name conflicts with `System.Drawing.ImageConverter`; files that use it must import `using ImageConverter = Oire.Sic.Services.ImageConverter;`
 
+**`src/Sic/Services/UnsupportedImageException.cs`** — Domain exception thrown when content downloads/loads fine but isn't a decodable image (e.g. a link to an HTML page). `LoadFromUrl` translates Magick.NET's decode failure into this so the UI can show a friendly "not an image" message without referencing Magick.NET — keeps the image-library dependency inside the Services layer.
+
 ### UI
 
 **`src/Sic/MainWindow.cs` + `MainWindow.Designer.cs`** — Main application window. Menu bar (File, Edit, Convert, Help) + `TableLayoutPanel`-based layout with:
@@ -59,13 +61,19 @@ After editing `.po` files, always run `compile-translations.ps1` to regenerate t
 - `StatusStrip` with status label at the bottom
 - Batch operations show a separate `ProgressDialog` with progress bar
 - Supports drag & drop, Ctrl+V paste (file drops and bitmap clipboard), Delete key to remove
+- Clipboard auto-detection (issue #36, opt-in via `DetectClipboardData`): on `OnShown` and every `Activated`, `CheckClipboardForImport()` offers (Yes/No) to add image data, image files, or an image link from the clipboard. Two gates prevent nagging — the Win32 clipboard sequence number (`GetClipboardSequenceNumber`, P/Invoked) skips unchanged clipboards, and a content signature (hash of image bytes / sorted paths / URL) suppresses re-prompts when the same content is re-copied. The passive detector only offers image-extension URLs; manual Ctrl+V accepts any http(s) link.
 
-**`src/Sic/SettingsDialog.cs` + `SettingsDialog.Designer.cs`** — Settings form. Flat `TableLayoutPanel` layout with output folder (textbox + browse + clear), language dropdown, confirm-exit checkbox, a "check for updates on startup" checkbox, a background update-frequency dropdown, and OK/Cancel. Exposes `UpdatePeriodicCheckChanged` so `MainWindow` can re-arm the background update loop live (without a restart) when the frequency changes.
+**`src/Sic/SettingsDialog.cs` + `SettingsDialog.Designer.cs`** — Settings form. A `TabControl` (filling the form, OK/Cancel beneath) with two tabs, each its own flat `TableLayoutPanel`:
+- **General** — language dropdown, confirm-exit checkbox, "check for updates on startup" checkbox, background update-frequency dropdown.
+- **Images** — output folder (textbox + browse + reset) and a "detect data in clipboard" checkbox (issue #36). Has room for future image/conversion options (e.g. selective targets).
+
+Tab page `Text` doesn't honor `&` mnemonics — navigate tabs with Ctrl+Tab / Ctrl+PgUp/Dn. Exposes `UpdatePeriodicCheckChanged` so `MainWindow` can re-arm the background update loop live (without a restart) when the frequency changes.
 
 ### Utilities (`src/Sic/Utils/`)
 
-- `Config.cs` — Static config manager using SharpConfig. Reads/writes `%APPDATA%/Oire/Sic/Sic.cfg` with a `[General]` section (Language, OutputFolder, LastInputFolder, ConfirmExitWithQueue, CheckForUpdatesOnStartup, UpdateCheckInterval). Accepts `isGui` parameter to route errors to MessageBox (GUI) or stderr (CLI).
+- `Config.cs` — Static config manager using SharpConfig. Reads/writes `%APPDATA%/Oire/Sic/Sic.cfg` with a `[General]` section (Language, OutputFolder, LastInputFolder, ConfirmExitWithQueue, CheckForUpdatesOnStartup, UpdateCheckInterval, DetectClipboardData). Accepts `isGui` parameter to route errors to MessageBox (GUI) or stderr (CLI).
 - `FileHelper.cs` — Cloud placeholder detection (OneDrive/SharePoint recall attributes) and image file enumeration with glob patterns.
+- `UrlHelper.cs` — Single source of truth for link validation: `IsValidHttpUrl(text, out url)` trims input and checks for an absolute http(s) URL. Used by the "Add by link" dialog, Ctrl+V paste, and clipboard auto-detection so all three validate links identically.
 - `Localization.cs` — Wraps GetText.NET with convenience methods: `_()`, `_n()`, `_p()`, `_pn()` for translations. Loads `.mo` files from the `locale/` folder relative to the executable. Falls back through language parents to `en-US`.
 - `Constants/App.cs` — Application metadata, data folder paths (`%APPDATA%/Oire/Sic/`), file extensions.
 - `Constants/ExitCode.cs` — CLI exit code constants (`Success`, `Error`, `Canceled`).
@@ -130,6 +138,7 @@ SIC! is an accessible image format converter primarily aimed at blind and low-co
 - Confirm exit when images are in the queue
 - Check for updates on startup (default: enabled) — a single silent check shortly after launch
 - Background update-check frequency (`UpdateCheckInterval`: Daily / EveryThreeDays / Weekly / Monthly / Never; default Daily)
+- Detect data in clipboard (`DetectClipboardData`, default: off) — when on, SIC! offers (via a Yes/No prompt) to add usable clipboard content (raw image, image files, or an image link) when the window opens or regains focus. Deduplicated by the Win32 clipboard sequence number so the same payload is offered at most once.
 
 ## Auto-Updates (NetSparkleUpdater)
 

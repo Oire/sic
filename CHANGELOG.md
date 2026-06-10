@@ -2,6 +2,17 @@
 
 All notable changes to SIC! (Simple Image Converter) will be documented in this file.
 
+## [Unreleased]
+
+### Features
+
+- Detect data in clipboard: SIC! can now offer to add an image, image files, or an image link from the clipboard when its window opens or regains focus ([#36](https://github.com/Oire/sic/issues/36)). It is off by default and can be toggled in Settings; the same clipboard content is offered only once.
+
+### Changes
+
+- The Settings dialog is now organized into **General** and **Images** tabs.
+- Adding a link (by paste or **Add by link**) that doesn't point to a supported image now shows a clear message instead of a raw decoder error.
+
 ## [1.0.2.2] — 2026-04-17
 
 ### Bug Fixes

@@ -11,6 +11,7 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 - **Resize and crop** — specify target dimensions with two modes: keep proportions or crop to exact size
 - **Multi-size ICO** — create `.ico` files with multiple embedded sizes using built-in presets or custom dimensions
 - **Multiple input methods** — file dialog, folder import, drag & drop, Ctrl+V paste (files, screenshots, or URLs), download by link
+- **Clipboard detection** — optionally offers to add an image, image files, or an image link from the clipboard when the window opens or gains focus (opt-in)
 - **Filename conflict handling** — always asks: overwrite, rename (`_1` suffix), or skip
 - **Cloud file detection** — warns about OneDrive/SharePoint placeholder files that haven't been downloaded yet
 - **CLI mode** — headless conversion from the command line, no UI needed
@@ -107,6 +108,7 @@ Settings are stored in `%APPDATA%\Oire\Sic\Sic.cfg` (or `userdata\Sic.cfg` in po
 - **Confirm exit** — warn when closing with images still in the queue (default: enabled)
 - **Check for updates on startup** — perform a single silent update check shortly after launch (default: enabled)
 - **Check for updates in the background** — how often to check for updates while running: once a day, every 3 days, once a week, once a month, or never (default: once a day)
+- **Detect images in clipboard** — offer to add an image, image files, or an image link from the clipboard when the window opens or gains focus (default: off)
 
 ### Portable Mode
 
