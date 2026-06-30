@@ -316,13 +316,23 @@ public static class ImageConverter {
         };
     }
 
-    public static string GenerateOutputPath(ImageItem item, string targetFormat, string outputFolder) {
+    public static string GenerateOutputPath(ImageItem item, string targetFormat, string outputFolder, bool saveToSourceFolder = false) {
+        var baseName = Path.GetFileNameWithoutExtension(item.FileName);
+        var extension = GetFileExtension(targetFormat);
+
+        // Write next to the original when requested (issue #33), but only for items that actually
+        // came from a file on disk. Clipboard captures and downloaded links have no source folder,
+        // so they fall through to the configured output folder below.
+        if (saveToSourceFolder && !string.IsNullOrWhiteSpace(item.FilePath)) {
+            var sourceDir = Path.GetDirectoryName(item.FilePath);
+            if (!string.IsNullOrWhiteSpace(sourceDir)) {
+                return Path.Combine(sourceDir, baseName + extension);
+            }
+        }
+
         if (string.IsNullOrWhiteSpace(outputFolder)) {
             outputFolder = App.DefaultOutputFolder;
         }
-
-        var baseName = Path.GetFileNameWithoutExtension(item.FileName);
-        var extension = GetFileExtension(targetFormat);
 
         if (item.BasePath != null && item.FilePath != null) {
             var relativePath = Path.GetRelativePath(item.BasePath, item.FilePath);

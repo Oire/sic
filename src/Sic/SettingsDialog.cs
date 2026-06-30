@@ -61,6 +61,7 @@ public partial class SettingsDialog: Form {
 
     private void LoadSettings() {
         outputFolderTextBox.Text = Config.General.OutputFolder;
+        saveToSourceFolderCheckBox.Checked = Config.General.SaveToSourceFolder;
         confirmExitCheckBox.Checked = Config.General.ConfirmExitWithQueue;
         checkUpdatesOnStartupCheckBox.Checked = Config.General.CheckForUpdatesOnStartup;
         detectClipboardCheckBox.Checked = Config.General.DetectClipboardData;
@@ -219,6 +220,7 @@ public partial class SettingsDialog: Form {
         var oldUpdateInterval = Config.General.UpdateCheckInterval;
 
         Config.General.OutputFolder = folder;
+        Config.General.SaveToSourceFolder = saveToSourceFolderCheckBox.Checked;
         Config.General.ConfirmExitWithQueue = confirmExitCheckBox.Checked;
         Config.General.CheckForUpdatesOnStartup = checkUpdatesOnStartupCheckBox.Checked;
         Config.General.DetectClipboardData = detectClipboardCheckBox.Checked;

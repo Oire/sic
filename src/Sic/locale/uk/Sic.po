@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-06-30 02:17:23+0200\n"
+"POT-Creation-Date: 2026-06-30 14:25:10+0200\n"
 "PO-Revision-Date: 2026-03-07 23:00+0100\n"
 "Last-Translator: \n"
 "Language-Team: uk\n"
@@ -112,13 +112,13 @@ msgstr "&Про SIC!..."
 msgid "&Add..."
 msgstr "&Додати..."
 
-#: ..\..\AddFolderDialog.Designer.cs:83 ..\..\SettingsDialog.Designer.cs:226
+#: ..\..\AddFolderDialog.Designer.cs:83 ..\..\SettingsDialog.Designer.cs:231
 msgid "&Browse..."
 msgstr "О&гляд..."
 
 #: ..\..\AddUrlDialog.Designer.cs:76 ..\..\ProgressDialog.Designer.cs:83
-#: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\AddSizeDialog.Designer.cs:76
-#: ..\..\AddFolderDialog.Designer.cs:126 ..\..\SettingsDialog.Designer.cs:288
+#: ..\..\AddSizeDialog.Designer.cs:76 ..\..\AddFolderDialog.Designer.cs:126
+#: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\SettingsDialog.Designer.cs:304
 msgid "&Cancel"
 msgstr "С&касувати"
 
@@ -134,7 +134,7 @@ msgstr "&Копіювати інформацію"
 msgid "&Crop"
 msgstr "О&брізка"
 
-#: ..\..\SettingsDialog.Designer.cs:244
+#: ..\..\SettingsDialog.Designer.cs:260
 msgid "&Detect images in clipboard"
 msgstr "Ви&значати зображення в буфері обміну"
 
@@ -170,7 +170,7 @@ msgstr "&Довідка"
 msgid "&Keep proportions"
 msgstr "&Зберігати пропорції"
 
-#: ..\..\SettingsDialog.Designer.cs:117
+#: ..\..\SettingsDialog.Designer.cs:118
 msgid "&Language:"
 msgstr "&Мова:"
 
@@ -178,25 +178,29 @@ msgstr "&Мова:"
 msgid "&Link:"
 msgstr "&Посилання:"
 
-#: ..\..\AddUrlDialog.Designer.cs:67 ..\..\IcoPresetDialog.Designer.cs:155
-#: ..\..\AddSizeDialog.Designer.cs:67 ..\..\AboutDialog.Designer.cs:117
-#: ..\..\AddFolderDialog.Designer.cs:117 ..\..\SettingsDialog.Designer.cs:277
+#: ..\..\AddUrlDialog.Designer.cs:67 ..\..\AddSizeDialog.Designer.cs:67
+#: ..\..\AboutDialog.Designer.cs:117 ..\..\AddFolderDialog.Designer.cs:117
+#: ..\..\IcoPresetDialog.Designer.cs:155 ..\..\SettingsDialog.Designer.cs:293
 msgid "&OK"
 msgstr "&ОК"
 
-#: ..\..\IcoPresetDialog.Designer.cs:145 ..\..\MainWindow.Designer.cs:136
+#: ..\..\MainWindow.Designer.cs:136 ..\..\IcoPresetDialog.Designer.cs:145
 msgid "&Remove"
 msgstr "В&идалити"
 
-#: ..\..\SettingsDialog.Designer.cs:235
+#: ..\..\SettingsDialog.Designer.cs:240
 msgid "&Reset"
 msgstr "&Скинути"
+
+#: ..\..\SettingsDialog.Designer.cs:250
+msgid "&Save converted images in the same folder as the original"
+msgstr "Зберігати перетворені зображення в тій &же теці, що й оригінал"
 
 #: ..\..\MainWindow.Designer.cs:152
 msgid "&Settings..."
 msgstr "&Налаштування..."
 
-#: ..\..\SettingsDialog.Designer.cs:255
+#: ..\..\SettingsDialog.Designer.cs:271
 msgid "&Target formats to show in the list"
 msgstr "&Цільові формати для показу в списку"
 
@@ -287,7 +291,7 @@ msgstr "Корист&увацький"
 msgid "Cancelled."
 msgstr "Скасовано."
 
-#: ..\..\SettingsDialog.Designer.cs:145
+#: ..\..\SettingsDialog.Designer.cs:146
 msgid "Check for &updates on startup"
 msgstr "Перевіряти &оновлення під час запуску"
 
@@ -295,7 +299,7 @@ msgstr "Перевіряти &оновлення під час запуску"
 msgid "Check for &Updates..."
 msgstr "Перевірити &оновлення..."
 
-#: ..\..\SettingsDialog.Designer.cs:155
+#: ..\..\SettingsDialog.Designer.cs:156
 msgid "Check for updates in the back&ground:"
 msgstr "Перевіряти оновлення у &фоні:"
 
@@ -311,7 +315,7 @@ msgstr "Хмарні файли"
 msgid "Confirm Exit"
 msgstr "Підтвердження виходу"
 
-#: ..\..\SettingsDialog.Designer.cs:135
+#: ..\..\SettingsDialog.Designer.cs:136
 msgid "Confirm on exit with non-empty &queue"
 msgstr "Підтверджу&вати вихід при непорожній черзі"
 
@@ -409,7 +413,7 @@ msgstr "Необхідно вказати --output або --format."
 
 #: ..\..\Program.cs:46 ..\..\Program.cs:73 ..\..\MainWindow.cs:651
 #: ..\..\MainWindow.cs:1033 ..\..\MainWindow.cs:1092 ..\..\MainWindow.cs:1097
-#: ..\..\Utils\Config.cs:95 ..\..\MainWindow.cs:1290
+#: ..\..\MainWindow.cs:1290 ..\..\Utils\Config.cs:102
 msgid "Error"
 msgstr "Помилка"
 
@@ -417,7 +421,7 @@ msgstr "Помилка"
 msgid "Errors:"
 msgstr "Помилки:"
 
-#: ..\..\SettingsDialog.cs:122
+#: ..\..\SettingsDialog.cs:123
 msgid "Every 3 days"
 msgstr "Раз на 3 дні"
 
@@ -498,7 +502,7 @@ msgstr "Ім'я файлу"
 msgid "File not found: {0}"
 msgstr "Файл не знайдено: {0}"
 
-#: ..\..\SettingsDialog.cs:200
+#: ..\..\SettingsDialog.cs:201
 msgid "Folder Not Found"
 msgstr "Папку не знайдено"
 
@@ -506,7 +510,7 @@ msgstr "Папку не знайдено"
 msgid "Format"
 msgstr "Формат"
 
-#: ..\..\SettingsDialog.Designer.cs:85
+#: ..\..\SettingsDialog.Designer.cs:86
 msgid "General"
 msgstr "Загальні"
 
@@ -530,7 +534,7 @@ msgstr "Значки ICO (*.ico)"
 msgid "Image files"
 msgstr "Файли зображень"
 
-#: ..\..\SettingsDialog.Designer.cs:174
+#: ..\..\SettingsDialog.Designer.cs:175
 msgid "Images"
 msgstr "Зображення"
 
@@ -610,7 +614,7 @@ msgstr ""
 msgid "Multi-size ICO created: {0}"
 msgstr "Створено багаторозмірний ICO: {0}"
 
-#: ..\..\SettingsDialog.cs:125
+#: ..\..\SettingsDialog.cs:126
 msgid "Never"
 msgstr "Ніколи"
 
@@ -622,7 +626,7 @@ msgstr "Папку не вибрано"
 msgid "No format selected"
 msgstr "Формат не вибрано"
 
-#: ..\..\SettingsDialog.cs:211
+#: ..\..\SettingsDialog.cs:212
 msgid "No Formats Selected"
 msgstr "Формати не вибрано"
 
@@ -654,19 +658,19 @@ msgstr "Немає що конвертувати"
 msgid "Oire Software SARL"
 msgstr "Oire Software SARL"
 
-#: ..\..\SettingsDialog.cs:121
+#: ..\..\SettingsDialog.cs:122
 msgid "Once a day"
 msgstr "Раз на день"
 
-#: ..\..\SettingsDialog.cs:124
+#: ..\..\SettingsDialog.cs:125
 msgid "Once a month"
 msgstr "Раз на місяць"
 
-#: ..\..\SettingsDialog.cs:123
+#: ..\..\SettingsDialog.cs:124
 msgid "Once a week"
 msgstr "Раз на тиждень"
 
-#: ..\..\SettingsDialog.Designer.cs:207
+#: ..\..\SettingsDialog.Designer.cs:212
 msgid "Output &Folder:"
 msgstr "Папка &призначення:"
 
@@ -721,7 +725,7 @@ msgstr "Будь ласка, виберіть папку."
 msgid "Please select a target format."
 msgstr "Будь ласка, виберіть цільовий формат."
 
-#: ..\..\SettingsDialog.cs:210
+#: ..\..\SettingsDialog.cs:211
 msgid "Please show at least one target format."
 msgstr "Будь ласка, виберіть хоча б один цільовий формат для показу."
 
@@ -787,7 +791,7 @@ msgstr "Виберіть папку із зображеннями"
 msgid "Select images to add"
 msgstr "Виберіть зображення для додавання"
 
-#: ..\..\SettingsDialog.cs:170
+#: ..\..\SettingsDialog.cs:171
 msgid "Select output folder for converted images"
 msgstr "Виберіть папку призначення для конвертованих зображень"
 
@@ -844,7 +848,7 @@ msgstr "Стан"
 msgid "Supported formats: {0}"
 msgstr "Підтримувані формати: {0}"
 
-#: ..\..\SettingsDialog.cs:71
+#: ..\..\SettingsDialog.cs:72
 msgid "System"
 msgstr "Системна"
 
@@ -917,7 +921,7 @@ msgstr ""
 "Вставлений текст не є дійсним посиланням.\n"
 "Посилання мають починатися з http:// або https://."
 
-#: ..\..\SettingsDialog.cs:199
+#: ..\..\SettingsDialog.cs:200
 msgid "The selected folder does not exist. Please choose an existing folder."
 msgstr "Вибрана папка не існує. Будь ласка, виберіть наявну папку."
 
@@ -938,12 +942,12 @@ msgstr "Зображення TIFF (*.tif, *.tiff)"
 msgid "Unable to check for updates. Please try again later."
 msgstr "Неможливо перевірити оновлення. Спробуйте пізніше."
 
-#: ..\..\Utils\Config.cs:77
+#: ..\..\Utils\Config.cs:84
 #, csharp-format
 msgid "Unable to load configuration: {0}"
 msgstr "Не вдалося завантажити конфігурацію: {0}"
 
-#: ..\..\Utils\Config.cs:73 ..\..\Utils\Config.cs:89
+#: ..\..\Utils\Config.cs:80 ..\..\Utils\Config.cs:96
 #, csharp-format
 msgid "Unable to save configuration: {0}"
 msgstr "Не вдалося зберегти конфігурацію: {0}"

@@ -16,6 +16,13 @@ public class Config {
     public class SectionGeneral {
         public string Language { get; set; } = "System";
         public string OutputFolder { get; set; } = App.DefaultOutputFolder;
+
+        /// <summary>When <c>true</c>, converted files are written next to their source file
+        /// instead of into <see cref="OutputFolder"/> (issue #33). Items that have no source
+        /// folder — clipboard captures and downloaded links — still fall back to
+        /// <see cref="OutputFolder"/>. Opt-in; off by default.</summary>
+        public bool SaveToSourceFolder { get; set; }
+
         public string LastInputFolder { get; set; } = "";
         public bool ConfirmExitWithQueue { get; set; } = true;
 
