@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-06-30 02:17:23+0200\n"
+"POT-Creation-Date: 2026-06-30 14:25:10+0200\n"
 "PO-Revision-Date: 2026-03-07 23:00+0100\n"
 "Last-Translator: \n"
 "Language-Team: fr\n"
@@ -106,13 +106,13 @@ msgstr "À &propos de SIC!..."
 msgid "&Add..."
 msgstr "&Ajouter..."
 
-#: ..\..\AddFolderDialog.Designer.cs:83 ..\..\SettingsDialog.Designer.cs:226
+#: ..\..\AddFolderDialog.Designer.cs:83 ..\..\SettingsDialog.Designer.cs:231
 msgid "&Browse..."
 msgstr "&Parcourir..."
 
 #: ..\..\AddUrlDialog.Designer.cs:76 ..\..\ProgressDialog.Designer.cs:83
-#: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\AddSizeDialog.Designer.cs:76
-#: ..\..\AddFolderDialog.Designer.cs:126 ..\..\SettingsDialog.Designer.cs:288
+#: ..\..\AddSizeDialog.Designer.cs:76 ..\..\AddFolderDialog.Designer.cs:126
+#: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\SettingsDialog.Designer.cs:304
 msgid "&Cancel"
 msgstr "&Annuler"
 
@@ -128,7 +128,7 @@ msgstr "&Copier les infos"
 msgid "&Crop"
 msgstr "&Recadrer"
 
-#: ..\..\SettingsDialog.Designer.cs:244
+#: ..\..\SettingsDialog.Designer.cs:260
 msgid "&Detect images in clipboard"
 msgstr "&Détecter les images dans le presse-papiers"
 
@@ -164,7 +164,7 @@ msgstr "&Aide"
 msgid "&Keep proportions"
 msgstr "&Garder les proportions"
 
-#: ..\..\SettingsDialog.Designer.cs:117
+#: ..\..\SettingsDialog.Designer.cs:118
 msgid "&Language:"
 msgstr "&Langue :"
 
@@ -172,25 +172,29 @@ msgstr "&Langue :"
 msgid "&Link:"
 msgstr "&Lien :"
 
-#: ..\..\AddUrlDialog.Designer.cs:67 ..\..\IcoPresetDialog.Designer.cs:155
-#: ..\..\AddSizeDialog.Designer.cs:67 ..\..\AboutDialog.Designer.cs:117
-#: ..\..\AddFolderDialog.Designer.cs:117 ..\..\SettingsDialog.Designer.cs:277
+#: ..\..\AddUrlDialog.Designer.cs:67 ..\..\AddSizeDialog.Designer.cs:67
+#: ..\..\AboutDialog.Designer.cs:117 ..\..\AddFolderDialog.Designer.cs:117
+#: ..\..\IcoPresetDialog.Designer.cs:155 ..\..\SettingsDialog.Designer.cs:293
 msgid "&OK"
 msgstr "&OK"
 
-#: ..\..\IcoPresetDialog.Designer.cs:145 ..\..\MainWindow.Designer.cs:136
+#: ..\..\MainWindow.Designer.cs:136 ..\..\IcoPresetDialog.Designer.cs:145
 msgid "&Remove"
 msgstr "&Supprimer"
 
-#: ..\..\SettingsDialog.Designer.cs:235
+#: ..\..\SettingsDialog.Designer.cs:240
 msgid "&Reset"
 msgstr "&Réinitialiser"
+
+#: ..\..\SettingsDialog.Designer.cs:250
+msgid "&Save converted images in the same folder as the original"
+msgstr "Enregi&strer les images converties dans le même dossier que l'original"
 
 #: ..\..\MainWindow.Designer.cs:152
 msgid "&Settings..."
 msgstr "&Paramètres..."
 
-#: ..\..\SettingsDialog.Designer.cs:255
+#: ..\..\SettingsDialog.Designer.cs:271
 msgid "&Target formats to show in the list"
 msgstr "&Formats cibles à afficher dans la liste"
 
@@ -280,7 +284,7 @@ msgstr "Personnal&isé"
 msgid "Cancelled."
 msgstr "Annulé."
 
-#: ..\..\SettingsDialog.Designer.cs:145
+#: ..\..\SettingsDialog.Designer.cs:146
 msgid "Check for &updates on startup"
 msgstr "Rechercher les mises à &jour au démarrage"
 
@@ -288,7 +292,7 @@ msgstr "Rechercher les mises à &jour au démarrage"
 msgid "Check for &Updates..."
 msgstr "Vérifier les mises à &jour..."
 
-#: ..\..\SettingsDialog.Designer.cs:155
+#: ..\..\SettingsDialog.Designer.cs:156
 msgid "Check for updates in the back&ground:"
 msgstr "Rechercher les mises à jour en &arrière-plan :"
 
@@ -304,7 +308,7 @@ msgstr "Fichiers dans le cloud"
 msgid "Confirm Exit"
 msgstr "Confirmer la fermeture"
 
-#: ..\..\SettingsDialog.Designer.cs:135
+#: ..\..\SettingsDialog.Designer.cs:136
 msgid "Confirm on exit with non-empty &queue"
 msgstr "&Confirmer la fermeture avec une file non vide"
 
@@ -402,7 +406,7 @@ msgstr "Il faut spécifier --output ou --format."
 
 #: ..\..\Program.cs:46 ..\..\Program.cs:73 ..\..\MainWindow.cs:651
 #: ..\..\MainWindow.cs:1033 ..\..\MainWindow.cs:1092 ..\..\MainWindow.cs:1097
-#: ..\..\Utils\Config.cs:95 ..\..\MainWindow.cs:1290
+#: ..\..\MainWindow.cs:1290 ..\..\Utils\Config.cs:102
 msgid "Error"
 msgstr "Erreur"
 
@@ -410,7 +414,7 @@ msgstr "Erreur"
 msgid "Errors:"
 msgstr "Erreurs :"
 
-#: ..\..\SettingsDialog.cs:122
+#: ..\..\SettingsDialog.cs:123
 msgid "Every 3 days"
 msgstr "Tous les 3 jours"
 
@@ -491,7 +495,7 @@ msgstr "Nom du fichier"
 msgid "File not found: {0}"
 msgstr "Fichier introuvable : {0}"
 
-#: ..\..\SettingsDialog.cs:200
+#: ..\..\SettingsDialog.cs:201
 msgid "Folder Not Found"
 msgstr "Dossier introuvable"
 
@@ -499,7 +503,7 @@ msgstr "Dossier introuvable"
 msgid "Format"
 msgstr "Format"
 
-#: ..\..\SettingsDialog.Designer.cs:85
+#: ..\..\SettingsDialog.Designer.cs:86
 msgid "General"
 msgstr "Général"
 
@@ -523,7 +527,7 @@ msgstr "Icônes ICO (*.ico)"
 msgid "Image files"
 msgstr "Fichiers image"
 
-#: ..\..\SettingsDialog.Designer.cs:174
+#: ..\..\SettingsDialog.Designer.cs:175
 msgid "Images"
 msgstr "Images"
 
@@ -604,7 +608,7 @@ msgstr ""
 msgid "Multi-size ICO created: {0}"
 msgstr "ICO multi-tailles créé : {0}"
 
-#: ..\..\SettingsDialog.cs:125
+#: ..\..\SettingsDialog.cs:126
 msgid "Never"
 msgstr "Jamais"
 
@@ -616,7 +620,7 @@ msgstr "Aucun dossier sélectionné"
 msgid "No format selected"
 msgstr "Aucun format sélectionné"
 
-#: ..\..\SettingsDialog.cs:211
+#: ..\..\SettingsDialog.cs:212
 msgid "No Formats Selected"
 msgstr "Aucun format sélectionné"
 
@@ -648,19 +652,19 @@ msgstr "Rien à convertir"
 msgid "Oire Software SARL"
 msgstr "Oire Software SARL"
 
-#: ..\..\SettingsDialog.cs:121
+#: ..\..\SettingsDialog.cs:122
 msgid "Once a day"
 msgstr "Une fois par jour"
 
-#: ..\..\SettingsDialog.cs:124
+#: ..\..\SettingsDialog.cs:125
 msgid "Once a month"
 msgstr "Une fois par mois"
 
-#: ..\..\SettingsDialog.cs:123
+#: ..\..\SettingsDialog.cs:124
 msgid "Once a week"
 msgstr "Une fois par semaine"
 
-#: ..\..\SettingsDialog.Designer.cs:207
+#: ..\..\SettingsDialog.Designer.cs:212
 msgid "Output &Folder:"
 msgstr "D&ossier de sortie :"
 
@@ -714,7 +718,7 @@ msgstr "Veuillez sélectionner un dossier."
 msgid "Please select a target format."
 msgstr "Veuillez sélectionner un format cible."
 
-#: ..\..\SettingsDialog.cs:210
+#: ..\..\SettingsDialog.cs:211
 msgid "Please show at least one target format."
 msgstr "Veuillez afficher au moins un format cible."
 
@@ -779,7 +783,7 @@ msgstr "Sélectionner le dossier contenant les images"
 msgid "Select images to add"
 msgstr "Sélectionner les images à ajouter"
 
-#: ..\..\SettingsDialog.cs:170
+#: ..\..\SettingsDialog.cs:171
 msgid "Select output folder for converted images"
 msgstr "Sélectionner le dossier de sortie pour les images converties"
 
@@ -836,7 +840,7 @@ msgstr "Statut"
 msgid "Supported formats: {0}"
 msgstr "Formats pris en charge : {0}"
 
-#: ..\..\SettingsDialog.cs:71
+#: ..\..\SettingsDialog.cs:72
 msgid "System"
 msgstr "Système"
 
@@ -908,7 +912,7 @@ msgstr ""
 "Le texte collé n'est pas un lien valide.\n"
 "Les liens doivent commencer par http:// ou https://."
 
-#: ..\..\SettingsDialog.cs:199
+#: ..\..\SettingsDialog.cs:200
 msgid "The selected folder does not exist. Please choose an existing folder."
 msgstr ""
 "Le dossier sélectionné n'existe pas. Veuillez choisir un dossier existant."
@@ -930,12 +934,12 @@ msgstr "Images TIFF (*.tif, *.tiff)"
 msgid "Unable to check for updates. Please try again later."
 msgstr "Impossible de vérifier les mises à jour. Veuillez réessayer plus tard."
 
-#: ..\..\Utils\Config.cs:77
+#: ..\..\Utils\Config.cs:84
 #, csharp-format
 msgid "Unable to load configuration: {0}"
 msgstr "Impossible de charger la configuration : {0}"
 
-#: ..\..\Utils\Config.cs:73 ..\..\Utils\Config.cs:89
+#: ..\..\Utils\Config.cs:80 ..\..\Utils\Config.cs:96
 #, csharp-format
 msgid "Unable to save configuration: {0}"
 msgstr "Impossible d'enregistrer la configuration : {0}"

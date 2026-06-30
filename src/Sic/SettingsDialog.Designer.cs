@@ -33,6 +33,7 @@ partial class SettingsDialog {
         outputFolderTextBox = new TextBox();
         browseButton = new Button();
         clearOutputFolderButton = new Button();
+        saveToSourceFolderCheckBox = new CheckBox();
         detectClipboardCheckBox = new CheckBox();
         formatsGroupBox = new GroupBox();
         formatsPanel = new TableLayoutPanel();
@@ -177,18 +178,20 @@ partial class SettingsDialog {
         imagesTab.Padding = new Padding(8);
         imagesTab.Controls.Add(imagesLayout);
 
-        // imagesLayout — 4 cols × 3 rows. Row 0 is the output-folder line (label, path,
-        // Browse, Reset); row 1 is the clipboard toggle; row 2 is the target-formats group box,
-        // which stretches to fill the tab. Rows 1-2 span all columns.
+        // imagesLayout — 4 cols × 4 rows. Row 0 is the output-folder line (label, path,
+        // Browse, Reset); row 1 is the save-next-to-original toggle; row 2 is the clipboard
+        // toggle; row 3 is the target-formats group box, which stretches to fill the tab.
+        // Rows 1-3 span all columns.
         imagesLayout.ColumnCount = 4;
         imagesLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));     // label
         imagesLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F)); // path
         imagesLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));     // browse
         imagesLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));     // reset
-        imagesLayout.RowCount = 3;
+        imagesLayout.RowCount = 4;
         imagesLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // 0: output folder
-        imagesLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // 1: detect clipboard
-        imagesLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F)); // 2: formats group
+        imagesLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // 1: save to source folder
+        imagesLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // 2: detect clipboard
+        imagesLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F)); // 3: formats group
         imagesLayout.Dock = DockStyle.Fill;
         imagesLayout.Name = "imagesLayout";
 
@@ -196,9 +199,11 @@ partial class SettingsDialog {
         imagesLayout.Controls.Add(outputFolderTextBox, 1, 0);
         imagesLayout.Controls.Add(browseButton, 2, 0);
         imagesLayout.Controls.Add(clearOutputFolderButton, 3, 0);
-        imagesLayout.Controls.Add(detectClipboardCheckBox, 0, 1);
+        imagesLayout.Controls.Add(saveToSourceFolderCheckBox, 0, 1);
+        imagesLayout.SetColumnSpan(saveToSourceFolderCheckBox, 4);
+        imagesLayout.Controls.Add(detectClipboardCheckBox, 0, 2);
         imagesLayout.SetColumnSpan(detectClipboardCheckBox, 4);
-        imagesLayout.Controls.Add(formatsGroupBox, 0, 2);
+        imagesLayout.Controls.Add(formatsGroupBox, 0, 3);
         imagesLayout.SetColumnSpan(formatsGroupBox, 4);
 
         //
@@ -239,6 +244,17 @@ partial class SettingsDialog {
         clearOutputFolderButton.TabIndex = 3;
 
         //
+        // saveToSourceFolderCheckBox — when ticked, converted files go next to their originals
+        // (issue #33); the output folder above still applies to clipboard and downloaded images.
+        //
+        saveToSourceFolderCheckBox.Text = "&Save converted images in the same folder as the original";
+        saveToSourceFolderCheckBox.AutoSize = true;
+        saveToSourceFolderCheckBox.Anchor = AnchorStyles.Left;
+        saveToSourceFolderCheckBox.Margin = new Padding(3, 10, 3, 3);
+        saveToSourceFolderCheckBox.Name = "saveToSourceFolderCheckBox";
+        saveToSourceFolderCheckBox.TabIndex = 4;
+
+        //
         // detectClipboardCheckBox
         //
         detectClipboardCheckBox.Text = "&Detect images in clipboard";
@@ -246,7 +262,7 @@ partial class SettingsDialog {
         detectClipboardCheckBox.Anchor = AnchorStyles.Left;
         detectClipboardCheckBox.Margin = new Padding(3, 10, 3, 3);
         detectClipboardCheckBox.Name = "detectClipboardCheckBox";
-        detectClipboardCheckBox.TabIndex = 4;
+        detectClipboardCheckBox.TabIndex = 5;
 
         //
         // formatsGroupBox — its caption is the accessible group name screen readers announce when
@@ -257,7 +273,7 @@ partial class SettingsDialog {
         formatsGroupBox.Margin = new Padding(3, 9, 3, 3);
         formatsGroupBox.Padding = new Padding(8, 4, 8, 8);
         formatsGroupBox.Name = "formatsGroupBox";
-        formatsGroupBox.TabIndex = 5;
+        formatsGroupBox.TabIndex = 6;
         formatsGroupBox.Controls.Add(formatsPanel);
 
         //
@@ -346,6 +362,7 @@ partial class SettingsDialog {
     private TextBox outputFolderTextBox;
     private Button browseButton;
     private Button clearOutputFolderButton;
+    private CheckBox saveToSourceFolderCheckBox;
     private CheckBox detectClipboardCheckBox;
     private GroupBox formatsGroupBox;
     private TableLayoutPanel formatsPanel;

@@ -476,7 +476,7 @@ public partial class MainWindow: Form {
                         continue;
                     }
 
-                    var outputPath = ImageConverter.GenerateOutputPath(item, targetFormat, outputFolder);
+                    var outputPath = ImageConverter.GenerateOutputPath(item, targetFormat, outputFolder, Config.General.SaveToSourceFolder);
 
                     if (File.Exists(outputPath)) {
                         var resolution = ResolveFileConflict(outputPath);
@@ -594,7 +594,7 @@ public partial class MainWindow: Form {
         var index = imageListView.SelectedIndices[0];
         var item = _imageItems[index];
         var outputFolder = ValidateOutputFolder();
-        var outputPath = ImageConverter.GenerateOutputPath(item, "ICO", outputFolder);
+        var outputPath = ImageConverter.GenerateOutputPath(item, "ICO", outputFolder, Config.General.SaveToSourceFolder);
 
         if (File.Exists(outputPath)) {
             var resolution = ResolveFileConflict(outputPath);
