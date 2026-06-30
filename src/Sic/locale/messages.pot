@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-06-30 14:25:10+0200\n"
-"PO-Revision-Date: 2026-06-30 14:25:10+0200\n"
+"POT-Creation-Date: 2026-06-30 17:40:59+0200\n"
+"PO-Revision-Date: 2026-06-30 17:41:00+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -104,11 +104,11 @@ msgstr ""
 msgid "&Browse..."
 msgstr ""
 
-#: ..\..\AddUrlDialog.Designer.cs:76
-#: ..\..\ProgressDialog.Designer.cs:83
 #: ..\..\AddSizeDialog.Designer.cs:76
-#: ..\..\AddFolderDialog.Designer.cs:126
+#: ..\..\ProgressDialog.Designer.cs:83
+#: ..\..\AddUrlDialog.Designer.cs:76
 #: ..\..\IcoPresetDialog.Designer.cs:164
+#: ..\..\AddFolderDialog.Designer.cs:126
 #: ..\..\SettingsDialog.Designer.cs:304
 msgid "&Cancel"
 msgstr ""
@@ -169,11 +169,11 @@ msgstr ""
 msgid "&Link:"
 msgstr ""
 
-#: ..\..\AddUrlDialog.Designer.cs:67
 #: ..\..\AddSizeDialog.Designer.cs:67
-#: ..\..\AboutDialog.Designer.cs:117
-#: ..\..\AddFolderDialog.Designer.cs:117
+#: ..\..\AddUrlDialog.Designer.cs:67
 #: ..\..\IcoPresetDialog.Designer.cs:155
+#: ..\..\AddFolderDialog.Designer.cs:117
+#: ..\..\AboutDialog.Designer.cs:117
 #: ..\..\SettingsDialog.Designer.cs:293
 msgid "&OK"
 msgstr ""
@@ -408,11 +408,11 @@ msgstr ""
 #: ..\..\Program.cs:46
 #: ..\..\Program.cs:73
 #: ..\..\MainWindow.cs:651
+#: ..\..\Utils\Config.cs:102
 #: ..\..\MainWindow.cs:1033
 #: ..\..\MainWindow.cs:1092
 #: ..\..\MainWindow.cs:1097
 #: ..\..\MainWindow.cs:1290
-#: ..\..\Utils\Config.cs:102
 msgid "Error"
 msgstr ""
 
@@ -511,6 +511,10 @@ msgstr ""
 msgid "GitHub Repository"
 msgstr ""
 
+#: ..\..\AddFolderDialog.cs:19
+msgid "HEIC images (*.heic, *.heif)"
+msgstr ""
+
 #: ..\..\MainWindow.cs:643
 msgid "ICO Created"
 msgstr ""
@@ -604,7 +608,7 @@ msgstr ""
 msgid "Never"
 msgstr ""
 
-#: ..\..\AddFolderDialog.cs:62
+#: ..\..\AddFolderDialog.cs:63
 msgid "No folder selected"
 msgstr ""
 
@@ -702,7 +706,7 @@ msgstr ""
 msgid "Please enter at least one valid dimension (1–65535)."
 msgstr ""
 
-#: ..\..\AddFolderDialog.cs:62
+#: ..\..\AddFolderDialog.cs:63
 msgid "Please select a folder."
 msgstr ""
 
@@ -771,7 +775,7 @@ msgstr ""
 msgid "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)"
 msgstr ""
 
-#: ..\..\AddFolderDialog.cs:43
+#: ..\..\AddFolderDialog.cs:44
 msgid "Select folder containing images"
 msgstr ""
 

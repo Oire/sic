@@ -7,7 +7,7 @@ namespace Oire.Sic;
 
 public partial class AddFolderDialog: Form {
     private static (string Label, string[] Extensions)[] GetFilters() => [
-        (_("All supported images"), ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.ico", "*.bmp", "*.tif", "*.tiff", "*.gif", "*.avif"]),
+        (_("All supported images"), ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.ico", "*.bmp", "*.tif", "*.tiff", "*.gif", "*.avif", "*.heic", "*.heif"]),
         (_("JPEG images (*.jpg, *.jpeg)"), ["*.jpg", "*.jpeg"]),
         (_("PNG images (*.png)"), ["*.png"]),
         (_("WebP images (*.webp)"), ["*.webp"]),
@@ -16,6 +16,7 @@ public partial class AddFolderDialog: Form {
         (_("TIFF images (*.tif, *.tiff)"), ["*.tif", "*.tiff"]),
         (_("GIF images (*.gif)"), ["*.gif"]),
         (_("AVIF images (*.avif)"), ["*.avif"]),
+        (_("HEIC images (*.heic, *.heif)"), ["*.heic", "*.heif"]),
     ];
 
     private readonly (string Label, string[] Extensions)[] _filters = GetFilters();

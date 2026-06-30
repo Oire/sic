@@ -1,13 +1,14 @@
 # SIC! — Simple Image Converter
 
-An accessible image format converter for Windows. Batch-convert images between JPG, PNG, WebP, ICO, BMP, TIFF, GIF, and AVIF with optional resizing. Works as both a GUI app and a command-line tool.
+An accessible image format converter for Windows. Batch-convert images between JPG, PNG, WebP, ICO, BMP, TIFF, GIF, and AVIF (plus reading HEIC photos from iPhones) with optional resizing. Works as both a GUI app and a command-line tool.
 
 Built with accessibility in mind — screen-reader friendly with proper labels and tab order — but designed to look and feel like a proper app for sighted users too.
 
 ## Features
 
 - **Batch conversion** — queue multiple images and convert them all at once
-- **8 formats** — JPG, PNG, WebP, ICO, BMP, TIFF, GIF, AVIF
+- **8 output formats** — JPG, PNG, WebP, ICO, BMP, TIFF, GIF, AVIF
+- **HEIC input** — open and convert HEIC/HEIF photos from newer iPhones to any supported format (input only; HEIC can't be written)
 - **Resize and crop** — specify target dimensions with two modes: keep proportions or crop to exact size
 - **Multi-size ICO** — create `.ico` files with multiple embedded sizes using built-in presets or custom dimensions
 - **Multiple input methods** — file dialog, folder import, drag & drop, Ctrl+V paste (files, screenshots, or URLs), download by link

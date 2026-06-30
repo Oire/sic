@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-06-30 14:25:10+0200\n"
+"POT-Creation-Date: 2026-06-30 17:40:59+0200\n"
 "PO-Revision-Date: 2026-03-07 23:00+0100\n"
 "Last-Translator: \n"
 "Language-Team: fr\n"
@@ -110,9 +110,9 @@ msgstr "&Ajouter..."
 msgid "&Browse..."
 msgstr "&Parcourir..."
 
-#: ..\..\AddUrlDialog.Designer.cs:76 ..\..\ProgressDialog.Designer.cs:83
-#: ..\..\AddSizeDialog.Designer.cs:76 ..\..\AddFolderDialog.Designer.cs:126
-#: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\SettingsDialog.Designer.cs:304
+#: ..\..\AddSizeDialog.Designer.cs:76 ..\..\ProgressDialog.Designer.cs:83
+#: ..\..\AddUrlDialog.Designer.cs:76 ..\..\IcoPresetDialog.Designer.cs:164
+#: ..\..\AddFolderDialog.Designer.cs:126 ..\..\SettingsDialog.Designer.cs:304
 msgid "&Cancel"
 msgstr "&Annuler"
 
@@ -172,9 +172,9 @@ msgstr "&Langue :"
 msgid "&Link:"
 msgstr "&Lien :"
 
-#: ..\..\AddUrlDialog.Designer.cs:67 ..\..\AddSizeDialog.Designer.cs:67
-#: ..\..\AboutDialog.Designer.cs:117 ..\..\AddFolderDialog.Designer.cs:117
-#: ..\..\IcoPresetDialog.Designer.cs:155 ..\..\SettingsDialog.Designer.cs:293
+#: ..\..\AddSizeDialog.Designer.cs:67 ..\..\AddUrlDialog.Designer.cs:67
+#: ..\..\IcoPresetDialog.Designer.cs:155 ..\..\AddFolderDialog.Designer.cs:117
+#: ..\..\AboutDialog.Designer.cs:117 ..\..\SettingsDialog.Designer.cs:293
 msgid "&OK"
 msgstr "&OK"
 
@@ -405,8 +405,8 @@ msgid "Either --output or --format must be specified."
 msgstr "Il faut spécifier --output ou --format."
 
 #: ..\..\Program.cs:46 ..\..\Program.cs:73 ..\..\MainWindow.cs:651
-#: ..\..\MainWindow.cs:1033 ..\..\MainWindow.cs:1092 ..\..\MainWindow.cs:1097
-#: ..\..\MainWindow.cs:1290 ..\..\Utils\Config.cs:102
+#: ..\..\Utils\Config.cs:102 ..\..\MainWindow.cs:1033 ..\..\MainWindow.cs:1092
+#: ..\..\MainWindow.cs:1097 ..\..\MainWindow.cs:1290
 msgid "Error"
 msgstr "Erreur"
 
@@ -515,6 +515,10 @@ msgstr "Images GIF (*.gif)"
 msgid "GitHub Repository"
 msgstr "Dépôt GitHub"
 
+#: ..\..\AddFolderDialog.cs:19
+msgid "HEIC images (*.heic, *.heif)"
+msgstr "Images HEIC (*.heic, *.heif)"
+
 #: ..\..\MainWindow.cs:643
 msgid "ICO Created"
 msgstr "ICO créé"
@@ -612,7 +616,7 @@ msgstr "ICO multi-tailles créé : {0}"
 msgid "Never"
 msgstr "Jamais"
 
-#: ..\..\AddFolderDialog.cs:62
+#: ..\..\AddFolderDialog.cs:63
 msgid "No folder selected"
 msgstr "Aucun dossier sélectionné"
 
@@ -710,7 +714,7 @@ msgstr "Veuillez saisir un lien valide commençant par http:// ou https://."
 msgid "Please enter at least one valid dimension (1–65535)."
 msgstr "Veuillez saisir au moins une dimension valide (1–65535)."
 
-#: ..\..\AddFolderDialog.cs:62
+#: ..\..\AddFolderDialog.cs:63
 msgid "Please select a folder."
 msgstr "Veuillez sélectionner un dossier."
 
@@ -775,7 +779,7 @@ msgstr "&Mode de redimensionnement :"
 msgid "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)"
 msgstr "Dimensions sous forme LxH, Lx ou xH (ex. 128x128, 128x, x128)"
 
-#: ..\..\AddFolderDialog.cs:43
+#: ..\..\AddFolderDialog.cs:44
 msgid "Select folder containing images"
 msgstr "Sélectionner le dossier contenant les images"
 
