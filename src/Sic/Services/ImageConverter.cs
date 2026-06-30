@@ -61,6 +61,7 @@ public static class ImageConverter {
             "TIFF" or "TIF" or "TIFF64" => "TIFF",
             "GIF" or "GIF87" => "GIF",
             "AVIF" => "AVIF",
+            "HEIC" or "HEIF" => "HEIC",
             _ => null,
         };
     }

@@ -33,7 +33,7 @@ public partial class MainWindow: Form {
     private bool _clipboardPromptOpen;
 
     private static readonly string[] ClipboardImageExtensions =
-        [".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".webp", ".ico", ".avif"];
+        [".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".webp", ".ico", ".avif", ".heic", ".heif"];
 
     [DllImport("user32.dll")]
     private static extern uint GetClipboardSequenceNumber();
@@ -223,7 +223,7 @@ public partial class MainWindow: Form {
     private async void AddImageMenuItem_Click(object? sender, EventArgs e) {
         using var dialog = new OpenFileDialog {
             Title = _("Select images to add"),
-            Filter = _("Image files") + "|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.tiff;*.tif;*.webp;*.ico;*.avif|" + _("All files") + "|*.*",
+            Filter = _("Image files") + "|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.tiff;*.tif;*.webp;*.ico;*.avif;*.heic;*.heif|" + _("All files") + "|*.*",
             Multiselect = true,
         };
 
