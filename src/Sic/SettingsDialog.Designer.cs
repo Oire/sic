@@ -34,6 +34,8 @@ partial class SettingsDialog {
         browseButton = new Button();
         clearOutputFolderButton = new Button();
         detectClipboardCheckBox = new CheckBox();
+        formatsGroupBox = new GroupBox();
+        formatsPanel = new TableLayoutPanel();
 
         okButton = new Button();
         cancelButton = new Button();
@@ -44,6 +46,7 @@ partial class SettingsDialog {
         generalLayout.SuspendLayout();
         imagesTab.SuspendLayout();
         imagesLayout.SuspendLayout();
+        formatsGroupBox.SuspendLayout();
         SuspendLayout();
 
         //
@@ -175,7 +178,8 @@ partial class SettingsDialog {
         imagesTab.Controls.Add(imagesLayout);
 
         // imagesLayout — 4 cols × 3 rows. Row 0 is the output-folder line (label, path,
-        // Browse, Reset); row 1 is the clipboard toggle spanning all columns; row 2 fills.
+        // Browse, Reset); row 1 is the clipboard toggle; row 2 is the target-formats group box,
+        // which stretches to fill the tab. Rows 1-2 span all columns.
         imagesLayout.ColumnCount = 4;
         imagesLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));     // label
         imagesLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F)); // path
@@ -184,7 +188,7 @@ partial class SettingsDialog {
         imagesLayout.RowCount = 3;
         imagesLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // 0: output folder
         imagesLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // 1: detect clipboard
-        imagesLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F)); // 2: filler
+        imagesLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F)); // 2: formats group
         imagesLayout.Dock = DockStyle.Fill;
         imagesLayout.Name = "imagesLayout";
 
@@ -194,6 +198,8 @@ partial class SettingsDialog {
         imagesLayout.Controls.Add(clearOutputFolderButton, 3, 0);
         imagesLayout.Controls.Add(detectClipboardCheckBox, 0, 1);
         imagesLayout.SetColumnSpan(detectClipboardCheckBox, 4);
+        imagesLayout.Controls.Add(formatsGroupBox, 0, 2);
+        imagesLayout.SetColumnSpan(formatsGroupBox, 4);
 
         //
         // outputFolderLabel
@@ -243,6 +249,29 @@ partial class SettingsDialog {
         detectClipboardCheckBox.TabIndex = 4;
 
         //
+        // formatsGroupBox — its caption is the accessible group name screen readers announce when
+        // focus enters the format checkboxes; the mnemonic jumps focus to the first checkbox.
+        //
+        formatsGroupBox.Text = "&Target formats to show in the list";
+        formatsGroupBox.Dock = DockStyle.Fill;
+        formatsGroupBox.Margin = new Padding(3, 9, 3, 3);
+        formatsGroupBox.Padding = new Padding(8, 4, 8, 8);
+        formatsGroupBox.Name = "formatsGroupBox";
+        formatsGroupBox.TabIndex = 5;
+        formatsGroupBox.Controls.Add(formatsPanel);
+
+        //
+        // formatsPanel — host for one real CheckBox per supported target format, added at runtime in
+        // PopulateFormats(). Real checkboxes (rather than a CheckedListBox) are used so screen readers
+        // announce each toggle; the boxes stack in a single auto-sizing column that scrolls if needed.
+        //
+        formatsPanel.Dock = DockStyle.Fill;
+        formatsPanel.AutoScroll = true;
+        formatsPanel.ColumnCount = 1;
+        formatsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        formatsPanel.Name = "formatsPanel";
+
+        //
         // okButton
         //
         okButton.Text = "&OK";
@@ -269,7 +298,7 @@ partial class SettingsDialog {
         //
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(470, 300);
+        ClientSize = new Size(470, 380);
         Controls.Add(mainLayout);
         Name = "SettingsDialog";
         Text = "Settings";
@@ -292,6 +321,7 @@ partial class SettingsDialog {
         imagesTab.PerformLayout();
         imagesLayout.ResumeLayout(false);
         imagesLayout.PerformLayout();
+        formatsGroupBox.ResumeLayout(false);
         ResumeLayout(false);
         PerformLayout();
     }
@@ -317,6 +347,8 @@ partial class SettingsDialog {
     private Button browseButton;
     private Button clearOutputFolderButton;
     private CheckBox detectClipboardCheckBox;
+    private GroupBox formatsGroupBox;
+    private TableLayoutPanel formatsPanel;
 
     private Button okButton;
     private Button cancelButton;

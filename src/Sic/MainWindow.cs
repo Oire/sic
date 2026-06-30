@@ -151,13 +151,23 @@ public partial class MainWindow: Form {
     }
 
     private void PopulateFormatComboBox() {
-        foreach (var format in ImageConverter.GetSupportedFormats()) {
+        // Preserve the current pick across a refresh (e.g. after Settings narrows the list),
+        // falling back to the first format when the previous one is no longer shown.
+        var previous = formatComboBox.SelectedItem as string;
+
+        formatComboBox.BeginUpdate();
+        formatComboBox.Items.Clear();
+        foreach (var format in ImageConverter.GetEnabledFormats(Config.General.GetEnabledFormatKeys())) {
             formatComboBox.Items.Add(format);
         }
+        formatComboBox.EndUpdate();
 
-        if (formatComboBox.Items.Count > 0) {
-            formatComboBox.SelectedIndex = 0;
+        if (formatComboBox.Items.Count == 0) {
+            return;
         }
+
+        var index = previous != null ? formatComboBox.Items.IndexOf(previous) : -1;
+        formatComboBox.SelectedIndex = index >= 0 ? index : 0;
     }
 
     private void UpdateMenuState() {
@@ -300,6 +310,9 @@ public partial class MainWindow: Form {
         if (Config.General.Language != previousLanguage) {
             ApplyLocalization();
         }
+
+        // The Images tab can change which target formats are offered — rebuild the dropdown.
+        PopulateFormatComboBox();
     }
 
     private void ApplyLocalization() {

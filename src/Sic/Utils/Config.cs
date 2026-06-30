@@ -30,6 +30,18 @@ public class Config {
         /// re-focusing never re-prompts for the same data. Opt-in; off by default.</summary>
         public bool DetectClipboardData { get; set; }
 
+        /// <summary>Comma-separated list of SIC! format keys (e.g. <c>"JPG,PNG,WEBP"</c>) to show
+        /// in the target-format dropdown, letting users hide formats they never convert to
+        /// (issue #47). An empty value means "show every supported format" — the default — so a
+        /// fresh or upgraded config naturally exposes all formats. Parse it via
+        /// <see cref="GetEnabledFormatKeys"/>.</summary>
+        public string EnabledFormats { get; set; } = "";
+
+        /// <summary>The configured <see cref="EnabledFormats"/> split into individual format keys,
+        /// trimmed and with blanks dropped. Empty when no restriction is set (all formats shown).</summary>
+        public IEnumerable<string> GetEnabledFormatKeys() =>
+            EnabledFormats.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
         /// <summary>How often the app checks for updates in the background while it runs.
         /// <see cref="UpdateCheckInterval.Never"/> disables the background loop. Independent of
         /// <see cref="CheckForUpdatesOnStartup"/>: either, both, or neither may be active.</summary>

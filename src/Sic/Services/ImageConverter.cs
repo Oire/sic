@@ -28,6 +28,25 @@ public static class ImageConverter {
     public static IReadOnlyList<string> GetSupportedFormats() => FormatMap.Keys.ToList();
 
     /// <summary>
+    /// The supported formats filtered down to those whose keys appear in <paramref name="enabledKeys"/>,
+    /// preserving the canonical display order. If the filter is <c>null</c>, empty, or matches no known
+    /// format, every supported format is returned — the dropdown is never left empty (issue #47).
+    /// </summary>
+    public static IReadOnlyList<string> GetEnabledFormats(IEnumerable<string>? enabledKeys) {
+        if (enabledKeys is null) {
+            return GetSupportedFormats();
+        }
+
+        var set = new HashSet<string>(enabledKeys, StringComparer.OrdinalIgnoreCase);
+        if (set.Count == 0) {
+            return GetSupportedFormats();
+        }
+
+        var filtered = FormatMap.Keys.Where(set.Contains).ToList();
+        return filtered.Count > 0 ? filtered : GetSupportedFormats();
+    }
+
+    /// <summary>
     /// Maps an arbitrary format name (a SIC! format key like "JPG", or a Magick.NET
     /// format name like "Jpeg"/"Bmp3") to one of the canonical SIC! format keys.
     /// Returns <c>null</c> for unknown formats.
