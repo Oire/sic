@@ -48,6 +48,7 @@ After editing `.po` files, always run `compile-translations.ps1` to regenerate t
 - `Convert` — converts an `ImageItem` to a target format with optional resize, writes to disk
 - `GeneratePreview` — produces a `Bitmap` for the preview panel
 - `GenerateOutputPath`, `GetConflictRenamePath` — output path logic with conflict resolution
+- `GetSupportedFormats` — all SIC! format keys in canonical order; `GetEnabledFormats(enabledKeys)` filters them to the user-selected subset (issue #47), preserving order and never returning an empty list
 - Note: The class name conflicts with `System.Drawing.ImageConverter`; files that use it must import `using ImageConverter = Oire.Sic.Services.ImageConverter;`
 
 **`src/Sic/Services/UnsupportedImageException.cs`** — Domain exception thrown when content downloads/loads fine but isn't a decodable image (e.g. a link to an HTML page). `LoadFromUrl` translates Magick.NET's decode failure into this so the UI can show a friendly "not an image" message without referencing Magick.NET — keeps the image-library dependency inside the Services layer.
@@ -65,13 +66,13 @@ After editing `.po` files, always run `compile-translations.ps1` to regenerate t
 
 **`src/Sic/SettingsDialog.cs` + `SettingsDialog.Designer.cs`** — Settings form. A `TabControl` (filling the form, OK/Cancel beneath) with two tabs, each its own flat `TableLayoutPanel`:
 - **General** — language dropdown, confirm-exit checkbox, "check for updates on startup" checkbox, background update-frequency dropdown.
-- **Images** — output folder (textbox + browse + reset) and a "detect data in clipboard" checkbox (issue #36). Has room for future image/conversion options (e.g. selective targets).
+- **Images** — output folder (textbox + browse + reset), a "detect data in clipboard" checkbox (issue #36), and a target-formats checklist that selects which formats appear in the main window's dropdown (issue #47). Built as individual `CheckBox` controls stacked in a `TableLayoutPanel` (`formatsPanel`, filled at runtime in `PopulateFormats()`) inside a `GroupBox` (`formatsGroupBox`) — *not* a `CheckedListBox`, which doesn't reliably announce toggle state changes to screen readers. The group box caption (rather than a separate label) supplies the accessible group name; each checkbox is its own tab stop. OK requires at least one format ticked; when all are ticked it saves `EnabledFormats` as empty so formats added in future versions show automatically.
 
 Tab page `Text` doesn't honor `&` mnemonics — navigate tabs with Ctrl+Tab / Ctrl+PgUp/Dn. Exposes `UpdatePeriodicCheckChanged` so `MainWindow` can re-arm the background update loop live (without a restart) when the frequency changes.
 
 ### Utilities (`src/Sic/Utils/`)
 
-- `Config.cs` — Static config manager using SharpConfig. Reads/writes `%APPDATA%/Oire/Sic/Sic.cfg` with a `[General]` section (Language, OutputFolder, LastInputFolder, ConfirmExitWithQueue, CheckForUpdatesOnStartup, UpdateCheckInterval, DetectClipboardData). Accepts `isGui` parameter to route errors to MessageBox (GUI) or stderr (CLI).
+- `Config.cs` — Static config manager using SharpConfig. Reads/writes `%APPDATA%/Oire/Sic/Sic.cfg` with a `[General]` section (Language, OutputFolder, LastInputFolder, ConfirmExitWithQueue, CheckForUpdatesOnStartup, UpdateCheckInterval, DetectClipboardData, EnabledFormats). `EnabledFormats` is a comma-separated list of SIC! format keys shown in the target dropdown (empty = all); parse it via `GetEnabledFormatKeys()` and filter with `ImageConverter.GetEnabledFormats(...)`. Accepts `isGui` parameter to route errors to MessageBox (GUI) or stderr (CLI).
 - `FileHelper.cs` — Cloud placeholder detection (OneDrive/SharePoint recall attributes) and image file enumeration with glob patterns.
 - `UrlHelper.cs` — Single source of truth for link validation: `IsValidHttpUrl(text, out url)` trims input and checks for an absolute http(s) URL. Used by the "Add by link" dialog, Ctrl+V paste, and clipboard auto-detection so all three validate links identically.
 - `Localization.cs` — Wraps GetText.NET with convenience methods: `_()`, `_n()`, `_p()`, `_pn()` for translations. Loads `.mo` files from the `locale/` folder relative to the executable. Falls back through language parents to `en-US`.
@@ -139,6 +140,7 @@ SIC! is an accessible image format converter primarily aimed at blind and low-co
 - Check for updates on startup (default: enabled) — a single silent check shortly after launch
 - Background update-check frequency (`UpdateCheckInterval`: Daily / EveryThreeDays / Weekly / Monthly / Never; default Daily)
 - Detect data in clipboard (`DetectClipboardData`, default: off) — when on, SIC! offers (via a Yes/No prompt) to add usable clipboard content (raw image, image files, or an image link) when the window opens or regains focus. Deduplicated by the Win32 clipboard sequence number so the same payload is offered at most once.
+- Target formats to show (`EnabledFormats`, default: empty = all) — comma-separated list of format keys to display in the target-format dropdown, letting users hide formats they never convert to (issue #47). Empty means every supported format; at least one must stay selected.
 
 ## Auto-Updates (NetSparkleUpdater)
 

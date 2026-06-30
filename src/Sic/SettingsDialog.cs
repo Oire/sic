@@ -5,11 +5,13 @@ using Oire.Sic.Utils.Enums;
 using Serilog;
 using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
+using ImageConverter = Oire.Sic.Services.ImageConverter;
 
 namespace Oire.Sic;
 
 public partial class SettingsDialog: Form {
     private readonly Dictionary<string, string> _languageMap = new();
+    private readonly List<CheckBox> _formatCheckBoxes = new();
 
     /// <summary>Set when the background update-frequency preference changed; MainWindow starts,
     /// stops, or re-times the background update loop to match without waiting for a restart. The
@@ -63,6 +65,7 @@ public partial class SettingsDialog: Form {
         checkUpdatesOnStartupCheckBox.Checked = Config.General.CheckForUpdatesOnStartup;
         detectClipboardCheckBox.Checked = Config.General.DetectClipboardData;
         SelectUpdateInterval(Config.General.UpdateCheckInterval);
+        PopulateFormats();
 
         // "System" always first — uses the OS language
         var systemDisplayName = _("System");
@@ -135,6 +138,33 @@ public partial class SettingsDialog: Form {
     private UpdateCheckInterval SelectedUpdateInterval() =>
         (updateIntervalComboBox.SelectedItem as UpdateIntervalOption)?.Interval ?? UpdateCheckInterval.Daily;
 
+    /// <summary>
+    /// Builds one real <see cref="CheckBox"/> per supported target format, ticking the ones currently
+    /// shown in the main window's dropdown (issue #47). An empty
+    /// <see cref="Config.SectionGeneral.EnabledFormats"/> means "all formats", so on first use every box
+    /// starts checked. Individual checkboxes are used instead of a <see cref="CheckedListBox"/> because
+    /// that control doesn't reliably announce toggle state changes to screen readers.
+    /// </summary>
+    private void PopulateFormats() {
+        var enabled = new HashSet<string>(Config.General.GetEnabledFormatKeys(), StringComparer.OrdinalIgnoreCase);
+        foreach (var format in ImageConverter.GetSupportedFormats()) {
+            var checkBox = new CheckBox {
+                Text = format,
+                Checked = enabled.Count == 0 || enabled.Contains(format),
+                AutoSize = true,
+                UseMnemonic = false, // format names like "JPG" carry no accelerator
+                Anchor = AnchorStyles.Left,
+                Margin = new Padding(3, 2, 3, 2),
+            };
+            _formatCheckBoxes.Add(checkBox);
+            formatsPanel.Controls.Add(checkBox);
+        }
+    }
+
+    /// <summary>The format keys the user has ticked, in their canonical display order.</summary>
+    private List<string> SelectedFormats() =>
+        _formatCheckBoxes.Where(cb => cb.Checked).Select(cb => cb.Text).ToList();
+
     private void BrowseButton_Click(object? sender, EventArgs e) {
         using var dialog = new FolderBrowserDialog {
             Description = _("Select output folder for converted images"),
@@ -173,6 +203,19 @@ public partial class SettingsDialog: Form {
             return;
         }
 
+        var selectedFormats = SelectedFormats();
+        if (selectedFormats.Count == 0) {
+            Log.Warning("Settings: No target formats selected");
+            MessageBox.Show(
+                _("Please show at least one target format."),
+                _("No Formats Selected"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            tabControl.SelectedTab = imagesTab;
+            _formatCheckBoxes.FirstOrDefault()?.Focus();
+            DialogResult = DialogResult.None;
+            return;
+        }
+
         var oldUpdateInterval = Config.General.UpdateCheckInterval;
 
         Config.General.OutputFolder = folder;
@@ -180,6 +223,11 @@ public partial class SettingsDialog: Form {
         Config.General.CheckForUpdatesOnStartup = checkUpdatesOnStartupCheckBox.Checked;
         Config.General.DetectClipboardData = detectClipboardCheckBox.Checked;
         Config.General.UpdateCheckInterval = SelectedUpdateInterval();
+
+        // Store empty when every format is ticked, so any format added in a future version is
+        // shown automatically instead of being silently filtered out by a stale saved list.
+        var allSelected = selectedFormats.Count == _formatCheckBoxes.Count;
+        Config.General.EnabledFormats = allSelected ? "" : string.Join(",", selectedFormats);
         var selectedDisplay = languageComboBox.SelectedItem as string;
         Config.General.Language = selectedDisplay != null && _languageMap.TryGetValue(selectedDisplay, out var code)
             ? code
