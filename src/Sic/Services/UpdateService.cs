@@ -3,6 +3,7 @@ using NetSparkleUpdater.Enums;
 using NetSparkleUpdater.SignatureVerifiers;
 using NetSparkleUpdater.UI.WinForms;
 using Serilog;
+using Oire.Sic.Utils;
 using Oire.Sic.Utils.Enums;
 using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
@@ -102,7 +103,7 @@ internal sealed class UpdateService: IDisposable {
                     break;
                 case UpdateStatus.UpdateNotAvailable:
                     if (announceNoUpdate) {
-                        MessageBox.Show(
+                        DialogHelper.Show(
                             _("Your current version is up to date."),
                             _("Software Update"),
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -110,7 +111,7 @@ internal sealed class UpdateService: IDisposable {
                     break;
                 case UpdateStatus.UserSkipped:
                     if (announceNoUpdate) {
-                        MessageBox.Show(
+                        DialogHelper.Show(
                             _("The latest available update was previously skipped."),
                             _("Software Update"),
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -118,7 +119,7 @@ internal sealed class UpdateService: IDisposable {
                     break;
                 case UpdateStatus.CouldNotDetermine:
                     if (announceNoUpdate) {
-                        MessageBox.Show(
+                        DialogHelper.Show(
                             _("Unable to check for updates. Please try again later."),
                             _("Software Update"),
                             MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -130,7 +131,7 @@ internal sealed class UpdateService: IDisposable {
             // manual check, let the user know; a silent startup check stays silent.
             Log.Warning(ex, "UpdateService: Update check failed (likely no network)");
             if (announceNoUpdate) {
-                MessageBox.Show(
+                DialogHelper.Show(
                     _("Unable to check for updates. Please try again later."),
                     _("Software Update"),
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);

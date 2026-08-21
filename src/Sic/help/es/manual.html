@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIC! — Manual de usuario</title>
+<style>
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.6;
+    max-width: 50em;
+    margin: 0 auto;
+    padding: 1em 2em;
+    color: #1a1a1a;
+    background: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+    body { color: #e0e0e0; background: #1a1a1a; }
+    a { color: #6db3f2; }
+    a:visited { color: #b39ddb; }
+    kbd { background: #333; border-color: #555; }
+    table, th, td { border-color: #444; }
+    th { background: #333; }
+    nav { background: #252525; border-color: #444; }
+    header { border-color: #444; }
+    footer { border-color: #444; }
+}
+
+h1, h2, h3 { line-height: 1.2; }
+h2 { margin-top: 1.5em; }
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    border-bottom: 2px solid currentColor;
+    padding-bottom: 0.5em;
+    margin-bottom: 1.5em;
+}
+
+header img {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+header div h1 {
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
+header div p {
+    margin: 0.2em 0 0;
+}
+
+nav {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 1em;
+    margin-bottom: 2em;
+}
+
+nav ul { margin: 0; padding-left: 1.5em; }
+nav li { margin: 0.3em 0; }
+
+kbd {
+    display: inline-block;
+    padding: 0.1em 0.4em;
+    font-size: 0.9em;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 0.5em 0.8em;
+    text-align: left;
+}
+
+th { background: #f5f5f5; }
+
+dl dt { font-weight: bold; margin-top: 0.8em; }
+dl dd { margin-left: 1.5em; }
+
+footer {
+    border-top: 1px solid #ddd;
+    margin-top: 2em;
+    padding-top: 0.5em;
+}
+</style>
+</head>
+<body>
+<header>
+    <img src="../logo.png" alt="Logotipo de SIC!" width="48" height="48">
+    <div>
+        <h1>SIC! — Conversor de imágenes sencillo</h1>
+        <p>Manual de usuario</p>
+    </div>
+</header>
+
+<main>
+<nav aria-label="Índice">
+<h2>Contenido</h2>
+<ul>
+    <li><a href="#overview">Descripción general</a></li>
+    <li><a href="#installation">Modos de instalación</a></li>
+    <li><a href="#adding-images">Añadir imágenes</a></li>
+    <li><a href="#converting">Convertir imágenes</a></li>
+    <li><a href="#resizing">Redimensionar</a></li>
+    <li><a href="#multi-size-ico">Crear archivos ICO multitamaño</a></li>
+    <li><a href="#fit-to-size">Ajustar una imagen a un tamaño de archivo</a></li>
+    <li><a href="#settings">Configuración</a></li>
+    <li><a href="#updates">Actualizaciones del programa</a></li>
+    <li><a href="#cli">Uso desde la línea de comandos</a></li>
+    <li><a href="#keyboard-shortcuts">Atajos de teclado</a></li>
+    <li><a href="#supported-formats">Formatos compatibles</a></li>
+    <li><a href="#troubleshooting">Resolución de problemas</a></li>
+</ul>
+</nav>
+
+<h2 id="overview">Descripción general</h2>
+<p>SIC! es un conversor de formatos de imagen sencillo y accesible. Le permite convertir imágenes entre los formatos más habituales, redimensionarlas si lo desea y procesar varias imágenes a la vez.</p>
+
+<h3>Ventana principal</h3>
+<p>La ventana principal consta de las siguientes áreas:</p>
+<dl>
+    <dt>Barra de menús</dt>
+    <dd>Cuatro menús en la parte superior de la ventana:
+        <ul>
+            <li><strong>Archivo</strong>: añadir imágenes (desde archivos, carpetas o enlaces), abrir la configuración o salir de la aplicación.</li>
+            <li><strong>Edición</strong>: quitar de la cola la imagen seleccionada o todas. Este menú está desactivado cuando la cola está vacía.</li>
+            <li><strong>Convertir</strong>: ejecutar la conversión, crear un ICO multitamaño o ajustar una imagen a un tamaño de archivo. Este menú está desactivado cuando la cola está vacía.</li>
+            <li><strong>Ayuda</strong>: abrir este manual, buscar actualizaciones, donar o ver el cuadro de diálogo «Acerca de».</li>
+        </ul>
+    </dd>
+
+    <dt>Lista de imágenes</dt>
+    <dd>La mitad izquierda de la ventana muestra la cola por lotes en forma de tabla, con las columnas Nombre del archivo, Formato, Dimensiones, Tamaño y Estado.</dd>
+
+    <dt>Panel de vista previa</dt>
+    <dd>La mitad derecha de la ventana muestra una vista previa de la imagen seleccionada.</dd>
+
+    <dt>Área de controles</dt>
+    <dd>Debajo de la lista de imágenes y de la vista previa:
+        <ul>
+            <li>Lista desplegable <strong>Formato de destino</strong>: elija el formato de salida.</li>
+            <li>Casilla <strong>Redimensionar</strong>: al marcarla aparecen el modo de redimensionado (Mantener proporciones o Recortar) y los campos Ancho y Alto.</li>
+        </ul>
+    </dd>
+
+    <dt>Botones de conversión</dt>
+    <dd><strong>Convertir seleccionadas</strong> convierte solo la imagen resaltada; <strong>Convertir todas</strong> procesa todas las imágenes de la cola.</dd>
+
+    <dt>Barra de estado</dt>
+    <dd>En la parte inferior de la ventana; muestra mensajes de estado, como el progreso y el resultado de la conversión.</dd>
+</dl>
+
+<h2 id="installation">Modos de instalación</h2>
+<p>SIC! está disponible como instalador y como archivo ZIP portátil. Ambos se pueden descargar desde <a href="https://github.com/Oire/sic/releases">GitHub Releases</a> o desde el <a href="https://sic.oire.dev">sitio web de SIC!</a>.</p>
+<p>SIC! puede funcionar de dos maneras:</p>
+<dl>
+    <dt>Instalador (predeterminado)</dt>
+    <dd>Cuando se instala de la forma habitual, SIC! guarda su configuración, los archivos convertidos y los registros en <code>%APPDATA%\Oire\Sic\</code>. La carpeta de salida predeterminada es <code>%APPDATA%\Oire\Sic\Converted\</code>.</dd>
+
+    <dt>Portátil</dt>
+    <dd>Si junto al ejecutable existe una carpeta <code>userdata</code>, SIC! funciona en modo portátil. Todos los datos (configuración, archivos convertidos y registros) se guardan en esa carpeta <code>userdata</code> en lugar de en <code>%APPDATA%</code>. Así puede ejecutar SIC! desde una memoria USB o desde cualquier carpeta sin dejar rastro en el sistema.</dd>
+</dl>
+
+<h2 id="adding-images">Añadir imágenes</h2>
+<p>Hay varias maneras de añadir imágenes a la cola:</p>
+<dl>
+    <dt>Abrir archivos</dt>
+    <dd>Use <strong>Archivo &gt; Añadir imagen</strong> (<kbd>Ctrl+N</kbd>) para abrir un selector de archivos. Puede seleccionar varios archivos a la vez.</dd>
+
+    <dt>Añadir una carpeta</dt>
+    <dd>Use <strong>Archivo &gt; Añadir carpeta</strong> (<kbd>Ctrl+Mayús+N</kbd>) para añadir todas las imágenes de una carpeta. Puede elegir qué tipos de archivo incluir y si se exploran las subcarpetas.</dd>
+
+    <dt>Añadir por enlace</dt>
+    <dd>Use <strong>Archivo &gt; Añadir imagen por enlace</strong> (<kbd>Ctrl+L</kbd>) para descargar una imagen desde una URL y añadirla a la cola.</dd>
+
+    <dt>Arrastrar y soltar</dt>
+    <dd>Arrastre archivos de imagen desde el Explorador de archivos y suéltelos sobre la lista de imágenes.</dd>
+
+    <dt>Pegar desde el portapapeles</dt>
+    <dd>Pulse <kbd>Ctrl+V</kbd> para pegar. SIC! admite pegar archivos (por ejemplo, copiados desde el Explorador de archivos o desde Outlook), datos de mapa de bits en bruto (por ejemplo, de Impr Pant) y enlaces a imágenes desde el portapapeles. Si el portapapeles contiene texto que no es un enlace válido, SIC! se lo indica en lugar de no hacer nada.</dd>
+
+    <dt>Detección automática del portapapeles</dt>
+    <dd>SIC! puede vigilar el portapapeles y ofrecerse a añadir automáticamente una imagen, archivos de imagen o un enlace a una imagen cada vez que su ventana se abre o recupera el foco. Esta opción está desactivada de forma predeterminada; active <strong>Detectar imágenes en el portapapeles</strong> en la <a href="#settings">configuración</a>. Siempre aparece una pregunta de Sí/No antes de añadir nada, y el mismo contenido del portapapeles se ofrece una sola vez, así que nunca resulta pesado.</dd>
+</dl>
+
+<h2 id="converting">Convertir imágenes</h2>
+<ol>
+    <li>Añada una o varias imágenes a la cola.</li>
+    <li>Seleccione el formato de destino que desee en la lista desplegable <strong>Formato de destino</strong>.</li>
+    <li>Haga clic en <strong>Convertir todas</strong> (<kbd>Ctrl+Mayús+F5</kbd>) para convertir todas las imágenes de la cola, o seleccione imágenes concretas y haga clic en <strong>Convertir seleccionadas</strong> (<kbd>F5</kbd>).</li>
+</ol>
+<p>De forma predeterminada, los archivos convertidos se guardan en una carpeta <code>Converted</code> dentro del directorio de datos de la aplicación. Puede cambiarlo en la <a href="#settings">configuración</a>.</p>
+<p>Si ya existe un archivo con el mismo nombre, SIC! le preguntará si desea sobrescribirlo, cambiarle el nombre (añadiendo el sufijo <code>_1</code>) u omitirlo.</p>
+<p>Convertir una imagen al formato que ya tiene se omite en lugar de realizarse: volver a codificarla solo perdería calidad sin ganar nada, así que la cola simplemente indica <em>Omitida (mismo formato)</em>. Si al mismo tiempo se pide un redimensionado, la conversión sí se lleva a cabo, y SIC! vuelve a aplicar la calidad de codificación original para que la imagen no se comprima más de lo que ya estaba.</p>
+
+<h2 id="resizing">Redimensionar</h2>
+<p>Marque la casilla <strong>Redimensionar</strong> para redimensionar durante la conversión. Hay dos modos disponibles:</p>
+<dl>
+    <dt>Mantener proporciones (predeterminado)</dt>
+    <dd>Introduzca un ancho, un alto o ambos. La imagen se escalará para caber dentro de las dimensiones indicadas conservando su relación de aspecto. Si introduce solo una dimensión, la otra se calcula automáticamente.</dd>
+
+    <dt>Recortar</dt>
+    <dd>Se necesitan tanto el ancho como el alto. La imagen se redimensiona hasta cubrir las dimensiones de destino y después se recorta al tamaño exacto.</dd>
+</dl>
+<p>Cuando selecciona una imagen de la lista con el redimensionado activado, los campos de ancho y alto se rellenan previamente con las dimensiones actuales de esa imagen.</p>
+
+<h2 id="multi-size-ico">Crear archivos ICO multitamaño</h2>
+<p>Para crear un archivo ICO que contenga varios tamaños (útil para iconos de aplicación):</p>
+<ol>
+    <li>Seleccione una imagen de la lista.</li>
+    <li>Elija <strong>Convertir &gt; Crear ICO multitamaño</strong> (<kbd>Ctrl+Alt+F5</kbd>).</li>
+    <li>Elija un preajuste o configure tamaños personalizados en el cuadro de diálogo que aparece.</li>
+</ol>
+<p>Están disponibles los siguientes preajustes:</p>
+<dl>
+    <dt>Favicon</dt>
+    <dd>Genera los tamaños de 16, 32, 48 y 64 píxeles. Un favicon es el pequeño icono que se muestra en las pestañas del navegador, en los marcadores y en la barra de direcciones. Este preajuste cubre todos los tamaños que suelen esperar los navegadores web.</dd>
+
+    <dt>Icono de aplicación</dt>
+    <dd>Genera los tamaños de 16, 20, 24, 32, 40, 48, 64 y 256 píxeles. Cubre toda la gama de tamaños que Windows usa para los iconos de aplicación, desde los iconos pequeños de la barra de tareas hasta los mosaicos grandes que muestra el Explorador.</dd>
+
+    <dt>Personalizado</dt>
+    <dd>Le permite crear su propia lista de tamaños. Parte del preajuste seleccionado anteriormente como base, y a partir de ahí puede añadir o quitar tamaños concretos.</dd>
+</dl>
+
+<h2 id="fit-to-size">Ajustar una imagen a un tamaño de archivo</h2>
+<p>Los sitios web y los formularios a menudo rechazan una imagen que supere cierto tamaño: «su foto de perfil debe ocupar menos de 200 KB». En lugar de andar adivinando formatos y ajustes de calidad, deje que SIC! busque una combinación que encaje:</p>
+<ol>
+    <li>Seleccione una imagen de la lista.</li>
+    <li>Elija <strong>Convertir &gt; Ajustar al tamaño de archivo</strong> (<kbd>Ctrl+Alt+Mayús+F5</kbd>).</li>
+    <li>Introduzca el <strong>tamaño máximo del archivo</strong> en kilobytes. Si lo desea, marque <strong>Limitar el ancho</strong> e introduzca un ancho máximo en píxeles, para los casos en que también haya un límite de dimensiones. Las proporciones siempre se conservan.</li>
+    <li>Pulse <strong>Aceptar</strong>. SIC! prueba por turnos cada formato de destino activado e informa de su progreso, por ejemplo <em>Comprobando AVIF (6/6)...</em>. Puede cancelar en cualquier momento.</li>
+    <li>Elija uno de los resultados y pulse <strong>Convertir</strong>.</li>
+</ol>
+<p>Cada resultado detalla exactamente lo que obtendría, por ejemplo <em>WEBP — 1280x853, calidad 82 % — 195.4 KB (recomendado)</em> o <em>PNG — 800x533, calidad completa — 187.2 KB</em>.</p>
+<p>Los resultados se ordenan de modo que el mejor aparece primero y se marca como <em>(recomendado)</em>: primero manda el mayor número de píxeles, después la mayor calidad y por último el archivo más pequeño. Eso suele ser lo que interesa ante un límite de subida: una imagen a tamaño completo con la calidad ligeramente reducida es mejor que una encogida con la calidad máxima.</p>
+<p>Conviene saber algunas cosas:</p>
+<ul>
+    <li>Todos los tamaños que se muestran son medidas reales, no estimaciones. Durante la búsqueda no se escribe nada en el disco, y el archivo que SIC! acaba escribiendo es byte a byte el mismo que midió.</li>
+    <li>Solo se prueban los formatos marcados en <strong>Formatos de destino que se muestran en la lista</strong>, dentro de la <a href="#settings">configuración</a>.</li>
+    <li>ICO y GIF nunca se usan aquí. ICO no puede contener imágenes grandes, y GIF está limitado a 256 colores e ignora los ajustes de calidad, así que ninguno de los dos puede cumplir honestamente un límite de tamaño arbitrario. Ambos siguen disponibles como destinos de conversión normales. Si son los únicos formatos que tiene activados, SIC! se lo indica en lugar de ponerse a buscar.</li>
+    <li>Para los formatos con pérdida (JPG, WebP, AVIF), SIC! también prueba a conservar todos los píxeles y bajar la calidad en lugar de encoger la imagen. La calidad nunca baja del 45 %, y ninguna imagen se reduce por debajo de 16 píxeles en su lado más corto.</li>
+    <li>La búsqueda realiza muchas codificaciones de prueba y puede tardar decenas de segundos con una foto grande; AVIF es con diferencia el formato más lento.</li>
+    <li>Si ningún formato puede cumplir el límite —pongamos 5 KB para una foto de 24 megapíxeles—, SIC! informa de que no se encontró ningún ajuste en lugar de ofrecer una miniatura inservible.</li>
+</ul>
+<p>El resultado elegido se guarda siguiendo las reglas habituales de carpeta de salida y de conflicto de nombres, exactamente igual que en una conversión normal.</p>
+
+<h2 id="settings">Configuración</h2>
+<p>Abra <strong>Archivo &gt; Configuración</strong> (<kbd>Ctrl+,</kbd>) para configurar SIC!. El cuadro de diálogo está organizado en dos pestañas, <strong>General</strong> e <strong>Imágenes</strong>. Pulse <kbd>Ctrl+Tab</kbd> para moverse entre pestañas.</p>
+
+<h3>Pestaña General</h3>
+<dl>
+    <dt>Idioma</dt>
+    <dd>Elija el idioma de la interfaz. Seleccione <em>Sistema</em> para seguir la configuración de idioma de Windows.</dd>
+
+    <dt>Confirmar al salir si la cola no está vacía</dt>
+    <dd>Cuando está activada (opción predeterminada), SIC! pide confirmación antes de cerrarse si quedan imágenes en la cola. Desmarque esta opción para salir sin preguntar.</dd>
+
+    <dt>Buscar actualizaciones al iniciar</dt>
+    <dd>Cuando está activada (opción predeterminada), SIC! realiza una única comprobación silenciosa de actualizaciones poco después de arrancar. Si la comprobación no logra acceder a la red, se ignora: nunca interrumpe el arranque ni muestra un error. Desmarque esta opción para omitir la comprobación al iniciar.</dd>
+
+    <dt>Buscar actualizaciones en segundo plano</dt>
+    <dd>Elija con qué frecuencia busca SIC! actualizaciones mientras está en ejecución: <em>Una vez al día</em> (opción predeterminada), <em>Cada 3 días</em>, <em>Una vez a la semana</em>, <em>Una vez al mes</em> o <em>Nunca</em>. Seleccione <em>Nunca</em> para desactivar por completo las comprobaciones en segundo plano. Esta opción es independiente de la comprobación al iniciar: puede tener una, las dos o ninguna. El cambio surte efecto de inmediato, sin reiniciar la aplicación.</dd>
+</dl>
+
+<h3>Pestaña Imágenes</h3>
+<dl>
+    <dt>Carpeta de salida</dt>
+    <dd>Establezca una carpeta personalizada donde se guardarán todos los archivos convertidos. Haga clic en <strong>Restablecer</strong> para volver a la carpeta <code>Converted</code> predeterminada, dentro del directorio de datos de la aplicación.</dd>
+
+    <dt>Guardar las imágenes convertidas en la misma carpeta que el original</dt>
+    <dd>Cuando está activada, cada archivo convertido se escribe junto a su archivo de origen en lugar de en la carpeta de salida anterior. Las imágenes que no tienen carpeta de origen —capturas del portapapeles y enlaces descargados— siguen yendo a la carpeta de salida. Esta opción está desactivada de forma predeterminada.</dd>
+
+    <dt>Detectar imágenes en el portapapeles</dt>
+    <dd>Cuando está activada, SIC! se ofrece a añadir el contenido aprovechable del portapapeles —una imagen, archivos de imagen o un enlace a una imagen— cada vez que su ventana se abre o recupera el foco. Siempre aparece una pregunta de Sí/No antes de añadir nada, y el mismo contenido del portapapeles se ofrece una sola vez, así que nunca resulta pesado. Esta opción está desactivada de forma predeterminada. Consulte <a href="#adding-images">Añadir imágenes</a> para más detalles.</dd>
+
+    <dt>Formatos de destino que se muestran en la lista</dt>
+    <dd>Marque los formatos que quiere ver en la lista desplegable <strong>Formato de destino</strong> de la ventana principal, y desmarque aquellos a los que nunca convierte. Al menos un formato debe permanecer marcado. Dejarlos todos marcados significa además que los formatos añadidos en futuras versiones de SIC! aparecerán automáticamente.</dd>
+</dl>
+<p>La configuración se guarda en <code>Sic.cfg</code>, dentro del directorio de datos de la aplicación (consulte <a href="#installation">Modos de instalación</a> para conocer la ubicación exacta).</p>
+
+<h2 id="updates">Actualizaciones del programa</h2>
+<p>SIC! puede buscar nuevas versiones automáticamente. De forma predeterminada se realiza una comprobación al iniciar y después una vez al día mientras la aplicación está en ejecución, pero ambos comportamientos se pueden configurar en la <a href="#settings">configuración</a>: puede desactivar la comprobación de inicio y elegir la frecuencia en segundo plano (o desactivar por completo las comprobaciones en segundo plano). Siempre puede comprobarlo manualmente desde <strong>Ayuda &gt; Buscar actualizaciones</strong>.</p>
+<p>Cuando hay una actualización disponible, SIC! muestra un cuadro de diálogo con el número de la nueva versión. Puede optar por actualizar, omitir esta versión o que se le recuerde más adelante. Si hace clic en <strong>Actualizar</strong>, la nueva versión se descarga automáticamente. Cuando termina la descarga aparece un cuadro de confirmación con los botones <strong>Instalar</strong> y <strong>Cancelar</strong>. Al hacer clic en <strong>Instalar</strong> comienza la instalación.</p>
+
+<h2 id="cli">Uso desde la línea de comandos</h2>
+<p>SIC! también se puede usar desde la línea de comandos sin abrir la interfaz gráfica. Resulta útil para scripts o para el procesamiento por lotes.</p>
+<pre>sic -i entrada.png -o salida.jpg
+sic --input foto.bmp --output foto.webp
+sic -i avatar.png -o avatar.ico --resize 128x128
+sic -i foto.jpg -f png --resize 800x</pre>
+<dl>
+    <dt><code>--input</code>, <code>-i</code> (obligatorio)</dt>
+    <dd>Ruta de la imagen de origen.</dd>
+
+    <dt><code>--output</code>, <code>-o</code></dt>
+    <dd>Ruta del archivo de salida. El formato de destino se deduce de la extensión del archivo.</dd>
+
+    <dt><code>--format</code>, <code>-f</code></dt>
+    <dd>Nombre del formato de destino (por ejemplo, <code>png</code> o <code>jpg</code>). Úselo en lugar de <code>--output</code> para generar la ruta de salida automáticamente.</dd>
+
+    <dt><code>--resize</code>, <code>-r</code></dt>
+    <dd>Redimensiona la imagen. Formato: <code>AnchoxAlto</code>, <code>Anchox</code> (solo el ancho) o <code>xAlto</code> (solo el alto).</dd>
+
+    <dt><code>--crop</code>, <code>-c</code></dt>
+    <dd>Recorta en lugar de escalar proporcionalmente. Requiere tanto el ancho como el alto en <code>--resize</code>.</dd>
+</dl>
+<p>Hay que indicar <code>--output</code> o <code>--format</code> (pero no ambos).</p>
+
+<h2 id="keyboard-shortcuts">Atajos de teclado</h2>
+<table>
+<thead>
+    <tr><th>Acción</th><th>Atajo</th></tr>
+</thead>
+<tbody>
+    <tr><td>Añadir imagen</td><td><kbd>Ctrl+N</kbd></td></tr>
+    <tr><td>Añadir carpeta</td><td><kbd>Ctrl+Mayús+N</kbd></td></tr>
+    <tr><td>Añadir imagen por enlace</td><td><kbd>Ctrl+L</kbd></td></tr>
+    <tr><td>Configuración</td><td><kbd>Ctrl+,</kbd></td></tr>
+    <tr><td>Quitar la imagen seleccionada</td><td><kbd>Supr</kbd></td></tr>
+    <tr><td>Quitar todas las imágenes</td><td><kbd>Ctrl+Mayús+Supr</kbd></td></tr>
+    <tr><td>Pegar desde el portapapeles</td><td><kbd>Ctrl+V</kbd></td></tr>
+    <tr><td>Convertir seleccionadas</td><td><kbd>F5</kbd></td></tr>
+    <tr><td>Convertir todas</td><td><kbd>Ctrl+Mayús+F5</kbd></td></tr>
+    <tr><td>Crear ICO multitamaño</td><td><kbd>Ctrl+Alt+F5</kbd></td></tr>
+    <tr><td>Ajustar al tamaño de archivo</td><td><kbd>Ctrl+Alt+Mayús+F5</kbd></td></tr>
+    <tr><td>Manual de usuario</td><td><kbd>F1</kbd></td></tr>
+    <tr><td>Acerca de SIC!</td><td><kbd>Mayús+F1</kbd></td></tr>
+    <tr><td>Donar</td><td><kbd>Ctrl+Mayús+D</kbd></td></tr>
+    <tr><td>Salir</td><td><kbd>Esc</kbd> / <kbd>Alt+F4</kbd></td></tr>
+</tbody>
+</table>
+
+<h2 id="supported-formats">Formatos compatibles</h2>
+<table>
+<thead>
+    <tr><th>Formato</th><th>Extensiones</th><th>Notas</th></tr>
+</thead>
+<tbody>
+    <tr><td>JPEG</td><td>.jpg, .jpeg</td><td>Muy extendido, compresión con pérdida</td></tr>
+    <tr><td>PNG</td><td>.png</td><td>Sin pérdida, admite transparencia</td></tr>
+    <tr><td>WebP</td><td>.webp</td><td>Formato moderno, buena compresión</td></tr>
+    <tr><td>ICO</td><td>.ico</td><td>Formato de icono de Windows</td></tr>
+    <tr><td>BMP</td><td>.bmp</td><td>Mapa de bits sin comprimir</td></tr>
+    <tr><td>TIFF</td><td>.tiff, .tif</td><td>Sin pérdida, usado en imprenta y escaneado</td></tr>
+    <tr><td>GIF</td><td>.gif</td><td>Limitado a 256 colores</td></tr>
+    <tr><td>AVIF</td><td>.avif</td><td>Formato moderno, compresión excelente</td></tr>
+    <tr><td>HEIC</td><td>.heic, .heif</td><td>Formato de foto de Apple/iPhone. Solo como entrada: SIC! puede convertir imágenes HEIC a otros formatos, pero no puede guardar en HEIC.</td></tr>
+</tbody>
+</table>
+
+<h2 id="troubleshooting">Resolución de problemas</h2>
+<dl>
+    <dt>No se puede cargar un archivo de la nube</dt>
+    <dd>Los archivos guardados en OneDrive o SharePoint que no se han descargado localmente aparecen como marcadores de posición en la nube. SIC! lo detecta y le pregunta si desea descargarlos primero.</dd>
+
+    <dt>La conversión falla con un archivo concreto</dt>
+    <dd>Compruebe que el archivo sea una imagen válida y no esté dañado. SIC! registra los errores con detalle en la carpeta <code>logs</code>, dentro del directorio de datos de la aplicación.</dd>
+
+    <dt>La carpeta de salida ya no existe</dt>
+    <dd>Si la carpeta de salida personalizada se ha eliminado o movido, SIC! se lo advertirá y volverá a la carpeta <code>Converted</code> predeterminada.</dd>
+</dl>
+</main>
+
+<footer>
+    <p><small>© Oire Software. Distribuido bajo la <a href="https://github.com/Oire/sic/blob/master/LICENSE">licencia Apache 2.0</a>.</small></p>
+    <p><small><a href="https://github.com/Oire/sic">GitHub</a> · <a href="https://sic.oire.dev">sic.oire.dev</a> · <a href="https://oire.org/donate">Donar</a></small></p>
+</footer>
+</body>
+</html>

@@ -47,6 +47,10 @@ Keep the designer's English `Text` as-is — it's what the visual designer shows
 
 Note that `Update-Translations.ps1` fuzzy-matches new titles against the similarly worded menu items, so freshly merged title entries arrive with `&` mnemonics and trailing `...` and a `#, fuzzy` flag. Fix the `msgstr` and drop the flag — window titles carry neither.
 
+**Languages ship as three parallel pieces**, and a new one is only half-added if any is missing: `locale/<code>/Sic.po` + `.mo` (UI strings), `help/<code>/manual.html` (user manual, resolved by culture name then two-letter code, falling back to `en`), and `installer/Languages/Custom.<code>.isl` wired into the `[Languages]` section of `installer/sic.iss`. Add the code to `SatelliteResourceLanguages` in the csproj as well, or NuGet dependencies (NetSparkle's update UI) stay untranslated. The Settings language dropdown needs no code change — it lists every `locale/` subdirectory that holds a `Sic.mo`, named by the culture's native name.
+
+Hebrew is right-to-left; see `Utils/TextDirection.cs` and `Utils/DialogHelper.cs` below.
+
 ## Architecture
 
 **Entry point:** `src/Sic/Program.cs` — Sets up Serilog logging. If CLI arguments are present, runs headless conversion via `System.CommandLine`; otherwise loads config and launches the WinForms `MainWindow`.
@@ -96,6 +100,8 @@ Tab page `Text` doesn't honor `&` mnemonics — navigate tabs with Ctrl+Tab / Ct
 - `FileHelper.cs` — Cloud placeholder detection (OneDrive/SharePoint recall attributes) and image file enumeration with glob patterns.
 - `UrlHelper.cs` — Single source of truth for link validation: `IsValidHttpUrl(text, out url)` trims input and checks for an absolute http(s) URL. Used by the "Add by link" dialog, Ctrl+V paste, and clipboard auto-detection so all three validate links identically.
 - `Localization.cs` — Wraps GetText.NET with convenience methods: `_()`, `_n()`, `_p()`, `_pn()` for translations. Loads `.mo` files from the `locale/` folder relative to the executable. Falls back through language parents to `en-US`.
+- `TextDirection.cs` — Right-to-left support (Hebrew). `Apply(form)` sets `RightToLeft` from the active culture and walks the control tree setting `RightToLeftLayout`, which — unlike `RightToLeft` — is *not* ambient and only exists on `Form`, `ListView`, `TabControl` and `ProgressBar`. Every form calls it immediately after `Localizer.Localize`, and `MainWindow.ApplyLocalization` calls it again so a live language switch re-mirrors the window. The hand-built file-conflict dialog in `MainWindow.ResolveFileConflict` calls it too.
+- `DialogHelper.cs` — `Show(text, caption, buttons, icon)`, a one-method wrapper over `MessageBox.Show`. WinForms mirrors a message box only when passed `MessageBoxOptions.RtlReading | RightAlign`, and those cannot be inherited from the owning form, so **every** message box in SIC! goes through here — never call `MessageBox.Show` directly.
 - `Constants/App.cs` — Application metadata, data folder paths (`%APPDATA%/Oire/Sic/`), file extensions.
 - `Constants/ExitCode.cs` — CLI exit code constants (`Success`, `Error`, `Canceled`).
 - `Constants/Logging.cs` — Log file paths and output templates. Logs go to `%APPDATA%/Oire/Sic/logs/`.

@@ -24,6 +24,7 @@ public partial class IcoPresetDialog: Form {
     public IcoPresetDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        TextDirection.Apply(this);
         Text = _("Create Multi-size ICO");
 
         faviconRadioButton.CheckedChanged += PresetRadioButton_CheckedChanged;
@@ -78,7 +79,7 @@ public partial class IcoPresetDialog: Form {
 
         if (_customSizes.Contains(size)) {
             Log.Debug("IcoPresetDialog: Duplicate size {Size} rejected", size);
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("Size {0} is already in the list.", size),
                 _("Existing size"),
                 MessageBoxButtons.OK,
@@ -120,7 +121,7 @@ public partial class IcoPresetDialog: Form {
 
         if (customRadioButton.Checked && _customSizes.Count == 0) {
             Log.Debug("IcoPresetDialog: No custom sizes added");
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("Please add at least one size to the list."),
                 _("No Sizes"),
                 MessageBoxButtons.OK,

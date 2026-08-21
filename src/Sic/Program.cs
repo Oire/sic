@@ -41,7 +41,7 @@ internal static class Program {
             }
 
             Log.Error(e.Exception, "Unhandled UI thread exception");
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("An unexpected error occurred:\n{0}\n\nThe application will continue running.", e.Exception.Message),
                 _("Error"),
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -70,7 +70,7 @@ internal static class Program {
                 return ExitCode.Error;
             }
 
-            DialogResult msg = MessageBox.Show(_("Unable to start the program up. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            DialogResult msg = DialogHelper.Show(_("Unable to start the program up. Please contact the developer."), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
             if (msg == DialogResult.OK) {
                 Environment.Exit(ExitCode.Error);
@@ -124,7 +124,7 @@ internal static class Program {
         Log.Warning("Custom output folder no longer exists: {Folder}", outputFolder);
 
         if (showGui) {
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("The output folder \"{0}\" no longer exists. The default folder will be used.", outputFolder),
                 _("Output Folder Not Found"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);

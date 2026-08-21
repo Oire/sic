@@ -21,7 +21,7 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 - **CLI mode** — headless conversion from the command line, no UI needed
 - **Automatic updates** — checks for new versions in the background with Ed25519 signature verification, with adjustable frequency (or off) in Settings
 - **Portable mode** — place an empty `userdata` folder next to `Sic.exe` to keep all data alongside the executable
-- **Localized** — English, German, French, Russian, Ukrainian
+- **Localized** — English, German, Spanish, French, Hebrew, Russian, Ukrainian (Hebrew runs the whole UI right-to-left)
 - **Accessible** — logical tab order, keyboard shortcuts, screen-reader friendly
 
 ## Requirements

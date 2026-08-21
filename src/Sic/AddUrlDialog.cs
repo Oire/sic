@@ -11,6 +11,7 @@ public partial class AddUrlDialog: Form {
     public AddUrlDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        TextDirection.Apply(this);
         Text = _("Add Image by Link");
     }
 
@@ -22,14 +23,14 @@ public partial class AddUrlDialog: Form {
 
         if (string.IsNullOrWhiteSpace(urlTextBox.Text)) {
             Log.Debug("AddUrlDialog: Empty URL submitted");
-            MessageBox.Show(_("Please enter a link."), _("No link entered"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            DialogHelper.Show(_("Please enter a link."), _("No link entered"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             e.Cancel = true;
             return;
         }
 
         if (!UrlHelper.IsValidHttpUrl(urlTextBox.Text, out var parsedUrl)) {
             Log.Debug("AddUrlDialog: Invalid URL submitted: {Url}", urlTextBox.Text.Trim());
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("Please enter a valid link starting with http:// or https://."),
                 _("Invalid link"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
