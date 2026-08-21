@@ -11,9 +11,12 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 - **HEIC input** — open and convert HEIC/HEIF photos from newer iPhones to any supported format (input only; HEIC can't be written)
 - **Resize and crop** — specify target dimensions with two modes: keep proportions or crop to exact size
 - **Multi-size ICO** — create `.ico` files with multiple embedded sizes using built-in presets or custom dimensions
+- **Fit to file size** — give a maximum file size (and optionally a maximum width) and SIC! searches every enabled format for a combination of format, dimensions, and quality that fits, then converts to the result you pick
 - **Multiple input methods** — file dialog, folder import, drag & drop, Ctrl+V paste (files, screenshots, or URLs), download by link
 - **Clipboard detection** — optionally offers to add an image, image files, or an image link from the clipboard when the window opens or gains focus (opt-in)
 - **Filename conflict handling** — always asks: overwrite, rename (`_1` suffix), or skip
+- **Configurable output location** — a custom output folder, or save each converted file next to its original
+- **Selectable target formats** — hide the formats you never convert to from the target-format dropdown
 - **Cloud file detection** — warns about OneDrive/SharePoint placeholder files that haven't been downloaded yet
 - **CLI mode** — headless conversion from the command line, no UI needed
 - **Automatic updates** — checks for new versions in the background with Ed25519 signature verification, with adjustable frequency (or off) in Settings
@@ -76,6 +79,7 @@ Converted files are saved to `%APPDATA%\Oire\Sic\Converted\` by default (or `use
 | F5 | Convert selected |
 | Ctrl+Shift+F5 | Convert all |
 | Ctrl+Alt+F5 | Create multi-size ICO |
+| Ctrl+Alt+Shift+F5 | Fit to file size |
 | Ctrl+, | Settings |
 | F1 | Open user manual |
 | Ctrl+Shift+D | Donate |
@@ -105,11 +109,13 @@ sic -i avatar.png -o avatar.ico -r 128x128
 Settings are stored in `%APPDATA%\Oire\Sic\Sic.cfg` (or `userdata\Sic.cfg` in portable mode):
 
 - **Output folder** — where converted files are saved (default: `Converted` subfolder in the data directory)
+- **Save converted images in the same folder as the original** — write each converted file next to its source file instead of into the output folder; clipboard captures and downloaded links still go to the output folder (default: off)
 - **Language** — UI language (default: system language)
 - **Confirm exit** — warn when closing with images still in the queue (default: enabled)
 - **Check for updates on startup** — perform a single silent update check shortly after launch (default: enabled)
 - **Check for updates in the background** — how often to check for updates while running: once a day, every 3 days, once a week, once a month, or never (default: once a day)
 - **Detect images in clipboard** — offer to add an image, image files, or an image link from the clipboard when the window opens or gains focus (default: off)
+- **Target formats to show in the list** — which formats appear in the target-format dropdown (default: all)
 
 ### Portable Mode
 
@@ -178,16 +184,24 @@ src/Sic/
   AddFolderDialog.cs/.Designer.cs # Add images from folder dialog
   IcoPresetDialog.cs/.Designer.cs # Multi-size ICO preset picker
   AddSizeDialog.cs/.Designer.cs   # Custom ICO size entry dialog
+  FitToSizeDialog.cs/.Designer.cs # Fit to file size: budget and max width entry
+  FitToSizeResultsDialog.cs/.Designer.cs # Fit to file size: ranked results picker
   ProgressDialog.cs/.Designer.cs  # Progress dialog for batch operations
   Models/
     ImageItem.cs                  # Image queue item data model
     ResizeMode.cs                 # Resize mode enum (KeepProportions, Crop)
+    SizeFitProposal.cs            # One viable fit-to-file-size result
   Services/
     ImageConverter.cs             # Magick.NET conversion engine
+    UpdateService.cs              # NetSparkle update checks
+    UnsupportedImageException.cs  # Thrown when content loads but isn't a decodable image
   Utils/
     Config.cs                     # SharpConfig-based settings
     FileHelper.cs                 # Cloud placeholder detection, file enumeration
     Localization.cs               # GetText.NET wrapper
+    UrlHelper.cs                  # http(s) link validation
+    Enums/
+      UpdateCheckInterval.cs      # Background update-check frequency
     Constants/
       App.cs                      # App metadata and paths
       ExitCode.cs                 # CLI exit code constants

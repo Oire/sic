@@ -113,6 +113,7 @@ public partial class MainWindow: Form {
         convertSelectedMenuItem.Click += ConvertSelectedMenuItem_Click;
         convertAllMenuItem.Click += ConvertButton_Click;
         createMultiSizeIcoMenuItem.Click += CreateMultiSizeIcoMenuItem_Click;
+        fitToFileSizeMenuItem.Click += FitToFileSizeMenuItem_Click;
 
         // Help menu
         userManualMenuItem.Click += UserManualMenuItem_Click;
@@ -183,6 +184,7 @@ public partial class MainWindow: Form {
         convertSelectedMenuItem.Enabled = hasSelection;
         convertAllMenuItem.Enabled = hasItems;
         createMultiSizeIcoMenuItem.Enabled = hasSelection;
+        fitToFileSizeMenuItem.Enabled = hasSelection;
     }
 
     // Placeholder management is split out of UpdateMenuState because Items.Insert/Remove
@@ -649,6 +651,157 @@ public partial class MainWindow: Form {
             Log.Error("Failed to create multi-size ICO for {FileName}: {Error}", item.FileName, ex.Message);
             imageListView.Items[index].SubItems[4].Text = _("Failed");
             MessageBox.Show(_("Failed to create multi-size ICO:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+        } finally {
+            progressDialog?.Close();
+            progressDialog?.Dispose();
+            convertButton.Enabled = true;
+        }
+
+        UpdateMenuState();
+        UpdatePlaceholderState();
+    }
+
+    private async void FitToFileSizeMenuItem_Click(object? sender, EventArgs e) {
+        if (_imageItems.Count == 0 || imageListView.SelectedIndices.Count == 0)
+            return;
+
+        using var fitDialog = new FitToSizeDialog();
+        if (fitDialog.ShowDialog(this) != DialogResult.OK)
+            return;
+
+        var maxBytes = fitDialog.MaxBytes;
+        var maxWidth = fitDialog.MaxWidth;
+        var index = imageListView.SelectedIndices[0];
+        var item = _imageItems[index];
+        var formats = ImageConverter.GetSizeFitFormats(ImageConverter.GetEnabledFormats(Config.General.GetEnabledFormatKeys()));
+
+        // ICO and GIF are never fit-to-size candidates, so a queue targeting only those has nothing to try.
+        if (formats.Count == 0) {
+            MessageBox.Show(
+                _("ICO and GIF can't be fitted to a file size, and no other format is enabled.\nPlease enable at least one more target format in Settings."),
+                _("No fit found"),
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            return;
+        }
+
+        // Step 1: search for proposals. This runs many trial encodes, so it goes on a background
+        // thread behind a cancellable progress dialog.
+        IReadOnlyList<SizeFitProposal> proposals;
+        ProgressDialog? searchDialog = null;
+
+        try {
+            searchDialog = new ProgressDialog(_("Looking for the best fit..."));
+            searchDialog.Text = _("Fitting...");
+            searchDialog.Show(this);
+            await Task.Yield();
+
+            var token = searchDialog.CancellationToken;
+
+            // The search reports each format as it starts, which turns the marquee into a real bar and
+            // tells the user which format is holding things up (AVIF is much slower than the rest).
+            var examined = 0;
+            var searchProgress = new Progress<string>(format => {
+                // Progress is posted to the UI thread asynchronously, so a report queued just before
+                // the user cancelled can still arrive after the finally block disposed the dialog.
+                if (searchDialog is null || searchDialog.IsDisposed) {
+                    return;
+                }
+
+                examined++;
+                searchDialog.UpdateMessage(_("Checking {0} ({1}/{2})...", format, examined, formats.Count));
+                searchDialog.UpdateProgress(examined, formats.Count);
+            });
+
+            proposals = await Task.Run(() => ImageConverter.FindSizeFitProposals(item, formats, maxBytes, maxWidth, searchProgress, token)).WaitAsync(token);
+        } catch (OperationCanceledException) {
+            statusLabel.Text = _("Ready");
+            return;
+        } catch (Exception ex) {
+            Log.Error("Failed to compute size-fit proposals for {FileName}: {Error}", item.FileName, ex.Message);
+            MessageBox.Show(_("Failed to analyze the image:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        } finally {
+            searchDialog?.Close();
+            searchDialog?.Dispose();
+        }
+
+        if (proposals.Count == 0) {
+            MessageBox.Show(
+                _("None of the enabled formats can bring this image under {0} KB.\nTry a larger size, a smaller width, or enabling more formats in Settings.", maxBytes / 1024),
+                _("No fit found"),
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            return;
+        }
+
+        // Step 2: let the user pick one of the proposals.
+        SizeFitProposal proposal;
+
+        using (var resultsDialog = new FitToSizeResultsDialog(proposals)) {
+            if (resultsDialog.ShowDialog(this) != DialogResult.OK || resultsDialog.SelectedProposal is null)
+                return;
+
+            proposal = resultsDialog.SelectedProposal;
+        }
+
+        // Step 3: write the chosen proposal through the standard output-path + conflict handling.
+        var outputFolder = ValidateOutputFolder();
+        var outputPath = ImageConverter.GenerateOutputPath(item, proposal.Format, outputFolder, Config.General.SaveToSourceFolder);
+
+        if (File.Exists(outputPath)) {
+            var resolution = ResolveFileConflict(outputPath);
+
+            switch (resolution) {
+                case ConflictResolution.Overwrite:
+                    break;
+                case ConflictResolution.Rename:
+                    outputPath = ImageConverter.GetConflictRenamePath(outputPath);
+                    break;
+                case ConflictResolution.Skip:
+                    return;
+            }
+        }
+
+        convertButton.Enabled = false;
+        ProgressDialog? progressDialog = null;
+
+        try {
+            progressDialog = new ProgressDialog(_("Converting..."));
+            progressDialog.Text = _("Converting...");
+            progressDialog.Show(this);
+            await Task.Yield();
+
+            imageListView.Items[index].SubItems[4].Text = _("Converting...");
+
+            await Task.Run(() => {
+                var dir = Path.GetDirectoryName(outputPath);
+                if (dir != null && !Directory.Exists(dir)) {
+                    Directory.CreateDirectory(dir);
+                }
+
+                ImageConverter.ConvertToProposal(item, proposal, outputPath);
+            }).WaitAsync(progressDialog.CancellationToken);
+
+            imageListView.SelectedIndices.Clear();
+            imageListView.FocusedItem = null;
+            _imageItems.RemoveAt(index);
+            imageListView.Items.RemoveAt(index);
+            previewPictureBox.Image?.Dispose();
+            previewPictureBox.Image = null;
+
+            statusLabel.Text = _("Converted: {0}", Path.GetFileName(outputPath));
+            UpdateMenuState();
+            UpdatePlaceholderState();
+            MessageBox.Show(_("Image converted successfully:\n{0}", outputPath), _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        } catch (OperationCanceledException) {
+            imageListView.Items[index].SubItems[4].Text = "";
+            statusLabel.Text = _("Ready");
+        } catch (Exception ex) {
+            Log.Error("Failed to fit {FileName} to size: {Error}", item.FileName, ex.Message);
+            imageListView.Items[index].SubItems[4].Text = _("Failed");
+            MessageBox.Show(_("Failed to convert {0}:\n{1}", item.FileName, ex.Message), _("Conversion Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         } finally {
             progressDialog?.Close();
             progressDialog?.Dispose();

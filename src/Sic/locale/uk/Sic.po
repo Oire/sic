@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-06-30 17:40:59+0200\n"
+"POT-Creation-Date: 2026-08-21 14:36:45+0200\n"
 "PO-Revision-Date: 2026-03-07 23:00+0100\n"
 "Last-Translator: \n"
 "Language-Team: uk\n"
@@ -13,26 +13,41 @@ msgstr ""
 "10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 3.8\n"
 
-#: ..\..\MainWindow.cs:554
+#: ..\..\MainWindow.cs:556
 msgid ", "
 msgstr ", "
 
-#: ..\..\MainWindow.cs:1275
+#: ..\..\MainWindow.cs:1428
 #, csharp-format
 msgid "...and {0} more"
 msgstr "...і ще {0}"
+
+#: ..\..\FitToSizeResultsDialog.cs:42
+#, csharp-format
+msgid "{0} — {1}, full quality — {2}"
+msgstr "{0} — {1}, повна якість — {2}"
+
+#: ..\..\FitToSizeResultsDialog.cs:41
+#, csharp-format
+msgid "{0} — {1}, quality {2}% — {3}"
+msgstr "{0} — {1}, якість {2}% — {3}"
 
 #: ..\..\Models\ImageItem.cs:16
 #, csharp-format
 msgid "{0} ({1}, {2}, {3})"
 msgstr "{0} ({1}, {2}, {3})"
 
-#: ..\..\Models\ImageItem.cs:23
+#: ..\..\FitToSizeResultsDialog.cs:44
+#, csharp-format
+msgid "{0} (recommended)"
+msgstr "{0} (рекомендовано)"
+
+#: ..\..\FitToSizeResultsDialog.cs:49 ..\..\Models\ImageItem.cs:23
 #, csharp-format
 msgid "{0} B"
 msgstr "{0} б"
 
-#: ..\..\MainWindow.cs:1263
+#: ..\..\MainWindow.cs:1416
 #, csharp-format
 msgid "{0} cloud-only file skipped"
 msgid_plural "{0} cloud-only files skipped"
@@ -40,17 +55,17 @@ msgstr[0] "{0} файл, що зберігається тільки в хмар�
 msgstr[1] "{0} файли, що зберігаються тільки в хмарі, пропущено"
 msgstr[2] "{0} файлів, що зберігаються тільки в хмарі, пропущено"
 
-#: ..\..\MainWindow.cs:548
+#: ..\..\MainWindow.cs:550
 #, csharp-format
 msgid "{0} converted"
 msgstr "{0} перетворено"
 
-#: ..\..\MainWindow.cs:552
+#: ..\..\MainWindow.cs:554
 #, csharp-format
 msgid "{0} failed"
 msgstr "{0} не вдалося"
 
-#: ..\..\MainWindow.cs:1265
+#: ..\..\MainWindow.cs:1418
 #, csharp-format
 msgid "{0} file failed to load"
 msgid_plural "{0} files failed to load"
@@ -58,7 +73,7 @@ msgstr[0] "Не вдалося завантажити {0} файл"
 msgstr[1] "Не вдалося завантажити {0} файли"
 msgstr[2] "Не вдалося завантажити {0} файлів"
 
-#: ..\..\MainWindow.cs:1139
+#: ..\..\MainWindow.cs:1292
 #, csharp-format
 msgid ""
 "{0} file is stored in the cloud and needs to be downloaded first.\n"
@@ -76,7 +91,7 @@ msgstr[2] ""
 "{0} файлів зберігаються у хмарі й їх потрібно спочатку завантажити.\n"
 "Завантажити їх?"
 
-#: ..\..\MainWindow.cs:1261
+#: ..\..\MainWindow.cs:1414
 #, csharp-format
 msgid "{0} image loaded"
 msgid_plural "{0} images loaded"
@@ -84,27 +99,27 @@ msgstr[0] "Завантажено {0} зображення"
 msgstr[1] "Завантажено {0} зображення"
 msgstr[2] "Завантажено {0} зображень"
 
-#: ..\..\Models\ImageItem.cs:24
+#: ..\..\FitToSizeResultsDialog.cs:50 ..\..\Models\ImageItem.cs:24
 #, csharp-format
 msgid "{0} KB"
 msgstr "{0} кБ"
 
-#: ..\..\Models\ImageItem.cs:25
+#: ..\..\FitToSizeResultsDialog.cs:51 ..\..\Models\ImageItem.cs:25
 #, csharp-format
 msgid "{0} MB"
 msgstr "{0} МБ"
 
-#: ..\..\MainWindow.cs:550
+#: ..\..\MainWindow.cs:552
 #, csharp-format
 msgid "{0} skipped"
 msgstr "{0} пропущено"
 
-#: ..\..\Models\ImageItem.cs:19
+#: ..\..\FitToSizeResultsDialog.cs:37 ..\..\Models\ImageItem.cs:19
 #, csharp-format
 msgid "{0}x{1}"
 msgstr "{0}x{1}"
 
-#: ..\..\MainWindow.Designer.cs:246
+#: ..\..\MainWindow.Designer.cs:256
 msgid "&About SIC!..."
 msgstr "&Про SIC!..."
 
@@ -116,13 +131,15 @@ msgstr "&Додати..."
 msgid "&Browse..."
 msgstr "О&гляд..."
 
-#: ..\..\AddSizeDialog.Designer.cs:76 ..\..\ProgressDialog.Designer.cs:83
-#: ..\..\AddUrlDialog.Designer.cs:76 ..\..\IcoPresetDialog.Designer.cs:164
-#: ..\..\AddFolderDialog.Designer.cs:126 ..\..\SettingsDialog.Designer.cs:304
+#: ..\..\FitToSizeResultsDialog.Designer.cs:81
+#: ..\..\AddSizeDialog.Designer.cs:76 ..\..\AddUrlDialog.Designer.cs:76
+#: ..\..\AddFolderDialog.Designer.cs:126 ..\..\FitToSizeDialog.Designer.cs:117
+#: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\ProgressDialog.Designer.cs:83
+#: ..\..\SettingsDialog.Designer.cs:304
 msgid "&Cancel"
 msgstr "С&касувати"
 
-#: ..\..\MainWindow.Designer.cs:177
+#: ..\..\MainWindow.Designer.cs:178
 msgid "&Convert"
 msgstr "&Конвертувати"
 
@@ -130,7 +147,7 @@ msgstr "&Конвертувати"
 msgid "&Copy Info"
 msgstr "&Копіювати інформацію"
 
-#: ..\..\MainWindow.Designer.cs:463
+#: ..\..\MainWindow.Designer.cs:473
 msgid "&Crop"
 msgstr "О&брізка"
 
@@ -138,11 +155,11 @@ msgstr "О&брізка"
 msgid "&Detect images in clipboard"
 msgstr "Ви&значати зображення в буфері обміну"
 
-#: ..\..\MainWindow.Designer.cs:239
+#: ..\..\MainWindow.Designer.cs:249
 msgid "&Donate..."
 msgstr "По&жертвувати..."
 
-#: ..\..\MainWindow.Designer.cs:167
+#: ..\..\MainWindow.Designer.cs:168
 msgid "&Edit"
 msgstr "&Редагування"
 
@@ -150,23 +167,27 @@ msgstr "&Редагування"
 msgid "&Favicon"
 msgstr "&Фавікон"
 
-#: ..\..\MainWindow.Designer.cs:100
+#: ..\..\MainWindow.Designer.cs:101
 msgid "&File"
 msgstr "&Файл"
+
+#: ..\..\MainWindow.Designer.cs:215
+msgid "&Fit to File Size..."
+msgstr "Підігнати під &розмір файлу..."
 
 #: ..\..\AddFolderDialog.Designer.cs:66
 msgid "&Folder:"
 msgstr "&Папка:"
 
-#: ..\..\MainWindow.Designer.cs:396
+#: ..\..\MainWindow.Designer.cs:406
 msgid "&Height:"
 msgstr "&Висота:"
 
-#: ..\..\MainWindow.Designer.cs:213
+#: ..\..\MainWindow.Designer.cs:223
 msgid "&Help"
 msgstr "&Довідка"
 
-#: ..\..\MainWindow.Designer.cs:454
+#: ..\..\MainWindow.Designer.cs:464
 msgid "&Keep proportions"
 msgstr "&Зберігати пропорції"
 
@@ -174,17 +195,22 @@ msgstr "&Зберігати пропорції"
 msgid "&Language:"
 msgstr "&Мова:"
 
+#: ..\..\FitToSizeDialog.Designer.cs:81
+msgid "&Limit width (keeps proportions)"
+msgstr "&Обмежити ширину (пропорції зберігаються)"
+
 #: ..\..\AddUrlDialog.Designer.cs:51
 msgid "&Link:"
 msgstr "&Посилання:"
 
 #: ..\..\AddSizeDialog.Designer.cs:67 ..\..\AddUrlDialog.Designer.cs:67
-#: ..\..\IcoPresetDialog.Designer.cs:155 ..\..\AddFolderDialog.Designer.cs:117
-#: ..\..\AboutDialog.Designer.cs:117 ..\..\SettingsDialog.Designer.cs:293
+#: ..\..\AddFolderDialog.Designer.cs:117 ..\..\FitToSizeDialog.Designer.cs:108
+#: ..\..\AboutDialog.Designer.cs:117 ..\..\IcoPresetDialog.Designer.cs:155
+#: ..\..\SettingsDialog.Designer.cs:293
 msgid "&OK"
 msgstr "&ОК"
 
-#: ..\..\MainWindow.Designer.cs:136 ..\..\IcoPresetDialog.Designer.cs:145
+#: ..\..\MainWindow.Designer.cs:137 ..\..\IcoPresetDialog.Designer.cs:145
 msgid "&Remove"
 msgstr "В&идалити"
 
@@ -196,7 +222,7 @@ msgstr "&Скинути"
 msgid "&Save converted images in the same folder as the original"
 msgstr "Зберігати перетворені зображення в тій &же теці, що й оригінал"
 
-#: ..\..\MainWindow.Designer.cs:152
+#: ..\..\MainWindow.Designer.cs:153
 msgid "&Settings..."
 msgstr "&Налаштування..."
 
@@ -204,16 +230,16 @@ msgstr "&Налаштування..."
 msgid "&Target formats to show in the list"
 msgstr "&Цільові формати для показу в списку"
 
-#: ..\..\MainWindow.Designer.cs:377
+#: ..\..\MainWindow.Designer.cs:387
 msgid "&Width:"
 msgstr "&Ширина:"
 
-#: ..\..\AboutDialog.cs:16
+#: ..\..\AboutDialog.cs:17
 #, csharp-format
 msgid "© {0} Oire Software"
 msgstr "© {0} Oire Software"
 
-#: ..\..\MainWindow.cs:284 ..\..\MainWindow.cs:1238 ..\..\MainWindow.cs:1309
+#: ..\..\MainWindow.cs:286 ..\..\MainWindow.cs:1391 ..\..\MainWindow.cs:1462
 #, csharp-format
 msgid "1 image in queue"
 msgid_plural "{0} images in queue"
@@ -221,36 +247,52 @@ msgstr[0] "{0} зображення в черзі"
 msgstr[1] "{0} зображення в черзі"
 msgstr[2] "{0} зображень у черзі"
 
-#: ..\..\MainWindow.Designer.cs:115
+#: ..\..\AboutDialog.cs:15
+msgid "About SIC!"
+msgstr "Про SIC!"
+
+#: ..\..\MainWindow.Designer.cs:116
 msgid "Add &Image..."
 msgstr "Додати &зображення..."
 
-#: ..\..\MainWindow.Designer.cs:122
+#: ..\..\MainWindow.Designer.cs:123
 msgid "Add F&older..."
 msgstr "Додати &папку..."
 
-#: ..\..\MainWindow.Designer.cs:129
+#: ..\..\AddFolderDialog.cs:31
+msgid "Add Folder"
+msgstr "Додати папку"
+
+#: ..\..\MainWindow.Designer.cs:130
 msgid "Add Image by &Link..."
 msgstr "Додати зображення за &посиланням..."
 
-#: ..\..\MainWindow.cs:1280
+#: ..\..\AddUrlDialog.cs:14
+msgid "Add Image by Link"
+msgstr "Додати зображення за посиланням"
+
+#: ..\..\MainWindow.cs:1433
 msgid "Add Images"
 msgstr "Додати зображення"
 
-#: ..\..\MainWindow.cs:203
+#: ..\..\AddSizeDialog.cs:17
+msgid "Add Size"
+msgstr "Додати розмір"
+
+#: ..\..\MainWindow.cs:205
 msgid "Add your images here"
 msgstr "Додайте сюди свої зображення"
 
-#: ..\..\MainWindow.cs:1085
+#: ..\..\MainWindow.cs:1238
 #, csharp-format
 msgid "Added {0} from URL"
 msgstr "Додано {0} за посиланням"
 
-#: ..\..\MainWindow.cs:1030
+#: ..\..\MainWindow.cs:1183
 msgid "Added image from clipboard"
 msgstr "Додано зображення з буфера обміну"
 
-#: ..\..\MainWindow.cs:226
+#: ..\..\MainWindow.cs:228
 msgid "All files"
 msgstr "Усі файли"
 
@@ -283,11 +325,15 @@ msgstr "Зображення AVIF (*.avif)"
 msgid "BMP images (*.bmp)"
 msgstr "Зображення BMP (*.bmp)"
 
+#: ..\..\FitToSizeResultsDialog.Designer.cs:55
+msgid "C&hoose a result to convert to:"
+msgstr "&Виберіть результат для конвертації:"
+
 #: ..\..\IcoPresetDialog.Designer.cs:108
 msgid "C&ustom"
 msgstr "Корист&увацький"
 
-#: ..\..\MainWindow.cs:556
+#: ..\..\MainWindow.cs:558
 msgid "Cancelled."
 msgstr "Скасовано."
 
@@ -295,7 +341,7 @@ msgstr "Скасовано."
 msgid "Check for &updates on startup"
 msgstr "Перевіряти &оновлення під час запуску"
 
-#: ..\..\MainWindow.Designer.cs:233
+#: ..\..\MainWindow.Designer.cs:243
 msgid "Check for &Updates..."
 msgstr "Перевірити &оновлення..."
 
@@ -303,15 +349,24 @@ msgstr "Перевірити &оновлення..."
 msgid "Check for updates in the back&ground:"
 msgstr "Перевіряти оновлення у &фоні:"
 
-#: ..\..\MainWindow.cs:938
+#: ..\..\MainWindow.cs:712
+#, csharp-format
+msgid "Checking {0} ({1}/{2})..."
+msgstr "Перевірка {0} ({1}/{2})..."
+
+#: ..\..\MainWindow.cs:1091
 msgid "Clipboard Content Detected"
 msgstr "Виявлено вміст буфера обміну"
 
-#: ..\..\MainWindow.cs:1142
+#: ..\..\MainWindow.cs:1295
 msgid "Cloud Files"
 msgstr "Хмарні файли"
 
-#: ..\..\MainWindow.cs:893
+#: ..\..\FitToSizeResultsDialog.Designer.cs:72
+msgid "Con&vert"
+msgstr "&Конвертувати"
+
+#: ..\..\MainWindow.cs:1046
 msgid "Confirm Exit"
 msgstr "Підтвердження виходу"
 
@@ -319,11 +374,11 @@ msgstr "Підтвердження виходу"
 msgid "Confirm on exit with non-empty &queue"
 msgstr "Підтверджу&вати вихід при непорожній черзі"
 
-#: ..\..\MainWindow.cs:563
+#: ..\..\MainWindow.cs:565 ..\..\MainWindow.cs:796
 msgid "Conversion Complete"
 msgstr "Конвертацію завершено"
 
-#: ..\..\MainWindow.cs:513
+#: ..\..\MainWindow.cs:515 ..\..\MainWindow.cs:804
 msgid "Conversion Error"
 msgstr "Помилка конвертації"
 
@@ -332,46 +387,51 @@ msgstr "Помилка конвертації"
 msgid "Conversion failed: {0}"
 msgstr "Помилка конвертації: {0}"
 
-#: ..\..\MainWindow.Designer.cs:197 ..\..\MainWindow.Designer.cs:444
+#: ..\..\MainWindow.Designer.cs:199 ..\..\MainWindow.Designer.cs:454
 msgid "Convert &All"
 msgstr "Конвертувати &все"
 
-#: ..\..\MainWindow.Designer.cs:189 ..\..\MainWindow.Designer.cs:434
+#: ..\..\MainWindow.Designer.cs:191 ..\..\MainWindow.Designer.cs:444
 msgid "Convert &Selected"
 msgstr "Конвертувати &вибране"
 
-#: ..\..\Program.cs:285
+#: ..\..\MainWindow.cs:793 ..\..\Program.cs:285
 #, csharp-format
 msgid "Converted: {0}"
 msgstr "Конвертовано: {0}"
 
-#: ..\..\MainWindow.cs:465
+#: ..\..\MainWindow.cs:467
 #, csharp-format
 msgid "Converting {0} ({1}/{2})..."
 msgstr "Конвертація {0} ({1}/{2})..."
 
-#: ..\..\MainWindow.cs:449 ..\..\MainWindow.cs:467 ..\..\MainWindow.cs:618
-#: ..\..\MainWindow.cs:622
+#: ..\..\MainWindow.cs:451 ..\..\MainWindow.cs:469 ..\..\MainWindow.cs:620
+#: ..\..\MainWindow.cs:624 ..\..\MainWindow.cs:770 ..\..\MainWindow.cs:771
+#: ..\..\MainWindow.cs:775
 msgid "Converting..."
 msgstr "Конвертація..."
 
-#: ..\..\AboutDialog.cs:40
+#: ..\..\AboutDialog.cs:41
 msgid "Copied!"
 msgstr "Скопійовано!"
 
-#: ..\..\MainWindow.Designer.cs:205
+#: ..\..\MainWindow.Designer.cs:207
 msgid "Create Multi-size &ICO..."
 msgstr "Створити багаторозмірний &ICO..."
 
-#: ..\..\MainWindow.cs:617
+#: ..\..\IcoPresetDialog.cs:27
+msgid "Create Multi-size ICO"
+msgstr "Створити багаторозмірний ICO"
+
+#: ..\..\MainWindow.cs:619
 msgid "Creating multi-size ICO..."
 msgstr "Створення багаторозмірного ICO..."
 
-#: ..\..\MainWindow.cs:384
+#: ..\..\MainWindow.cs:386
 msgid "Crop mode requires a valid height (1–65535)."
 msgstr "Режим обрізки потребує допустиму висоту (1–65535)."
 
-#: ..\..\MainWindow.cs:376
+#: ..\..\MainWindow.cs:378
 msgid "Crop mode requires a valid width (1–65535)."
 msgstr "Режим обрізки потребує допустиму ширину (1–65535)."
 
@@ -381,29 +441,29 @@ msgstr ""
 "Режим обрізки потребує і ширину, і висоту (наприклад, --resize 128x128 --"
 "crop)"
 
-#: ..\..\MainWindow.Designer.cs:310
+#: ..\..\MainWindow.Designer.cs:320
 msgid "Dimensions"
 msgstr "Розміри"
 
-#: ..\..\MainWindow.cs:1059
+#: ..\..\MainWindow.cs:1212
 msgid "Downloading image..."
 msgstr "Завантаження зображення..."
 
-#: ..\..\MainWindow.cs:1072
+#: ..\..\MainWindow.cs:1225
 #, csharp-format
 msgid "Downloading image... ({0} KB)"
 msgstr "Завантаження зображення... ({0} кБ)"
 
-#: ..\..\MainWindow.cs:1069
+#: ..\..\MainWindow.cs:1222
 #, csharp-format
 msgid "Downloading image... {0}%"
 msgstr "Завантаження зображення... {0}%"
 
-#: ..\..\MainWindow.cs:1060
+#: ..\..\MainWindow.cs:1213
 msgid "Downloading..."
 msgstr "Завантаження..."
 
-#: ..\..\MainWindow.Designer.cs:160
+#: ..\..\MainWindow.Designer.cs:161
 msgid "E&xit"
 msgstr "В&ихід"
 
@@ -411,29 +471,38 @@ msgstr "В&ихід"
 msgid "Either --output or --format must be specified."
 msgstr "Необхідно вказати --output або --format."
 
-#: ..\..\Program.cs:46 ..\..\Program.cs:73 ..\..\MainWindow.cs:651
-#: ..\..\Utils\Config.cs:102 ..\..\MainWindow.cs:1033 ..\..\MainWindow.cs:1092
-#: ..\..\MainWindow.cs:1097 ..\..\MainWindow.cs:1290
+#: ..\..\MainWindow.cs:653 ..\..\Utils\Config.cs:102 ..\..\MainWindow.cs:722
+#: ..\..\MainWindow.cs:1186 ..\..\MainWindow.cs:1245 ..\..\MainWindow.cs:1250
+#: ..\..\MainWindow.cs:1443 ..\..\Program.cs:46 ..\..\Program.cs:73
 msgid "Error"
 msgstr "Помилка"
 
-#: ..\..\MainWindow.cs:1270
+#: ..\..\MainWindow.cs:1423
 msgid "Errors:"
 msgstr "Помилки:"
 
-#: ..\..\SettingsDialog.cs:123
+#: ..\..\SettingsDialog.cs:124
 msgid "Every 3 days"
 msgstr "Раз на 3 дні"
 
-#: ..\..\IcoPresetDialog.cs:82
+#: ..\..\IcoPresetDialog.cs:83
 msgid "Existing size"
 msgstr "Розмір вже існує"
 
-#: ..\..\MainWindow.cs:512 ..\..\MainWindow.cs:650
+#: ..\..\MainWindow.cs:514 ..\..\MainWindow.cs:652 ..\..\MainWindow.cs:803
 msgid "Failed"
 msgstr "Помилка"
 
-#: ..\..\MainWindow.cs:513
+#: ..\..\MainWindow.cs:722
+#, csharp-format
+msgid ""
+"Failed to analyze the image:\n"
+"{0}"
+msgstr ""
+"Не вдалося проаналізувати зображення:\n"
+"{0}"
+
+#: ..\..\MainWindow.cs:515 ..\..\MainWindow.cs:804
 #, csharp-format
 msgid ""
 "Failed to convert {0}:\n"
@@ -442,7 +511,7 @@ msgstr ""
 "Не вдалося конвертувати {0}:\n"
 "{1}"
 
-#: ..\..\MainWindow.cs:651
+#: ..\..\MainWindow.cs:653
 #, csharp-format
 msgid ""
 "Failed to create multi-size ICO:\n"
@@ -451,7 +520,7 @@ msgstr ""
 "Не вдалося створити багаторозмірний ICO:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:1033
+#: ..\..\MainWindow.cs:1186
 #, csharp-format
 msgid ""
 "Failed to load clipboard image:\n"
@@ -460,7 +529,7 @@ msgstr ""
 "Не вдалося завантажити зображення з буфера обміну:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:1097
+#: ..\..\MainWindow.cs:1250
 #, csharp-format
 msgid ""
 "Failed to load image from URL:\n"
@@ -469,7 +538,7 @@ msgstr ""
 "Не вдалося завантажити зображення за посиланням:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:1290
+#: ..\..\MainWindow.cs:1443
 #, csharp-format
 msgid ""
 "Failed to load image:\n"
@@ -489,11 +558,11 @@ msgstr "Критична помилка: {0}"
 msgid "Fi&lter:"
 msgstr "Фі&льтр:"
 
-#: ..\..\MainWindow.cs:1318
+#: ..\..\MainWindow.cs:1471
 msgid "File Already Exists"
 msgstr "Файл вже існує"
 
-#: ..\..\MainWindow.Designer.cs:306
+#: ..\..\MainWindow.Designer.cs:316
 msgid "File Name"
 msgstr "Ім'я файлу"
 
@@ -502,11 +571,23 @@ msgstr "Ім'я файлу"
 msgid "File not found: {0}"
 msgstr "Файл не знайдено: {0}"
 
-#: ..\..\SettingsDialog.cs:201
+#: ..\..\FitToSizeDialog.cs:20
+msgid "Fit to File Size"
+msgstr "Підігнати під розмір файлу"
+
+#: ..\..\FitToSizeResultsDialog.cs:24
+msgid "Fit to File Size — Results"
+msgstr "Підігнати під розмір файлу — результати"
+
+#: ..\..\MainWindow.cs:695
+msgid "Fitting..."
+msgstr "Підгонка..."
+
+#: ..\..\SettingsDialog.cs:202
 msgid "Folder Not Found"
 msgstr "Папку не знайдено"
 
-#: ..\..\MainWindow.Designer.cs:308
+#: ..\..\MainWindow.Designer.cs:318
 msgid "Format"
 msgstr "Формат"
 
@@ -526,7 +607,16 @@ msgstr "Репозиторій GitHub"
 msgid "HEIC images (*.heic, *.heif)"
 msgstr "Зображення HEIC (*.heic, *.heif)"
 
-#: ..\..\MainWindow.cs:643
+#: ..\..\MainWindow.cs:681
+msgid ""
+"ICO and GIF can't be fitted to a file size, and no other format is enabled.\n"
+"Please enable at least one more target format in Settings."
+msgstr ""
+"ICO та GIF не можна підігнати під розмір файлу, а інших форматів не "
+"ввімкнено.\n"
+"Будь ласка, увімкніть у налаштуваннях хоча б ще один цільовий формат."
+
+#: ..\..\MainWindow.cs:645
 msgid "ICO Created"
 msgstr "ICO створено"
 
@@ -534,7 +624,16 @@ msgstr "ICO створено"
 msgid "ICO icons (*.ico)"
 msgstr "Значки ICO (*.ico)"
 
-#: ..\..\MainWindow.cs:226
+#: ..\..\MainWindow.cs:796
+#, csharp-format
+msgid ""
+"Image converted successfully:\n"
+"{0}"
+msgstr ""
+"Зображення успішно сконвертовано:\n"
+"{0}"
+
+#: ..\..\MainWindow.cs:228
 msgid "Image files"
 msgstr "Файли зображень"
 
@@ -546,11 +645,11 @@ msgstr "Зображення"
 msgid "Include &All Subfolders"
 msgstr "Включити &всі підпапки"
 
-#: ..\..\MainWindow.cs:395
+#: ..\..\MainWindow.cs:397
 msgid "Invalid dimensions"
 msgstr "Недопустимі розміри"
 
-#: ..\..\MainWindow.cs:384
+#: ..\..\MainWindow.cs:386
 msgid "Invalid height"
 msgstr "Недопустима висота"
 
@@ -559,7 +658,7 @@ msgstr "Недопустима висота"
 msgid "Invalid height value: {0}"
 msgstr "Недопустиме значення висоти: {0}"
 
-#: ..\..\AddUrlDialog.cs:33 ..\..\MainWindow.cs:1049
+#: ..\..\AddUrlDialog.cs:34 ..\..\MainWindow.cs:1202
 msgid "Invalid link"
 msgstr "Недопустиме посилання"
 
@@ -578,11 +677,15 @@ msgstr ""
 "Недопустимий формат зміни розміру: {0}. Використовуйте ШxВ, Шx, xВ або Ш "
 "(наприклад, 128x128, 128x, x128, 128)"
 
-#: ..\..\AddSizeDialog.cs:31
+#: ..\..\FitToSizeDialog.cs:50
+msgid "Invalid size"
+msgstr "Недопустимий розмір"
+
+#: ..\..\AddSizeDialog.cs:32
 msgid "Invalid Size"
 msgstr "Недопустимий розмір"
 
-#: ..\..\MainWindow.cs:376
+#: ..\..\FitToSizeDialog.cs:68 ..\..\MainWindow.cs:378
 msgid "Invalid width"
 msgstr "Недопустима ширина"
 
@@ -595,16 +698,28 @@ msgstr "Недопустиме значення ширини: {0}"
 msgid "JPEG images (*.jpg, *.jpeg)"
 msgstr "Зображення JPEG (*.jpg, *.jpeg)"
 
-#: ..\..\MainWindow.cs:1163 ..\..\MainWindow.cs:1187
+#: ..\..\MainWindow.cs:1316 ..\..\MainWindow.cs:1340
 #, csharp-format
 msgid "Loading images ({0}/{1})..."
 msgstr "Завантаження зображень ({0}/{1})..."
 
-#: ..\..\MainWindow.cs:1164
+#: ..\..\MainWindow.cs:1317
 msgid "Loading..."
 msgstr "Завантаження..."
 
-#: ..\..\MainWindow.cs:643
+#: ..\..\MainWindow.cs:694
+msgid "Looking for the best fit..."
+msgstr "Пошук найкращого варіанта..."
+
+#: ..\..\FitToSizeDialog.Designer.cs:90
+msgid "Maximum &width (px):"
+msgstr "Максимальна &ширина (px):"
+
+#: ..\..\FitToSizeDialog.Designer.cs:65
+msgid "Maximum file size (&KB):"
+msgstr "Максимальний розмір файлу (&КБ):"
+
+#: ..\..\MainWindow.cs:645
 #, csharp-format
 msgid ""
 "Multi-size ICO created successfully:\n"
@@ -613,48 +728,62 @@ msgstr ""
 "Багаторозмірний ICO успішно створено:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:640
+#: ..\..\MainWindow.cs:642
 #, csharp-format
 msgid "Multi-size ICO created: {0}"
 msgstr "Створено багаторозмірний ICO: {0}"
 
-#: ..\..\SettingsDialog.cs:126
+#: ..\..\SettingsDialog.cs:127
 msgid "Never"
 msgstr "Ніколи"
 
-#: ..\..\AddFolderDialog.cs:63
+#: ..\..\MainWindow.cs:682 ..\..\MainWindow.cs:732
+msgid "No fit found"
+msgstr "Підхожий варіант не знайдено"
+
+#: ..\..\AddFolderDialog.cs:64
 msgid "No folder selected"
 msgstr "Папку не вибрано"
 
-#: ..\..\MainWindow.cs:361
+#: ..\..\MainWindow.cs:363
 msgid "No format selected"
 msgstr "Формат не вибрано"
 
-#: ..\..\SettingsDialog.cs:212
+#: ..\..\SettingsDialog.cs:213
 msgid "No Formats Selected"
 msgstr "Формати не вибрано"
 
-#: ..\..\MainWindow.cs:250
+#: ..\..\MainWindow.cs:252
 msgid "No images found"
 msgstr "Зображення не знайдено"
 
-#: ..\..\MainWindow.cs:569
+#: ..\..\MainWindow.cs:571
 msgid "No images to convert. Add some images first."
 msgstr "Немає зображень для конвертації. Спочатку додайте зображення."
 
-#: ..\..\AddUrlDialog.cs:24
+#: ..\..\AddUrlDialog.cs:25
 msgid "No link entered"
 msgstr "Посилання не вказано"
 
-#: ..\..\MainWindow.cs:250
+#: ..\..\MainWindow.cs:252
 msgid "No matching images found in the selected folder."
 msgstr "У вибраній папці не знайдено відповідних зображень."
 
-#: ..\..\IcoPresetDialog.cs:124
+#: ..\..\IcoPresetDialog.cs:125
 msgid "No Sizes"
 msgstr "Немає розмірів"
 
-#: ..\..\MainWindow.cs:569
+#: ..\..\MainWindow.cs:731
+#, csharp-format
+msgid ""
+"None of the enabled formats can bring this image under {0} KB.\n"
+"Try a larger size, a smaller width, or enabling more formats in Settings."
+msgstr ""
+"Жоден із увімкнених форматів не може зменшити це зображення до {0} КБ.\n"
+"Спробуйте вказати більший розмір, меншу ширину або увімкніть більше форматів "
+"у налаштуваннях."
+
+#: ..\..\MainWindow.cs:571
 msgid "Nothing to convert"
 msgstr "Немає що конвертувати"
 
@@ -662,15 +791,15 @@ msgstr "Немає що конвертувати"
 msgid "Oire Software SARL"
 msgstr "Oire Software SARL"
 
-#: ..\..\SettingsDialog.cs:122
+#: ..\..\SettingsDialog.cs:123
 msgid "Once a day"
 msgstr "Раз на день"
 
-#: ..\..\SettingsDialog.cs:125
+#: ..\..\SettingsDialog.cs:126
 msgid "Once a month"
 msgstr "Раз на місяць"
 
-#: ..\..\SettingsDialog.cs:124
+#: ..\..\SettingsDialog.cs:125
 msgid "Once a week"
 msgstr "Раз на тиждень"
 
@@ -678,7 +807,7 @@ msgstr "Раз на тиждень"
 msgid "Output &Folder:"
 msgstr "Папка &призначення:"
 
-#: ..\..\Program.cs:129 ..\..\MainWindow.cs:420
+#: ..\..\MainWindow.cs:422 ..\..\Program.cs:129
 msgid "Output Folder Not Found"
 msgstr "Папку призначення не знайдено"
 
@@ -687,7 +816,7 @@ msgid "Output path must have a file extension (e.g. .jpg, .png)"
 msgstr ""
 "Шлях призначення повинен містити розширення файлу (наприклад, .jpg, .png)"
 
-#: ..\..\MainWindow.cs:1346
+#: ..\..\MainWindow.cs:1499
 msgid "Overwrite"
 msgstr "Перезаписати"
 
@@ -700,40 +829,50 @@ msgstr ""
 msgid "Path to the source image file or a URL"
 msgstr "Шлях до вихідного файлу зображення або посилання"
 
-#: ..\..\IcoPresetDialog.cs:123
+#: ..\..\IcoPresetDialog.cs:124
 msgid "Please add at least one size to the list."
 msgstr "Будь ласка, додайте до списку хоча б один розмір."
 
-#: ..\..\AddUrlDialog.cs:24
+#: ..\..\AddUrlDialog.cs:25
 msgid "Please enter a link."
 msgstr "Будь ласка, введіть посилання."
 
-#: ..\..\AddSizeDialog.cs:30
+#: ..\..\FitToSizeDialog.cs:49
+msgid "Please enter a maximum file size in KB (a whole number of at least 1)."
+msgstr ""
+"Будь ласка, введіть максимальний розмір файлу в КБ (ціле число не менше 1)."
+
+#: ..\..\AddSizeDialog.cs:31
 #, csharp-format
 msgid "Please enter a number between {0} and {1}."
 msgstr "Введіть число від {0} до {1}."
 
-#: ..\..\AddUrlDialog.cs:32
+#: ..\..\AddUrlDialog.cs:33
 msgid "Please enter a valid link starting with http:// or https://."
 msgstr "Введіть допустиме посилання, що починається з http:// або https://."
 
-#: ..\..\MainWindow.cs:395
+#: ..\..\FitToSizeDialog.cs:67
+#, csharp-format
+msgid "Please enter a valid maximum width (1–{0})."
+msgstr "Будь ласка, введіть допустиму максимальну ширину (1–{0})."
+
+#: ..\..\MainWindow.cs:397
 msgid "Please enter at least one valid dimension (1–65535)."
 msgstr "Будь ласка, вкажіть хоча б один допустимий вимір (1–65535)."
 
-#: ..\..\AddFolderDialog.cs:63
+#: ..\..\AddFolderDialog.cs:64
 msgid "Please select a folder."
 msgstr "Будь ласка, виберіть папку."
 
-#: ..\..\MainWindow.cs:361
+#: ..\..\MainWindow.cs:363
 msgid "Please select a target format."
 msgstr "Будь ласка, виберіть цільовий формат."
 
-#: ..\..\SettingsDialog.cs:211
+#: ..\..\SettingsDialog.cs:212
 msgid "Please show at least one target format."
 msgstr "Будь ласка, виберіть хоча б один цільовий формат для показу."
 
-#: ..\..\ProgressDialog.Designer.cs:62
+#: ..\..\ProgressDialog.Designer.cs:62 ..\..\ProgressDialog.cs:16
 msgid "Please wait..."
 msgstr "Будь ласка, зачекайте..."
 
@@ -745,11 +884,11 @@ msgstr "Зображення PNG (*.png)"
 msgid "Pre&set:"
 msgstr "Пере&дустановка:"
 
-#: ..\..\MainWindow.cs:448
+#: ..\..\MainWindow.cs:450
 msgid "Preparing to convert..."
 msgstr "Підготовка до конвертації..."
 
-#: ..\..\MainWindow.cs:545
+#: ..\..\MainWindow.cs:547
 #, csharp-format
 msgid "Processed {0} image."
 msgid_plural "Processed {0} images."
@@ -757,29 +896,30 @@ msgstr[0] "Оброблено {0} зображення."
 msgstr[1] "Оброблено {0} зображення."
 msgstr[2] "Оброблено {0} зображень."
 
-#: ..\..\MainWindow.Designer.cs:226
+#: ..\..\MainWindow.Designer.cs:236
 msgid "Read User &Manual"
 msgstr "&Посібник користувача"
 
-#: ..\..\MainWindow.cs:296 ..\..\MainWindow.cs:322
-#: ..\..\MainWindow.Designer.cs:480 ..\..\MainWindow.cs:647
-#: ..\..\MainWindow.cs:1087 ..\..\MainWindow.cs:1094 ..\..\MainWindow.cs:1098
+#: ..\..\MainWindow.cs:298 ..\..\MainWindow.cs:324
+#: ..\..\MainWindow.Designer.cs:490 ..\..\MainWindow.cs:649
+#: ..\..\MainWindow.cs:718 ..\..\MainWindow.cs:800 ..\..\MainWindow.cs:1240
+#: ..\..\MainWindow.cs:1247 ..\..\MainWindow.cs:1251
 msgid "Ready"
 msgstr "Готово"
 
-#: ..\..\MainWindow.Designer.cs:144
+#: ..\..\MainWindow.Designer.cs:145
 msgid "Remove &All"
 msgstr "Видалити &все"
 
-#: ..\..\MainWindow.cs:1347
+#: ..\..\MainWindow.cs:1500
 msgid "Rename"
 msgstr "Перейменувати"
 
-#: ..\..\MainWindow.Designer.cs:347
+#: ..\..\MainWindow.Designer.cs:357
 msgid "Resi&ze"
 msgstr "Змінити ро&змір"
 
-#: ..\..\MainWindow.Designer.cs:356
+#: ..\..\MainWindow.Designer.cs:366
 msgid "Resize &Mode:"
 msgstr "Ре&жим зміни розміру:"
 
@@ -787,17 +927,21 @@ msgstr "Ре&жим зміни розміру:"
 msgid "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)"
 msgstr "Розміри у форматі ШxВ, Шx або xВ (наприклад, 128x128, 128x, x128)"
 
-#: ..\..\AddFolderDialog.cs:44
+#: ..\..\AddFolderDialog.cs:45
 msgid "Select folder containing images"
 msgstr "Виберіть папку із зображеннями"
 
-#: ..\..\MainWindow.cs:225
+#: ..\..\MainWindow.cs:227
 msgid "Select images to add"
 msgstr "Виберіть зображення для додавання"
 
-#: ..\..\SettingsDialog.cs:171
+#: ..\..\SettingsDialog.cs:172
 msgid "Select output folder for converted images"
 msgstr "Виберіть папку призначення для конвертованих зображень"
+
+#: ..\..\SettingsDialog.cs:24
+msgid "Settings"
+msgstr "Налаштування"
 
 #: ..\..\AddSizeDialog.Designer.cs:51
 msgid "Si&ze (16–512):"
@@ -811,24 +955,24 @@ msgstr "Ро&зміри:"
 msgid "SIC! — Simple Image Converter"
 msgstr "SIC! — Простий конвертер зображень"
 
-#: ..\..\MainWindow.Designer.cs:312
+#: ..\..\MainWindow.Designer.cs:322
 msgid "Size"
 msgstr "Розмір"
 
-#: ..\..\IcoPresetDialog.cs:81
+#: ..\..\IcoPresetDialog.cs:82
 #, csharp-format
 msgid "Size {0} is already in the list."
 msgstr "Розмір {0} вже у списку."
 
-#: ..\..\MainWindow.cs:1348
+#: ..\..\MainWindow.cs:1501
 msgid "Skip"
 msgstr "Пропустити"
 
-#: ..\..\MainWindow.cs:493
+#: ..\..\MainWindow.cs:495
 msgid "Skipped"
 msgstr "Пропущено"
 
-#: ..\..\MainWindow.cs:474
+#: ..\..\MainWindow.cs:476
 msgid "Skipped (same format)"
 msgstr "Пропущено (той самий формат)"
 
@@ -837,13 +981,13 @@ msgstr "Пропущено (той самий формат)"
 msgid "Skipped: {0} is already in {1} format."
 msgstr "Пропущено: {0} вже у форматі {1}."
 
-#: ..\..\MainWindow.cs:700 ..\..\Services\UpdateService.cs:107
+#: ..\..\MainWindow.cs:853 ..\..\Services\UpdateService.cs:107
 #: ..\..\Services\UpdateService.cs:115 ..\..\Services\UpdateService.cs:123
 #: ..\..\Services\UpdateService.cs:135
 msgid "Software Update"
 msgstr "Оновлення програмного забезпечення"
 
-#: ..\..\MainWindow.Designer.cs:314
+#: ..\..\MainWindow.Designer.cs:324
 msgid "Status"
 msgstr "Стан"
 
@@ -852,11 +996,11 @@ msgstr "Стан"
 msgid "Supported formats: {0}"
 msgstr "Підтримувані формати: {0}"
 
-#: ..\..\SettingsDialog.cs:72
+#: ..\..\SettingsDialog.cs:73
 msgid "System"
 msgstr "Системна"
 
-#: ..\..\MainWindow.Designer.cs:330
+#: ..\..\MainWindow.Designer.cs:340
 msgid "Target &Format:"
 msgstr "Цільовий &формат:"
 
@@ -866,7 +1010,7 @@ msgstr ""
 "Цільовий формат (наприклад, jpg, png, webp). Використовується, коли параметр "
 "--output не вказано."
 
-#: ..\..\MainWindow.cs:986
+#: ..\..\MainWindow.cs:1139
 #, csharp-format
 msgid ""
 "The clipboard contains a link:\n"
@@ -879,7 +1023,7 @@ msgstr ""
 "\n"
 "Завантажити зображення й додати його до черги?"
 
-#: ..\..\MainWindow.cs:967
+#: ..\..\MainWindow.cs:1120
 #, csharp-format
 msgid "The clipboard contains an image file. Add it to the queue?"
 msgid_plural "The clipboard contains {0} image files. Add them to the queue?"
@@ -888,11 +1032,11 @@ msgstr[0] ""
 msgstr[1] "У буфері обміну міститься {0} файли зображень. Додати їх до черги?"
 msgstr[2] "У буфері обміну міститься {0} файлів зображень. Додати їх до черги?"
 
-#: ..\..\MainWindow.cs:980
+#: ..\..\MainWindow.cs:1133
 msgid "The clipboard contains an image. Add it to the queue?"
 msgstr "У буфері обміну міститься зображення. Додати його до черги?"
 
-#: ..\..\MainWindow.cs:1336
+#: ..\..\MainWindow.cs:1489
 #, csharp-format
 msgid ""
 "The file \"{0}\" already exists.\n"
@@ -905,11 +1049,11 @@ msgstr ""
 msgid "The latest available update was previously skipped."
 msgstr "Останнє доступне оновлення було раніше пропущено."
 
-#: ..\..\MainWindow.cs:1091
+#: ..\..\MainWindow.cs:1244
 msgid "The link does not point to a supported image."
 msgstr "Посилання не вказує на підтримуване зображення."
 
-#: ..\..\Program.cs:128 ..\..\MainWindow.cs:419
+#: ..\..\MainWindow.cs:421 ..\..\Program.cs:128
 #, csharp-format
 msgid ""
 "The output folder \"{0}\" no longer exists. The default folder will be used."
@@ -917,7 +1061,7 @@ msgstr ""
 "Папка призначення «{0}» більше не існує. Буде використано папку за "
 "замовчуванням."
 
-#: ..\..\MainWindow.cs:1048
+#: ..\..\MainWindow.cs:1201
 msgid ""
 "The pasted text is not a valid link.\n"
 "Links must start with http:// or https://."
@@ -925,15 +1069,15 @@ msgstr ""
 "Вставлений текст не є дійсним посиланням.\n"
 "Посилання мають починатися з http:// або https://."
 
-#: ..\..\SettingsDialog.cs:200
+#: ..\..\SettingsDialog.cs:201
 msgid "The selected folder does not exist. Please choose an existing folder."
 msgstr "Вибрана папка не існує. Будь ласка, виберіть наявну папку."
 
-#: ..\..\MainWindow.cs:686
+#: ..\..\MainWindow.cs:839
 msgid "The user manual file could not be found."
 msgstr "Файл посібника користувача не знайдено."
 
-#: ..\..\MainWindow.cs:892
+#: ..\..\MainWindow.cs:1045
 msgid "There are images in the queue. Are you sure you want to exit?"
 msgstr "У черзі є зображення. Ви дійсно хочете вийти?"
 
@@ -941,7 +1085,7 @@ msgstr "У черзі є зображення. Ви дійсно хочете в
 msgid "TIFF images (*.tif, *.tiff)"
 msgstr "Зображення TIFF (*.tif, *.tiff)"
 
-#: ..\..\MainWindow.cs:699 ..\..\Services\UpdateService.cs:122
+#: ..\..\MainWindow.cs:852 ..\..\Services\UpdateService.cs:122
 #: ..\..\Services\UpdateService.cs:134
 msgid "Unable to check for updates. Please try again later."
 msgstr "Неможливо перевірити оновлення. Спробуйте пізніше."
@@ -971,7 +1115,7 @@ msgstr ""
 "Режим обрізки (масштабувати з заповненням, потім обрізати по центру до "
 "точних розмірів)"
 
-#: ..\..\MainWindow.cs:686
+#: ..\..\MainWindow.cs:839
 msgid "User Manual"
 msgstr "Посібник користувача"
 
@@ -979,7 +1123,7 @@ msgstr "Посібник користувача"
 msgid "Version"
 msgstr "Версія"
 
-#: ..\..\AboutDialog.cs:15
+#: ..\..\AboutDialog.cs:16
 #, csharp-format
 msgid "Version {0}"
 msgstr "Версія {0}"

@@ -14,6 +14,7 @@ public partial class AddSizeDialog: Form {
     public AddSizeDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        Text = _("Add Size");
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {

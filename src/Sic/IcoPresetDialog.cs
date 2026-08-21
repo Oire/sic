@@ -24,6 +24,7 @@ public partial class IcoPresetDialog: Form {
     public IcoPresetDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        Text = _("Create Multi-size ICO");
 
         faviconRadioButton.CheckedChanged += PresetRadioButton_CheckedChanged;
         appIconRadioButton.CheckedChanged += PresetRadioButton_CheckedChanged;

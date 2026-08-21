@@ -11,6 +11,7 @@ public partial class AddUrlDialog: Form {
     public AddUrlDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        Text = _("Add Image by Link");
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {

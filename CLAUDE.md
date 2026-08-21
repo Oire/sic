@@ -35,6 +35,18 @@ powershell -ExecutionPolicy Bypass -File src/Sic/locale/scripts/Update-Translati
 
 After editing `.po` files, always run `compile-translations.ps1` to regenerate the `.mo` binaries.
 
+**Form titles must be set in the constructor.** `GetText.Extractor` only recognizes *qualified* assignments in the designer (`okButton.Text = "&OK"`); a form's own bare `Text = "Add Folder";` is invisible to it, so the title never reaches the catalog and always renders in English. Every dialog therefore sets its own title right after `Localizer.Localize(this, Localization.Catalog)`:
+
+```csharp
+InitializeComponent();
+Localizer.Localize(this, Localization.Catalog);
+Text = _("Add Folder");
+```
+
+Keep the designer's English `Text` as-is — it's what the visual designer shows and the constructor simply reassigns it at runtime. `MainWindow` is the exception: its title is the product name and stays untranslated.
+
+Note that `Update-Translations.ps1` fuzzy-matches new titles against the similarly worded menu items, so freshly merged title entries arrive with `&` mnemonics and trailing `...` and a `#, fuzzy` flag. Fix the `msgstr` and drop the flag — window titles carry neither.
+
 ## Architecture
 
 **Entry point:** `src/Sic/Program.cs` — Sets up Serilog logging. If CLI arguments are present, runs headless conversion via `System.CommandLine`; otherwise loads config and launches the WinForms `MainWindow`.
@@ -43,12 +55,19 @@ After editing `.po` files, always run `compile-translations.ps1` to regenerate t
 
 **`src/Sic/Models/ImageItem.cs`** — Data model for an image in the conversion queue. Properties: `FilePath`, `ImageData` (for clipboard/URL sources), `OriginalFormat`, `FileName`, `Width`, `Height`, `FileSize`. Display helpers for dimensions and human-readable file sizes.
 
+**`src/Sic/Models/SizeFitProposal.cs`** — Plain data record describing one viable "fit to file size" result (issue #24): target `Format`, output `Width`/`Height`, `Quality` (null for lossless), resulting `FileSize`, a `Resized` flag, and a `Recommended` flag set by ranking. Produced by `ImageConverter.FindSizeFitProposals` and consumed by `ConvertToProposal`. (It lives in `Models`, not `Services`, because it's data, not behavior.)
+
 **`src/Sic/Services/ImageConverter.cs`** — Static conversion engine wrapping Magick.NET. Key methods:
 - `LoadFromFile`, `LoadFromStream`, `LoadFromBytes`, `LoadFromUrl` — create `ImageItem` from various sources
 - `Convert` — converts an `ImageItem` to a target format with optional resize, writes to disk
 - `GeneratePreview` — produces a `Bitmap` for the preview panel
 - `GenerateOutputPath`, `GetConflictRenamePath` — output path logic with conflict resolution
 - `GetSupportedFormats` — all SIC! format keys in canonical order; `GetEnabledFormats(enabledKeys)` filters them to the user-selected subset (issue #47), preserving order and never returning an empty list
+- `FindSizeFitProposals(item, formats, maxBytes, maxWidth, progress)` / `ConvertToProposal(item, proposal, outputPath)` — "fit to file size" (issue #24). Trial encodes go to a `MemoryStream`, never to disk, and every advertised size is a real measurement at the dimensions and quality that will actually be written, so `ConvertToProposal` reproduces a chosen proposal byte-for-byte. Each format is tried two ways: **keep quality, shrink** (`FitAtQuality` — proportions always kept, optional `maxWidth` applied first, never below `MinFitDimension` = 16 px on the smaller side) and, for lossy formats (`JPG`/`WEBP`/`AVIF`, the `LossyFormats` set) that had to give up pixels, **keep every pixel, drop quality** (`FitFullSizeByQuality`, never below `MinFitQuality` = 45). Ranking is **resolution first, then quality, then size** — a full-resolution result at quality 88 beats a downscaled one at 95, which is what someone facing an upload limit actually wants; `ranked[0]` gets `Recommended`. An impossible budget yields an empty list rather than a garbage thumbnail. `progress` (an `IProgress<string>`) is told each format key as its turn starts, which is what drives the determinate progress bar.
+  - Both searches **extrapolate rather than bisect**: encoded size tracks pixel count closely, so one cheap `ReferenceProbeLongSide` (384 px) probe yields a bytes-per-pixel estimate that aims every probe after it (`MaxFitProbes` = 8 bounds the worst case). Convergence is tested in output pixels, not in scale — a scale-based test stops far too early on formats whose size tracks pixel count exactly, and silently returns a thumbnail where a usable size existed.
+  - The quality search never brute-forces full-resolution encodes (a single full-size AVIF costs ~2 s). It picks a quality on a `QualityProbeLongSide` (768 px) proxy against a pixel-scaled budget, confirms at full size, then **calibrates the proxy from that one real measurement** (`proxyBudget = maxBytes * proxySize / realSize`) and lets the cheap search choose again. `MaxQualityConfirmations` = 2 full-resolution encodes is enough to land on the same quality an exhaustive search finds.
+  - Trial encodes are memoized per format in a `(width, height, quality) -> bytes` dictionary shared by both searches; without it the two searches re-encode the same candidates repeatedly.
+- `GetSizeFitFormats(formats)` — drops `SizeFitExcludedFormats` (**ICO** and **GIF**) from a format list. Both stay ordinary conversion targets but are never fit-to-size candidates: Magick's ICO encoder hard-throws above **512 px per side** (so probing any normal photo would fail the whole search) and its payload flips between BMP and PNG around 256 px, making encoded size non-monotonic in the scale factor — the exact assumption the binary search relies on; GIF quantizes to ≤256 colors (measured: ~750,000 colors → 76) while ignoring `Quality` entirely, so a badly degraded result would be advertised as "full quality", and it encodes larger than JPG/WEBP at equal dimensions anyway. `FindSizeFitProposals` applies the filter defensively too. Unlike `GetEnabledFormats` this **can** return an empty list (user enabled only ICO/GIF), which `MainWindow` reports with its own message.
 - Note: The class name conflicts with `System.Drawing.ImageConverter`; files that use it must import `using ImageConverter = Oire.Sic.Services.ImageConverter;`
 
 **`src/Sic/Services/UnsupportedImageException.cs`** — Domain exception thrown when content downloads/loads fine but isn't a decodable image (e.g. a link to an HTML page). `LoadFromUrl` translates Magick.NET's decode failure into this so the UI can show a friendly "not an image" message without referencing Magick.NET — keeps the image-library dependency inside the Services layer.
@@ -59,6 +78,7 @@ After editing `.po` files, always run `compile-translations.ps1` to regenerate t
 - `ListView` (batch queue) + `PictureBox` (image preview) in the top row
 - Format dropdown, resize checkbox + resize mode / width / height fields in the controls rows
 - Convert Selected + Convert All buttons
+- Convert menu also offers *Create Multi-size ICO…* and *Fit to File Size…* (issue #24), each acting on the single selected image. *Fit to File Size* opens `FitToSizeDialog` (max size in KB + optional max width, both plain `TextBox`es like the resize fields), runs `ImageConverter.FindSizeFitProposals` on a background thread behind `ProgressDialog`, then shows `FitToSizeResultsDialog` (a `ListBox` of ranked proposals) and converts the chosen one through the standard output-path + conflict-resolution flow. The search reports each format as it starts, so the progress bar is determinate ("Checking AVIF (6/6)…") rather than a marquee — it can still take tens of seconds on a large photo, and AVIF is by far the slowest. Cancellation lands in about a quarter of a second. The `Progress<string>` callback checks `IsDisposed` first: reports are posted to the UI thread asynchronously, so one queued just before a cancel can arrive after `finally` disposed the dialog.
 - `StatusStrip` with status label at the bottom
 - Batch operations show a separate `ProgressDialog` with progress bar
 - Supports drag & drop, Ctrl+V paste (file drops and bitmap clipboard), Delete key to remove

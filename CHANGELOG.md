@@ -6,12 +6,26 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 
 ### Features
 
-- Detect data in clipboard: SIC! can now offer to add an image, image files, or an image link from the clipboard when its window opens or regains focus ([#36](https://github.com/Oire/sic/issues/36)). It is off by default and can be toggled in Settings; the same clipboard content is offered only once.
+- **Fit to file size**: give SIC! a maximum file size (and optionally a maximum width) and it searches every enabled format for combinations of format, dimensions, and quality that fit under it, then converts to the result you pick ([#24](https://github.com/Oire/sic/issues/24)). Available via **Convert > Fit to File Size** (<kbd>Ctrl+Alt+Shift+F5</kbd>). Every size offered is a real measurement, the results are ranked resolution first, and nothing is written to disk until you choose one. ICO and GIF are excluded from the search; they remain ordinary conversion targets.
+- **HEIC/HEIF input**: photos from newer iPhones can now be opened and converted to any supported format. Input only — HEIC can be read but not written ([#30](https://github.com/Oire/sic/issues/30))
+- **Save converted images in the same folder as the original**: a new Settings option that writes each converted file next to its source file instead of into the output folder. Clipboard captures and downloaded links still go to the output folder ([#33](https://github.com/Oire/sic/issues/33))
+- **Detect data in clipboard**: SIC! can now offer to add an image, image files, or an image link from the clipboard when its window opens or regains focus ([#36](https://github.com/Oire/sic/issues/36)). It is off by default and can be toggled in Settings; the same clipboard content is offered only once.
+- **Adjustable update checks**: the startup check can be turned off, and the background check frequency can be set to daily, every 3 days, weekly, monthly, or never. A change takes effect immediately, without restarting ([#45](https://github.com/Oire/sic/issues/45))
+- **Customizable target formats**: choose which formats appear in the target-format dropdown and hide the ones you never convert to ([#47](https://github.com/Oire/sic/issues/47))
 
 ### Changes
 
 - The Settings dialog is now organized into **General** and **Images** tabs.
+- Converting an image to the format it is already in is now skipped (reported as *Skipped (same format)*) instead of re-encoding and degrading it for nothing. When a resize does force a re-encode, the original encoding quality is reapplied ([#44](https://github.com/Oire/sic/pull/44))
 - Adding a link (by paste or **Add by link**) that doesn't point to a supported image now shows a clear message instead of a raw decoder error.
+
+### Bug Fixes
+
+- Dialog window titles (Settings, About, Add Folder, Add Image by Link, Create Multi-size ICO, Add Size, Fit to File Size) are now localized. They had always been left in English: the string extractor only picks up qualified `control.Text` assignments, so a form's own title never reached the translation catalog.
+
+### Other
+
+- Updated the target framework to .NET 10.0 ([#43](https://github.com/Oire/sic/pull/43))
 
 ## [1.0.2.2] — 2026-04-17
 
