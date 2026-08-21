@@ -46,6 +46,7 @@ partial class MainWindow {
         convertSelectedMenuItem = new ToolStripMenuItem();
         convertAllMenuItem = new ToolStripMenuItem();
         createMultiSizeIcoMenuItem = new ToolStripMenuItem();
+        fitToFileSizeMenuItem = new ToolStripMenuItem();
 
         // Help menu
         helpMenu = new ToolStripMenuItem();
@@ -181,6 +182,7 @@ partial class MainWindow {
             convertAllMenuItem,
             new ToolStripSeparator(),
             createMultiSizeIcoMenuItem,
+            fitToFileSizeMenuItem,
         });
 
         //
@@ -206,6 +208,14 @@ partial class MainWindow {
         createMultiSizeIcoMenuItem.Name = "createMultiSizeIcoMenuItem";
         createMultiSizeIcoMenuItem.ShortcutKeys = Keys.Control | Keys.Alt | Keys.F5;
         createMultiSizeIcoMenuItem.Enabled = false;
+
+        //
+        // fitToFileSizeMenuItem
+        //
+        fitToFileSizeMenuItem.Text = "&Fit to File Size...";
+        fitToFileSizeMenuItem.Name = "fitToFileSizeMenuItem";
+        fitToFileSizeMenuItem.ShortcutKeys = Keys.Control | Keys.Alt | Keys.Shift | Keys.F5;
+        fitToFileSizeMenuItem.Enabled = false;
 
         //
         // helpMenu
@@ -527,6 +537,7 @@ partial class MainWindow {
     private ToolStripMenuItem convertSelectedMenuItem;
     private ToolStripMenuItem convertAllMenuItem;
     private ToolStripMenuItem createMultiSizeIcoMenuItem;
+    private ToolStripMenuItem fitToFileSizeMenuItem;
     private ToolStripMenuItem helpMenu;
     private ToolStripMenuItem userManualMenuItem;
     private ToolStripMenuItem checkForUpdatesMenuItem;
