@@ -13,6 +13,7 @@ public partial class ProgressDialog: Form {
     public ProgressDialog(string message) {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        Text = _("Please wait...");
         messageLabel.Text = message;
         cancelOperationButton.Click += cancelOperationButton_Click;
     }

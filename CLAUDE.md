@@ -35,6 +35,18 @@ powershell -ExecutionPolicy Bypass -File src/Sic/locale/scripts/Update-Translati
 
 After editing `.po` files, always run `compile-translations.ps1` to regenerate the `.mo` binaries.
 
+**Form titles must be set in the constructor.** `GetText.Extractor` only recognizes *qualified* assignments in the designer (`okButton.Text = "&OK"`); a form's own bare `Text = "Add Folder";` is invisible to it, so the title never reaches the catalog and always renders in English. Every dialog therefore sets its own title right after `Localizer.Localize(this, Localization.Catalog)`:
+
+```csharp
+InitializeComponent();
+Localizer.Localize(this, Localization.Catalog);
+Text = _("Add Folder");
+```
+
+Keep the designer's English `Text` as-is — it's what the visual designer shows and the constructor simply reassigns it at runtime. `MainWindow` is the exception: its title is the product name and stays untranslated.
+
+Note that `Update-Translations.ps1` fuzzy-matches new titles against the similarly worded menu items, so freshly merged title entries arrive with `&` mnemonics and trailing `...` and a `#, fuzzy` flag. Fix the `msgstr` and drop the flag — window titles carry neither.
+
 ## Architecture
 
 **Entry point:** `src/Sic/Program.cs` — Sets up Serilog logging. If CLI arguments are present, runs headless conversion via `System.CommandLine`; otherwise loads config and launches the WinForms `MainWindow`.

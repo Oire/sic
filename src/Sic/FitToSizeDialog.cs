@@ -17,6 +17,7 @@ public partial class FitToSizeDialog: Form {
     public FitToSizeDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        Text = _("Fit to File Size");
 
         limitWidthCheckBox.CheckedChanged += LimitWidthCheckBox_CheckedChanged;
         maxSizeTextBox.GotFocus += (s, _) => (s as TextBox)?.BeginInvoke(((TextBox)s!).SelectAll);

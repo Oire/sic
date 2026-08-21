@@ -117,6 +117,7 @@ footer {
     <li><a href="#converting">Bilder konvertieren</a></li>
     <li><a href="#resizing">Größe ändern</a></li>
     <li><a href="#multi-size-ico">Mehrgrößen-ICO-Dateien erstellen</a></li>
+    <li><a href="#fit-to-size">Ein Bild an eine Dateigröße anpassen</a></li>
     <li><a href="#settings">Einstellungen</a></li>
     <li><a href="#updates">Softwareaktualisierungen</a></li>
     <li><a href="#cli">Kommandozeilenverwendung</a></li>
@@ -137,7 +138,7 @@ footer {
         <ul>
             <li><strong>Datei</strong> — Bilder hinzufügen (aus Dateien, Ordnern oder per Link), Einstellungen öffnen oder die Anwendung beenden.</li>
             <li><strong>Bearbeiten</strong> — Ausgewählte oder alle Bilder aus der Warteschlange entfernen. Dieses Menü ist deaktiviert, wenn die Warteschlange leer ist.</li>
-            <li><strong>Konvertieren</strong> — Konvertierung starten oder ein Mehrgrößen-ICO erstellen. Dieses Menü ist deaktiviert, wenn die Warteschlange leer ist.</li>
+            <li><strong>Konvertieren</strong> — Konvertierung starten, ein Mehrgrößen-ICO erstellen oder ein Bild an eine Dateigröße anpassen. Dieses Menü ist deaktiviert, wenn die Warteschlange leer ist.</li>
             <li><strong>Hilfe</strong> — Dieses Handbuch öffnen, nach Softwareaktualisierungen suchen, spenden oder den Info-Dialog anzeigen.</li>
         </ul>
     </dd>
@@ -204,6 +205,7 @@ footer {
 </ol>
 <p>Standardmäßig werden konvertierte Dateien im Ordner <code>Converted</code> innerhalb des Anwendungsdatenverzeichnisses gespeichert. Sie können dies in den <a href="#settings">Einstellungen</a> ändern.</p>
 <p>Wenn bereits eine Datei mit dem gleichen Namen existiert, fragt SIC!, ob Sie überschreiben, umbenennen (durch Hinzufügen eines <code>_1</code>-Suffixes) oder die Datei überspringen möchten.</p>
+<p>Die Konvertierung eines Bildes in das Format, in dem es bereits vorliegt, wird übersprungen statt ausgeführt: Ein erneutes Kodieren würde nur Qualität kosten, ohne etwas zu bringen — die Warteschlange meldet daher einfach <em>Übersprungen (gleiches Format)</em>. Wird gleichzeitig eine Größenänderung angefordert, findet die Konvertierung statt, und SIC! wendet die ursprüngliche Kodierungsqualität erneut an, damit das Bild nicht stärker komprimiert wird als zuvor.</p>
 
 <h2 id="resizing">Größe ändern</h2>
 <p>Aktivieren Sie das Kontrollkästchen <strong>Größe ändern</strong>, um die Größenänderung bei der Konvertierung zu aktivieren. Zwei Modi sind verfügbar:</p>
@@ -235,6 +237,28 @@ footer {
     <dd>Ermöglicht das Erstellen einer eigenen Größenliste. Startet mit der zuvor ausgewählten Voreinstellung als Basis, dann können Sie einzelne Größen hinzufügen oder entfernen.</dd>
 </dl>
 
+<h2 id="fit-to-size">Ein Bild an eine Dateigröße anpassen</h2>
+<p>Websites und Formulare lehnen Bilder oberhalb einer bestimmten Größe oft ab — „Ihr Profilbild darf höchstens 200 KB groß sein“. Statt selbst mit Formaten und Qualitätsstufen zu experimentieren, lassen Sie SIC! eine passende Kombination suchen:</p>
+<ol>
+    <li>Wählen Sie ein Bild in der Liste aus.</li>
+    <li>Wählen Sie <strong>Konvertieren > An Dateigröße anpassen</strong> (<kbd>Strg+Alt+Umschalt+F5</kbd>).</li>
+    <li>Geben Sie die <strong>Maximale Dateigröße</strong> in Kilobyte ein. Optional aktivieren Sie <strong>Breite begrenzen</strong> und geben eine maximale Breite in Pixeln an, falls auch die Abmessungen begrenzt sind. Die Proportionen bleiben stets erhalten.</li>
+    <li>Klicken Sie auf <strong>OK</strong>. SIC! probiert jedes aktivierte Zielformat nacheinander durch und zeigt den Fortschritt an, zum Beispiel <em>Prüfe AVIF (6/6)...</em>. Sie können den Vorgang jederzeit abbrechen.</li>
+    <li>Wählen Sie eines der Ergebnisse aus und klicken Sie auf <strong>Konvertieren</strong>.</li>
+</ol>
+<p>Jedes Ergebnis nennt genau das, was Sie erhalten würden, zum Beispiel <em>WEBP — 1280x853, Qualität 82 % — 195,4 KB (empfohlen)</em> oder <em>PNG — 800x533, volle Qualität — 187,2 KB</em>.</p>
+<p>Die Ergebnisse sind so sortiert, dass das beste zuerst steht und mit <em>(empfohlen)</em> gekennzeichnet ist: Zuerst zählen mehr Pixel, dann höhere Qualität, dann die kleinere Datei. Bei einer Upload-Begrenzung ist das meist genau das Gewünschte — ein Bild in voller Größe mit leicht reduzierter Qualität ist besser als ein verkleinertes in maximaler Qualität.</p>
+<p>Einige Punkte, die Sie kennen sollten:</p>
+<ul>
+    <li>Jede angezeigte Größe ist eine echte Messung, keine Schätzung. Während der Suche wird nichts auf die Festplatte geschrieben, und die schließlich geschriebene Datei entspricht Byte für Byte der gemessenen.</li>
+    <li>Es werden nur die Formate ausprobiert, die in den <a href="#settings">Einstellungen</a> unter <strong>In der Liste anzuzeigende Zielformate</strong> aktiviert sind.</li>
+    <li>ICO und GIF werden hier nie verwendet. ICO kann keine großen Bilder aufnehmen, und GIF ist auf 256 Farben beschränkt und ignoriert Qualitätseinstellungen — beide können ein beliebiges Größenbudget nicht zuverlässig einhalten. Als gewöhnliche Zielformate bleiben sie weiterhin verfügbar. Sind sie die einzigen aktivierten Formate, weist SIC! darauf hin, statt zu suchen.</li>
+    <li>Bei verlustbehafteten Formaten (JPG, WebP, AVIF) versucht SIC! zusätzlich, alle Pixel zu erhalten und stattdessen die Qualität zu senken. Die Qualität wird nie unter 45 % gesenkt, und kein Bild wird auf weniger als 16 Pixel an der kürzeren Seite verkleinert.</li>
+    <li>Die Suche führt viele Probekodierungen durch und kann bei einem großen Foto einige zehn Sekunden dauern; AVIF ist mit Abstand das langsamste Format.</li>
+    <li>Kann kein Format das Budget einhalten — etwa 5 KB für ein 24-Megapixel-Foto —, meldet SIC!, dass keine Anpassung gefunden wurde, statt ein unbrauchbares Miniaturbild anzubieten.</li>
+</ul>
+<p>Das gewählte Ergebnis wird nach den üblichen Regeln für Ausgabeordner und Dateinamenskonflikte gespeichert, genau wie bei einer normalen Konvertierung.</p>
+
 <h2 id="settings">Einstellungen</h2>
 <p>Öffnen Sie <strong>Datei > Einstellungen</strong> (<kbd>Strg+,</kbd>), um SIC! zu konfigurieren. Der Dialog ist in zwei Registerkarten gegliedert: <strong>Allgemein</strong> und <strong>Bilder</strong>. Drücken Sie <kbd>Strg+Tab</kbd>, um zwischen den Registerkarten zu wechseln.</p>
 
@@ -258,8 +282,14 @@ footer {
     <dt>Ausgabeordner</dt>
     <dd>Legen Sie einen benutzerdefinierten Ordner fest, in dem alle konvertierten Dateien gespeichert werden. Klicken Sie auf <strong>Zurücksetzen</strong>, um den Standard-Ordner <code>Converted</code> innerhalb des Anwendungsdatenverzeichnisses wiederherzustellen.</dd>
 
+    <dt>Konvertierte Bilder im selben Ordner wie das Original speichern</dt>
+    <dd>Wenn aktiviert, wird jede konvertierte Datei neben ihrer Quelldatei abgelegt statt im oben angegebenen Ausgabeordner. Bilder ohne Quellordner — aus der Zwischenablage übernommene oder heruntergeladene Bilder — landen weiterhin im Ausgabeordner. Diese Option ist standardmäßig deaktiviert.</dd>
+
     <dt>Bilder in der Zwischenablage erkennen</dt>
     <dd>Wenn aktiviert, bietet SIC! an, verwendbare Inhalte der Zwischenablage — ein Bild, Bilddateien oder einen Bildlink — hinzuzufügen, sobald sein Fenster geöffnet wird oder den Fokus erhält. Vor dem Hinzufügen werden Sie stets mit einer Ja/Nein-Abfrage gefragt, und derselbe Inhalt wird nur einmal angeboten, sodass Sie nie belästigt werden. Diese Option ist standardmäßig deaktiviert. Weitere Informationen finden Sie unter <a href="#adding-images">Bilder hinzufügen</a>.</dd>
+
+    <dt>In der Liste anzuzeigende Zielformate</dt>
+    <dd>Aktivieren Sie die Formate, die im Auswahlfeld <strong>Zielformat</strong> des Hauptfensters erscheinen sollen, und deaktivieren Sie die, in die Sie nie konvertieren. Mindestens ein Format muss aktiviert bleiben. Bleiben alle aktiviert, erscheinen auch Formate automatisch, die in künftigen Versionen von SIC! hinzukommen.</dd>
 </dl>
 <p>Einstellungen werden in <code>Sic.cfg</code> innerhalb des Anwendungsdatenverzeichnisses gespeichert (den genauen Speicherort finden Sie unter <a href="#installation">Installationsmodi</a>).</p>
 
@@ -307,6 +337,7 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <tr><td>Ausgewählte konvertieren</td><td><kbd>F5</kbd></td></tr>
     <tr><td>Alle konvertieren</td><td><kbd>Strg+Umschalt+F5</kbd></td></tr>
     <tr><td>Mehrgrößen-ICO erstellen</td><td><kbd>Strg+Alt+F5</kbd></td></tr>
+    <tr><td>An Dateigröße anpassen</td><td><kbd>Strg+Alt+Umschalt+F5</kbd></td></tr>
     <tr><td>Benutzerhandbuch</td><td><kbd>F1</kbd></td></tr>
     <tr><td>Über SIC!</td><td><kbd>Umschalt+F1</kbd></td></tr>
     <tr><td>Spenden</td><td><kbd>Strg+Umschalt+D</kbd></td></tr>

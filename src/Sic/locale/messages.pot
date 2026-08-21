@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-08-21 02:17:13+0200\n"
-"PO-Revision-Date: 2026-08-21 02:17:13+0200\n"
+"POT-Creation-Date: 2026-08-21 14:36:45+0200\n"
+"PO-Revision-Date: 2026-08-21 14:36:45+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -19,12 +19,12 @@ msgstr ""
 msgid "...and {0} more"
 msgstr ""
 
-#: ..\..\FitToSizeResultsDialog.cs:41
+#: ..\..\FitToSizeResultsDialog.cs:42
 #, csharp-format
 msgid "{0} — {1}, full quality — {2}"
 msgstr ""
 
-#: ..\..\FitToSizeResultsDialog.cs:40
+#: ..\..\FitToSizeResultsDialog.cs:41
 #, csharp-format
 msgid "{0} — {1}, quality {2}% — {3}"
 msgstr ""
@@ -34,12 +34,12 @@ msgstr ""
 msgid "{0} ({1}, {2}, {3})"
 msgstr ""
 
-#: ..\..\FitToSizeResultsDialog.cs:43
+#: ..\..\FitToSizeResultsDialog.cs:44
 #, csharp-format
 msgid "{0} (recommended)"
 msgstr ""
 
-#: ..\..\FitToSizeResultsDialog.cs:48
+#: ..\..\FitToSizeResultsDialog.cs:49
 #: ..\..\Models\ImageItem.cs:23
 #, csharp-format
 msgid "{0} B"
@@ -87,13 +87,13 @@ msgid_plural "{0} images loaded"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ..\..\FitToSizeResultsDialog.cs:49
+#: ..\..\FitToSizeResultsDialog.cs:50
 #: ..\..\Models\ImageItem.cs:24
 #, csharp-format
 msgid "{0} KB"
 msgstr ""
 
-#: ..\..\FitToSizeResultsDialog.cs:50
+#: ..\..\FitToSizeResultsDialog.cs:51
 #: ..\..\Models\ImageItem.cs:25
 #, csharp-format
 msgid "{0} MB"
@@ -104,7 +104,7 @@ msgstr ""
 msgid "{0} skipped"
 msgstr ""
 
-#: ..\..\FitToSizeResultsDialog.cs:36
+#: ..\..\FitToSizeResultsDialog.cs:37
 #: ..\..\Models\ImageItem.cs:19
 #, csharp-format
 msgid "{0}x{1}"
@@ -123,12 +123,12 @@ msgstr ""
 msgid "&Browse..."
 msgstr ""
 
+#: ..\..\FitToSizeResultsDialog.Designer.cs:81
 #: ..\..\AddSizeDialog.Designer.cs:76
 #: ..\..\AddUrlDialog.Designer.cs:76
 #: ..\..\AddFolderDialog.Designer.cs:126
 #: ..\..\FitToSizeDialog.Designer.cs:117
 #: ..\..\IcoPresetDialog.Designer.cs:164
-#: ..\..\FitToSizeResultsDialog.Designer.cs:81
 #: ..\..\ProgressDialog.Designer.cs:83
 #: ..\..\SettingsDialog.Designer.cs:304
 msgid "&Cancel"
@@ -202,8 +202,8 @@ msgstr ""
 #: ..\..\AddUrlDialog.Designer.cs:67
 #: ..\..\AddFolderDialog.Designer.cs:117
 #: ..\..\FitToSizeDialog.Designer.cs:108
-#: ..\..\IcoPresetDialog.Designer.cs:155
 #: ..\..\AboutDialog.Designer.cs:117
+#: ..\..\IcoPresetDialog.Designer.cs:155
 #: ..\..\SettingsDialog.Designer.cs:293
 msgid "&OK"
 msgstr ""
@@ -233,7 +233,7 @@ msgstr ""
 msgid "&Width:"
 msgstr ""
 
-#: ..\..\AboutDialog.cs:16
+#: ..\..\AboutDialog.cs:17
 #, csharp-format
 msgid "© {0} Oire Software"
 msgstr ""
@@ -247,6 +247,10 @@ msgid_plural "{0} images in queue"
 msgstr[0] ""
 msgstr[1] ""
 
+#: ..\..\AboutDialog.cs:15
+msgid "About SIC!"
+msgstr ""
+
 #: ..\..\MainWindow.Designer.cs:116
 msgid "Add &Image..."
 msgstr ""
@@ -255,12 +259,24 @@ msgstr ""
 msgid "Add F&older..."
 msgstr ""
 
+#: ..\..\AddFolderDialog.cs:31
+msgid "Add Folder"
+msgstr ""
+
 #: ..\..\MainWindow.Designer.cs:130
 msgid "Add Image by &Link..."
 msgstr ""
 
+#: ..\..\AddUrlDialog.cs:14
+msgid "Add Image by Link"
+msgstr ""
+
 #: ..\..\MainWindow.cs:1433
 msgid "Add Images"
+msgstr ""
+
+#: ..\..\AddSizeDialog.cs:17
+msgid "Add Size"
 msgstr ""
 
 #: ..\..\MainWindow.cs:205
@@ -400,12 +416,16 @@ msgstr ""
 msgid "Converting..."
 msgstr ""
 
-#: ..\..\AboutDialog.cs:40
+#: ..\..\AboutDialog.cs:41
 msgid "Copied!"
 msgstr ""
 
 #: ..\..\MainWindow.Designer.cs:207
 msgid "Create Multi-size &ICO..."
+msgstr ""
+
+#: ..\..\IcoPresetDialog.cs:27
+msgid "Create Multi-size ICO"
 msgstr ""
 
 #: ..\..\MainWindow.cs:619
@@ -455,9 +475,9 @@ msgid "Either --output or --format must be specified."
 msgstr ""
 
 #: ..\..\MainWindow.cs:653
+#: ..\..\Utils\Config.cs:102
 #: ..\..\MainWindow.cs:722
 #: ..\..\MainWindow.cs:1186
-#: ..\..\Utils\Config.cs:102
 #: ..\..\MainWindow.cs:1245
 #: ..\..\MainWindow.cs:1250
 #: ..\..\MainWindow.cs:1443
@@ -470,11 +490,11 @@ msgstr ""
 msgid "Errors:"
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:123
+#: ..\..\SettingsDialog.cs:124
 msgid "Every 3 days"
 msgstr ""
 
-#: ..\..\IcoPresetDialog.cs:82
+#: ..\..\IcoPresetDialog.cs:83
 msgid "Existing size"
 msgstr ""
 
@@ -550,11 +570,19 @@ msgstr ""
 msgid "File not found: {0}"
 msgstr ""
 
+#: ..\..\FitToSizeDialog.cs:20
+msgid "Fit to File Size"
+msgstr ""
+
+#: ..\..\FitToSizeResultsDialog.cs:24
+msgid "Fit to File Size — Results"
+msgstr ""
+
 #: ..\..\MainWindow.cs:695
 msgid "Fitting..."
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:201
+#: ..\..\SettingsDialog.cs:202
 msgid "Folder Not Found"
 msgstr ""
 
@@ -624,7 +652,7 @@ msgstr ""
 msgid "Invalid height value: {0}"
 msgstr ""
 
-#: ..\..\AddUrlDialog.cs:33
+#: ..\..\AddUrlDialog.cs:34
 #: ..\..\MainWindow.cs:1202
 msgid "Invalid link"
 msgstr ""
@@ -641,15 +669,15 @@ msgid ""
 "128)"
 msgstr ""
 
-#: ..\..\FitToSizeDialog.cs:49
+#: ..\..\FitToSizeDialog.cs:50
 msgid "Invalid size"
 msgstr ""
 
-#: ..\..\AddSizeDialog.cs:31
+#: ..\..\AddSizeDialog.cs:32
 msgid "Invalid Size"
 msgstr ""
 
-#: ..\..\FitToSizeDialog.cs:67
+#: ..\..\FitToSizeDialog.cs:68
 #: ..\..\MainWindow.cs:378
 msgid "Invalid width"
 msgstr ""
@@ -697,7 +725,7 @@ msgstr ""
 msgid "Multi-size ICO created: {0}"
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:126
+#: ..\..\SettingsDialog.cs:127
 msgid "Never"
 msgstr ""
 
@@ -706,7 +734,7 @@ msgstr ""
 msgid "No fit found"
 msgstr ""
 
-#: ..\..\AddFolderDialog.cs:63
+#: ..\..\AddFolderDialog.cs:64
 msgid "No folder selected"
 msgstr ""
 
@@ -714,7 +742,7 @@ msgstr ""
 msgid "No format selected"
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:212
+#: ..\..\SettingsDialog.cs:213
 msgid "No Formats Selected"
 msgstr ""
 
@@ -726,7 +754,7 @@ msgstr ""
 msgid "No images to convert. Add some images first."
 msgstr ""
 
-#: ..\..\AddUrlDialog.cs:24
+#: ..\..\AddUrlDialog.cs:25
 msgid "No link entered"
 msgstr ""
 
@@ -734,7 +762,7 @@ msgstr ""
 msgid "No matching images found in the selected folder."
 msgstr ""
 
-#: ..\..\IcoPresetDialog.cs:124
+#: ..\..\IcoPresetDialog.cs:125
 msgid "No Sizes"
 msgstr ""
 
@@ -753,15 +781,15 @@ msgstr ""
 msgid "Oire Software SARL"
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:122
+#: ..\..\SettingsDialog.cs:123
 msgid "Once a day"
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:125
+#: ..\..\SettingsDialog.cs:126
 msgid "Once a month"
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:124
+#: ..\..\SettingsDialog.cs:125
 msgid "Once a week"
 msgstr ""
 
@@ -790,28 +818,28 @@ msgstr ""
 msgid "Path to the source image file or a URL"
 msgstr ""
 
-#: ..\..\IcoPresetDialog.cs:123
+#: ..\..\IcoPresetDialog.cs:124
 msgid "Please add at least one size to the list."
 msgstr ""
 
-#: ..\..\AddUrlDialog.cs:24
+#: ..\..\AddUrlDialog.cs:25
 msgid "Please enter a link."
 msgstr ""
 
-#: ..\..\FitToSizeDialog.cs:48
+#: ..\..\FitToSizeDialog.cs:49
 msgid "Please enter a maximum file size in KB (a whole number of at least 1)."
 msgstr ""
 
-#: ..\..\AddSizeDialog.cs:30
+#: ..\..\AddSizeDialog.cs:31
 #, csharp-format
 msgid "Please enter a number between {0} and {1}."
 msgstr ""
 
-#: ..\..\AddUrlDialog.cs:32
+#: ..\..\AddUrlDialog.cs:33
 msgid "Please enter a valid link starting with http:// or https://."
 msgstr ""
 
-#: ..\..\FitToSizeDialog.cs:66
+#: ..\..\FitToSizeDialog.cs:67
 #, csharp-format
 msgid "Please enter a valid maximum width (1–{0})."
 msgstr ""
@@ -820,7 +848,7 @@ msgstr ""
 msgid "Please enter at least one valid dimension (1–65535)."
 msgstr ""
 
-#: ..\..\AddFolderDialog.cs:63
+#: ..\..\AddFolderDialog.cs:64
 msgid "Please select a folder."
 msgstr ""
 
@@ -828,11 +856,12 @@ msgstr ""
 msgid "Please select a target format."
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:211
+#: ..\..\SettingsDialog.cs:212
 msgid "Please show at least one target format."
 msgstr ""
 
 #: ..\..\ProgressDialog.Designer.cs:62
+#: ..\..\ProgressDialog.cs:16
 msgid "Please wait..."
 msgstr ""
 
@@ -891,7 +920,7 @@ msgstr ""
 msgid "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)"
 msgstr ""
 
-#: ..\..\AddFolderDialog.cs:44
+#: ..\..\AddFolderDialog.cs:45
 msgid "Select folder containing images"
 msgstr ""
 
@@ -899,8 +928,12 @@ msgstr ""
 msgid "Select images to add"
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:171
+#: ..\..\SettingsDialog.cs:172
 msgid "Select output folder for converted images"
+msgstr ""
+
+#: ..\..\SettingsDialog.cs:24
+msgid "Settings"
 msgstr ""
 
 #: ..\..\AddSizeDialog.Designer.cs:51
@@ -920,7 +953,7 @@ msgstr ""
 msgid "Size"
 msgstr ""
 
-#: ..\..\IcoPresetDialog.cs:81
+#: ..\..\IcoPresetDialog.cs:82
 #, csharp-format
 msgid "Size {0} is already in the list."
 msgstr ""
@@ -959,7 +992,7 @@ msgstr ""
 msgid "Supported formats: {0}"
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:72
+#: ..\..\SettingsDialog.cs:73
 msgid "System"
 msgstr ""
 
@@ -1019,7 +1052,7 @@ msgid ""
 "Links must start with http:// or https://."
 msgstr ""
 
-#: ..\..\SettingsDialog.cs:200
+#: ..\..\SettingsDialog.cs:201
 msgid "The selected folder does not exist. Please choose an existing folder."
 msgstr ""
 
@@ -1073,7 +1106,7 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-#: ..\..\AboutDialog.cs:15
+#: ..\..\AboutDialog.cs:16
 #, csharp-format
 msgid "Version {0}"
 msgstr ""

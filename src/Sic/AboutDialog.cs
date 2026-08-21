@@ -12,6 +12,7 @@ public partial class AboutDialog: Form {
     public AboutDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        Text = _("About SIC!");
         versionLabel.Text = _("Version {0}", Application.ProductVersion);
         copyrightLabel.Text = _("\u00a9 {0} Oire Software", DateTime.Now.Year);
         repoLink.LinkClicked += RepoLink_LinkClicked;

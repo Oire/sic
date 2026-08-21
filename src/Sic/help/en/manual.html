@@ -117,6 +117,7 @@ footer {
     <li><a href="#converting">Converting images</a></li>
     <li><a href="#resizing">Resizing</a></li>
     <li><a href="#multi-size-ico">Creating multi-size ICO files</a></li>
+    <li><a href="#fit-to-size">Fitting an image to a file size</a></li>
     <li><a href="#settings">Settings</a></li>
     <li><a href="#updates">Software updates</a></li>
     <li><a href="#cli">Command-line usage</a></li>
@@ -137,7 +138,7 @@ footer {
         <ul>
             <li><strong>File</strong> — add images (from files, folders, or links), open Settings, or exit the application.</li>
             <li><strong>Edit</strong> — remove selected or all images from the queue. This menu is disabled when the queue is empty.</li>
-            <li><strong>Convert</strong> — run conversion or create a multi-size ICO. This menu is disabled when the queue is empty.</li>
+            <li><strong>Convert</strong> — run conversion, create a multi-size ICO, or fit an image to a file size. This menu is disabled when the queue is empty.</li>
             <li><strong>Help</strong> — open this manual, check for software updates, donate, or view the About dialog.</li>
         </ul>
     </dd>
@@ -204,6 +205,7 @@ footer {
 </ol>
 <p>By default, converted files are saved to a <code>Converted</code> folder inside the application data directory. You can change this in <a href="#settings">Settings</a>.</p>
 <p>If a file with the same name already exists, SIC! will ask you whether to overwrite, rename (by adding a <code>_1</code> suffix), or skip that file.</p>
+<p>Converting an image to the format it is already in is skipped rather than performed: re-encoding it would only lose quality for no gain, so the queue simply reports <em>Skipped (same format)</em>. If a resize is requested at the same time, the conversion does go ahead, and SIC! reapplies the original encoding quality so the image is not compressed harder than it already was.</p>
 
 <h2 id="resizing">Resizing</h2>
 <p>Check the <strong>Resize</strong> checkbox to enable resizing during conversion. Two modes are available:</p>
@@ -235,6 +237,28 @@ footer {
     <dd>Lets you build your own list of sizes. Starts with the previously selected preset as a base, then you can add or remove individual sizes.</dd>
 </dl>
 
+<h2 id="fit-to-size">Fitting an image to a file size</h2>
+<p>Sites and forms often refuse an image above a certain size — "your avatar must be under 200 KB". Rather than guessing at formats and quality settings yourself, let SIC! search for a combination that fits:</p>
+<ol>
+    <li>Select an image in the list.</li>
+    <li>Choose <strong>Convert > Fit to File Size</strong> (<kbd>Ctrl+Alt+Shift+F5</kbd>).</li>
+    <li>Enter the <strong>Maximum file size</strong> in kilobytes. Optionally tick <strong>Limit width</strong> and enter a maximum width in pixels, for cases where the dimensions are capped too. Proportions are always kept.</li>
+    <li>Press <strong>OK</strong>. SIC! tries each enabled target format in turn and reports its progress, for example <em>Checking AVIF (6/6)...</em>. You can cancel at any point.</li>
+    <li>Choose one of the results and press <strong>Convert</strong>.</li>
+</ol>
+<p>Each result spells out exactly what you would get, for example <em>WEBP — 1280x853, quality 82% — 195.4 KB (recommended)</em> or <em>PNG — 800x533, full quality — 187.2 KB</em>.</p>
+<p>Results are ranked so that the best one comes first and is marked <em>(recommended)</em>: more pixels wins first, then higher quality, then the smaller file. That is usually what you want when facing an upload limit — a full-size image at slightly reduced quality beats a shrunken one at maximum quality.</p>
+<p>A few things worth knowing:</p>
+<ul>
+    <li>Every size listed is a real measurement, not an estimate. Nothing is written to disk during the search, and the file SIC! finally writes is byte-for-byte the one it measured.</li>
+    <li>Only the formats ticked under <strong>Target formats to show in the list</strong> in <a href="#settings">Settings</a> are tried.</li>
+    <li>ICO and GIF are never used here. ICO cannot hold large images, and GIF is limited to 256 colors and ignores quality settings, so neither can honestly meet an arbitrary size budget. Both remain available as ordinary conversion targets. If they are the only formats you have enabled, SIC! tells you so instead of searching.</li>
+    <li>For lossy formats (JPG, WebP, AVIF), SIC! also tries keeping every pixel and lowering quality instead of shrinking the image. Quality is never taken below 45%, and no image is shrunk below 16 pixels on its shorter side.</li>
+    <li>The search performs many trial encodes and can take tens of seconds on a large photo; AVIF is by far the slowest format.</li>
+    <li>If no format can meet the budget — say 5 KB for a 24-megapixel photo — SIC! reports that no fit was found instead of offering an unusable thumbnail.</li>
+</ul>
+<p>The chosen result is saved using the usual output folder and filename-conflict rules, exactly like a normal conversion.</p>
+
 <h2 id="settings">Settings</h2>
 <p>Open <strong>File > Settings</strong> (<kbd>Ctrl+,</kbd>) to configure SIC!. The dialog is organized into two tabs, <strong>General</strong> and <strong>Images</strong>. Press <kbd>Ctrl+Tab</kbd> to move between tabs.</p>
 
@@ -258,8 +282,14 @@ footer {
     <dt>Output folder</dt>
     <dd>Set a custom folder where all converted files will be saved. Click <strong>Reset</strong> to restore the default <code>Converted</code> folder inside the application data directory.</dd>
 
+    <dt>Save converted images in the same folder as the original</dt>
+    <dd>When enabled, each converted file is written next to its source file instead of into the output folder above. Images that have no source folder — clipboard captures and downloaded links — still go to the output folder. This option is off by default.</dd>
+
     <dt>Detect images in clipboard</dt>
     <dd>When enabled, SIC! offers to add usable clipboard content — an image, image files, or an image link — whenever its window opens or regains focus. A Yes/No prompt always asks before anything is added, and the same clipboard content is offered only once, so it never nags you. This option is off by default. See <a href="#adding-images">Adding images</a> for details.</dd>
+
+    <dt>Target formats to show in the list</dt>
+    <dd>Tick the formats you want to see in the <strong>Target Format</strong> dropdown of the main window, and untick the ones you never convert to. At least one format must stay ticked. Leaving them all ticked also means that formats added in future versions of SIC! appear automatically.</dd>
 </dl>
 <p>Settings are stored in <code>Sic.cfg</code> inside the application data directory (see <a href="#installation">Installation modes</a> for the exact location).</p>
 
@@ -307,6 +337,7 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <tr><td>Convert selected</td><td><kbd>F5</kbd></td></tr>
     <tr><td>Convert all</td><td><kbd>Ctrl+Shift+F5</kbd></td></tr>
     <tr><td>Create multi-size ICO</td><td><kbd>Ctrl+Alt+F5</kbd></td></tr>
+    <tr><td>Fit to file size</td><td><kbd>Ctrl+Alt+Shift+F5</kbd></td></tr>
     <tr><td>User manual</td><td><kbd>F1</kbd></td></tr>
     <tr><td>About SIC!</td><td><kbd>Shift+F1</kbd></td></tr>
     <tr><td>Donate</td><td><kbd>Ctrl+Shift+D</kbd></td></tr>

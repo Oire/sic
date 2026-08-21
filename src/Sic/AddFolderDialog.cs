@@ -28,6 +28,7 @@ public partial class AddFolderDialog: Form {
     public AddFolderDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        Text = _("Add Folder");
 
         foreach (var (label, _) in _filters) {
             filterComboBox.Items.Add(label);

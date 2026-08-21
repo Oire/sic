@@ -117,6 +117,7 @@ footer {
     <li><a href="#converting">Convertir des images</a></li>
     <li><a href="#resizing">Redimensionnement</a></li>
     <li><a href="#multi-size-ico">Créer des fichiers ICO multi-tailles</a></li>
+    <li><a href="#fit-to-size">Ajuster une image à une taille de fichier</a></li>
     <li><a href="#settings">Paramètres</a></li>
     <li><a href="#updates">Mises à jour logicielles</a></li>
     <li><a href="#cli">Utilisation en ligne de commande</a></li>
@@ -137,7 +138,7 @@ footer {
         <ul>
             <li><strong>Fichier</strong> — ajouter des images (depuis des fichiers, dossiers ou liens), ouvrir les paramètres ou quitter l'application.</li>
             <li><strong>Édition</strong> — supprimer les images sélectionnées ou toutes les images de la file. Ce menu est désactivé lorsque la file est vide.</li>
-            <li><strong>Convertir</strong> — lancer la conversion ou créer un ICO multi-tailles. Ce menu est désactivé lorsque la file est vide.</li>
+            <li><strong>Convertir</strong> — lancer la conversion, créer un ICO multi-tailles ou ajuster une image à une taille de fichier. Ce menu est désactivé lorsque la file est vide.</li>
             <li><strong>Aide</strong> — ouvrir ce manuel, vérifier les mises à jour logicielles, faire un don ou afficher la boîte de dialogue À propos.</li>
         </ul>
     </dd>
@@ -204,6 +205,7 @@ footer {
 </ol>
 <p>Par défaut, les fichiers convertis sont enregistrés dans un dossier <code>Converted</code> à l'intérieur du répertoire de données de l'application. Vous pouvez modifier cela dans les <a href="#settings">Paramètres</a>.</p>
 <p>Si un fichier portant le même nom existe déjà, SIC! vous demandera si vous souhaitez remplacer, renommer (en ajoutant un suffixe <code>_1</code>) ou ignorer ce fichier.</p>
+<p>La conversion d'une image vers le format qu'elle utilise déjà est ignorée plutôt qu'effectuée : la réencoder ne ferait que perdre de la qualité sans rien apporter, la file indique donc simplement <em>Ignoré (même format)</em>. Si un redimensionnement est demandé en même temps, la conversion a bien lieu, et SIC! réapplique la qualité d'encodage d'origine afin que l'image ne soit pas compressée davantage qu'elle ne l'était.</p>
 
 <h2 id="resizing">Redimensionnement</h2>
 <p>Cochez la case <strong>Redimensionner</strong> pour activer le redimensionnement lors de la conversion. Deux modes sont disponibles :</p>
@@ -235,6 +237,28 @@ footer {
     <dd>Permet de créer votre propre liste de tailles. Commence avec le préréglage précédemment sélectionné comme base, puis vous pouvez ajouter ou supprimer des tailles individuelles.</dd>
 </dl>
 
+<h2 id="fit-to-size">Ajuster une image à une taille de fichier</h2>
+<p>Les sites et les formulaires refusent souvent les images dépassant une certaine taille — « votre avatar ne doit pas dépasser 200 Ko ». Plutôt que de tâtonner entre les formats et les niveaux de qualité, laissez SIC! chercher une combinaison qui convient :</p>
+<ol>
+    <li>Sélectionnez une image dans la liste.</li>
+    <li>Choisissez <strong>Convertir > Ajuster à la taille du fichier</strong> (<kbd>Ctrl+Alt+Maj+F5</kbd>).</li>
+    <li>Saisissez la <strong>Taille maximale du fichier</strong> en kilooctets. Vous pouvez aussi cocher <strong>Limiter la largeur</strong> et indiquer une largeur maximale en pixels, si les dimensions sont également limitées. Les proportions sont toujours conservées.</li>
+    <li>Cliquez sur <strong>OK</strong>. SIC! essaie tour à tour chaque format cible activé et affiche sa progression, par exemple <em>Vérification de AVIF (6/6)...</em>. Vous pouvez annuler à tout moment.</li>
+    <li>Choisissez l'un des résultats et cliquez sur <strong>Convertir</strong>.</li>
+</ol>
+<p>Chaque résultat indique précisément ce que vous obtiendrez, par exemple <em>WEBP — 1280x853, qualité 82 % — 195,4 Ko (recommandé)</em> ou <em>PNG — 800x533, pleine qualité — 187,2 Ko</em>.</p>
+<p>Les résultats sont classés de façon que le meilleur apparaisse en premier, marqué <em>(recommandé)</em> : d'abord le plus grand nombre de pixels, puis la meilleure qualité, puis le fichier le plus petit. C'est généralement ce que l'on souhaite face à une limite de téléversement — une image en taille réelle légèrement moins compressée vaut mieux qu'une image réduite en qualité maximale.</p>
+<p>Quelques points à connaître :</p>
+<ul>
+    <li>Chaque taille affichée est une mesure réelle, pas une estimation. Rien n'est écrit sur le disque pendant la recherche, et le fichier finalement écrit est identique, octet pour octet, à celui qui a été mesuré.</li>
+    <li>Seuls les formats cochés sous <strong>Formats cibles à afficher dans la liste</strong> dans les <a href="#settings">Paramètres</a> sont essayés.</li>
+    <li>ICO et GIF ne sont jamais utilisés ici. ICO ne peut pas contenir de grandes images, et GIF est limité à 256 couleurs et ignore les réglages de qualité : ni l'un ni l'autre ne peut honnêtement respecter un budget de taille arbitraire. Ils restent disponibles comme formats de conversion ordinaires. S'ils sont les seuls formats activés, SIC! vous en informe au lieu de lancer la recherche.</li>
+    <li>Pour les formats avec perte (JPG, WebP, AVIF), SIC! essaie aussi de conserver tous les pixels en abaissant la qualité plutôt qu'en réduisant l'image. La qualité ne descend jamais en dessous de 45 %, et aucune image n'est réduite en dessous de 16 pixels sur son côté le plus court.</li>
+    <li>La recherche effectue de nombreux encodages d'essai et peut prendre plusieurs dizaines de secondes sur une grande photo ; AVIF est de loin le format le plus lent.</li>
+    <li>Si aucun format ne peut respecter le budget — par exemple 5 Ko pour une photo de 24 mégapixels — SIC! signale qu'aucun ajustement n'a été trouvé au lieu de proposer une vignette inutilisable.</li>
+</ul>
+<p>Le résultat choisi est enregistré selon les règles habituelles de dossier de sortie et de conflit de nom de fichier, exactement comme lors d'une conversion normale.</p>
+
 <h2 id="settings">Paramètres</h2>
 <p>Ouvrez <strong>Fichier > Paramètres</strong> (<kbd>Ctrl+,</kbd>) pour configurer SIC!. La fenêtre est organisée en deux onglets, <strong>Général</strong> et <strong>Images</strong>. Appuyez sur <kbd>Ctrl+Tab</kbd> pour passer d'un onglet à l'autre.</p>
 
@@ -258,8 +282,14 @@ footer {
     <dt>Dossier de sortie</dt>
     <dd>Définissez un dossier personnalisé où tous les fichiers convertis seront enregistrés. Cliquez sur <strong>Réinitialiser</strong> pour restaurer le dossier par défaut <code>Converted</code> à l'intérieur du répertoire de données de l'application.</dd>
 
+    <dt>Enregistrer les images converties dans le même dossier que l'original</dt>
+    <dd>Lorsque cette option est activée, chaque fichier converti est écrit à côté de son fichier source au lieu d'être placé dans le dossier de sortie ci-dessus. Les images sans dossier source — captures du presse-papiers et images téléchargées — vont toujours dans le dossier de sortie. Cette option est désactivée par défaut.</dd>
+
     <dt>Détecter les images dans le presse-papiers</dt>
     <dd>Lorsque cette option est activée, SIC! propose d'ajouter le contenu utilisable du presse-papiers — une image, des fichiers image ou un lien d'image — dès que sa fenêtre s'ouvre ou reçoit le focus. Une confirmation Oui/Non vous est toujours demandée avant tout ajout, et le même contenu n'est proposé qu'une seule fois, afin de ne jamais vous importuner. Cette option est désactivée par défaut. Voir <a href="#adding-images">Ajouter des images</a> pour plus de détails.</dd>
+
+    <dt>Formats cibles à afficher dans la liste</dt>
+    <dd>Cochez les formats que vous souhaitez voir dans la liste déroulante <strong>Format cible</strong> de la fenêtre principale, et décochez ceux vers lesquels vous ne convertissez jamais. Au moins un format doit rester coché. Si vous les laissez tous cochés, les formats ajoutés dans les futures versions de SIC! apparaîtront automatiquement.</dd>
 </dl>
 <p>Les paramètres sont stockés dans <code>Sic.cfg</code> à l'intérieur du répertoire de données de l'application (voir <a href="#installation">Modes d'installation</a> pour l'emplacement exact).</p>
 
@@ -307,6 +337,7 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <tr><td>Convertir la sélection</td><td><kbd>F5</kbd></td></tr>
     <tr><td>Tout convertir</td><td><kbd>Ctrl+Maj+F5</kbd></td></tr>
     <tr><td>Créer un ICO multi-tailles</td><td><kbd>Ctrl+Alt+F5</kbd></td></tr>
+    <tr><td>Ajuster à la taille du fichier</td><td><kbd>Ctrl+Alt+Maj+F5</kbd></td></tr>
     <tr><td>Manuel utilisateur</td><td><kbd>F1</kbd></td></tr>
     <tr><td>À propos de SIC!</td><td><kbd>Maj+F1</kbd></td></tr>
     <tr><td>Faire un don</td><td><kbd>Ctrl+Maj+D</kbd></td></tr>

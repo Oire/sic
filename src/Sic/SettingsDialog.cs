@@ -21,6 +21,7 @@ public partial class SettingsDialog: Form {
     public SettingsDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        Text = _("Settings");
         PopulateUpdateIntervals();
         LoadSettings();
         browseButton.Click += BrowseButton_Click;
