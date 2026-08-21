@@ -21,6 +21,7 @@ public partial class FitToSizeResultsDialog: Form {
 
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        TextDirection.Apply(this);
         Text = _("Fit to File Size — Results");
 
         foreach (var proposal in _proposals) {

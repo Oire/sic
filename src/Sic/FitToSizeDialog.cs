@@ -17,6 +17,7 @@ public partial class FitToSizeDialog: Form {
     public FitToSizeDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        TextDirection.Apply(this);
         Text = _("Fit to File Size");
 
         limitWidthCheckBox.CheckedChanged += LimitWidthCheckBox_CheckedChanged;
@@ -45,7 +46,7 @@ public partial class FitToSizeDialog: Form {
 
         if (!int.TryParse(sizeText, out var kilobytes) || kilobytes < 1) {
             Log.Debug("FitToSizeDialog: Invalid size entered: {Input}", sizeText);
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("Please enter a maximum file size in KB (a whole number of at least 1)."),
                 _("Invalid size"),
                 MessageBoxButtons.OK,
@@ -63,7 +64,7 @@ public partial class FitToSizeDialog: Form {
 
             if (!int.TryParse(widthText, out var w) || w < 1 || w > MaxDimension) {
                 Log.Debug("FitToSizeDialog: Invalid width entered: {Input}", widthText);
-                MessageBox.Show(
+                DialogHelper.Show(
                     _("Please enter a valid maximum width (1–{0}).", MaxDimension),
                     _("Invalid width"),
                     MessageBoxButtons.OK,

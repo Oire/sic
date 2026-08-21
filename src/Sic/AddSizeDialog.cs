@@ -14,6 +14,7 @@ public partial class AddSizeDialog: Form {
     public AddSizeDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        TextDirection.Apply(this);
         Text = _("Add Size");
     }
 
@@ -27,7 +28,7 @@ public partial class AddSizeDialog: Form {
 
         if (!uint.TryParse(text, out var value) || value < MinSize || value > MaxSize) {
             Log.Debug("AddSizeDialog: Invalid size entered: {Input}", text);
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("Please enter a number between {0} and {1}.", MinSize, MaxSize),
                 _("Invalid Size"),
                 MessageBoxButtons.OK,

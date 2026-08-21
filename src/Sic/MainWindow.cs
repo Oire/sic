@@ -49,6 +49,7 @@ public partial class MainWindow: Form {
     public MainWindow() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog, _localizationStore);
+        TextDirection.Apply(this);
         SetupEventHandlers();
         PopulateFormatComboBox();
         UpdateMenuState();
@@ -249,7 +250,7 @@ public partial class MainWindow: Form {
 
         if (files.Length == 0) {
             Log.Debug("AddFolderMenuItem_Click: No matching images in folder {Folder}", folder);
-            MessageBox.Show(_("No matching images found in the selected folder."), _("No images found"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DialogHelper.Show(_("No matching images found in the selected folder."), _("No images found"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
@@ -320,6 +321,7 @@ public partial class MainWindow: Form {
     private void ApplyLocalization() {
         Localizer.Revert(this, _localizationStore);
         Localizer.Localize(this, Localization.Catalog, _localizationStore);
+        TextDirection.Apply(this);
         RefreshShortcutKeys(menuStrip);
         statusLabel.Text = _("Ready");
     }
@@ -360,7 +362,7 @@ public partial class MainWindow: Form {
 
         if (formatComboBox.SelectedItem is not string format) {
             Log.Debug("TryGetConversionParams: No format selected");
-            MessageBox.Show(_("Please select a target format."), _("No format selected"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            DialogHelper.Show(_("Please select a target format."), _("No format selected"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
 
@@ -375,7 +377,7 @@ public partial class MainWindow: Form {
             if (resizeMode == Models.ResizeMode.Crop) {
                 if (!hasWidth) {
                     Log.Debug("TryGetConversionParams: Invalid crop width: {Input}", widthTextBox.Text);
-                    MessageBox.Show(_("Crop mode requires a valid width (1\u201365535)."), _("Invalid width"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    DialogHelper.Show(_("Crop mode requires a valid width (1\u201365535)."), _("Invalid width"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
                     return false;
@@ -383,7 +385,7 @@ public partial class MainWindow: Form {
 
                 if (!hasHeight) {
                     Log.Debug("TryGetConversionParams: Invalid crop height: {Input}", heightTextBox.Text);
-                    MessageBox.Show(_("Crop mode requires a valid height (1\u201365535)."), _("Invalid height"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    DialogHelper.Show(_("Crop mode requires a valid height (1\u201365535)."), _("Invalid height"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     heightTextBox.Focus();
                     heightTextBox.SelectAll();
                     return false;
@@ -394,7 +396,7 @@ public partial class MainWindow: Form {
             } else {
                 if (!hasWidth && !hasHeight) {
                     Log.Debug("TryGetConversionParams: No valid resize dimensions entered");
-                    MessageBox.Show(_("Please enter at least one valid dimension (1\u201365535)."), _("Invalid dimensions"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    DialogHelper.Show(_("Please enter at least one valid dimension (1\u201365535)."), _("Invalid dimensions"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     widthTextBox.Focus();
                     widthTextBox.SelectAll();
                     return false;
@@ -417,7 +419,7 @@ public partial class MainWindow: Form {
             && outputFolder != Utils.Constants.App.DefaultOutputFolder
             && !Directory.Exists(outputFolder)) {
             Log.Warning("Custom output folder no longer exists: {Folder}", outputFolder);
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("The output folder \"{0}\" no longer exists. The default folder will be used.", outputFolder),
                 _("Output Folder Not Found"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -512,7 +514,7 @@ public partial class MainWindow: Form {
                         Log.Error("Failed to convert {FileName}: {Error}", item.FileName, ex.Message);
                         Invoke(() => {
                             imageListView.Items[i].SubItems[4].Text = _("Failed");
-                            MessageBox.Show(_("Failed to convert {0}:\n{1}", item.FileName, ex.Message), _("Conversion Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            DialogHelper.Show(_("Failed to convert {0}:\n{1}", item.FileName, ex.Message), _("Conversion Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                         });
                     }
                 }
@@ -562,13 +564,13 @@ public partial class MainWindow: Form {
         // MessageBox pump dispatches any queued ListView notifications.
         UpdateMenuState();
         UpdatePlaceholderState();
-        MessageBox.Show(summary, _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+        DialogHelper.Show(summary, _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
     private async void ConvertButton_Click(object? sender, EventArgs e) {
         if (_imageItems.Count == 0) {
             Log.Debug("ConvertButton_Click: Attempted to convert with empty queue");
-            MessageBox.Show(_("No images to convert. Add some images first."), _("Nothing to convert"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DialogHelper.Show(_("No images to convert. Add some images first."), _("Nothing to convert"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
@@ -642,7 +644,7 @@ public partial class MainWindow: Form {
             statusLabel.Text = _("Multi-size ICO created: {0}", Path.GetFileName(outputPath));
             UpdateMenuState();
             UpdatePlaceholderState();
-            MessageBox.Show(_("Multi-size ICO created successfully:\n{0}", outputPath), _("ICO Created"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DialogHelper.Show(_("Multi-size ICO created successfully:\n{0}", outputPath), _("ICO Created"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         } catch (OperationCanceledException) {
             imageListView.Items[index].SubItems[4].Text = "";
@@ -650,7 +652,7 @@ public partial class MainWindow: Form {
         } catch (Exception ex) {
             Log.Error("Failed to create multi-size ICO for {FileName}: {Error}", item.FileName, ex.Message);
             imageListView.Items[index].SubItems[4].Text = _("Failed");
-            MessageBox.Show(_("Failed to create multi-size ICO:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            DialogHelper.Show(_("Failed to create multi-size ICO:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         } finally {
             progressDialog?.Close();
             progressDialog?.Dispose();
@@ -677,7 +679,7 @@ public partial class MainWindow: Form {
 
         // ICO and GIF are never fit-to-size candidates, so a queue targeting only those has nothing to try.
         if (formats.Count == 0) {
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("ICO and GIF can't be fitted to a file size, and no other format is enabled.\nPlease enable at least one more target format in Settings."),
                 _("No fit found"),
                 MessageBoxButtons.OK,
@@ -719,7 +721,7 @@ public partial class MainWindow: Form {
             return;
         } catch (Exception ex) {
             Log.Error("Failed to compute size-fit proposals for {FileName}: {Error}", item.FileName, ex.Message);
-            MessageBox.Show(_("Failed to analyze the image:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            DialogHelper.Show(_("Failed to analyze the image:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         } finally {
             searchDialog?.Close();
@@ -727,7 +729,7 @@ public partial class MainWindow: Form {
         }
 
         if (proposals.Count == 0) {
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("None of the enabled formats can bring this image under {0} KB.\nTry a larger size, a smaller width, or enabling more formats in Settings.", maxBytes / 1024),
                 _("No fit found"),
                 MessageBoxButtons.OK,
@@ -793,7 +795,7 @@ public partial class MainWindow: Form {
             statusLabel.Text = _("Converted: {0}", Path.GetFileName(outputPath));
             UpdateMenuState();
             UpdatePlaceholderState();
-            MessageBox.Show(_("Image converted successfully:\n{0}", outputPath), _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DialogHelper.Show(_("Image converted successfully:\n{0}", outputPath), _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         } catch (OperationCanceledException) {
             imageListView.Items[index].SubItems[4].Text = "";
@@ -801,7 +803,7 @@ public partial class MainWindow: Form {
         } catch (Exception ex) {
             Log.Error("Failed to fit {FileName} to size: {Error}", item.FileName, ex.Message);
             imageListView.Items[index].SubItems[4].Text = _("Failed");
-            MessageBox.Show(_("Failed to convert {0}:\n{1}", item.FileName, ex.Message), _("Conversion Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            DialogHelper.Show(_("Failed to convert {0}:\n{1}", item.FileName, ex.Message), _("Conversion Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         } finally {
             progressDialog?.Close();
             progressDialog?.Dispose();
@@ -836,7 +838,7 @@ public partial class MainWindow: Form {
 
         if (!File.Exists(manualPath)) {
             Log.Warning("User manual file not found at {Path}", manualPath);
-            MessageBox.Show(_("The user manual file could not be found."), _("User Manual"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            DialogHelper.Show(_("The user manual file could not be found."), _("User Manual"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -848,7 +850,7 @@ public partial class MainWindow: Form {
 
     private async void CheckForUpdatesMenuItem_Click(object? sender, EventArgs e) {
         if (_updateService == null) {
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("Unable to check for updates. Please try again later."),
                 _("Software Update"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1041,7 +1043,7 @@ public partial class MainWindow: Form {
 
     private void MainWindow_FormClosing(object? sender, FormClosingEventArgs e) {
         if (_imageItems.Count > 0 && Config.General.ConfirmExitWithQueue) {
-            var result = MessageBox.Show(
+            var result = DialogHelper.Show(
                 _("There are images in the queue. Are you sure you want to exit?"),
                 _("Confirm Exit"),
                 MessageBoxButtons.YesNo,
@@ -1087,7 +1089,7 @@ public partial class MainWindow: Form {
 
         _clipboardPromptOpen = true;
         try {
-            var answer = MessageBox.Show(
+            var answer = DialogHelper.Show(
                 import.Prompt, _("Clipboard Content Detected"),
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -1183,7 +1185,7 @@ public partial class MainWindow: Form {
                 statusLabel.Text = _("Added image from clipboard");
             } catch (Exception ex) {
                 Log.Error("Failed to load clipboard image: {Error}", ex.Message);
-                MessageBox.Show(_("Failed to load clipboard image:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                DialogHelper.Show(_("Failed to load clipboard image:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         } else if (Clipboard.ContainsText()) {
             var text = Clipboard.GetText().Trim();
@@ -1197,7 +1199,7 @@ public partial class MainWindow: Form {
                 await PasteFromUrlAsync(url);
             } else {
                 Log.Debug("Paste: clipboard text is not a valid http/https link");
-                MessageBox.Show(
+                DialogHelper.Show(
                     _("The pasted text is not a valid link.\nLinks must start with http:// or https://."),
                     _("Invalid link"),
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1240,14 +1242,14 @@ public partial class MainWindow: Form {
             statusLabel.Text = _("Ready");
         } catch (UnsupportedImageException) {
             Log.Information("URL did not point to a supported image: {Url}", url);
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("The link does not point to a supported image."),
                 _("Error"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             statusLabel.Text = _("Ready");
         } catch (Exception ex) {
             Log.Error("Failed to load image from URL {Url}: {Error}", url, ex.Message);
-            MessageBox.Show(_("Failed to load image from URL:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            DialogHelper.Show(_("Failed to load image from URL:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             statusLabel.Text = _("Ready");
         } finally {
             if (progressDialog != null) {
@@ -1287,7 +1289,7 @@ public partial class MainWindow: Form {
             var skippedPlaceholders = 0;
 
             if (cloudPaths.Count > 0) {
-                var answer = MessageBox.Show(
+                var answer = DialogHelper.Show(
                     _n(
                         "{0} file is stored in the cloud and needs to be downloaded first.\nDownload it?",
                         "{0} files are stored in the cloud and need to be downloaded first.\nDownload them?",
@@ -1430,7 +1432,7 @@ public partial class MainWindow: Form {
         }
 
         var icon = result.Errors.Count > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information;
-        MessageBox.Show(summary, _("Add Images"), MessageBoxButtons.OK, icon);
+        DialogHelper.Show(summary, _("Add Images"), MessageBoxButtons.OK, icon);
     }
 
     private void AddImageFromFile(string path, string? basePath = null) {
@@ -1440,7 +1442,7 @@ public partial class MainWindow: Form {
             AddImageItem(item);
         } catch (Exception ex) {
             Log.Error("Failed to load image {Path}: {Error}", path, ex.Message);
-            MessageBox.Show(_("Failed to load image:\n{0}\n{1}", path, ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            DialogHelper.Show(_("Failed to load image:\n{0}\n{1}", path, ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -1514,6 +1516,10 @@ public partial class MainWindow: Form {
             dialog.AcceptButton = overwriteBtn;
             dialog.CancelButton = skipBtn;
 
+            // Built by hand rather than in the designer, so it needs the same mirroring the
+            // localized forms get. FlowLayoutPanel reverses LeftToRight flow on its own once
+            // the form is right-to-left, so the buttons follow the reading order.
+            TextDirection.Apply(dialog);
             dialog.ShowDialog(this);
         });
 

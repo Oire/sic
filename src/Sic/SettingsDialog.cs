@@ -21,6 +21,7 @@ public partial class SettingsDialog: Form {
     public SettingsDialog() {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog);
+        TextDirection.Apply(this);
         Text = _("Settings");
         PopulateUpdateIntervals();
         LoadSettings();
@@ -197,7 +198,7 @@ public partial class SettingsDialog: Form {
             && folder != App.DefaultOutputFolder
             && !Directory.Exists(folder)) {
             Log.Warning("Settings: Selected output folder does not exist: {Folder}", folder);
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("The selected folder does not exist. Please choose an existing folder."),
                 _("Folder Not Found"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -208,7 +209,7 @@ public partial class SettingsDialog: Form {
         var selectedFormats = SelectedFormats();
         if (selectedFormats.Count == 0) {
             Log.Warning("Settings: No target formats selected");
-            MessageBox.Show(
+            DialogHelper.Show(
                 _("Please show at least one target format."),
                 _("No Formats Selected"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);

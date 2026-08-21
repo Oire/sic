@@ -69,6 +69,8 @@ Name: "fr"; MessagesFile: "compiler:Languages\French.isl,Languages\Custom.fr.isl
 Name: "de"; MessagesFile: "compiler:Languages\German.isl,Languages\Custom.de.isl"
 Name: "uk"; MessagesFile: "compiler:Languages\Ukrainian.isl,Languages\Custom.uk.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl,Languages\Custom.ru.isl"
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl,Languages\Custom.es.isl"
+Name: "he"; MessagesFile: "compiler:Languages\Hebrew.isl,Languages\Custom.he.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked

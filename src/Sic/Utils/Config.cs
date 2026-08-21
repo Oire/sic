@@ -99,7 +99,7 @@ public class Config {
 
     private static void ReportError(string message, bool isGui) {
         if (isGui) {
-            MessageBox.Show(message, _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            DialogHelper.Show(message, _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         } else {
             Console.Error.WriteLine(message);
         }
