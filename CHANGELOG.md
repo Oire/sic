@@ -2,7 +2,7 @@
 
 All notable changes to SIC! (Simple Image Converter) will be documented in this file.
 
-## [Unreleased]
+## [1.1.0.22] — 2026-08-21
 
 ### Features
 
@@ -46,7 +46,7 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 
 - Fix NVDA not announcing empty images list on focus ([#31](https://github.com/Oire/sic/pull/31)) by [Quinn Gillespie](https://github.com/trypsynth)
 
-## [1.0.0] — 2026-03-08
+## [1.0.0.23] — 2026-03-08
 
 ### Initial Release
 
