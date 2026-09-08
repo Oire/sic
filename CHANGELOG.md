@@ -2,6 +2,16 @@
 
 All notable changes to SIC! (Simple Image Converter) will be documented in this file.
 
+## [1.2.0.0] — unreleased
+
+### Changes
+
+- **Native menus and image list**: the menu bar and the image list are now real Windows controls rather than WinForms-drawn imitations, which is what screen readers need from them ([#68](https://github.com/Oire/sic/issues/68)). The menu is a genuine `HMENU` attached with `SetMenu`, announced as a menu bar with real submenus instead of a panel that draws things resembling menu items. The image list is a genuine `SysListView32` rather than one wearing a window class no screen reader recognizes, so every column is read instead of only the file name. Nothing changes about how either looks or behaves for sighted users.
+
+### Other
+
+- SIC! can now be installed and updated through WinGet.
+
 ## [1.1.0.22] — 2026-08-21
 
 ### Features
@@ -12,6 +22,7 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 - **Detect data in clipboard**: SIC! can now offer to add an image, image files, or an image link from the clipboard when its window opens or regains focus ([#36](https://github.com/Oire/sic/issues/36)). It is off by default and can be toggled in Settings; the same clipboard content is offered only once.
 - **Adjustable update checks**: the startup check can be turned off, and the background check frequency can be set to daily, every 3 days, weekly, monthly, or never. A change takes effect immediately, without restarting ([#45](https://github.com/Oire/sic/issues/45))
 - **Customizable target formats**: choose which formats appear in the target-format dropdown and hide the ones you never convert to ([#47](https://github.com/Oire/sic/issues/47))
+- **Spanish and Hebrew interfaces**: the UI, the user manual and the installer are now translated into Spanish and Hebrew, bringing SIC! to seven languages. Hebrew runs the entire interface right-to-left ([#66](https://github.com/Oire/sic/pull/66))
 
 ### Changes
 
