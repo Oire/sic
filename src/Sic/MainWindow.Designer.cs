@@ -1,3 +1,4 @@
+using Oire.WinForms.NativeControls;
 namespace Oire.Sic;
 
 partial class MainWindow {
@@ -26,42 +27,22 @@ partial class MainWindow {
     ///  the contents of this method with the code editor.
     /// </summary>
     private void InitializeComponent() {
-        menuStrip = new MenuStrip();
 
         // File menu
-        fileMenu = new ToolStripMenuItem();
-        addImageMenuItem = new ToolStripMenuItem();
-        addFolderMenuItem = new ToolStripMenuItem();
-        addByLinkMenuItem = new ToolStripMenuItem();
-        settingsMenuItem = new ToolStripMenuItem();
-        exitMenuItem = new ToolStripMenuItem();
 
         // Edit menu
-        editMenu = new ToolStripMenuItem();
-        removeMenuItem = new ToolStripMenuItem();
-        removeAllMenuItem = new ToolStripMenuItem();
 
         // Convert menu
-        convertMenu = new ToolStripMenuItem();
-        convertSelectedMenuItem = new ToolStripMenuItem();
-        convertAllMenuItem = new ToolStripMenuItem();
-        createMultiSizeIcoMenuItem = new ToolStripMenuItem();
-        fitToFileSizeMenuItem = new ToolStripMenuItem();
 
         // Help menu
-        helpMenu = new ToolStripMenuItem();
-        userManualMenuItem = new ToolStripMenuItem();
-        checkForUpdatesMenuItem = new ToolStripMenuItem();
-        donateMenuItem = new ToolStripMenuItem();
-        aboutMenuItem = new ToolStripMenuItem();
 
         mainLayout = new TableLayoutPanel();
-        imageListView = new ListView();
-        colFileName = new ColumnHeader();
-        colFormat = new ColumnHeader();
-        colDimensions = new ColumnHeader();
-        colSize = new ColumnHeader();
-        colStatus = new ColumnHeader();
+        imageListView = new NativeListView();
+        colFileName = new NativeListViewColumn("File Name", NativeListViewColumn.AutoSizeToContent);
+        colFormat = new NativeListViewColumn("Format", NativeListViewColumn.AutoSizeToContent);
+        colDimensions = new NativeListViewColumn("Dimensions", NativeListViewColumn.AutoSizeToContent);
+        colSize = new NativeListViewColumn("Size", NativeListViewColumn.AutoSizeToContent);
+        colStatus = new NativeListViewColumn("Status", NativeListViewColumn.AutoSizeToContent);
         previewPictureBox = new PictureBox();
         formatLabel = new Label();
         formatComboBox = new ComboBox();
@@ -80,7 +61,6 @@ partial class MainWindow {
         statusStrip = new StatusStrip();
         statusLabel = new ToolStripStatusLabel();
 
-        menuStrip.SuspendLayout();
         mainLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).BeginInit();
         resizeModeGroupBox.SuspendLayout();
@@ -88,174 +68,6 @@ partial class MainWindow {
         resizeFieldsLayout.SuspendLayout();
         statusStrip.SuspendLayout();
         SuspendLayout();
-
-        //
-        // menuStrip
-        //
-        menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu, editMenu, convertMenu, helpMenu });
-        menuStrip.Name = "menuStrip";
-
-        //
-        // fileMenu
-        //
-        fileMenu.Text = "&File";
-        fileMenu.Name = "fileMenu";
-        fileMenu.DropDownItems.AddRange(new ToolStripItem[] {
-            addImageMenuItem,
-            addFolderMenuItem,
-            addByLinkMenuItem,
-            new ToolStripSeparator(),
-            settingsMenuItem,
-            new ToolStripSeparator(),
-            exitMenuItem,
-        });
-
-        //
-        // addImageMenuItem
-        //
-        addImageMenuItem.Text = "Add &Image...";
-        addImageMenuItem.ShortcutKeys = Keys.Control | Keys.N;
-        addImageMenuItem.Name = "addImageMenuItem";
-
-        //
-        // addFolderMenuItem
-        //
-        addFolderMenuItem.Text = "Add F&older...";
-        addFolderMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.N;
-        addFolderMenuItem.Name = "addFolderMenuItem";
-
-        //
-        // addByLinkMenuItem
-        //
-        addByLinkMenuItem.Text = "Add Image by &Link...";
-        addByLinkMenuItem.ShortcutKeys = Keys.Control | Keys.L;
-        addByLinkMenuItem.Name = "addByLinkMenuItem";
-
-        //
-        // removeMenuItem
-        //
-        removeMenuItem.Text = "&Remove";
-        removeMenuItem.ShortcutKeyDisplayString = "Del";
-        removeMenuItem.Name = "removeMenuItem";
-        removeMenuItem.Enabled = false;
-
-        //
-        // removeAllMenuItem
-        //
-        removeAllMenuItem.Text = "Remove &All";
-        removeAllMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.Delete;
-        removeAllMenuItem.Name = "removeAllMenuItem";
-        removeAllMenuItem.Enabled = false;
-
-        //
-        // settingsMenuItem
-        //
-        settingsMenuItem.Text = "&Settings...";
-        settingsMenuItem.ShortcutKeys = Keys.Control | Keys.Oemcomma;
-        settingsMenuItem.ShortcutKeyDisplayString = "Ctrl+,";
-        settingsMenuItem.Name = "settingsMenuItem";
-
-        //
-        // exitMenuItem
-        //
-        exitMenuItem.Text = "E&xit";
-        exitMenuItem.ShortcutKeys = Keys.Alt | Keys.F4;
-        exitMenuItem.Name = "exitMenuItem";
-
-        //
-        // editMenu
-        //
-        editMenu.Text = "&Edit";
-        editMenu.Name = "editMenu";
-        editMenu.DropDownItems.AddRange(new ToolStripItem[] {
-            removeMenuItem,
-            removeAllMenuItem,
-        });
-
-        //
-        // convertMenu
-        //
-        convertMenu.Text = "&Convert";
-        convertMenu.Name = "convertMenu";
-        convertMenu.DropDownItems.AddRange(new ToolStripItem[] {
-            convertSelectedMenuItem,
-            convertAllMenuItem,
-            new ToolStripSeparator(),
-            createMultiSizeIcoMenuItem,
-            fitToFileSizeMenuItem,
-        });
-
-        //
-        // convertSelectedMenuItem
-        //
-        convertSelectedMenuItem.Text = "Convert &Selected";
-        convertSelectedMenuItem.ShortcutKeys = Keys.F5;
-        convertSelectedMenuItem.Name = "convertSelectedMenuItem";
-        convertSelectedMenuItem.Enabled = false;
-
-        //
-        // convertAllMenuItem
-        //
-        convertAllMenuItem.Text = "Convert &All";
-        convertAllMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.F5;
-        convertAllMenuItem.Name = "convertAllMenuItem";
-        convertAllMenuItem.Enabled = false;
-
-        //
-        // createMultiSizeIcoMenuItem
-        //
-        createMultiSizeIcoMenuItem.Text = "Create Multi-size &ICO...";
-        createMultiSizeIcoMenuItem.Name = "createMultiSizeIcoMenuItem";
-        createMultiSizeIcoMenuItem.ShortcutKeys = Keys.Control | Keys.Alt | Keys.F5;
-        createMultiSizeIcoMenuItem.Enabled = false;
-
-        //
-        // fitToFileSizeMenuItem
-        //
-        fitToFileSizeMenuItem.Text = "&Fit to File Size...";
-        fitToFileSizeMenuItem.Name = "fitToFileSizeMenuItem";
-        fitToFileSizeMenuItem.ShortcutKeys = Keys.Control | Keys.Alt | Keys.Shift | Keys.F5;
-        fitToFileSizeMenuItem.Enabled = false;
-
-        //
-        // helpMenu
-        //
-        helpMenu.Text = "&Help";
-        helpMenu.Name = "helpMenu";
-        helpMenu.DropDownItems.AddRange(new ToolStripItem[] {
-            userManualMenuItem,
-            checkForUpdatesMenuItem,
-            new ToolStripSeparator(),
-            donateMenuItem,
-            aboutMenuItem,
-        });
-
-        //
-        // userManualMenuItem
-        //
-        userManualMenuItem.Text = "Read User &Manual";
-        userManualMenuItem.ShortcutKeys = Keys.F1;
-        userManualMenuItem.Name = "userManualMenuItem";
-
-        //
-        // checkForUpdatesMenuItem
-        //
-        checkForUpdatesMenuItem.Text = "Check for &Updates...";
-        checkForUpdatesMenuItem.Name = "checkForUpdatesMenuItem";
-
-        //
-        // donateMenuItem
-        //
-        donateMenuItem.Text = "&Donate...";
-        donateMenuItem.Name = "donateMenuItem";
-        donateMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.D;
-
-        //
-        // aboutMenuItem
-        //
-        aboutMenuItem.Text = "&About SIC!...";
-        aboutMenuItem.ShortcutKeys = Keys.Shift | Keys.F1;
-        aboutMenuItem.Name = "aboutMenuItem";
 
         //
         // mainLayout
@@ -300,11 +112,14 @@ partial class MainWindow {
         //
         // imageListView
         //
-        imageListView.Columns.AddRange(new ColumnHeader[] { colFileName, colFormat, colDimensions, colSize, colStatus });
+        // FullRowSelect and Details view are not settings here: the control is always a
+        // report-mode SysListView32 with full-row selection, which is the whole point of it.
+        foreach (var column in new[] { colFileName, colFormat, colDimensions, colSize, colStatus }) {
+            imageListView.Columns.Add(column);
+        }
+
         imageListView.Dock = DockStyle.Fill;
-        imageListView.FullRowSelect = true;
         imageListView.MultiSelect = false;
-        imageListView.View = View.Details;
         imageListView.Name = "imageListView";
         imageListView.AccessibleName = "Images list";
         imageListView.AllowDrop = true;
@@ -498,14 +313,10 @@ partial class MainWindow {
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(900, 550);
         Controls.Add(mainLayout);
-        Controls.Add(menuStrip);
-        MainMenuStrip = menuStrip;
         Name = "MainWindow";
         Text = "SIC! — Simple Image Converter";
         MinimumSize = new Size(640, 400);
 
-        menuStrip.ResumeLayout(false);
-        menuStrip.PerformLayout();
         mainLayout.ResumeLayout(false);
         mainLayout.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)previewPictureBox).EndInit();
@@ -523,33 +334,13 @@ partial class MainWindow {
 
     #endregion
 
-    private MenuStrip menuStrip;
-    private ToolStripMenuItem fileMenu;
-    private ToolStripMenuItem addImageMenuItem;
-    private ToolStripMenuItem addFolderMenuItem;
-    private ToolStripMenuItem addByLinkMenuItem;
-    private ToolStripMenuItem settingsMenuItem;
-    private ToolStripMenuItem exitMenuItem;
-    private ToolStripMenuItem editMenu;
-    private ToolStripMenuItem removeMenuItem;
-    private ToolStripMenuItem removeAllMenuItem;
-    private ToolStripMenuItem convertMenu;
-    private ToolStripMenuItem convertSelectedMenuItem;
-    private ToolStripMenuItem convertAllMenuItem;
-    private ToolStripMenuItem createMultiSizeIcoMenuItem;
-    private ToolStripMenuItem fitToFileSizeMenuItem;
-    private ToolStripMenuItem helpMenu;
-    private ToolStripMenuItem userManualMenuItem;
-    private ToolStripMenuItem checkForUpdatesMenuItem;
-    private ToolStripMenuItem donateMenuItem;
-    private ToolStripMenuItem aboutMenuItem;
     private TableLayoutPanel mainLayout;
-    private ListView imageListView;
-    private ColumnHeader colFileName;
-    private ColumnHeader colFormat;
-    private ColumnHeader colDimensions;
-    private ColumnHeader colSize;
-    private ColumnHeader colStatus;
+    private NativeListView imageListView;
+    private NativeListViewColumn colFileName;
+    private NativeListViewColumn colFormat;
+    private NativeListViewColumn colDimensions;
+    private NativeListViewColumn colSize;
+    private NativeListViewColumn colStatus;
     private PictureBox previewPictureBox;
     private Label formatLabel;
     private ComboBox formatComboBox;

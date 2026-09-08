@@ -38,6 +38,7 @@
     <ItemGroup>
         <PackageReference Include="GetText.NET.WindowsForms" Version="10.0.1" NoWarn="NU1701" />
         <PackageReference Include="Magick.NET-Q16-x64" Version="14.16.0" />
+        <PackageReference Include="Oire.WinForms.NativeControls" Version="1.1.0" />
         <PackageReference Include="GitVersion.MsBuild" Version="6.8.2">
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>

@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using GetText.WindowsForms;
 using Oire.Sic.Models;
+using Oire.WinForms.NativeControls;
 using Oire.Sic.Services;
 using Oire.Sic.Utils;
 using static Oire.Sic.Utils.Localization;
@@ -15,7 +16,11 @@ namespace Oire.Sic;
 public partial class MainWindow: Form {
     private readonly List<ImageItem> _imageItems = [];
     private ImageItem? _selectedItem;
-    private ListViewItem? _placeholderItem;
+    private NativeListViewItem? _placeholderItem;
+    private NativeMenuBar? _menuBar;
+    private NativeMenuSpec? _menuSpec;
+    private bool _hasItems;
+    private bool _hasSelection;
     private bool _isAutoFilling;
     private bool _isLoadingFiles;
     private int _clipboardImageCount;
@@ -100,29 +105,6 @@ public partial class MainWindow: Form {
 
     private void SetupEventHandlers() {
         // File menu
-        addImageMenuItem.Click += AddImageMenuItem_Click;
-        addFolderMenuItem.Click += AddFolderMenuItem_Click;
-        addByLinkMenuItem.Click += AddByLinkMenuItem_Click;
-        settingsMenuItem.Click += SettingsMenuItem_Click;
-        exitMenuItem.Click += ExitMenuItem_Click;
-
-        // Edit menu
-        removeMenuItem.Click += RemoveMenuItem_Click;
-        removeAllMenuItem.Click += RemoveAllMenuItem_Click;
-
-        // Convert menu
-        convertSelectedMenuItem.Click += ConvertSelectedMenuItem_Click;
-        convertAllMenuItem.Click += ConvertButton_Click;
-        createMultiSizeIcoMenuItem.Click += CreateMultiSizeIcoMenuItem_Click;
-        fitToFileSizeMenuItem.Click += FitToFileSizeMenuItem_Click;
-
-        // Help menu
-        userManualMenuItem.Click += UserManualMenuItem_Click;
-        checkForUpdatesMenuItem.Click += CheckForUpdatesMenuItem_Click;
-        donateMenuItem.Click += DonateMenuItem_Click;
-        aboutMenuItem.Click += AboutMenuItem_Click;
-
-        // Controls
         convertSelectedButton.Click += ConvertSelectedMenuItem_Click;
         convertButton.Click += ConvertButton_Click;
         resizeCheckBox.CheckedChanged += ResizeCheckBox_CheckedChanged;
@@ -174,18 +156,17 @@ public partial class MainWindow: Form {
 
     private void UpdateMenuState() {
         var hasItems = _imageItems.Count > 0;
-        var hasSelection = hasItems && imageListView.SelectedIndices.Count > 0;
+        var hasSelection = hasItems && imageListView.SelectedItems.Count > 0;
 
-        editMenu.Enabled = hasItems;
-        removeMenuItem.Enabled = hasSelection;
-        removeAllMenuItem.Enabled = hasItems;
-        convertMenu.Enabled = hasItems;
+        _hasItems = hasItems;
+        _hasSelection = hasSelection;
+
         convertSelectedButton.Enabled = hasSelection;
         convertButton.Enabled = hasItems;
-        convertSelectedMenuItem.Enabled = hasSelection;
-        convertAllMenuItem.Enabled = hasItems;
-        createMultiSizeIcoMenuItem.Enabled = hasSelection;
-        fitToFileSizeMenuItem.Enabled = hasSelection;
+
+        // The native menu reads enabled state from the spec every time a popup opens, so the
+        // flags above are the whole update: nothing has to be pushed into the menu itself.
+        RefreshMenuState();
     }
 
     // Placeholder management is split out of UpdateMenuState because Items.Insert/Remove
@@ -200,10 +181,164 @@ public partial class MainWindow: Form {
         }
     }
 
+    /// <summary>
+    /// Drops the selection and the focus rectangle. <c>NativeListView.FocusedItem</c> is
+    /// read-only - the focus rectangle is a property of a row rather than of the control - so
+    /// the focused row is the thing that has to be told.
+    /// </summary>
+    private void ClearListSelection() {
+        imageListView.ClearSelection();
+
+        if (imageListView.FocusedItem is { } focused) {
+            focused.Focused = false;
+        }
+    }
+
+    /// <summary>
+    /// Re-measures every column against its content, which is what
+    /// <c>ListView.AutoResizeColumns</c> used to do. On the native control an auto-size is a
+    /// width you assign rather than a method you call.
+    /// </summary>
+    private void AutoSizeListColumns() {
+        foreach (var column in imageListView.Columns) {
+            column.Width = NativeListViewColumn.AutoSizeToContent;
+        }
+    }
+
+    /// <summary>One row of the list, in column order.</summary>
+    private static NativeListViewItem BuildRow(Models.ImageItem item) =>
+        new(item.FileName,
+            item.OriginalFormat,
+            item.GetDimensionsDisplay(),
+            item.GetSizeDisplay(),
+            string.Empty);
+
+    /// <inheritdoc />
+    protected override void OnHandleCreated(EventArgs e) {
+        base.OnHandleCreated(e);
+
+        // SetMenu needs a window to attach to, so this cannot happen in the constructor.
+        _menuBar = new NativeMenuBar(this);
+        _menuBar.Attach(BuildMenuSpec());
+    }
+
+    /// <inheritdoc />
+    protected override void OnFormClosed(FormClosedEventArgs e) {
+        // Before the handle goes: the HMENU, the accelerator table and the window subclass all
+        // need the form's HWND to still exist while they are released.
+        _menuBar?.Dispose();
+        _menuBar = null;
+        base.OnFormClosed(e);
+    }
+
+    /// <summary>
+    /// The whole menu, as data. Rebuilt rather than mutated: on a language change every label
+    /// is re-evaluated against the new catalog, and the enabled flags are read from the spec
+    /// each time a popup opens.
+    /// </summary>
+    private NativeMenuSpec BuildMenuSpec() {
+        var spec = new NativeMenuSpec();
+
+        spec.AddMenu(_("&File"), file => {
+            file.Add(_("Add &Image..."), _("Ctrl+N"), Keys.Control | Keys.N,
+                () => AddImageMenuItem_Click(this, EventArgs.Empty));
+            file.Add(_("Add F&older..."), _("Ctrl+Shift+N"), Keys.Control | Keys.Shift | Keys.N,
+                () => AddFolderMenuItem_Click(this, EventArgs.Empty));
+            file.Add(_("Add Image by &Link..."), _("Ctrl+L"), Keys.Control | Keys.L,
+                () => AddByLinkMenuItem_Click(this, EventArgs.Empty));
+            file.AddSeparator();
+            file.Add(_("&Settings..."), _("Ctrl+,"), Keys.Control | Keys.Oemcomma,
+                () => SettingsMenuItem_Click(this, EventArgs.Empty));
+            file.AddSeparator();
+            file.Add(_("E&xit"), _("Alt+F4"), Keys.Alt | Keys.F4,
+                () => ExitMenuItem_Click(this, EventArgs.Empty));
+        });
+
+        spec.AddMenu(_("&Edit"), edit => {
+            // Delete is handled by the form's key handler while the list has focus, so the
+            // chord is shown but not registered - registering it would take the key away from
+            // any text box on the form.
+            edit.Add(_("&Remove"), _("Del"), shortcutKeys: null,
+                () => RemoveMenuItem_Click(this, EventArgs.Empty));
+            edit.Add(_("Remove &All"), _("Ctrl+Shift+Del"), Keys.Control | Keys.Shift | Keys.Delete,
+                () => RemoveAllMenuItem_Click(this, EventArgs.Empty));
+        });
+
+        spec.AddMenu(_("&Convert"), convert => {
+            convert.Add(_("Convert &Selected"), _("F5"), Keys.F5,
+                () => ConvertSelectedMenuItem_Click(this, EventArgs.Empty));
+            convert.Add(_("Convert &All"), _("Ctrl+Shift+F5"), Keys.Control | Keys.Shift | Keys.F5,
+                () => ConvertButton_Click(this, EventArgs.Empty));
+            convert.AddSeparator();
+            convert.Add(_("Create Multi-size &ICO..."), _("Ctrl+Alt+F5"), Keys.Control | Keys.Alt | Keys.F5,
+                () => CreateMultiSizeIcoMenuItem_Click(this, EventArgs.Empty));
+            convert.Add(_("&Fit to File Size..."), _("Ctrl+Alt+Shift+F5"),
+                Keys.Control | Keys.Alt | Keys.Shift | Keys.F5,
+                () => FitToFileSizeMenuItem_Click(this, EventArgs.Empty));
+        });
+
+        spec.AddMenu(_("&Help"), help => {
+            help.Add(_("Read User &Manual"), _("F1"), Keys.F1,
+                () => UserManualMenuItem_Click(this, EventArgs.Empty));
+            help.Add(_("Check for &Updates..."), () => CheckForUpdatesMenuItem_Click(this, EventArgs.Empty));
+            help.AddSeparator();
+            help.Add(_("&Donate..."), _("Ctrl+Shift+D"), Keys.Control | Keys.Shift | Keys.D,
+                () => DonateMenuItem_Click(this, EventArgs.Empty));
+            help.Add(_("&About SIC!..."), _("Shift+F1"), Keys.Shift | Keys.F1,
+                () => AboutMenuItem_Click(this, EventArgs.Empty));
+        });
+
+        ApplyMenuState(spec);
+        _menuSpec = spec;
+        return spec;
+    }
+
+    /// <summary>
+    /// Grays the items that need something selected, or anything in the queue at all.
+    /// </summary>
+    /// <remarks>
+    /// The spec is mutable on purpose: enabled state is read out of it on every
+    /// <c>WM_INITMENUPOPUP</c>, so setting it here is enough and no rebuild is required.
+    /// </remarks>
+    private void ApplyMenuState(NativeMenuSpec spec) {
+        var edit = spec.Items[1];
+        var convert = spec.Items[2];
+
+        edit.IsEnabled = _hasItems;
+        convert.IsEnabled = _hasItems;
+
+        edit.Children![0].IsEnabled = _hasSelection;   // Remove
+        edit.Children![1].IsEnabled = _hasItems;       // Remove All
+
+        convert.Children![0].IsEnabled = _hasSelection;   // Convert Selected
+        convert.Children![1].IsEnabled = _hasItems;       // Convert All
+        convert.Children![3].IsEnabled = _hasSelection;   // Create multi-size ICO
+        convert.Children![4].IsEnabled = _hasSelection;   // Fit to file size
+    }
+
+    /// <summary>Pushes the current enabled flags into the live menu.</summary>
+    private void RefreshMenuState() {
+        if (_menuSpec is not null) {
+            ApplyMenuState(_menuSpec);
+        }
+    }
+
+    /// <summary>
+    /// Column headers are not controls, so the catalog walk in ApplyLocalization cannot reach
+    /// them the way it reached ColumnHeader.Text before.
+    /// </summary>
+    private void LocalizeColumns() {
+        colFileName.Text = _("File Name");
+        colFormat.Text = _("Format");
+        colDimensions.Text = _("Dimensions");
+        colSize.Text = _("Size");
+        colStatus.Text = _("Status");
+    }
+
     private void ShowPlaceholder() {
         if (_placeholderItem != null)
             return;
-        _placeholderItem = new ListViewItem(_("Add your images here")) {
+        _placeholderItem = new NativeListViewItem(_("Add your images here")) {
             ForeColor = SystemColors.GrayText
         };
         imageListView.Items.Insert(0, _placeholderItem);
@@ -267,10 +402,10 @@ public partial class MainWindow: Form {
     }
 
     private void RemoveMenuItem_Click(object? sender, EventArgs e) {
-        if (_imageItems.Count == 0 || imageListView.SelectedIndices.Count == 0)
+        if (_imageItems.Count == 0 || imageListView.SelectedItems.Count == 0)
             return;
 
-        var index = imageListView.SelectedIndices[0];
+        var index = imageListView.SelectedItems[0].Index;
         _imageItems.RemoveAt(index);
         imageListView.Items.RemoveAt(index);
 
@@ -290,8 +425,7 @@ public partial class MainWindow: Form {
     }
 
     private void RemoveAllMenuItem_Click(object? sender, EventArgs e) {
-        imageListView.SelectedIndices.Clear();
-        imageListView.FocusedItem = null;
+        ClearListSelection();
         _imageItems.Clear();
         imageListView.Items.Clear();
         previewPictureBox.Image?.Dispose();
@@ -322,30 +456,14 @@ public partial class MainWindow: Form {
         Localizer.Revert(this, _localizationStore);
         Localizer.Localize(this, Localization.Catalog, _localizationStore);
         TextDirection.Apply(this);
-        RefreshShortcutKeys(menuStrip);
+
+        // Neither of these is a control, so the catalog walk above does not reach them. A menu
+        // is rebuilt from a fresh spec, which is the path the library expects for a language
+        // change; column headers are assigned.
+        LocalizeColumns();
+        _menuBar?.Attach(BuildMenuSpec());
+
         statusLabel.Text = _("Ready");
-    }
-
-    private static void RefreshShortcutKeys(MenuStrip menu) {
-        foreach (ToolStripItem item in menu.Items) {
-            if (item is ToolStripMenuItem menuItem) {
-                RefreshShortcutKeys(menuItem);
-            }
-        }
-    }
-
-    private static void RefreshShortcutKeys(ToolStripMenuItem item) {
-        if (item.ShortcutKeys != Keys.None) {
-            var keys = item.ShortcutKeys;
-            item.ShortcutKeys = Keys.None;
-            item.ShortcutKeys = keys;
-        }
-
-        foreach (ToolStripItem sub in item.DropDownItems) {
-            if (sub is ToolStripMenuItem menuItem) {
-                RefreshShortcutKeys(menuItem);
-            }
-        }
     }
 
     private void ExitMenuItem_Click(object? sender, EventArgs e) {
@@ -468,14 +586,14 @@ public partial class MainWindow: Form {
                         progressDialog!.UpdateMessage(
                             _("Converting {0} ({1}/{2})...", item.FileName, j + 1, totalCount));
                         progressDialog!.UpdateProgress(j + 1, totalCount);
-                        imageListView.Items[i].SubItems[4].Text = _("Converting...");
+                        imageListView.Items[i].Cells[4] = _("Converting...");
                     });
 
                     if (ImageConverter.ShouldSkipConversion(item, targetFormat, width, height)) {
                         skipped++;
                         Log.Information("Skipped {FileName}: already in {Format} format", item.FileName, targetFormat);
                         Invoke(() => {
-                            imageListView.Items[i].SubItems[4].Text = _("Skipped (same format)");
+                            imageListView.Items[i].Cells[4] = _("Skipped (same format)");
                         });
                         continue;
                     }
@@ -494,7 +612,7 @@ public partial class MainWindow: Form {
                             case ConflictResolution.Skip:
                                 skipped++;
                                 Invoke(() => {
-                                    imageListView.Items[i].SubItems[4].Text = _("Skipped");
+                                    imageListView.Items[i].Cells[4] = _("Skipped");
                                 });
                                 continue;
                         }
@@ -513,7 +631,7 @@ public partial class MainWindow: Form {
                         failed++;
                         Log.Error("Failed to convert {FileName}: {Error}", item.FileName, ex.Message);
                         Invoke(() => {
-                            imageListView.Items[i].SubItems[4].Text = _("Failed");
+                            imageListView.Items[i].Cells[4] = _("Failed");
                             DialogHelper.Show(_("Failed to convert {0}:\n{1}", item.FileName, ex.Message), _("Conversion Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                         });
                     }
@@ -530,8 +648,7 @@ public partial class MainWindow: Form {
         // an item that's just been removed.
         imageListView.BeginUpdate();
         try {
-            imageListView.SelectedIndices.Clear();
-            imageListView.FocusedItem = null;
+            ClearListSelection();
 
             foreach (var index in convertedIndices.OrderByDescending(i => i)) {
                 _imageItems.RemoveAt(index);
@@ -579,15 +696,15 @@ public partial class MainWindow: Form {
     }
 
     private async void ConvertSelectedMenuItem_Click(object? sender, EventArgs e) {
-        if (_imageItems.Count == 0 || imageListView.SelectedIndices.Count == 0)
+        if (_imageItems.Count == 0 || imageListView.SelectedItems.Count == 0)
             return;
 
-        var selectedIndices = imageListView.SelectedIndices.Cast<int>().ToList();
+        var selectedIndices = imageListView.SelectedItems.Select(row => row.Index).ToList();
         await ConvertItemsAsync(selectedIndices);
     }
 
     private async void CreateMultiSizeIcoMenuItem_Click(object? sender, EventArgs e) {
-        if (_imageItems.Count == 0 || imageListView.SelectedIndices.Count == 0)
+        if (_imageItems.Count == 0 || imageListView.SelectedItems.Count == 0)
             return;
 
         using var presetDialog = new IcoPresetDialog();
@@ -595,7 +712,7 @@ public partial class MainWindow: Form {
             return;
 
         var sizes = presetDialog.SelectedSizes;
-        var index = imageListView.SelectedIndices[0];
+        var index = imageListView.SelectedItems[0].Index;
         var item = _imageItems[index];
         var outputFolder = ValidateOutputFolder();
         var outputPath = ImageConverter.GenerateOutputPath(item, "ICO", outputFolder, Config.General.SaveToSourceFolder);
@@ -623,7 +740,7 @@ public partial class MainWindow: Form {
             progressDialog.Show(this);
             await Task.Yield();
 
-            imageListView.Items[index].SubItems[4].Text = _("Converting...");
+            imageListView.Items[index].Cells[4] = _("Converting...");
 
             await Task.Run(() => {
                 var dir = Path.GetDirectoryName(outputPath);
@@ -634,8 +751,7 @@ public partial class MainWindow: Form {
                 ImageConverter.CreateMultiSizeIco(item, outputPath, sizes);
             }).WaitAsync(progressDialog.CancellationToken);
 
-            imageListView.SelectedIndices.Clear();
-            imageListView.FocusedItem = null;
+            ClearListSelection();
             _imageItems.RemoveAt(index);
             imageListView.Items.RemoveAt(index);
             previewPictureBox.Image?.Dispose();
@@ -647,11 +763,11 @@ public partial class MainWindow: Form {
             DialogHelper.Show(_("Multi-size ICO created successfully:\n{0}", outputPath), _("ICO Created"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         } catch (OperationCanceledException) {
-            imageListView.Items[index].SubItems[4].Text = "";
+            imageListView.Items[index].Cells[4] = "";
             statusLabel.Text = _("Ready");
         } catch (Exception ex) {
             Log.Error("Failed to create multi-size ICO for {FileName}: {Error}", item.FileName, ex.Message);
-            imageListView.Items[index].SubItems[4].Text = _("Failed");
+            imageListView.Items[index].Cells[4] = _("Failed");
             DialogHelper.Show(_("Failed to create multi-size ICO:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         } finally {
             progressDialog?.Close();
@@ -664,7 +780,7 @@ public partial class MainWindow: Form {
     }
 
     private async void FitToFileSizeMenuItem_Click(object? sender, EventArgs e) {
-        if (_imageItems.Count == 0 || imageListView.SelectedIndices.Count == 0)
+        if (_imageItems.Count == 0 || imageListView.SelectedItems.Count == 0)
             return;
 
         using var fitDialog = new FitToSizeDialog();
@@ -673,7 +789,7 @@ public partial class MainWindow: Form {
 
         var maxBytes = fitDialog.MaxBytes;
         var maxWidth = fitDialog.MaxWidth;
-        var index = imageListView.SelectedIndices[0];
+        var index = imageListView.SelectedItems[0].Index;
         var item = _imageItems[index];
         var formats = ImageConverter.GetSizeFitFormats(ImageConverter.GetEnabledFormats(Config.General.GetEnabledFormatKeys()));
 
@@ -774,7 +890,7 @@ public partial class MainWindow: Form {
             progressDialog.Show(this);
             await Task.Yield();
 
-            imageListView.Items[index].SubItems[4].Text = _("Converting...");
+            imageListView.Items[index].Cells[4] = _("Converting...");
 
             await Task.Run(() => {
                 var dir = Path.GetDirectoryName(outputPath);
@@ -785,8 +901,7 @@ public partial class MainWindow: Form {
                 ImageConverter.ConvertToProposal(item, proposal, outputPath);
             }).WaitAsync(progressDialog.CancellationToken);
 
-            imageListView.SelectedIndices.Clear();
-            imageListView.FocusedItem = null;
+            ClearListSelection();
             _imageItems.RemoveAt(index);
             imageListView.Items.RemoveAt(index);
             previewPictureBox.Image?.Dispose();
@@ -798,11 +913,11 @@ public partial class MainWindow: Form {
             DialogHelper.Show(_("Image converted successfully:\n{0}", outputPath), _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         } catch (OperationCanceledException) {
-            imageListView.Items[index].SubItems[4].Text = "";
+            imageListView.Items[index].Cells[4] = "";
             statusLabel.Text = _("Ready");
         } catch (Exception ex) {
             Log.Error("Failed to fit {FileName} to size: {Error}", item.FileName, ex.Message);
-            imageListView.Items[index].SubItems[4].Text = _("Failed");
+            imageListView.Items[index].Cells[4] = _("Failed");
             DialogHelper.Show(_("Failed to convert {0}:\n{1}", item.FileName, ex.Message), _("Conversion Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         } finally {
             progressDialog?.Close();
@@ -997,14 +1112,14 @@ public partial class MainWindow: Form {
         // Treat placeholder selection (or any selection when _imageItems is empty)
         // as "no real selection" — clear preview state but leave the placeholder
         // focused so screen readers can announce it.
-        if (imageListView.SelectedIndices.Count == 0 || _imageItems.Count == 0) {
+        if (imageListView.SelectedItems.Count == 0 || _imageItems.Count == 0) {
             _selectedItem = null;
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = null;
             return;
         }
 
-        var index = imageListView.SelectedIndices[0];
+        var index = imageListView.SelectedItems[0].Index;
         var item = _imageItems[index];
         _selectedItem = item;
 
@@ -1032,7 +1147,7 @@ public partial class MainWindow: Form {
         if (e.KeyCode == Keys.Escape) {
             Close();
             e.Handled = true;
-        } else if (e.KeyCode == Keys.Delete && imageListView.Focused) {
+        } else if (e.KeyCode == Keys.Delete && imageListView.ContainsFocus) {
             RemoveMenuItem_Click(sender, e);
             e.Handled = true;
         } else if (e.Control && e.KeyCode == Keys.V) {
@@ -1361,29 +1476,24 @@ public partial class MainWindow: Form {
                 progressDialog.Dispose();
                 progressDialog = null;
 
-                // Batch-add to ListView without per-item overhead.
-                // AddImageItem calls AutoResizeColumns + sets Selected (firing
-                // SelectedIndexChanged → UpdatePreview → Magick.NET decode)
-                // per item, which freezes the UI on large batches.
+                // Batch-add to the list without per-item overhead. AddImageItem re-measures
+                // the columns and sets Selected on every item, and each selection fires
+                // SelectedIndexChanged → UpdatePreview → a Magick.NET decode, which freezes
+                // the UI on a large batch.
                 HidePlaceholder();
                 imageListView.BeginUpdate();
                 try {
                     foreach (var item in result.Items) {
                         _imageItems.Add(item);
 
-                        var listItem = new ListViewItem(item.FileName);
-                        listItem.SubItems.Add(item.OriginalFormat);
-                        listItem.SubItems.Add(item.GetDimensionsDisplay());
-                        listItem.SubItems.Add(item.GetSizeDisplay());
-                        listItem.SubItems.Add("");
-                        imageListView.Items.Add(listItem);
+                        imageListView.Items.Add(BuildRow(item));
                     }
                 } finally {
                     imageListView.EndUpdate();
                 }
 
                 if (result.Items.Count > 0) {
-                    imageListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    AutoSizeListColumns();
                     var lastIndex = imageListView.Items.Count - 1;
                     imageListView.Items[lastIndex].Selected = true;
                     imageListView.Items[lastIndex].Focused = true;
@@ -1450,17 +1560,12 @@ public partial class MainWindow: Form {
         HidePlaceholder();
         _imageItems.Add(item);
 
-        var listItem = new ListViewItem(item.FileName);
-        listItem.SubItems.Add(item.OriginalFormat);
-        listItem.SubItems.Add(item.GetDimensionsDisplay());
-        listItem.SubItems.Add(item.GetSizeDisplay());
-        listItem.SubItems.Add(""); // Status column — blank on add
-
-        imageListView.Items.Add(listItem);
-        imageListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-        listItem.Selected = true;
-        listItem.Focused = true;
-        listItem.EnsureVisible();
+        var row = BuildRow(item);
+        imageListView.Items.Add(row);
+        AutoSizeListColumns();
+        row.Selected = true;
+        row.Focused = true;
+        row.EnsureVisible();
         statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
     }
 
