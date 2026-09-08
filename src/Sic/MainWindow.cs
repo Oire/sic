@@ -401,13 +401,34 @@ public partial class MainWindow: Form {
         await PasteFromUrlAsync(dialog.Url);
     }
 
+    /// <summary>
+    /// The row a single-image command should act on: the one carrying the focus rectangle when
+    /// it is selected, and otherwise the first selected row.
+    /// </summary>
+    private int FocusedOrFirstSelectedIndex() =>
+        imageListView.FocusedItem is { Selected: true } focused
+            ? focused.Index
+            : imageListView.SelectedItems[0].Index;
+
     private void RemoveMenuItem_Click(object? sender, EventArgs e) {
         if (_imageItems.Count == 0 || imageListView.SelectedItems.Count == 0)
             return;
 
-        var index = imageListView.SelectedItems[0].Index;
-        _imageItems.RemoveAt(index);
-        imageListView.Items.RemoveAt(index);
+        // Descending, so removing one cannot shift the index of another still to go.
+        var indices = imageListView.SelectedItems
+            .Select(row => row.Index)
+            .OrderByDescending(i => i)
+            .ToList();
+
+        foreach (var removed in indices) {
+            _imageItems.RemoveAt(removed);
+            imageListView.Items.RemoveAt(removed);
+        }
+
+        // Land on the row that took the place of the first one removed, so the selection ends
+        // up somewhere predictable rather than nowhere - a list with nothing selected announces
+        // nothing when focus returns to it.
+        var index = indices[^1];
 
         if (imageListView.Items.Count > 0) {
             var newIndex = index < imageListView.Items.Count ? index : imageListView.Items.Count - 1;
@@ -703,6 +724,11 @@ public partial class MainWindow: Form {
         await ConvertItemsAsync(selectedIndices);
     }
 
+    /// <remarks>
+    /// One image in, one .ico out, so this works on the focused row even when several are
+    /// selected - taking the topmost of a multiple selection would act on an image the user is
+    /// not looking at.
+    /// </remarks>
     private async void CreateMultiSizeIcoMenuItem_Click(object? sender, EventArgs e) {
         if (_imageItems.Count == 0 || imageListView.SelectedItems.Count == 0)
             return;
@@ -712,7 +738,7 @@ public partial class MainWindow: Form {
             return;
 
         var sizes = presetDialog.SelectedSizes;
-        var index = imageListView.SelectedItems[0].Index;
+        var index = FocusedOrFirstSelectedIndex();
         var item = _imageItems[index];
         var outputFolder = ValidateOutputFolder();
         var outputPath = ImageConverter.GenerateOutputPath(item, "ICO", outputFolder, Config.General.SaveToSourceFolder);
@@ -789,7 +815,7 @@ public partial class MainWindow: Form {
 
         var maxBytes = fitDialog.MaxBytes;
         var maxWidth = fitDialog.MaxWidth;
-        var index = imageListView.SelectedItems[0].Index;
+        var index = FocusedOrFirstSelectedIndex();
         var item = _imageItems[index];
         var formats = ImageConverter.GetSizeFitFormats(ImageConverter.GetEnabledFormats(Config.General.GetEnabledFormatKeys()));
 
@@ -1119,7 +1145,13 @@ public partial class MainWindow: Form {
             return;
         }
 
-        var index = imageListView.SelectedItems[0].Index;
+        // The focused row when it is part of the selection, otherwise the first selected one.
+        // Extending a selection moves the focus, and previewing where the user actually is
+        // beats previewing where they started.
+        var index = imageListView.FocusedItem is { Selected: true } focused
+            ? focused.Index
+            : imageListView.SelectedItems[0].Index;
+
         var item = _imageItems[index];
         _selectedItem = item;
 

@@ -119,7 +119,7 @@ partial class MainWindow {
         }
 
         imageListView.Dock = DockStyle.Fill;
-        imageListView.MultiSelect = false;
+        imageListView.MultiSelect = true;
         imageListView.Name = "imageListView";
         imageListView.AccessibleName = "Images list";
         imageListView.AllowDrop = true;
