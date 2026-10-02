@@ -55,6 +55,15 @@ public partial class MainWindow: Form {
         InitializeComponent();
         Localizer.Localize(this, Localization.Catalog, _localizationStore);
         TextDirection.Apply(this);
+
+        // The .ico holds several sizes, so the title bar and Alt+Tab each get a sharp one; the
+        // exe's own icon (ApplicationIcon) is not what a form shows.
+        using (var iconStream = typeof(MainWindow).Assembly.GetManifestResourceStream("sic.ico")) {
+            if (iconStream is not null) {
+                Icon = new Icon(iconStream);
+            }
+        }
+
         SetupEventHandlers();
         PopulateFormatComboBox();
         UpdateMenuState();

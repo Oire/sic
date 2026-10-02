@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Drawing;
 using System.Net.Http;
 using ImageMagick;
@@ -318,7 +319,12 @@ public static class ImageConverter {
             image.Quality = sourceQuality;
         }
 
-        image.Write(outputPath);
+        if (magickFormat == MagickFormat.Ico) {
+            using var frames = new MagickImageCollection { image.Clone() };
+            WriteIco(frames, outputPath);
+        } else {
+            image.Write(outputPath);
+        }
 
         Log.Information("Converted {FileName} to {Format} at {OutputPath}", item.FileName, targetFormat, outputPath);
     }
@@ -433,8 +439,80 @@ public static class ImageConverter {
             collection.Add(frame);
         }
 
-        collection.Write(outputPath, MagickFormat.Ico);
+        WriteIco(collection, outputPath);
         Log.Information("Created multi-size ICO from {FileName} at {OutputPath} with sizes {Sizes}", item.FileName, outputPath, string.Join(", ", sizes));
+    }
+
+    /// <summary>
+    /// Writes <paramref name="frames"/> as an ICO file whose 256 px frame is stored as PNG.
+    /// </summary>
+    /// <remarks>
+    /// Magick's ICO encoder switches to PNG only above 256 px, whatever the frame's compression or
+    /// format settings say, so the 256 px frame Windows uses for large icons comes out as an
+    /// uncompressed bitmap of about 260 KB. Windows has read PNG frames since Vista and stores its own
+    /// 256 px icons that way. Magick still writes the file, which keeps its encoding of the smaller
+    /// frames and its 512 px limit; a frame of 256 px or more that it left as a bitmap is then
+    /// replaced by the same pixels as a 32-bit PNG.
+    /// </remarks>
+    private static void WriteIco(MagickImageCollection frames, string outputPath) {
+        const int HeaderSize = 6;
+        const int EntrySize = 16;
+        ReadOnlySpan<byte> pngSignature = [0x89, (byte)'P', (byte)'N', (byte)'G'];
+
+        byte[] ico;
+        using (var stream = new MemoryStream()) {
+            frames.Write(stream, MagickFormat.Ico);
+            ico = stream.ToArray();
+        }
+
+        var count = BinaryPrimitives.ReadUInt16LittleEndian(ico.AsSpan(4));
+        var payloads = new byte[count][];
+        var reencoded = new bool[count];
+
+        for (var i = 0; i < count; i++) {
+            var entry = ico.AsSpan(HeaderSize + (i * EntrySize), EntrySize);
+            var size = (int)BinaryPrimitives.ReadUInt32LittleEndian(entry[8..]);
+            var offset = (int)BinaryPrimitives.ReadUInt32LittleEndian(entry[12..]);
+            var payload = ico.AsSpan(offset, size);
+
+            // A width or height of 0 in the directory means 256 px or more.
+            var large = entry[0] == 0 || entry[1] == 0;
+            var matchesFrame = count == frames.Count && (frames[i].Width >= 256 || frames[i].Height >= 256);
+
+            if (large && matchesFrame && !payload.StartsWith(pngSignature)) {
+                payloads[i] = frames[i].ToByteArray(MagickFormat.Png32);
+                reencoded[i] = true;
+            } else {
+                payloads[i] = payload.ToArray();
+            }
+        }
+
+        if (!reencoded.Contains(true)) {
+            File.WriteAllBytes(outputPath, ico);
+            return;
+        }
+
+        var dataOffset = HeaderSize + (count * EntrySize);
+        var result = new byte[dataOffset + payloads.Sum(p => p.Length)];
+        ico.AsSpan(0, dataOffset).CopyTo(result);
+        var position = dataOffset;
+
+        for (var i = 0; i < count; i++) {
+            var entry = result.AsSpan(HeaderSize + (i * EntrySize), EntrySize);
+
+            if (reencoded[i]) {
+                entry[2] = 0; // color count: none, the frame is not paletted
+                BinaryPrimitives.WriteUInt16LittleEndian(entry[4..], 1); // planes
+                BinaryPrimitives.WriteUInt16LittleEndian(entry[6..], 32); // bits per pixel
+            }
+
+            BinaryPrimitives.WriteUInt32LittleEndian(entry[8..], (uint)payloads[i].Length);
+            BinaryPrimitives.WriteUInt32LittleEndian(entry[12..], (uint)position);
+            payloads[i].CopyTo(result, position);
+            position += payloads[i].Length;
+        }
+
+        File.WriteAllBytes(outputPath, result);
     }
 
     /// <summary>
