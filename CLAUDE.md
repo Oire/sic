@@ -64,6 +64,8 @@ Hebrew is right-to-left; see `Utils/TextDirection.cs` and `Utils/DialogHelper.cs
 **`src/Sic/Services/ImageConverter.cs`** — Static conversion engine wrapping Magick.NET. Key methods:
 - `LoadFromFile`, `LoadFromStream`, `LoadFromBytes`, `LoadFromUrl` — create `ImageItem` from various sources
 - `Convert` — converts an `ImageItem` to a target format with optional resize, writes to disk
+- `CreateMultiSizeIco` — one ICO holding several sizes of an image (Convert > Create Multi-size ICO…)
+- Every ICO, from `Convert` too, is written by `WriteIco`: Magick's encoder switches to PNG only *above* 256 px, whatever the compression or format settings, so the 256 px frame Windows uses comes out as a ~260 KB uncompressed bitmap. `WriteIco` lets Magick write the file (keeping its 512 px limit and its encoding of the smaller frames), then swaps such a frame's bitmap for the same pixels as a 32-bit PNG, as Windows' own icons store it.
 - `GeneratePreview` — produces a `Bitmap` for the preview panel
 - `GenerateOutputPath`, `GetConflictRenamePath` — output path logic with conflict resolution
 - `GetSupportedFormats` — all SIC! format keys in canonical order; `GetEnabledFormats(enabledKeys)` filters them to the user-selected subset (issue #47), preserving order and never returning an empty list
