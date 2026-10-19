@@ -187,12 +187,11 @@ begin
   end;
 end;
 
+// With the Ready to Install and Select Start Menu Folder pages off, Select Additional Tasks
+// (always shown: the desktop icon task is there) is the last page before installing, so its
+// button says Install. Inno Setup sets every other page's caption itself before calling this.
 procedure CurPageChanged(CurPageID: Integer);
 begin
-  if CurPageID in [wpSelectProgramGroup, wpReady] then
-    WizardForm.NextButton.Caption := SetupMessage(msgButtonInstall)
-  else if CurPageID = wpFinished then
-    WizardForm.NextButton.Caption := SetupMessage(msgButtonFinish)
-  else
-    WizardForm.NextButton.Caption := SetupMessage(msgButtonNext);
+  if CurPageID = wpSelectTasks then
+    WizardForm.NextButton.Caption := SetupMessage(msgButtonInstall);
 end;
