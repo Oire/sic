@@ -85,7 +85,9 @@ Write-Host "Using Inno Setup: $InnoSetupPath" -ForegroundColor Yellow
 # Code signing setup
 $SigningConfigPath = Join-Path $ScriptDir "signing.json"
 $TimestampUrl = "http://timestamp.acs.microsoft.com"
-$Sign = !$NoSign -and (Test-Path $SigningConfigPath)
+# The UAC prompt shows the description as the program name; the URL is the signature's more-info link
+$SignDescription = "SIC! Simple Image Converter"
+$Sign =!$NoSign -and (Test-Path $SigningConfigPath)
 
 if (!$NoSign -and !$Sign) {
     if ($Appcast) {
@@ -157,7 +159,7 @@ if ($Sign) {
 function Invoke-CodeSigning([string]$FilePath) {
     Write-Host "Signing $(Split-Path -Leaf $FilePath)..." -ForegroundColor Yellow
 
-    & "$SignToolPath" sign /fd SHA256 /tr $TimestampUrl /td SHA256 /dlib "$DlibPath" /dmdf "$SigningConfigPath" "$FilePath"
+    & "$SignToolPath" sign /fd SHA256 /tr $TimestampUrl /td SHA256 /d "$SignDescription" /du $BaseUrl /dlib "$DlibPath" /dmdf "$SigningConfigPath" "$FilePath"
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Signing failed with exit code $LASTEXITCODE"
@@ -248,7 +250,7 @@ $IsccArgs = @()
 if ($Sign) {
     # Inno Setup signs the installer and its uninstaller itself through the "azure" sign tool
     # that sic.iss enables under /DSign. In the command, $q is a quote and $f the quoted file name.
-    $SignCommand = '$q' + $SignToolPath + '$q sign /fd SHA256 /tr ' + $TimestampUrl + ' /td SHA256 /dlib $q' + $DlibPath + '$q /dmdf $q' + $SigningConfigPath + '$q $f'
+    $SignCommand = '$q' + $SignToolPath + '$q sign /fd SHA256 /tr ' + $TimestampUrl + ' /td SHA256 /d $q' + $SignDescription + '$q /du ' + $BaseUrl + ' /dlib $q' + $DlibPath + '$q /dmdf $q' + $SigningConfigPath + '$q $f'
     $IsccArgs += @("/DSign", "/Sazure=$SignCommand")
 }
 
