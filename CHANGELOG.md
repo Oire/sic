@@ -8,6 +8,8 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 
 - **Native menus and image list**: the menu bar and the image list are now real Windows controls rather than WinForms-drawn imitations, which is what screen readers need from them ([#68](https://github.com/Oire/sic/issues/68)). The menu is a genuine `HMENU` attached with `SetMenu`, announced as a menu bar with real submenus instead of a panel that draws things resembling menu items. The image list is a genuine `SysListView32` rather than one wearing a window class no screen reader recognizes, so every column is read instead of only the file name. Nothing changes about how either looks or behaves for sighted users.
 - **Smaller icons**: the 256 px image in an ICO file is now stored as PNG, as in Windows' own icons, instead of as an uncompressed bitmap. A multi-size icon made with the Windows application preset drops from about 285 KB to about 85 KB, with the same pixels.
+- **Signed by Oire Software**: the installer, its uninstaller and `sic.exe` now carry Oire Software's digital signature ([#86](https://github.com/Oire/sic/issues/86)). When you install, Windows' permission prompt names Oire Software as the verified publisher instead of an unknown one, and a file's **Properties** show the signature on the **Digital Signatures** tab. Windows SmartScreen may still warn for a while after a release; the manual's Installation section explains what to check.
+- The publisher shown in Windows' list of installed apps is now **Oire Software**, the company's name as registered and as the signature gives it.
 
 ### Fixes
 
