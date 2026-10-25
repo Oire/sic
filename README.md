@@ -33,6 +33,8 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 
 Download the latest release from [GitHub Releases](https://github.com/Oire/sic/releases) or the official [SIC! website](https://sic.oire.dev/).
 
+Starting with version 1.2, SIC! is signed by Oire Software: the installer and `sic.exe` carry its digital signature, and Windows names Oire Software as the verified publisher when you install. For a while after a new release, Windows SmartScreen may still say "Windows protected your PC"; choose **More info**, check that the publisher is Oire Software, then choose **Run anyway**.
+
 You can also install via [winget](https://learn.microsoft.com/windows/package-manager/winget/):
 
 ```bash
