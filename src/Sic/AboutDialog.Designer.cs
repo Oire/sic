@@ -75,7 +75,7 @@ partial class AboutDialog {
         //
         // copyrightLabel
         //
-        copyrightLabel.Text = "Oire Software SARL";
+        copyrightLabel.Text = "Oire Software";
         copyrightLabel.AutoSize = true;
         copyrightLabel.Anchor = AnchorStyles.None;
         copyrightLabel.Name = "copyrightLabel";

@@ -1,6 +1,6 @@
 @echo off
 REM SIC! Installer Build Script (Batch wrapper)
-REM Copyright © 2026 Oire Software SARL.
+REM Copyright © 2026 Oire Software.
 
 echo Building SIC! Installer...
 echo.

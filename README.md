@@ -210,4 +210,4 @@ src/Sic/
 
 ## License
 
-Copyright 2026 Oire Software SARL. Licensed under the [Apache License 2.0](LICENSE).
+Copyright 2026 Oire Software. Licensed under the [Apache License 2.0](LICENSE).

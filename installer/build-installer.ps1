@@ -1,8 +1,12 @@
 #
 # SIC! Installer Build Script
-# Copyright © 2026 Oire Software SARL.
+# Copyright © 2026 Oire Software.
 #
 # Builds SIC! in Release x64 configuration and creates an installer.
+# Signs sic.exe, the installer and its uninstaller with Azure Artifact Signing whenever
+# installer\signing.json exists (-NoSign to skip; -Appcast and -Deploy refuse to go out unsigned
+# without it). Signing needs the Artifact Signing client tools and an Azure CLI session
+# (az login --use-device-code).
 # Also creates a portable ZIP archive (use -NoPortable to skip).
 # Optionally generates a signed appcast.xml for NetSparkle auto-updates.
 # Optionally deploys release files to the hosting server via SCP (-Deploy).
@@ -15,7 +19,10 @@ param(
     [switch]$NoPortable,
     [switch]$Deploy,
     [switch]$OpenOutput,
+    [switch]$NoSign,
     [string]$InnoSetupPath = "",
+    [string]$SignToolPath = "",
+    [string]$DlibPath = "",
     [string]$BaseUrl = "https://sic.oire.dev",
     [string]$KeyPath = "",
     [string]$ChangeLog = ""
@@ -75,6 +82,102 @@ if ([string]::IsNullOrEmpty($InnoSetupPath) -or !(Test-Path $InnoSetupPath)) {
 
 Write-Host "Using Inno Setup: $InnoSetupPath" -ForegroundColor Yellow
 
+# Code signing setup
+$SigningConfigPath = Join-Path $ScriptDir "signing.json"
+$TimestampUrl = "http://timestamp.acs.microsoft.com"
+$Sign = !$NoSign -and (Test-Path $SigningConfigPath)
+
+if (!$NoSign -and !$Sign) {
+    if ($Appcast) {
+        Write-Error "Signing configuration not found at: $SigningConfigPath"
+        Write-Host "Copy signing.example.json to signing.json and fill in the Artifact Signing details, or pass -NoSign to release unsigned." -ForegroundColor Yellow
+        exit 1
+    }
+
+    Write-Warning "signing.json not found: building unsigned. Copy signing.example.json to signing.json to sign."
+}
+
+if ($Sign) {
+    # Newest signtool from the Windows SDK
+    if ([string]::IsNullOrEmpty($SignToolPath)) {
+        $SignToolPath = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" -ErrorAction SilentlyContinue |
+            Where-Object { $null -ne ($_.Directory.Parent.Name -as [version]) } |
+            Sort-Object { $_.Directory.Parent.Name -as [version] } -Descending |
+            Select-Object -First 1 -ExpandProperty FullName
+    }
+
+    if ([string]::IsNullOrEmpty($SignToolPath) -or !(Test-Path $SignToolPath)) {
+        Write-Error "signtool.exe not found. Install the Windows SDK signing tools or specify the path using -SignToolPath parameter."
+        exit 1
+    }
+
+    # The signtool plugin from the Artifact Signing client tools (winget: Microsoft.Azure.ArtifactSigningClientTools)
+    if ([string]::IsNullOrEmpty($DlibPath)) {
+        $PossiblePaths = @(
+            "${env:LOCALAPPDATA}\Microsoft\MicrosoftArtifactSigningClientTools\Azure.CodeSigning.Dlib.dll",
+            "${env:LOCALAPPDATA}\Microsoft\MicrosoftTrustedSigningClientTools\Azure.CodeSigning.Dlib.dll"
+        )
+
+        foreach ($Path in $PossiblePaths) {
+            if (Test-Path $Path) {
+                $DlibPath = $Path
+                break
+            }
+        }
+    }
+
+    if ([string]::IsNullOrEmpty($DlibPath) -or !(Test-Path $DlibPath)) {
+        Write-Error "Azure.CodeSigning.Dlib.dll not found. Install it with:"
+        Write-Host "  winget install --id Microsoft.Azure.ArtifactSigningClientTools --exact"
+        exit 1
+    }
+
+    # The plugin authenticates through the Azure CLI session unless service principal
+    # credentials are set in the environment (AZURE_CLIENT_ID and friends)
+    if ([string]::IsNullOrEmpty($env:AZURE_CLIENT_ID)) {
+        if ($null -eq (Get-Command az -ErrorAction SilentlyContinue)) {
+            Write-Error "Azure CLI not found. Install it with: winget install --id Microsoft.AzureCLI --exact"
+            exit 1
+        }
+
+        $AzAccount = & az account show --query user.name --output tsv 2>&1
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Not signed in to Azure. Run: az login --use-device-code"
+            exit 1
+        }
+
+        Write-Host "Signing as: $AzAccount" -ForegroundColor Yellow
+    }
+
+    Write-Host "Using signtool: $SignToolPath" -ForegroundColor Yellow
+}
+
+# Signs a file with Artifact Signing and checks the result
+function Invoke-CodeSigning([string]$FilePath) {
+    Write-Host "Signing $(Split-Path -Leaf $FilePath)..." -ForegroundColor Yellow
+
+    & "$SignToolPath" sign /fd SHA256 /tr $TimestampUrl /td SHA256 /dlib "$DlibPath" /dmdf "$SigningConfigPath" "$FilePath"
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Signing failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
+    }
+
+    Assert-Signed $FilePath
+}
+
+function Assert-Signed([string]$FilePath) {
+    $Signature = Get-AuthenticodeSignature -FilePath $FilePath
+
+    if ($Signature.Status -ne "Valid") {
+        Write-Error "$(Split-Path -Leaf $FilePath) has no valid signature: $($Signature.StatusMessage)"
+        exit 1
+    }
+
+    Write-Host "  $(Split-Path -Leaf $FilePath) signed by: $($Signature.SignerCertificate.Subject)" -ForegroundColor Gray
+}
+
 # Build the application
 if (!$SkipBuild) {
     Write-Host "Building SIC! (Release x64)..." -ForegroundColor Yellow
@@ -116,6 +219,18 @@ foreach ($File in $RequiredFiles) {
     }
 }
 
+# Sign the exe before Inno Setup and the portable ZIP pick it up. With -SkipBuild it may
+# already carry a signature from an earlier run.
+if ($Sign) {
+    $ExePath = Join-Path $PublishOutputPath "sic.exe"
+
+    if ((Get-AuthenticodeSignature -FilePath $ExePath).Status -eq "Valid") {
+        Write-Host "sic.exe is already signed, skipping" -ForegroundColor Gray
+    } else {
+        Invoke-CodeSigning $ExePath
+    }
+}
+
 # Clean and (re)create output directory
 if (Test-Path $OutputDir) {
     Write-Host "Cleaning output directory..." -ForegroundColor Yellow
@@ -128,8 +243,19 @@ if (Test-Path $OutputDir) {
 Write-Host "Compiling installer..." -ForegroundColor Yellow
 Write-Host "ISS File: $IssPath" -ForegroundColor Gray
 
+$IsccArgs = @()
+
+if ($Sign) {
+    # Inno Setup signs the installer and its uninstaller itself through the "azure" sign tool
+    # that sic.iss enables under /DSign. In the command, $q is a quote and $f the quoted file name.
+    $SignCommand = '$q' + $SignToolPath + '$q sign /fd SHA256 /tr ' + $TimestampUrl + ' /td SHA256 /dlib $q' + $DlibPath + '$q /dmdf $q' + $SigningConfigPath + '$q $f'
+    $IsccArgs += @("/DSign", "/Sazure=$SignCommand")
+}
+
+$IsccArgs += $IssPath
+
 try {
-    & "$InnoSetupPath" "$IssPath"
+    & "$InnoSetupPath" @IsccArgs
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Installer compilation failed with exit code $LASTEXITCODE"
@@ -153,6 +279,11 @@ if ($InstallerFiles.Count -eq 0) {
 
 $Installer = $InstallerFiles[0]
 $FileSize = [math]::Round($Installer.Length / 1MB, 2)
+
+# The appcast below signs the installer's bytes, so it must already carry its Authenticode signature
+if ($Sign) {
+    Assert-Signed $Installer.FullName
+}
 
 if ($Installer.Name -match 'v([\d.]+)-setup') {
     $Version = $Matches[1]
