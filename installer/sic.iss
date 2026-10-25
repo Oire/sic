@@ -1,8 +1,8 @@
 ; SIC! InnoSetup Installer Script
-; Copyright © 2026 Oire Software SARL.
+; Copyright © 2026 Oire Software.
 
 #define MyAppName "SIC!"
-#define MyAppPublisher "Oire Software SARL"
+#define MyAppPublisher "Oire Software"
 #define MyAppCompany "Oire"
 #define MyAppFolderName "Sic"
 #define MyAppURL "https://sic.oire.dev"
@@ -39,6 +39,12 @@ OutputBaseFilename=sic-v{#MyAppVersion}-setup
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
+
+; Code signing: Build-Installer.ps1 passes /DSign and the "azure" sign tool command when signing.json exists
+#ifdef Sign
+SignTool=azure
+SignedUninstaller=yes
+#endif
 
 ; Uninstall configuration
 UninstallDisplayName={#MyAppName} {#MyAppVersion}

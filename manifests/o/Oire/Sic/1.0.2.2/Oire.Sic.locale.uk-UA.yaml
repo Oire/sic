@@ -4,7 +4,7 @@
 PackageIdentifier: Oire.Sic
 PackageVersion: 1.0.2.2
 PackageLocale: uk-UA
-Publisher: Oire Software SARL
+Publisher: Oire Software
 PublisherUrl: https://oire.org/
 PublisherSupportUrl: https://github.com/Oire/sic/issues
 Author: André Polykanine
@@ -12,7 +12,7 @@ PackageName: SIC!
 PackageUrl: https://sic.oire.dev/
 License: Apache-2.0
 LicenseUrl: https://github.com/Oire/sic/blob/master/LICENSE
-Copyright: Copyright © 2026 Oire Software SARL.
+Copyright: Copyright © 2026 Oire Software.
 ShortDescription: Простий конвертер зображень
 Description: Доступний конвертер форматів зображень для Windows. Пакетне перетворення зображень між 8 форматами з можливістю зміни розміру. Працює і як графічний застосунок, і як інструмент командного рядка.
 ReleaseNotesUrl: https://github.com/Oire/sic/releases/tag/v1.0.2.2

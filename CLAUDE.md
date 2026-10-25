@@ -201,7 +201,16 @@ The `installer/Build-Installer.ps1` script handles the full release pipeline:
 .\installer\Build-Installer.ps1 -Appcast -Deploy       # Build, appcast, and deploy via SCP
 .\installer\Build-Installer.ps1 -Appcast -NoPortable   # Skip portable ZIP (e.g., for beta releases)
 .\installer\Build-Installer.ps1 -SkipBuild             # Installer only (use existing binaries)
+.\installer\Build-Installer.ps1 -NoSign                # Unsigned build, even if signing.json exists
 ```
+
+### Code signing
+
+Releases are Authenticode-signed with **Azure Artifact Signing** (issue #86). The script signs whenever `installer/signing.json` (gitignored; copy `signing.example.json`) exists: `sic.exe` right after publish — so the installer and the portable ZIP both carry the signed exe — then the installer and its uninstaller through Inno Setup's own signing (`sic.iss` enables `SignTool=azure` only under `/DSign`, which the script passes along with the `/Sazure=` command). Every signed file is checked with `Get-AuthenticodeSignature` and the build fails on anything but `Valid`. The appcast is generated afterwards, which matters: its Ed25519 signature covers the installer's bytes, and Authenticode signing changes them. Without `signing.json`, a plain build warns and continues unsigned, but `-Appcast`/`-Deploy` refuse to run unless `-NoSign` says so.
+
+`signing.json` is the signtool plugin's own metadata file (`Endpoint`, `CodeSigningAccountName`, `CertificateProfileName`, `ExcludeCredentials`), passed as-is via `/dmdf`. Prerequisites on the build machine: `signtool.exe` from the Windows SDK, the Artifact Signing client tools (`winget install --id Microsoft.Azure.ArtifactSigningClientTools --exact`, which provide `Azure.CodeSigning.Dlib.dll` and need .NET 8+), and an Azure CLI session — sign in with `az login --use-device-code`, since the account picker that plain `az login` opens is not screen-reader accessible. Never drop the RFC 3161 timestamp (`/tr`): Artifact Signing certificates live about three days, and the timestamp is what keeps old signatures valid. `Magick.Native-Q16-x64.dll` already carries ImageMagick's signature and is left alone.
+
+The certificate subject is `Oire Software` — the company name exactly as registered, without the legal form. Keep the publisher name in `sic.iss`, the csproj and the About dialog identical to it.
 
 The script produces in `installer/Output/`:
 - `sic-v{version}-setup.exe` — Inno Setup installer
@@ -236,6 +245,8 @@ wingetcreate update -u 'https://github.com/Oire/sic/releases/download/v<VERSION>
 ```
 
 Without the `|x64` suffix the command fails with a "Multiple matches" error.
+
+**Next update only:** the manifests already in `microsoft/winget-pkgs` still say `Oire Software SARL` (the local copies in `manifests/` were corrected), and `wingetcreate update` carries the previous version's locale files over. Run it once with `--out .` instead of `--submit`, set `Publisher: Oire Software` and `Copyright: Copyright © 2026 Oire Software.` in every locale file of the new `manifests/o/Oire/Sic/<VERSION>/` folder, then submit it with `wingetcreate submit --token "$(gh auth token)" manifests/o/Oire/Sic/<VERSION>`. Delete this paragraph afterwards.
 
 ## Code Conventions
 

@@ -1,0 +1,6 @@
+{
+    "Endpoint": "https://<region>.codesigning.azure.net/",
+    "CodeSigningAccountName": "<artifact-signing-account>",
+    "CertificateProfileName": "<certificate-profile>",
+    "ExcludeCredentials": ["ManagedIdentityCredential", "InteractiveBrowserCredential"]
+}

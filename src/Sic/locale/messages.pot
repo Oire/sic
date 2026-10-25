@@ -778,7 +778,7 @@ msgid "Nothing to convert"
 msgstr ""
 
 #: ..\..\AboutDialog.Designer.cs:78
-msgid "Oire Software SARL"
+msgid "Oire Software"
 msgstr ""
 
 #: ..\..\SettingsDialog.cs:123

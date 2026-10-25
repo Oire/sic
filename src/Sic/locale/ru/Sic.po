@@ -785,8 +785,8 @@ msgid "Nothing to convert"
 msgstr "Нет изображения для конвертации"
 
 #: ..\..\AboutDialog.Designer.cs:78
-msgid "Oire Software SARL"
-msgstr "Oire Software SARL"
+msgid "Oire Software"
+msgstr "Oire Software"
 
 #: ..\..\SettingsDialog.cs:123
 msgid "Once a day"

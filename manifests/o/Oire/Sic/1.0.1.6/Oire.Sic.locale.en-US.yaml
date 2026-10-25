@@ -4,7 +4,7 @@
 PackageIdentifier: Oire.Sic
 PackageVersion: 1.0.1.6
 PackageLocale: en-US
-Publisher: Oire Software SARL
+Publisher: Oire Software
 PublisherUrl: https://oire.org/
 PublisherSupportUrl: https://github.com/Oire/sic/issues
 Author: André Polykanine
@@ -12,7 +12,7 @@ PackageName: SIC!
 PackageUrl: https://sic.oire.dev/
 License: Apache-2.0
 LicenseUrl: https://github.com/Oire/sic/blob/master/LICENSE
-Copyright: Copyright © 2026 Oire Software SARL.
+Copyright: Copyright © 2026 Oire Software.
 ShortDescription: Simple Image Converter
 Description: An accessible image format converter for Windows. Batch-convert images between 8 formats with optional resizing. Works as both a GUI app and a command-line tool.
 Moniker: oire-sic
