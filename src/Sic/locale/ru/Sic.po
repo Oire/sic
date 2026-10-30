@@ -390,7 +390,7 @@ msgstr "Конвертировать &всё"
 
 #: ..\..\MainWindow.Designer.cs:191 ..\..\MainWindow.Designer.cs:444
 msgid "Convert &Selected"
-msgstr "Конвертировать &выбранное"
+msgstr "Конвертировать в&ыбранное"
 
 #: ..\..\MainWindow.cs:793 ..\..\Program.cs:285
 #, csharp-format
@@ -461,7 +461,7 @@ msgstr "Загрузка..."
 
 #: ..\..\MainWindow.Designer.cs:161
 msgid "E&xit"
-msgstr "В&ыход"
+msgstr "Вы&ход"
 
 #: ..\..\Program.cs:205
 msgid "Either --output or --format must be specified."
