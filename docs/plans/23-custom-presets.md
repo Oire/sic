@@ -19,7 +19,8 @@ It's the third of four plans. `89-json-config` must be merged first.
 - [ ] A preset can be added, edited and removed with the keyboard, and the menu updates straight away.
 - [ ] `sic -i a.png --preset Blog` converts with the preset. An explicit `--output` extension, `--format`, `--resize` or `--crop` wins over the matching part of the preset.
 - [ ] An unknown `--preset` name exits with `ExitCode.Error` and lists the available presets on stderr.
-- [ ] An invalid preset in a hand-edited `sic.json` is never lost silently: the file is backed up and the user is told.
+- [ ] An invalid preset in a hand-edited `sic.json` drops only that preset, and is never lost silently: the file is backed up and the user is told.
+- [ ] Saving Settings, or anything else, never loses presets.
 - [ ] A size that SIC! fills in itself never triggers an "invalid size" error.
 - [ ] All new strings are translated into de, es, fr, he, ru and uk, and all 7 manuals are updated.
 - [ ] all validation commands pass
@@ -74,7 +75,7 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 - One task at a time; the validation commands pass before the next task starts.
 - Code changes come with tests for the new and changed behavior, success and error paths. Forms have no automated tests here, so keep logic in plain classes that can be tested and keep form code thin.
-- A test that cannot pass until a later task is still written now, marked with a comment naming that task.
+- A test that cannot pass until a later task is still written now, with `[Fact(Skip = "Task N")]`, so the validation commands keep passing.
 - Keep backward compatibility: the CLI's existing options keep working. The only intended behavior changes are listed under Technical details.
 - When scope changes, update this plan: new tasks get a "➕" prefix, blockers a "⚠️" prefix.
 
@@ -93,14 +94,16 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 #### Steps
 
 - [ ] Add `ResizeValidator` as under Technical details. It's pure: no dialogs, no focus handling, no gettext.
-- [ ] Replace the parsing in `MainWindow.TryGetConversionParams` with `Validate`, keeping the same dialogs and focus behavior for each error. Add one new message for a mistyped value when the other size is valid.
-- [ ] Add `ResizeValidator.ScaleDimension(target, sourceFrom, sourceTo)`, returning a size clamped to 1..`MaxDimension`, and use it in `AutoFillFromWidth` and `AutoFillFromHeight`. Today a 4000x100 image at width 16 gets height 0, which the stricter validation would reject.
-- [ ] Replace the parsing in `Program.RunCli` with `TryParseSpec` and `Validate`, keeping the existing stderr messages and exit codes.
+- [ ] Replace the parsing in `MainWindow.TryGetConversionParams` with `Validate`, using the GUI mapping under Technical details, with new per-box messages for a mistyped size in keep mode.
+- [ ] Add `ResizeValidator.ScaleDimension(target, sourceFrom, sourceTo)`, returning a size clamped to 1..`MaxDimension`, working in `double` and clamping before the cast, and use it in `AutoFillFromWidth` and `AutoFillFromHeight`. Today a 4000x100 image at width 16 gets height 0, which the stricter validation would reject.
+- [ ] Clamp in `PopulateResizeFieldsFromSelection` with `Math.Min(value, ResizeValidator.MaxDimension)`, because an image above 65535 px on a side would otherwise fail with a size SIC! typed itself.
+- [ ] Replace the parsing in `Program.RunCli` with `TryParseSpec` and `Validate`, using the CLI mapping under Technical details. It always passes `KeepProportions`, and the existing crop check stays where it is.
 - [ ] tests for `Validate`: keep mode with width only, height only and both; crop with both; the limits 1 and 65535
 - [ ] tests for `Validate`: blank fields, 0, 65536, non-numeric text with the other size valid, and crop missing either size
+- [ ] tests for the evaluation order: crop `("abc", "1")` gives `InvalidWidth`, crop `("", "abc")` gives `CropNeedsWidth`, and keep `("abc", "")`, `("", "abc")` and `("abc", "xyz")` give `InvalidWidth`, `InvalidHeight` and `InvalidWidth`
 - [ ] tests for `TryParseSpec`: `128x128`, `128x`, `x128`, `128`, `128X128`, and the rejected `1x2x3`
-- [ ] tests for `ScaleDimension`: a normal ratio, rounding to 0 giving 1, and a result above 65535 giving 65535
-- [ ] Add a `CliTests` case: `--resize 70000x` now fails.
+- [ ] tests for `ScaleDimension`: a normal ratio, rounding to 0 giving 1, a result above 65535 giving 65535, and a huge target that would overflow an `int`
+- [ ] Add `CliTests` cases: `--resize 70000x` now fails, and `--resize 128x --crop` keeps its existing message.
 - [ ] validation commands pass
 
 ### Task 2: Add presets to the configuration
@@ -111,22 +114,26 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 - Create: `src/Sic/Services/PresetValidator.cs`
 - Create: `tests/Sic.Tests/PresetValidatorTests.cs`
 - Modify: `src/Sic/Models/AppConfig.cs`
-- Modify: `src/Sic/Models/ConfigLoadResult.cs`
 - Modify: `src/Sic/Utils/ConfigSerializer.cs`
 - Modify: `src/Sic/Utils/Config.cs`
 - Modify: `tests/Sic.Tests/ConfigSerializerTests.cs`
+- Modify: `tests/Sic.Tests/ConfigTests.cs`
 
 #### Steps
 
 - [ ] Add `ConversionPreset` as under Technical details, and `Presets` to `AppConfig`.
 - [ ] Add `PresetValidator`: `ValidateName(name, takenNames)` returning an enum (`Valid`, `Empty`, `TooLong`, `InvalidCharacters`, `Duplicate`), `Normalize(presets)` for loaded data, and `EscapeForMenu(name)`.
-- [ ] In `ConfigSerializer`, run `Normalize` on load. When it drops anything, copy the file to `sic.json.bad` before anything can save over it, and put a message naming the count in `LoadError`.
-- [ ] Add `public static List<ConversionPreset> Presets { get; set; }` to `Config`.
+- [ ] In `ConfigSerializer`, read `presets` entry by entry from the `JsonDocument`, deserializing each to `ConversionPreset`, so that an entry that fails counts as dropped rather than sending the whole file to the corrupt path. Then run `Normalize`.
+- [ ] When anything is dropped, call `BackUpFile` before anything can save over it, and put a complete translated message naming the count in `LoadError`. If the backup fails, set `SavesBlocked` and say so.
+- [ ] Add `public static List<ConversionPreset> Presets { get; set; }` to `Config`. `Load` sets it from `result.Config.Presets`, and `Save` passes both `General` and `Presets`.
 - [ ] tests for `ValidateName`: trimmed names, 64 characters, Cyrillic and Hebrew names
 - [ ] tests for `ValidateName`: empty, 65 characters, tab and other control characters, duplicates differing only by case
-- [ ] tests for `Normalize`: each unusable case under Technical details is dropped, order is kept, the format is upper-cased, and JPEG maps to JPG and TIF to TIFF
+- [ ] tests for `Normalize`: each unusable case under Technical details is dropped, order is kept, the format is upper-cased, JPEG maps to JPG and TIF to TIFF, and a preset with no sizes stores `KeepProportions`
 - [ ] tests for `EscapeForMenu`: `R&D` becomes `R&&D`, `MenuTextFormatter.ExtractMnemonic(EscapeForMenu("R&D"))` is null, and a name with no ampersand is unchanged
-- [ ] tests for `ConfigSerializer`: presets round trip, null `presets` and `presets: [null]` load safely, and a file with a dropped preset is backed up to `sic.json.bad` and reported
+- [ ] tests for `ConfigSerializer`: presets round trip, null `presets`, `presets: {}` and `presets: [null]` load safely, and a file with a dropped preset is backed up and reported
+- [ ] tests for per-entry recovery: `"resizeMode": "Fit"`, `"resizeMode": 5`, `"width": "300"`, `"width": 300.5`, `"name": null` and `"format": null` each drop one preset, while the other presets and the `general` values survive
+- [ ] tests for a failed backup: with the `.bad` file locked, `SavesBlocked` is true and the file is unchanged
+- [ ] tests for `Config`: load a file with presets, change a general setting, call `Save`, reload, and assert the presets are still there
 - [ ] validation commands pass
 
 ### Task 3: Add --preset to the CLI
@@ -140,13 +147,15 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `PresetResolver` with `Find(presets, name)`, matching case-insensitively, and `ResolveResize(preset, hasExplicitResize, explicitWidth, explicitHeight, crop)`, following the precedence under Technical details.
+- [ ] Add `PresetResolver` with `Find(presets, name)`, matching case-insensitively, and `ResolveResize(preset, hasExplicitResize, explicitWidth, explicitHeight, crop)` returning `(int? Width, int? Height, ResizeMode Mode)`. It accepts a null preset, because every run goes through the merge, and follows the precedence under Technical details.
 - [ ] Add `var presetOption = new Option<string?>("--preset", "-p")` with a localized description, and register it on the root command.
-- [ ] Unknown preset: log it, print the error and the available names to stderr, and return `ExitCode.Error`. Say so plainly when there are no presets.
-- [ ] Target format order: `--output` extension, then `--format`, then the preset. Move the output-path block out of the `--format` branch (`Program.cs:193-202`) so it also runs when only the preset gives the format. Update the "Either --output or --format" error to mention `--preset`, and update its assertion in `CliTests`.
+- [ ] Look the preset up before the format chain, so an unknown name fails even when the preset isn't needed. Unknown preset: log it, print the error and the available names to stderr, and return `ExitCode.Error`. Say so plainly when there are no presets.
+- [ ] Target format order: `--output` extension, then `--format`, then the preset. Update the "Either --output or --format" error to mention `--preset`, and update its assertion in `CliTests`.
+- [ ] Move the block that builds the default output path out of the `--format` branch, to after the supported-format check, under `if (string.IsNullOrWhiteSpace(output))`. It then also runs when only the preset gives the format, `-o` is never overwritten, and a bad `--format` no longer creates the output folder.
+- [ ] Keep the crop check on the `crop` flag, after the merge, so a preset with no sizes can't trigger it.
 - [ ] tests for `Find`: exact match, different case, Cyrillic, unknown name, empty list
-- [ ] tests for `ResolveResize`: preset only; `--resize` replacing the preset's size and mode; `--crop` alone over a preset with both sizes; crop with one size reports the error; a preset with no resize
-- [ ] `CliTests`, writing a `sic.json` into `App.DataFolder`: preset only, with the default output path; `--output` extension beating the preset; `--format` beating it; an unknown preset's exit code and stderr; no presets at all
+- [ ] tests for `ResolveResize`: a null preset; preset only; `--resize` replacing the preset's size and mode; `--crop` alone over a preset with both sizes; a preset with no resize
+- [ ] `CliTests`, writing a `sic.json` into `App.DataFolder` and using `TestDataFolder.Clear()`: preset only, with the default output path; `--output` extension beating the preset with the preset's sizes still applied; `-o noext --preset` keeping its existing error; `--format` beating it; `--crop` with a one-size preset giving the crop error; an unknown preset's exit code and stderr, even with `--format`; no presets at all
 - [ ] validation commands pass
 
 ### Task 4: Add the testable preset helpers
@@ -161,11 +170,11 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `ImageConverter.GetDropdownFormats(enabledKeys, sessionFormats)`: the enabled formats plus the session formats, in `GetSupportedFormats` order. When `enabledKeys` is empty every format is already shown, so session formats must not be passed to `GetEnabledFormats` then.
+- [ ] Add `ImageConverter.GetDropdownFormats(enabledKeys, sessionFormats)`: call `GetEnabledFormats(enabledKeys)`, add the session formats, then filter `GetSupportedFormats()` by that set, so the order stays canonical. Never pass the combined keys to `GetEnabledFormats`: an empty list means "all formats", and it also has a fallback when nothing it's given is known.
 - [ ] Add a private `HashSet<string> _sessionFormats` to `MainWindow`, and make `PopulateFormatComboBox` use `GetDropdownFormats`.
-- [ ] Add `PresetCapturer.Capture(format, resizeEnabled, mode, widthText, heightText, lastTyped)` and a `DimensionBox` enum (`None`, `Width`, `Height`), with the rules under Technical details.
-- [ ] tests for `GetDropdownFormats`: no session formats, a hidden format added in canonical order, empty `enabledKeys` still showing all, and no duplicates
-- [ ] tests for `Capture`: resize off, crop, keep mode with each `lastTyped` value, and unparsable text
+- [ ] Add `PresetCapturer.Capture(format, resizeEnabled, mode, widthText, heightText, autoFilledBox)` and a `DimensionBox` enum (`None`, `Width`, `Height`), with the rules under Technical details.
+- [ ] tests for `GetDropdownFormats`: no session formats, a hidden format added in canonical order, empty `enabledKeys` still showing all, `enabledKeys` matching nothing known still showing all, and no duplicates
+- [ ] tests for `Capture`: resize off; crop; keep mode with each `autoFilledBox` value; both boxes typed with no selection; one box cleared while the other holds a size; unparsable text; and no sizes storing `KeepProportions`
 - [ ] validation commands pass
 
 ### Task 5: Apply a preset in the main window
@@ -176,12 +185,13 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `_isApplyingPreset`, `_presetSizesPinned` and `DimensionBox _lastTypedBox` fields.
+- [ ] Add `_isApplyingPreset`, `_presetSizesPinned` and `DimensionBox _autoFilledBox` fields.
 - [ ] Add `ApplyPreset(ConversionPreset preset)` exactly as under Technical details. It doesn't use `_isAutoFilling`.
 - [ ] `WidthTextBox_TextChanged`, `HeightTextBox_TextChanged` and `ResizeModeRadioButton_CheckedChanged` return at once when `_isApplyingPreset` is set.
 - [ ] `ResizeCheckBox_CheckedChanged` still enables and disables the fields when `_isApplyingPreset` is set, but skips `PopulateResizeFieldsFromSelection` and `UpdatePreview`. It must not return early, or the boxes stay disabled.
 - [ ] `ImageListView_SelectedIndexChanged` skips `PopulateResizeFieldsFromSelection` while `_presetSizesPinned` is set.
-- [ ] Clear the pin when the user edits a size box, toggles the resize checkbox or switches the radio buttons, which means in those handlers when neither `_isApplyingPreset` nor `_isAutoFilling` is set. Record `_lastTypedBox` in the text handlers under the same condition, and reset it to `None` in `PopulateResizeFieldsFromSelection`.
+- [ ] Clear the pin when the user edits a size box, toggles the resize checkbox or switches the radio buttons, which means in those handlers when neither `_isApplyingPreset` nor `_isAutoFilling` is set.
+- [ ] Set `_autoFilledBox` in `AutoFillFromWidth` and `AutoFillFromHeight` when they write a box, and clear it when the user edits that box. Set it to `None` in `ApplyPreset`.
 - [ ] validation commands pass
 
 ### Task 6: Add the preset editor dialog
@@ -194,10 +204,11 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 #### Steps
 
 - [ ] Build the designer as a flat `TableLayoutPanel`: name, format dropdown, resize checkbox, a keep proportions or crop group, width, height, a hint label, OK and Cancel. Give every control a mnemonic and a logical tab order.
-- [ ] Constructor `PresetDialog(ConversionPreset? initial, IEnumerable<string> takenNames, bool isEdit)`. Follow the standard constructor order, and set the title to "Add Preset" or "Edit Preset". The dropdown lists `GetSupportedFormats()`, not only the enabled formats. When editing, callers leave the preset's own name out of `takenNames`, so a case-only rename works.
+- [ ] Constructor `PresetDialog(ConversionPreset? initial, IEnumerable<string> takenNames, bool isEdit)`. Follow the standard constructor order, and set the title to "Add Preset" or "Edit Preset". The dropdown lists `GetSupportedFormats()`, not only the enabled formats, and selects the first when `initial` is null. When editing, callers leave the preset's own name out of `takenNames`, so a case-only rename works.
 - [ ] Use the checkbox-enabled fields from `FitToSizeDialog`. Unlike the main window, typing one size must never auto-fill the other.
 - [ ] Add the hint: "With Keep proportions, fill in one size to scale every image to it, or both to fit images inside that box."
-- [ ] Validate in `OnFormClosing` with `PresetValidator.ValidateName` and `ResizeValidator.Validate`, showing one specific message per error and moving focus to the field. Expose the outcome as `public ConversionPreset? Result { get; private set; }`.
+- [ ] Validate in `OnFormClosing` with `PresetValidator.ValidateName`, and with `ResizeValidator.Validate` only when Resize is ticked, because stale text in a disabled box must not block OK. Show one specific message per error and move focus to the field.
+- [ ] Expose the outcome as `public ConversionPreset? Result { get; private set; }`. With Resize unticked it has null sizes and `KeepProportions`.
 - [ ] validation commands pass
 
 ### Task 7: Add the Manage Presets dialog
@@ -206,11 +217,16 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 - Create: `src/Sic/ManagePresetsDialog.cs`
 - Create: `src/Sic/ManagePresetsDialog.Designer.cs`
+- Create: `src/Sic/Services/PresetDescriber.cs`
+- Create: `tests/Sic.Tests/PresetDescriberTests.cs`
 
 #### Steps
 
+- [ ] Set `Text = _("Manage Presets")` in the constructor, after `TextDirection.Apply`, because the extractor can't see a form's own title.
+
 - [ ] Build the designer from `IcoPresetDialog`: a `ListBox` labeled "Presets", then Add, Edit, Remove and Close buttons.
-- [ ] Each list row reads as the preset's name plus a plain summary, such as "Blog: WEBP, width 300". Put the summary text in a method on `ConversionPreset` or `PresetValidator` and test it.
+- [ ] Add `PresetDescriber.Describe(preset)`, and show each list row as the preset's name plus that summary, such as "Blog: WEBP, width 300".
+- [ ] tests for `Describe`, one for each form: "WEBP", "WEBP, width 300", "WEBP, height 200", "WEBP, fit inside 800x600" and "PNG, crop to 128x128"
 - [ ] Add and Edit open `PresetDialog`. Remove asks for confirmation through `DialogHelper.Show`. Edit and Remove are disabled with nothing selected, and focus returns to the list predictably after each action.
 - [ ] Work on a copy of `Config.Presets`. In `OnFormClosing`, so Esc and Alt+F4 don't lose edits, write it back, call `Config.Save()`, and set a `Changed` property for the caller.
 - [ ] validation commands pass
@@ -222,16 +238,14 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 - Create: `src/Sic/Utils/PresetMenuBuilder.cs`
 - Create: `tests/Sic.Tests/PresetMenuBuilderTests.cs`
 - Modify: `src/Sic/MainWindow.cs`
-- Modify: `tests/Sic.Tests/TranslationCatalogTests.cs`
 
 #### Steps
 
 - [ ] Add `PresetMenuBuilder.AddTo(NativeMenuSpec convert, presets, onApply, onAdd, onManage)`, appending a separator and `convert.AddMenu(_("&Presets"), ...)`. It lists each preset through `PresetValidator.EscapeForMenu`, then a separator, `_("&Add Preset...")` and `_("&Manage Presets...")`.
 - [ ] Show a disabled "No presets yet" item when the list is empty, so a screen reader user hears why the top of the menu has no presets.
-- [ ] Call it at the end of the Convert block in `BuildMenuSpec`. In `ApplyMenuState`, stop disabling the Convert menu as a whole; its children keep their own flags, and Presets stays enabled.
+- [ ] Call it at the end of the Convert block in `BuildMenuSpec`. In `ApplyMenuState`, remove both `convert.IsEnabled = _hasItems` and `edit.IsEnabled = _hasItems`; their children keep their own flags, and Presets stays enabled. Root items are pushed to Windows only when the menu is built, so a rebuild would otherwise freeze the Edit menu at whatever the queue state was then.
 - [ ] Add Preset opens `PresetDialog` pre-filled from `PresetCapturer.Capture`. After OK, append to `Config.Presets`, call `Config.Save()` and rebuild with `_menuBar?.Attach(BuildMenuSpec())` once the dialog has closed. Manage Presets rebuilds the same way when `Changed` is true.
-- [ ] tests: a spec with presets named `R&D`, `Blog` and `Banner` passes `MenuSpecValidator.Validate`; an empty list gives one disabled row; 200 presets pass
-- [ ] Add the Convert and Presets menu strings to the mnemonic lists in `TranslationCatalogTests`.
+- [ ] tests: a spec with presets named `R&D`, `Blog` and `Banner` passes `MenuSpecValidator.Validate`; an empty list gives one disabled row; 200 presets pass. `NativeMenuSpec.Add` needs a non-null `onClick`, so the disabled row passes a no-op.
 - [ ] validation commands pass
 
 ### Task 9: Translate all new strings
@@ -240,12 +254,14 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 - Modify: `src/Sic/locale/messages.pot`
 - Modify: `src/Sic/locale/{de,es,fr,he,ru,uk}/Sic.po`
+- Modify: `tests/Sic.Tests/TranslationCatalogTests.cs`
 
 #### Steps
 
 - [ ] Run `Extract-Strings.ps1`, then `Update-Translations.ps1`.
 - [ ] Translate every new string in all six languages, reusing each language's existing word for "preset".
 - [ ] Remove every `#, fuzzy` flag on new entries. Window titles must have no `&` and no trailing `...`.
+- [ ] Add `&Presets` to `ConvertMenuStrings` in `TranslationCatalogTests`, and a new `PresetsMenuStrings` with `&Add Preset...` and `&Manage Presets...`.
 - [ ] Run `Compile-Translations.ps1`.
 - [ ] validation commands pass, including `TranslationCatalogTests`
 
@@ -317,13 +333,16 @@ A preset resizes exactly when it has a size, so there is no separate flag that c
 
 An entry is unusable, and dropped with a logged warning, when any of these is true:
 
-- it is null, or its name fails `ValidateName`
+- it is null, or its name or format is null
+- its name fails `ValidateName`
 - its name duplicates an earlier entry, ignoring case
 - its format isn't in `GetSupportedFormats()` after upper-casing and mapping JPEG to JPG and TIF to TIFF (this excludes HEIC, which is input-only)
 - a size is outside 1..`ResizeValidator.MaxDimension`
-- its mode is Crop with only one size
+- its mode is an undefined enum value, or Crop with only one size
 
-Because dropped entries would disappear from disk on the next save, `ConfigSerializer` copies the file to `sic.json.bad` first and tells the user how many were dropped.
+A preset with no sizes is stored with `KeepProportions`, in `Normalize`, `PresetDialog.Result` and `PresetCapturer.Capture`. A leftover Crop there would select the Crop radio button while Resize is off.
+
+Entries that fail to deserialize, such as `"width": "300"`, count as dropped too. Because dropped entries would disappear from disk on the next save, `ConfigSerializer` calls `BackUpFile` first and tells the user how many were dropped.
 
 Names are at most 64 characters, trimmed, with no control characters, and unique ignoring case.
 
@@ -341,15 +360,29 @@ internal static class ResizeValidator {
 ```
 
 - `Validate` trims both texts. Non-empty text that isn't an integer from 1 to `MaxDimension` is an error.
-- In keep mode, at least one size is required. In crop mode, both are.
+- It checks the width first, then the height.
+- In crop mode, a blank box gives `CropNeedsWidth` or `CropNeedsHeight`, and bad text gives `InvalidWidth` or `InvalidHeight`.
+- In keep mode, bad text gives `InvalidWidth` or `InvalidHeight`, and two blanks give `MissingDimension`.
 - `TryParseSpec` keeps the CLI's accepted forms: `WxH`, `Wx`, `xH` and a bare `W`.
+
+GUI mapping in `TryGetConversionParams`:
+
+- Crop with `InvalidWidth` or `CropNeedsWidth`: the existing "Crop mode requires a valid width" dialog, focusing width. The same for height.
+- Keep with `MissingDimension`: the existing "at least one valid dimension" dialog, focusing width.
+- Keep with `InvalidWidth` or `InvalidHeight`: a new per-box message that focuses the bad box, whatever the other box holds.
+
+CLI mapping in `RunCli`, which always passes `KeepProportions`:
+
+- `TryParseSpec` returning false: the existing "Use WxH, Wx, xH, or W" message.
+- `InvalidWidth`: "Invalid width value: {0}" with the width text. `InvalidHeight`: the height equivalent.
+- `MissingDimension`: the existing "At least one dimension is required" message.
 
 ### PresetCapturer rules
 
-- Resize off: no sizes.
+- Resize off: no sizes, and `KeepProportions`.
 - Text that isn't a valid size is left out.
 - Crop keeps both sizes.
-- Keep proportions keeps only the box the user last typed in, because the other was auto-filled for one image and would turn the preset into a fit-inside-a-box. With nothing typed, it keeps both boxes as shown.
+- Keep proportions leaves out only the box SIC! filled itself (`autoFilledBox`), because that value was calculated for one image and would turn the preset into a fit-inside-a-box. Everything the user typed stays, so typing both sizes with nothing selected keeps both.
 
 ### ApplyPreset
 
@@ -373,7 +406,7 @@ private void ApplyPreset(ConversionPreset preset) {
     }
 
     _presetSizesPinned = preset.Resizes;
-    _lastTypedBox = DimensionBox.None;
+    _autoFilledBox = DimensionBox.None;
     UpdatePreview();
     statusLabel.Text = _("Preset applied: {0}", preset.Name);
 }
@@ -384,14 +417,23 @@ private void ApplyPreset(ConversionPreset preset) {
 - Format: `--output` extension, then `--format`, then the preset.
 - Size and mode with `--resize`: the sizes come from `--resize`, the mode comes only from `--crop`, and the preset's resize settings are ignored entirely.
 - Without `--resize`: sizes come from the preset, and the mode is Crop if `--crop` is given, otherwise the preset's mode.
-- The existing check that crop needs both sizes runs after this merge.
+- The existing check that crop needs both sizes runs after this merge, on the `crop` flag.
+
+The default output path is built after the supported-format check, under `if (string.IsNullOrWhiteSpace(output))`, so:
+
+- `-o a.jpg`, alone or with a preset: the extension wins, `-o` is kept, and preset sizes still apply.
+- `-o noext` with a preset: the existing error stays.
+- `--format`, alone or with a preset: the format wins, with the default path.
+- A preset alone: the preset's format, with the default path.
+- None of the three: the updated error.
 
 ### Intended behavior changes
 
-- The GUI now reports a mistyped size even when the other size is valid. It used to drop it silently.
+- The GUI now gives a mistyped size its own message and moves focus to that box, whatever the other box holds. It used to drop it silently, or show the general message.
 - The CLI now rejects sizes above 65535, matching the GUI. It had no upper limit.
-- Auto-filled sizes are clamped to 1..65535. They could be 0 or too large before.
-- The Convert menu is always enabled, with its items enabled individually. It used to be disabled while the queue was empty, which would have hidden Presets.
+- Filled-in sizes are clamped to 1..65535. They could be 0 or too large before.
+- The Edit and Convert menus are always enabled, with their items enabled individually. Convert being disabled on an empty queue would have hidden Presets.
+- A bad `--format` no longer creates the output folder.
 
 ### Out of scope
 
@@ -406,4 +448,6 @@ private void ApplyPreset(ConversionPreset preset) {
 - Convert a mixed portrait and landscape batch with a width-only preset, and confirm every result is 300 px wide.
 - Apply a preset with a format unticked in Settings, and confirm the format stays in the dropdown until SIC! closes.
 - Check whether the "Preset applied" status text is heard after the menu closes. If it isn't, decide whether SIC! needs a spoken announcement there; the other status messages have the same limitation.
+- Apply a no-resize preset while focus is in a size box. Disabling that box should move focus, and the result should be heard.
+- Start with an empty queue, add an image, and confirm Alt+E and Alt+C open their menus.
 - Launch once in each language to confirm the menu attaches, and check the dialogs and menu in Hebrew for right-to-left layout.
