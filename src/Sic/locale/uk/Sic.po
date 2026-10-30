@@ -265,7 +265,7 @@ msgstr "Додати папку"
 
 #: ..\..\MainWindow.Designer.cs:130
 msgid "Add Image by &Link..."
-msgstr "Додати зображення за &посиланням..."
+msgstr "Додати зображення за п&осиланням..."
 
 #: ..\..\AddUrlDialog.cs:14
 msgid "Add Image by Link"
@@ -393,7 +393,7 @@ msgstr "Конвертувати &все"
 
 #: ..\..\MainWindow.Designer.cs:191 ..\..\MainWindow.Designer.cs:444
 msgid "Convert &Selected"
-msgstr "Конвертувати &вибране"
+msgstr "Конвертувати в&ибране"
 
 #: ..\..\MainWindow.cs:793 ..\..\Program.cs:285
 #, csharp-format
@@ -898,7 +898,7 @@ msgstr[2] "Оброблено {0} зображень."
 
 #: ..\..\MainWindow.Designer.cs:236
 msgid "Read User &Manual"
-msgstr "&Посібник користувача"
+msgstr "По&сібник користувача"
 
 #: ..\..\MainWindow.cs:298 ..\..\MainWindow.cs:324
 #: ..\..\MainWindow.Designer.cs:490 ..\..\MainWindow.cs:649
