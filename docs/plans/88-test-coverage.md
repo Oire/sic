@@ -4,7 +4,7 @@
 
 SIC! has no automated tests. This plan adds a test project and covers the code that exists today: conversion, resizing, ICO output, fit to file size, output paths, utilities, translation catalogs and the CLI.
 
-It changes no behavior. It's the first of four plans, and it comes first so that the JSON config, presets and portable work all refactor tested code. The order is `001-test-coverage`, `002-json-config`, `23-custom-presets`, `003-portable-no-traces`, each as its own pull request.
+It changes no behavior. It's the first of four plans, and it comes first so that the JSON config, presets and portable work all refactor tested code. The order is `88-test-coverage`, `89-json-config`, `23-custom-presets`, `90-portable-no-traces`, each as its own pull request.
 
 ## Done when
 

@@ -6,7 +6,7 @@ This plan replaces SharpConfig's INI file with one JSON file, `%APPDATA%\Oire\Si
 
 It also makes the GUI single-instance per data folder. Two windows sharing one config file would overwrite each other's changes, and presets make that loss matter. Starting SIC! a second time now brings the running window forward instead. The CLI stays free to run in parallel.
 
-It's the second of four plans. `001-test-coverage` must be merged first. `23-custom-presets` then adds a `presets` sub-object to this file, and `003-portable-no-traces` builds on the guard.
+It's the second of four plans. `88-test-coverage` must be merged first. `23-custom-presets` then adds a `presets` sub-object to this file, and `90-portable-no-traces` builds on the guard.
 
 ## Done when
 
@@ -49,7 +49,7 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 ### Patterns to follow
 
 - Error reporting: `Config.ReportError`, which routes to `DialogHelper.Show` in the GUI and `Console.Error` in the CLI.
-- Tests touching `Config`, `Console` or `Localization`: the `StaticStateCollection` from `001-test-coverage`.
+- Tests touching `Config`, `Console` or `Localization`: the `StaticStateCollection` from `88-test-coverage`.
 - Tests of the CLI: `tests/Sic.Tests/CliTests.cs`, calling `Program.RunCli`.
 
 ### Conventions and traps

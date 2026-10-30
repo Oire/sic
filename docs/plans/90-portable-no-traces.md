@@ -8,7 +8,7 @@ Worse, portable updates don't work. The appcast lists only `setup.exe`, so "upda
 
 This plan keeps NetSparkle, which already has the hooks needed, moves all of SIC!'s state into its own folder, and gives portable copies their own appcast and an in-place update.
 
-It's the last of four plans. `002-json-config` must be merged first, because the update flow has to release `SingleInstanceGuard`.
+It's the last of four plans. `89-json-config` must be merged first, because the update flow has to release `SingleInstanceGuard`.
 
 ## Done when
 

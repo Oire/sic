@@ -6,7 +6,7 @@ Issue #23 asks for named conversion presets: a user who always posts WebP images
 
 Presets live in a `presets` sub-object of `sic.json`. They're available from a Presets submenu under Convert and from a new `--preset` CLI option. Issue #35 (Explorer context menu) comes next and will call `--preset`, so the CLI part must be solid.
 
-It's the third of four plans. `002-json-config` must be merged first.
+It's the third of four plans. `89-json-config` must be merged first.
 
 ## Done when
 
