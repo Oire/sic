@@ -51,6 +51,7 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 ### Patterns to follow
 
 - Error reporting: `Config.ReportError`, which routes to `DialogHelper.Show` in the GUI and `Console.Error` in the CLI.
+- Single instance: Notika already uses this mutex and broadcast, in `C:\repos\accessmind\notika-windows\src\Notika\Utils\SingleInstance.cs` and `WndProc` in `Ui\MainWindow.cs`. Adapt it, and keep the differences listed under Technical details.
 - Tests touching `Config`, `Console` or `Localization`: the `StaticStateCollection` from `88-test-coverage`.
 - Tests of the CLI: `tests/Sic.Tests/CliTests.cs`, calling `Program.RunCli`. `TestDataFolder.Clear()` removes config files from `App.DataFolder` between tests.
 
@@ -89,9 +90,9 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 #### Steps
 
-- [ ] Add `GeneralSettings` with the same nine properties, defaults and XML docs as `Config.SectionGeneral`, plus `GetEnabledFormatKeys()`. Leave `Config.cs` alone until Task 4.
+- [ ] Add `GeneralSettings` with the same nine properties, defaults and XML docs as `Config.SectionGeneral`, plus `GetEnabledFormatKeys()`. `EnabledFormats` becomes a `List<string>`, empty by default. Leave `Config.cs` alone until Task 4.
 - [ ] Add `AppConfig` and `ConfigLoadResult` as described under Technical details.
-- [ ] tests for `GeneralSettings` defaults, and for `GetEnabledFormatKeys`: empty, spaces and blank entries
+- [ ] tests for `GeneralSettings` defaults, and for `GetEnabledFormatKeys`: an empty list, entries with spaces, and blank entries
 - [ ] validation commands pass
 
 ### Task 2: Read legacy Sic.cfg files
@@ -128,8 +129,10 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 - [ ] Add `BackUpFile(path)`, which keeps the newest copy as `sic.json.bad` and first renames an existing `.bad` to `sic.json.bad.<yyyyMMdd-HHmmss>`, so no backup is overwritten. The presets plan reuses it.
 - [ ] Implement the load flow under Technical details. It takes a folder argument and shows no UI, so tests can use temporary folders. It builds complete translated messages for `LoadError` and `SaveError`, and the corrupt-file message names `sic.json.bad`.
 - [ ] tests for loading: valid file, missing `general`, null `enabledFormats`, `language` and `lastInputFolder`, blank `outputFolder`, a hand-edited file with comments and trailing commas, and a file with a UTF-8 BOM
-- [ ] tests for per-value recovery: `"updateCheckInterval": "Hourly"` and `"confirmExitWithQueue": 5` keep their defaults, every other setting survives, the file is backed up, and the message names the count. An invalid `language` becomes `System`.
-- [ ] tests for round trips: every setting, with Cyrillic and Hebrew written as readable text rather than `\u` escapes
+- [ ] tests for encoding: a file saved in a legacy code page, which isn't valid UTF-8, takes the corrupt-file path and loses nothing
+- [ ] tests for per-value recovery: `"updateCheckInterval": "Hourly"`, `"confirmExitWithQueue": 5` and `"enabledFormats": "JPG,PNG"` keep their defaults, every other setting survives, the file is backed up, and the message names the count. An invalid `language` becomes `System`.
+- [ ] tests for round trips: every setting, with Cyrillic and Hebrew in `outputFolder` written as readable text rather than `\u` escapes
+- [ ] tests for the saved file: it's pretty-printed, one property per line, and UTF-8 with no BOM
 - [ ] tests for the default output folder: saved as `""`, loaded back as the current `App.DefaultOutputFolder`, including for migrated values; a custom folder stays as it is; `config.General.OutputFolder` still holds the full path after `Save`
 - [ ] tests for portable migration: a legacy `OutputFolder` ending in `\userdata\Converted` from another location becomes the default in portable mode only, ignoring case and trailing separators
 - [ ] tests for migration: `sic.json` is created, `Sic.cfg` becomes `Sic.cfg.bak`, and an existing `sic.json` always wins over `Sic.cfg`
@@ -155,6 +158,7 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 - [ ] `Load` stores `isGui` in a field and passes `ConfigLoadResult`'s messages to `ReportError` unchanged. `Save` uses that field instead of the hardcoded `isGui: true`, and only logs when `SavesBlocked` is set. `ReportError` stays private.
 - [ ] When saves are blocked, the load error says changes won't be saved this session.
 - [ ] In `Program.EnsureOutputFolderExists`, with `showGui: false`, warn on stderr and use the default for this run without calling `Config.Save()`. The CLI is the one writer the guard doesn't cover, and today an unplugged drive permanently resets the custom folder.
+- [ ] In `SettingsDialog`, assign `EnabledFormats` a list, empty when every format is ticked.
 - [ ] Remove `ConfigFileExtension`, update the `SettingsDialog.cs` cref to `GeneralSettings`, then delete `SectionGeneral` and the `sharpconfig-huanlin` package reference.
 - [ ] tests in the non-parallel collection: with `Load(isGui: false)` and `sic.json` held open, `Save()` writes to stderr and returns; `SavesBlocked` skips the write
 - [ ] tests through `Program.RunCli`, starting and ending with `TestDataFolder.Clear()`: a `Sic.cfg` with `Language=System` and an existing temporary `OutputFolder` placed in `App.DataFolder` migrates on a CLI run, output lands in that folder, and `sic.json` and `Sic.cfg.bak` appear
@@ -174,7 +178,7 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 - [ ] Add `SingleInstanceGuard` as under Technical details: `TryAcquire(dataFolder)`, `Dispose`, `ActivateExisting(dataFolder)`, `GetActivationMessage(dataFolder)` and `GetInstanceKey(dataFolder)`.
 - [ ] In `Program.Main`, on the GUI path only, before `Config.Load`: keep the guard in `internal static SingleInstanceGuard? InstanceGuard` for the app's lifetime. If it can't be acquired, call `ActivateExisting` and return `ExitCode.Success` without showing anything.
-- [ ] In `MainWindow`, keep `GetActivationMessage(App.DataFolder)` in a `static readonly` field, because an instance field that isn't set yet equals `WM_NULL`, and override `WndProc`. On that message, call `ShowWindow(Handle, SW_RESTORE)` if `IsIconic(Handle)`, so a maximized window stays maximized, then bring forward `GetLastActivePopup(Handle)`, so an open modal dialog gets focus rather than the disabled main window. These window P/Invokes stay private in `MainWindow`, beside the one at line 43.
+- [ ] In `MainWindow`, keep `GetActivationMessage(App.DataFolder)` in a `static readonly` field, because an instance field that isn't set yet equals `WM_NULL`, and override `WndProc`. On that message, as Notika does, call `BeginInvoke` and return, so nothing runs inside the message tick. The queued method calls `ShowWindow(Handle, SW_RESTORE)` if `IsIconic(Handle)`, so a maximized window stays maximized, then brings forward `GetLastActivePopup(Handle)`, so an open modal dialog gets focus rather than the disabled main window. These window P/Invokes stay private in `MainWindow`, beside the one at line 43.
 - [ ] tests for `TryAcquire`: a second acquire for the same folder returns null, a different folder succeeds, and acquiring works again after `Dispose`
 - [ ] tests for `Dispose`: it's idempotent, and disposing from another thread lets the next `TryAcquire` succeed
 - [ ] tests for `GetActivationMessage`: the same non-zero value for the same folder, and different values for different folders
@@ -228,17 +232,17 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
     "confirmExitWithQueue": true,
     "checkForUpdatesOnStartup": true,
     "detectClipboardData": false,
-    "enabledFormats": "",
+    "enabledFormats": [],
     "updateCheckInterval": "Daily"
   }
 }
 ```
 
-`enabledFormats` stays a comma-separated string so `GetEnabledFormatKeys` and its callers don't change.
+`enabledFormats` is an array of format keys, such as `["JPG", "PNG"]`, and an empty array means all formats. Migration splits the old comma-separated value. `GetEnabledFormatKeys` keeps its signature, so its callers don't change.
 
 `outputFolder` is saved as `""` when it equals `App.DefaultOutputFolder`, ignoring case and trailing separators, and a blank value loads as the default. At runtime `Config.General.OutputFolder` still holds the full path. This keeps a portable copy working after it moves, and stops a moved copy from writing back to its old location.
 
-Saving must not change the object it's given, or Settings would show an empty box. `Save` serializes to a `JsonNode` with `JsonSerializer.SerializeToNode`, blanks `general.outputFolder` on the node, then writes that. Working on the node also means any member added to `AppConfig` later is saved without further changes.
+Saving must not change the object it's given, or Settings would show an empty box. `Save` serializes to a `JsonNode` with `JsonSerializer.SerializeToNode`, blanks `general.outputFolder` on the node, then writes `node.ToJsonString(options)`, which keeps the file pretty-printed. Working on the node also means any member added to `AppConfig` later is saved without further changes.
 
 Migration in portable mode only: a legacy `OutputFolder` ending in `\userdata\Converted`, ignoring case and trailing separators, counts as the default. `Sic.cfg` stored the full path, so a 1.1 `userdata` folder copied into a new 1.2 folder would otherwise keep pointing at the old copy.
 
@@ -255,13 +259,17 @@ public sealed record ConfigLoadResult(
 
 ### JsonSerializerOptions
 
-`WriteIndented = true`, `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`, `PropertyNameCaseInsensitive = true`, `DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull`, `ReadCommentHandling = JsonCommentHandling.Skip`, `AllowTrailingCommas = true`, `Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping` (so Cyrillic and Hebrew stay readable in a hand-edited file), and a `JsonStringEnumConverter`.
+`WriteIndented = true`, `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`, `PropertyNameCaseInsensitive = true`, `DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull`, `ReadCommentHandling = JsonCommentHandling.Skip`, `AllowTrailingCommas = true`, `Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping`, and a `JsonStringEnumConverter`.
+
+The encoder is about values, such as folder paths and preset names. The default would write `Блог` as `\u0411\u043B\u043E\u0433`, which is still UTF-8 but unreadable in a text editor. Comments are a different matter: `Skip` tolerates them when reading, but they aren't kept, so the next save removes them.
+
+`sic.json` is always UTF-8. It's written with no BOM, and a BOM is accepted when reading, because Notepad can add one.
 
 ### Load flow
 
 Every path that produces values finishes with the same clean-up: a null `general` becomes defaults, null strings become their defaults, a blank `outputFolder` becomes `App.DefaultOutputFolder`, and a `language` that isn't `System` or a valid culture name becomes `System`.
 
-1. If `sic.json` exists, read it with sharing allowed (`FileShare.ReadWrite | FileShare.Delete`) and parse it with `JsonDocument`. Read `general` one property at a time, deserializing each value to its property's type. A value of the wrong type or an unknown enum name keeps its default and counts as bad. If anything was bad, call `BackUpFile` before going on, and report how many values were reset. If that backup fails, set `SavesBlocked`.
+1. If `sic.json` exists, read its bytes with sharing allowed (`FileShare.ReadWrite | FileShare.Delete`), skip a UTF-8 BOM, decode with `new UTF8Encoding(false, throwOnInvalidBytes: true)`, and parse the text with `JsonDocument`. Bytes that aren't valid UTF-8 count as invalid JSON (step 2). Read `general` one property at a time, deserializing each value to its property's type. A value of the wrong type or an unknown enum name keeps its default and counts as bad. If anything was bad, call `BackUpFile` before going on, and report how many values were reset. If that backup fails, set `SavesBlocked`.
 2. If the file isn't valid JSON, call `BackUpFile`, use defaults, write a new `sic.json` and report the error, naming `sic.json.bad`. If the backup fails, set `SavesBlocked`, write nothing, and leave `sic.json` in place.
 3. If `sic.json` can't be read (I/O or access error), use defaults, set `SavesBlocked`, and report the error. The file is left untouched.
 4. If `sic.json` doesn't exist and `Sic.cfg` does, read it with `LegacyConfigReader`. If reading fails, use defaults, set `SavesBlocked`, leave `Sic.cfg` alone and report the error, so the next run tries again. Otherwise write `sic.json`, and only after that succeeds move `Sic.cfg` to `Sic.cfg.bak`, overwriting an older one. A failed rename is logged and is harmless, because `sic.json` wins from then on. A failed write keeps `Sic.cfg` as it is, reports the error, and the migrated values are used for this run.
@@ -303,7 +311,7 @@ Parser rules:
 - A line starting with `[` is a section header. Read only keys inside `[General]`, matching key names case-insensitively, and ignore unknown keys.
 - Split at the first `=`, trim the value, and strip surrounding double quotes.
 - Nothing is escaped inside a value, and backslashes are literal.
-- Bools: `True`, `False`, `true`, `yes`, `1` and their negatives. Enums: exact member names. `Language`: `System` or a valid culture name.
+- Bools: `True`, `False`, `true`, `yes`, `1` and their negatives. Enums: exact member names. `Language`: `System` or a valid culture name. `EnabledFormats`: split at commas, trimming entries and dropping blanks.
 - A malformed line is skipped with a logged warning, where SharpConfig discarded the whole file.
 
 ### SingleInstanceGuard
@@ -314,7 +322,14 @@ Parser rules:
 - `Dispose` only closes the handle. It never calls `ReleaseMutex`, which throws on any thread but the owner, and the portable updater disposes the guard from another thread. It's idempotent. Closing the last handle destroys the mutex, so the next process gets `createdNew == true`.
 - `GetActivationMessage(dataFolder)`: returns `RegisterWindowMessage($"Oire.Sic.Activate.{key}")`. The P/Invoke lives here and needs `CharSet = CharSet.Unicode`, unlike the existing example at `MainWindow.cs:43`.
 - `ActivateExisting(dataFolder)`: call `AllowSetForegroundWindow(ASFW_ANY)`, because the new process is the one Windows lets take the foreground, then post `GetActivationMessage(dataFolder)` to `HWND_BROADCAST`.
-- `MainWindow` handles that message by restoring if iconic, then calling `SetForegroundWindow(GetLastActivePopup(Handle))`. Both are best effort, so Windows may only flash the taskbar button.
+- `MainWindow` handles that message through `BeginInvoke`, by restoring if iconic, then calling `SetForegroundWindow(GetLastActivePopup(Handle))`. Both are best effort, so Windows may only flash the taskbar button.
+
+This is Notika's `SingleInstance` with four deliberate differences:
+
+- The mutex and message names are keyed by data folder, because SIC! has portable copies that may run side by side.
+- `Dispose` never calls `ReleaseMutex`, because the portable updater releases the guard from another thread.
+- `TryAcquire` catches `UnauthorizedAccessException`, for a normal launch beside an elevated copy.
+- Restoring uses `SW_RESTORE` rather than `WindowState = Normal`, which would lose a maximized window, and it targets `GetLastActivePopup`, because SIC! can have a modal dialog open.
 
 The mutex is a kernel object that vanishes when SIC! exits, so it leaves nothing behind in portable mode. The CLI never takes it.
 
@@ -336,7 +351,7 @@ The mutex is a kernel object that vanishes when SIC! exits, so it leaves nothing
 - Run the GUI against a real installed `Sic.cfg` on Windows 10 and 11, and confirm settings carry over.
 - Run the portable ZIP with an existing `userdata` folder containing `Sic.cfg`.
 - Move a portable folder to another drive letter, and confirm no "output folder no longer exists" message appears.
-- With NVDA and JAWS: start SIC! a second time, with the window normal, minimized, maximized then minimized, and with Settings open, and confirm focus lands where it should.
+- With JAWS and NVDA: start SIC! a second time, with the window normal, minimized, maximized then minimized, and with Settings open, and confirm focus lands where it should.
 - Run two portable copies side by side, and a portable beside an installed copy. Run the CLI while the GUI is open.
 - Start SIC! normally while an elevated copy runs, and confirm there's no error dialog.
 - A downgrade to 1.1 won't read `sic.json`. To recover the old settings, rename `Sic.cfg.bak` back to `Sic.cfg`.

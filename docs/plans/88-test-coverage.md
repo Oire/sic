@@ -14,9 +14,8 @@ It's the first of four plans, and it comes first so that the JSON config, preset
 - [ ] Every public method of `ImageConverter` has tests for success, and for failure wherever a failure path exists.
 - [ ] Every target format is tested from every source format that SIC! can write.
 - [ ] The CLI's options, exit codes and error output are tested end to end through `Program.RunCli`.
-- [ ] Every `Sic.po` catalog is checked for empty entries, mismatched placeholders and duplicate menu mnemonics.
+- [ ] Every `Sic.po` catalog is checked for empty entries, fuzzy entries, mismatched placeholders and duplicate menu mnemonics.
 - [ ] Tests never touch the real `%APPDATA%\Oire\Sic` folder, and a test proves it.
-- [ ] A coverage run reports figures for `Sic.dll`.
 - [ ] `build-installer.ps1` still produces the single-file `Sic.exe`, and no test files reach the published output.
 - [ ] all validation commands pass
 
@@ -27,7 +26,6 @@ Run from the repository root.
 - build: `dotnet build`
 - test: `dotnet test`
 - format check: `dotnet format --verify-no-changes`
-- coverage: `dotnet test --collect:"XPlat Code Coverage"`
 
 There are no e2e tests.
 
@@ -45,7 +43,7 @@ There are no e2e tests.
 
 ### Patterns to follow
 
-- Test project: copy `C:\repos\Oire\plan-cake\tests\PlanCake.Tests\PlanCake.Tests.csproj`. Keep its `net10.0-windows`, `UseWindowsForms`, `Platforms`, `Platform`, analyzer, `IsPackable`, `IsTestProject` and `PreserveCompilationContext` properties, its package versions (`xunit` 2.9.3, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `AwesomeAssertions`, `coverlet.collector`, `Microsoft.CodeAnalysis.NetAnalyzers`) and its `PrivateAssets` pattern. Leave out `Jint` and `Corpus`.
+- Test project: copy `C:\repos\Oire\plan-cake\tests\PlanCake.Tests\PlanCake.Tests.csproj`. Keep its `net10.0-windows`, `UseWindowsForms`, `Platforms`, `Platform`, analyzer, `IsPackable`, `IsTestProject` and `PreserveCompilationContext` properties, its package versions (`xunit` 2.9.3, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `AwesomeAssertions`, `Microsoft.CodeAnalysis.NetAnalyzers`) and its `PrivateAssets` pattern. Leave out `Jint`, `Corpus` and `coverlet.collector`.
 - Assertions: `using AwesomeAssertions;`, as in `plan-cake/tests`.
 - Non-parallel collection: `C:\repos\Oire\plan-cake\tests\PlanCake.Tests\LocalizationCollection.cs`, with `[CollectionDefinition(Name, DisableParallelization = true)]` on a `public sealed class` holding a `Name` constant.
 
@@ -89,6 +87,7 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - Modify: `.github/dependabot.yml`
 - Modify: `installer/build-installer.ps1`
 - Modify: `src/Sic/locale/scripts/Compile-Translations.ps1`
+- Modify: `src/Sic/locale/scripts/Update-Translations.ps1`
 
 #### Steps
 
@@ -96,13 +95,13 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - [ ] Add `<InternalsVisibleTo Include="Sic.Tests" />` to `Sic.csproj`, and add the test project to `Sic.sln` with Debug|x64 and Release|x64 entries.
 - [ ] Add an after-build target to the test project that creates `$(OutDir)userdata` and `$(OutDir)locale\de`, and a guard test asserting that `App.IsPortable` is true and `App.DataFolder` is under the test output folder.
 - [ ] Add `TestDataFolder.Clear()`, deleting `Sic.cfg`, `sic.json` and their backups from `App.DataFolder`, for tests in this and later plans that place config files there.
-- [ ] In `Sic.csproj`, change the Debug `DebugType` from `full` to `portable`, because coverlet reads only portable PDBs, and confirm the coverage command reports `Sic.dll`.
 - [ ] In `build-installer.ps1`, rename `$SolutionPath` to `$ProjectPath` pointing at `src\Sic\Sic.csproj`, with the error text "Project file not found", and pass exactly `$ProjectPath, "--configuration", "Release", "/verbosity:minimal"`. Do not copy PlanCake's `--output` or `--runtime`: here `$PublishOutputPath` is defined after the publish, and PlanCake's folder is different.
 - [ ] Confirm with `.\installer\build-installer.ps1 -NoSign`, which deletes `bin\x64\Release` first, so an old `Sic.exe` can't pass the check. The new `Sic.exe` must be in `src\Sic\bin\x64\Release\win-x64\publish`, with no `xunit*` or `Sic.Tests*` files beside it.
-- [ ] Make `Compile-Translations.ps1` find `msgfmt` on the `PATH` through `Get-Command` before trying the two GnuWin32 folders, because later plans use it as a validation command.
+- [ ] Make `Compile-Translations.ps1` and `Update-Translations.ps1` find `msgfmt` and `msgmerge` on the `PATH` through `Get-Command` before trying the two GnuWin32 folders, because later plans run both. The owner has mlocati's gettext build, in `%LOCALAPPDATA%\Programs\gettext-iconv\bin`, so change both install hints to `winget install mlocati.GetText`.
+- [ ] Make `Update-Translations.ps1` restore CRLF after each `msgmerge`, without adding a BOM. `msgmerge` writes LF, so every update would otherwise be a whole-file diff. Confirm by running the script with no new strings: `git diff` must show no line-ending changes.
 - [ ] tests for `UrlHelper.IsValidHttpUrl`: valid http and https links, including surrounding spaces
 - [ ] tests for `UrlHelper.IsValidHttpUrl`: other schemes, relative links and empty input
-- [ ] Add a `Test` step running `dotnet test --no-build --collect:"XPlat Code Coverage"` after `Build` in `dotnet.yml`, and `timeout-minutes: 20` on the job, so a hung socket test can't hold the runner. Replace `FluentAssertions*` with `AwesomeAssertions*` in `dependabot.yml`.
+- [ ] Add a `Test` step running `dotnet test --no-build` after `Build` in `dotnet.yml`, and `timeout-minutes: 20` on the job, so a hung socket test can't hold the runner. In `dependabot.yml`, replace `FluentAssertions*` with `AwesomeAssertions*` and remove `coverlet*`.
 - [ ] validation commands pass
 
 ### Task 2: Test format lists and output paths
@@ -222,7 +221,7 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 - [ ] `CLAUDE.md`: replace "There are no test projects" with `dotnet test`, the real format command `dotnet format --verify-no-changes`, test isolation through `userdata`, the non-parallel collection, and the rule against asserting translated text.
 - [ ] `README.md`: mention `dotnet test` wherever build commands are listed.
-- [ ] `README.md` lines 55 and 133 and `CLAUDE.md` say `dotnet publish -c Release` at solution level. Point them at the csproj, now that the solution includes tests. Update the note on Debug symbols in `CLAUDE.md`.
+- [ ] `README.md` lines 55 and 133 and `CLAUDE.md` say `dotnet publish -c Release` at solution level. Point them at the csproj, now that the solution includes tests.
 - [ ] validation commands pass
 
 ## Technical details
@@ -235,6 +234,7 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 - Automated tests that drive the forms. A UI Automation suite (FlaUI, for example) would be separate work.
 - A HEIC decoding test. This Magick build can't write HEIC, so a test can't generate one; it needs a small committed sample.
+- Coverage reports. Nothing would act on the figures, and collecting them would mean changing the Debug `DebugType`.
 
 ## Post-completion
 

@@ -19,6 +19,7 @@ It's the last of four plans. `89-json-config` must be merged first, because the 
 - [ ] A failed portable update leaves the old version working, and tells the user.
 - [ ] An update interrupted partway through recovers on the next start, or, in the one moment with no `Sic.exe`, through a documented rename.
 - [ ] A read-only portable copy still starts.
+- [ ] `userdata\temp` is gone after SIC! closes, and anything a crash left there is removed on the next start.
 - [ ] The old `HKCU\Software\Oire Software\SIC!` key is removed, and sibling keys such as `PlanCake` are left alone.
 - [ ] Parallel CLI runs in a portable copy can't delete each other's temporary files.
 - [ ] Answering No to the queue prompt cancels an update before any file changes, and never leaves two versions running.
@@ -137,11 +138,11 @@ Checked against the 3.1.0 package and the source in `C:\repos\Oire\NetSparkle`:
 
 - [ ] Add `App.UpdatesFolder = Path.Combine(DataFolder, "updates")`, and use it everywhere this plan names `userdata\updates`.
 - [ ] Add `ImageConverter.SetTempFolder(path)`, wrapping `MagickNET.SetTempDirectory`, so `ImageMagick` stays in Services.
-- [ ] Add `PortableTempFolder` with `TryCreate(dataFolder, processId)` returning `userdata\temp\<pid>`, or null if it can't be created, `Delete(folder)`, and `RemoveStale(dataFolder, isProcessRunning)`, which deletes folders whose process has gone. None of them throws.
+- [ ] Add `PortableTempFolder` with `TryCreate(dataFolder, processId)` returning `userdata\temp\<pid>`, or null if it can't be created, `Delete(folder)`, which also removes `userdata\temp` if that leaves it empty, and `RemoveStale(dataFolder, isProcessRunning)`, which deletes folders whose process has gone. None of them throws.
 - [ ] In `Program.Main`, in portable mode, follow the order under Technical details. If `TryCreate` returns null, log it and skip `SetTempFolder`, so a read-only copy still starts. Delete the folder in the existing `finally`.
 - [ ] In portable mode, set `TmpDownloadFilePath` to `App.UpdatesFolder`.
 - [ ] Set `AddToRecent = !App.IsPortable` on the `OpenFileDialog` in `MainWindow` and the `FolderBrowserDialog`s in `AddFolderDialog` and `SettingsDialog`.
-- [ ] tests for `PortableTempFolder`: two process IDs get separate folders, an unwritable folder gives null, `RemoveStale` keeps a running process's folder and removes a dead one's, and a locked file is skipped without failing
+- [ ] tests for `PortableTempFolder`: two process IDs get separate folders, an unwritable folder gives null, `Delete` removes an empty `temp` but keeps one holding another process's folder, `RemoveStale` keeps a running process's folder and removes a dead one's, and a locked file is skipped without failing
 - [ ] validation commands pass
 
 ### Task 4: Install portable updates in place
@@ -149,7 +150,7 @@ Checked against the 3.1.0 package and the source in `C:\repos\Oire\NetSparkle`:
 #### Files
 
 - Create: `src/Sic/Services/PortableUpdateInstaller.cs`
-- Create: `src/Sic/Models/PortableUpdateResult.cs`
+- Create: `src/Sic/Utils/Enums/PortableUpdateResult.cs`
 - Create: `tests/Sic.Tests/PortableUpdateInstallerTests.cs`
 - Modify: `src/Sic/Utils/Constants/App.cs`
 
@@ -269,9 +270,15 @@ GUI path, inside the `try`:
 CLI path, in portable mode:
 
 1. If `swap.json` exists, try the guard. If it's held, an update is running: print an error and exit with `ExitCode.Error`. Otherwise run `CleanUp`, then release the guard.
-2. Temp folder setup.
+2. Temp folder setup, then `RemoveStale`.
 
 Nothing in these steps may stop startup. Each is wrapped, and a failure is logged and skipped.
+
+### Temporary files
+
+A portable copy keeps Magick's temporary files in `userdata\temp\<pid>`, not in `%TEMP%`. That way a crash on a borrowed computer leaves nothing on it: the leftovers stay on the portable copy, which can still clean them up.
+
+Each process deletes its own folder on every exit, GUI or CLI, and `userdata\temp` with it if nothing else is there. A crash skips that, so every start removes folders whose process has gone.
 
 ### Portable update flow
 
@@ -307,6 +314,10 @@ The one moment with no `Sic.exe` is between its rename and the move, and renames
 
 Starting the new version only after the old one has left `Application.Run` means two versions can't run together, even though `QuitApplication` swallows exceptions.
 
+### Why portable copies have their own appcast
+
+One `appcast.xml` with an exe and a ZIP entry was considered and rejected. Installed 1.1 copies can't be changed, and they'd treat both entries as the same update: they'd show the release notes twice and depend on the exe coming first. A second file leaves what they see exactly as it is today.
+
 ### Why updater state is a separate file
 
 `updater.json` is written by NetSparkle's own `JSONConfiguration`, which saves it whenever it likes. Keeping it apart from `sic.json` means NetSparkle can never overwrite the user's settings. It holds no settings: only the last check time and any skipped version.
@@ -320,6 +331,7 @@ Starting the new version only after the old one has left `Application.Run` means
 
 - Copies older than 1.2 already point at the installer appcast. They can't be fixed from here, so those users need the new ZIP by hand once.
 - Windows itself records that a program ran, for example in Prefetch and UserAssist. No app can prevent that.
+- A read-only copy has nowhere of its own for temporary files, so Magick uses `%TEMP%` there.
 
 ## Post-completion
 
