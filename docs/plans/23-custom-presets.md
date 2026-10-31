@@ -53,7 +53,7 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 - Checkbox enabling numeric fields, with 1 to 65535 validation: `FitToSizeDialog`.
 - List with Add and Remove, nested dialog and duplicate rejection: `src/Sic/IcoPresetDialog.cs`. Take its behavior, not its layout.
 - OK validation: override `OnFormClosing`, call `base`, return unless `DialogResult == DialogResult.OK`, show `DialogHelper.Show(...)`, focus and select the field, set `e.Cancel = true`. Results live in `{ get; private set; }` properties.
-- Layout: one flat `TableLayoutPanel` in the designer, `Dock = Fill`, `Padding = new Padding(12)`, as in `FitToSizeDialog.Designer.cs`. Never pixel coordinates, so no control has a `Location` or a `Size`; the form's own `ClientSize` is the only size. No nested panels or group boxes unless that's absolutely unavoidable. `ColumnCount` and `RowCount` are the real counts, with one style for each column and row, and every control has `Dock = Fill`.
+- Layout: one flat `TableLayoutPanel` in the designer, `Dock = Fill`, `Padding = new Padding(12)`, as in `FitToSizeDialog.Designer.cs`. Never pixel coordinates, so no control has a `Location` or a `Size`; the form's own `ClientSize` is the only size. No nested panels or group boxes unless that's absolutely unavoidable. `ColumnCount` and `RowCount` are the real counts, with one style for each column and row, and every control has `Dock = Fill`. Labels also keep `AutoSize = true` and add `TextAlign = ContentAlignment.MiddleLeft`, so they're neither clipped nor left at the top of the row; `MiddleLeft` mirrors by itself in Hebrew.
 - Menu: `BuildMenuSpec` and `ApplyMenuState` in `MainWindow.cs`. `ApplyMenuState` is index-based and the separator counts, so append after the existing Convert items.
 - Tests touching `Config`, `Console` or `Localization`: the `StaticStateCollection`. Tests of the CLI: `tests/Sic.Tests/CliTests.cs`, calling `Program.RunCli`.
 
@@ -65,6 +65,7 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 - Every message box goes through `DialogHelper.Show`, never `MessageBox.Show`.
 - Do not set `AccessibleName` on a control that already has meaningful `Text`.
 - Data records go in `Models`. Services are named `...Service`, `-or` or `-er`.
+- New enums are `public` in `src/Sic/Utils/Enums`, namespace `Oire.Sic.Utils.Enums`, like `UpdateCheckInterval`. `MainWindow.cs` and `Program.cs` need that using, and `Program.cs` also needs `Oire.Sic.Services`.
 - `GetEnabledFormats` treats an empty list as "all formats", so it must never receive session formats on their own (Task 4).
 - "Preset" already means ICO presets (`IcoPresetDialog`). Reuse the existing translation of that word in each language.
 - `_isAutoFilling` is not re-entrant: `PopulateResizeFieldsFromSelection`, `AutoFillFromWidth` and `AutoFillFromHeight` all reset it in `finally`. Applying a preset must not rely on it (Task 5).
@@ -124,15 +125,15 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 #### Steps
 
 - [ ] Add `ConversionPreset` as under Technical details, and `Presets` to `AppConfig`.
-- [ ] Add `PresetValidator`: `ValidateName(name, takenNames)` returning `PresetNameResult` (`Valid`, `Empty`, `TooLong`, `InvalidCharacters`, `Duplicate`), `Normalize(presets)` for loaded data, and `EscapeForMenu(name)`.
-- [ ] In `ConfigSerializer`, read `presets` entry by entry from the `JsonDocument`, deserializing each to `ConversionPreset`, so that an entry that fails counts as dropped rather than sending the whole file to the corrupt path. Then run `Normalize`.
-- [ ] When anything is dropped, call `BackUpFile` before anything can save over it, and put a complete translated message naming the count in `LoadError`. If the backup fails, set `SavesBlocked` and say so.
+- [ ] Add `PresetValidator`: `NameComparer` (`StringComparer.OrdinalIgnoreCase`); `CleanName(name)`, which trims and applies `Normalize(NormalizationForm.FormC)`; `ValidateName(name, takenNames)` returning `PresetNameResult` (`Valid`, `Empty`, `TooLong`, `InvalidCharacters`, `Duplicate`); `Normalize(presets)` for loaded data, returning the kept presets and the number dropped; and `EscapeAmpersands(name)`. Every comparison of names uses `NameComparer`, and every stored name goes through `CleanName`.
+- [ ] In `ConfigSerializer`, read `presets` entry by entry from the `JsonDocument`, deserializing each to `ConversionPreset`, so that an entry that fails counts as dropped rather than sending the whole file to the corrupt path. A non-null `presets` that isn't an array counts as one dropped. Then run `Normalize`.
+- [ ] Join this to step 1 of the load flow in `89-json-config`: bad settings and dropped presets share one `BackUpFile` call, one repaired save and one complete translated message in `LoadError`, naming both counts. If the backup fails, set `SavesBlocked` and say so.
 - [ ] Add `public static List<ConversionPreset> Presets { get; set; }` to `Config`. `Load` sets it from `result.Config.Presets`, and `Save` passes both `General` and `Presets`.
 - [ ] tests for `ValidateName`: trimmed names, 64 characters, and names in any script, with `Блог`, `Démarche administrative` and `בלוג` all `Valid`
-- [ ] tests for `ValidateName`: empty, 65 characters, tab and other control characters, duplicates differing only by case
-- [ ] tests for `Normalize`: each unusable case under Technical details is dropped, order is kept, the format is upper-cased, JPEG maps to JPG and TIF to TIFF, and a preset with no sizes stores `KeepProportions`
-- [ ] tests for `EscapeForMenu`: `R&D` becomes `R&&D`, `MenuTextFormatter.ExtractMnemonic(EscapeForMenu("R&D"))` is null, and a name with no ampersand is unchanged
-- [ ] tests for `ConfigSerializer`: presets round trip, null `presets`, `presets: {}` and `presets: [null]` load safely, and a file with a dropped preset is backed up and reported
+- [ ] tests for `ValidateName`: empty, 65 characters, tab and other control characters, duplicates differing only by case or by a composed and decomposed `é`
+- [ ] tests for `Normalize`: each unusable case under Technical details is dropped and counted, order is kept, a name with spaces around it is stored cleaned, the format is upper-cased, JPEG maps to JPG and TIF to TIFF, and a preset with no sizes stores `KeepProportions`
+- [ ] tests for `EscapeAmpersands`: `R&D` becomes `R&&D`, `MenuTextFormatter.ExtractMnemonic(EscapeAmpersands("R&D"))` is null, and a name with no ampersand is unchanged
+- [ ] tests for `ConfigSerializer`: presets round trip; null `presets` and `presets: [null]` load safely; `presets: {}` and `presets: "x"` count as dropped; a file with a dropped preset is backed up and reported; a file with both a bad setting and a dropped preset gets one backup and one message; and the next load is silent
 - [ ] tests for per-entry recovery: `"resizeMode": "Fit"`, `"resizeMode": 5`, `"width": "300"`, `"width": 300.5`, `"name": null` and `"format": null` each drop one preset, while the other presets and the `general` values survive
 - [ ] tests for a failed backup: with the `.bad` file locked, `SavesBlocked` is true and the file is unchanged
 - [ ] tests for `Config`: load a file with presets, change a general setting, call `Save`, reload, and assert the presets are still there
@@ -149,7 +150,7 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `PresetResolver` with `Find(presets, name)`, matching case-insensitively, and `ResolveResize(preset, hasExplicitResize, explicitWidth, explicitHeight, crop)` returning `(int? Width, int? Height, ResizeMode Mode)`. It accepts a null preset, because every run goes through the merge, and follows the precedence under Technical details.
+- [ ] Add `PresetResolver` with `Find(presets, name)`, matching through `CleanName` and `NameComparer`, and `ResolveResize(preset, hasExplicitResize, explicitWidth, explicitHeight, crop)` returning `(int? Width, int? Height, ResizeMode Mode)`. It accepts a null preset, because every run goes through the merge, and follows the precedence under Technical details.
 - [ ] Add `var presetOption = new Option<string?>("--preset", "-p")` with a localized description, and register it on the root command.
 - [ ] Look the preset up before the format chain, so an unknown name fails even when the preset isn't needed. Unknown preset: log it, print the error and the available names to stderr, and return `ExitCode.Error`. Say so plainly when there are no presets.
 - [ ] Target format order: `--output` extension, then `--format`, then the preset. Update the "Either --output or --format" error to mention `--preset`, and update its assertion in `CliTests`.
@@ -175,9 +176,9 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 - [ ] Add `ImageConverter.GetDropdownFormats(enabledKeys, sessionFormats)`: call `GetEnabledFormats(enabledKeys)`, add the session formats, then filter `GetSupportedFormats()` by that set, so the order stays canonical. Never pass the combined keys to `GetEnabledFormats`: an empty list means "all formats", and it also has a fallback when nothing it's given is known.
 - [ ] Add a private `HashSet<string> _sessionFormats` to `MainWindow`, and make `PopulateFormatComboBox` use `GetDropdownFormats`.
-- [ ] Add `PresetCapturer.Capture(format, resizeEnabled, mode, widthText, heightText, autoFilledBox)` and a `DimensionBox` enum (`None`, `Width`, `Height`), with the rules under Technical details.
+- [ ] Add `PresetCapturer.Capture(format, resizeEnabled, mode, widthText, heightText, autoFilledBox)` and a `DimensionBox` enum (`None`, `Width`, `Height`, `Both`), with the rules under Technical details.
 - [ ] tests for `GetDropdownFormats`: no session formats, a hidden format added in canonical order, empty `enabledKeys` still showing all, `enabledKeys` matching nothing known still showing all, and no duplicates
-- [ ] tests for `Capture`: resize off; crop; keep mode with each `autoFilledBox` value; both boxes typed with no selection; one box cleared while the other holds a size; unparsable text; and no sizes storing `KeepProportions`
+- [ ] tests for `Capture`: resize off; crop; keep mode with each `autoFilledBox` value; both boxes typed with no selection; one box cleared while the other holds a typed size, which keeps it; one box cleared while SIC! filled the other, which gives no sizes; `Both`, which gives no sizes; unparsable text; and no sizes storing `KeepProportions`
 - [ ] validation commands pass
 
 ### Task 5: Apply a preset in the main window
@@ -194,7 +195,7 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 - [ ] `ResizeCheckBox_CheckedChanged` still enables and disables the fields when `_isApplyingPreset` is set, but skips `PopulateResizeFieldsFromSelection` and `UpdatePreview`. It must not return early, or the boxes stay disabled.
 - [ ] `ImageListView_SelectedIndexChanged` skips `PopulateResizeFieldsFromSelection` while `_presetSizesPinned` is set.
 - [ ] Clear the pin when the user edits a size box, toggles the resize checkbox or switches the radio buttons, which means in those handlers when neither `_isApplyingPreset` nor `_isAutoFilling` is set.
-- [ ] Set `_autoFilledBox` in `AutoFillFromWidth` and `AutoFillFromHeight` when they write a box, and clear it when the user edits that box. Set it to `None` in `ApplyPreset`.
+- [ ] Set `_autoFilledBox` in `AutoFillFromWidth` and `AutoFillFromHeight` when they write a box, and to `Both` in `PopulateResizeFieldsFromSelection`, which writes both. When the user edits a box, take that box out of the value, so `Both` becomes the other box alone. Set it to `None` in `ApplyPreset`.
 - [ ] validation commands pass
 
 ### Task 6: Add the preset editor dialog
@@ -206,12 +207,12 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Build the designer as one flat `TableLayoutPanel` with the grid under Technical details. The radio buttons sit directly in it: they're the dialog's only radio group, so they need no `GroupBox`. Give every control a mnemonic and a logical tab order.
+- [ ] Build the designer as one flat `TableLayoutPanel` with the grid and control texts under Technical details. Resize mode is a `DropDownList` `ComboBox` with plain `_("Keep proportions")` and `_("Crop")` items, added in the constructor. It can't be radio buttons in the table: arrow keys would walk through every control beside them, and reaching one by arrow or mnemonic would select it.
 - [ ] Constructor `PresetDialog(ConversionPreset? initial, IEnumerable<string> takenNames, bool isEdit)`. Follow the standard constructor order, and set the title to "Add Preset" or "Edit Preset". The dropdown lists `GetSupportedFormats()`, not only the enabled formats, and selects the first when `initial` is null. When editing, callers leave the preset's own name out of `takenNames`, so a case-only rename works.
-- [ ] Use the checkbox-enabled fields from `FitToSizeDialog`. Unlike the main window, typing one size must never auto-fill the other.
+- [ ] Enable the resize mode, width and height fields from the Resize checkbox, as `FitToSizeDialog` does, but don't move focus when it's ticked, or the mode would be skipped. Run the enable routine once after loading `initial`, so an edited preset can't show a ticked box with disabled fields. Unlike the main window, typing one size must never auto-fill the other.
 - [ ] Add the hint: "With Keep proportions, fill in one size to scale every image to it, or both to fit images inside that box."
 - [ ] Validate in `OnFormClosing` with `PresetValidator.ValidateName`, and with `ResizeValidator.Validate` only when Resize is ticked, because stale text in a disabled box must not block OK. Show one specific message per error and move focus to the field.
-- [ ] Expose the outcome as `public ConversionPreset? Result { get; private set; }`. With Resize unticked it has null sizes and `KeepProportions`.
+- [ ] Expose the outcome as `public ConversionPreset? Result { get; private set; }`. Its name goes through `CleanName`. With Resize unticked it has null sizes and `KeepProportions`.
 - [ ] validation commands pass
 
 ### Task 7: Add the Manage Presets dialog
@@ -228,10 +229,11 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 - [ ] Set `Text = _("Manage Presets")` in the constructor, after `TextDirection.Apply`, because the extractor can't see a form's own title.
 
 - [ ] Build the designer as one flat `TableLayoutPanel` with the grid under Technical details, not from `IcoPresetDialog`'s layout, which nests a `GroupBox` and a `FlowLayoutPanel`.
-- [ ] Add `PresetDescriber.Describe(preset)`, and show each list row as the preset's name plus that summary, such as "Blog: WEBP, width 300".
+- [ ] Add `PresetDescriber.Describe(preset)`, and show each list row as the preset's name plus that summary, such as "Blog: WEBP, width 300". Set `HorizontalScrollbar = true` on the list, because a 64-character name plus its summary is wider than the dialog.
 - [ ] tests for `Describe`, one for each form: "WEBP", "WEBP, width 300", "WEBP, height 200", "WEBP, fit inside 800x600" and "PNG, crop to 128x128"
 - [ ] Add and Edit open `PresetDialog`. Remove asks for confirmation through `DialogHelper.Show`. Edit and Remove are disabled with nothing selected, and focus returns to the list predictably after each action.
-- [ ] Work on a copy of `Config.Presets`. In `OnFormClosing`, so Esc and Alt+F4 don't lose edits, write it back, call `Config.Save()`, and set a `Changed` property for the caller.
+- [ ] Set `closeButton.DialogResult = DialogResult.Cancel` and `CancelButton = closeButton`, so Esc closes the dialog.
+- [ ] Work on a copy of `Config.Presets`. In `OnFormClosing`, so Esc and Alt+F4 don't lose edits, and only if something changed, write it back, call `Config.Save()`, and set a `Changed` property for the caller.
 - [ ] validation commands pass
 
 ### Task 8: Add the Presets submenu
@@ -244,7 +246,7 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `PresetMenuBuilder.AddTo(NativeMenuSpec convert, presets, onApply, onAdd, onManage)`, appending a separator and `convert.AddMenu(_("&Presets"), ...)`. It lists each preset through `PresetValidator.EscapeForMenu`, then a separator, `_("&Add Preset...")` and `_("&Manage Presets...")`.
+- [ ] Add `PresetMenuBuilder.AddTo(NativeMenuSpec convert, presets, onApply, onAdd, onManage)`, appending a separator and `convert.AddMenu(_("&Presets"), ...)`. It lists each preset through `PresetValidator.EscapeAmpersands`, then a separator, `_("&Add Preset...")` and `_("&Manage Presets...")`.
 - [ ] Show a disabled "No presets yet" item when the list is empty, so a screen reader user hears why the top of the menu has no presets.
 - [ ] Call it at the end of the Convert block in `BuildMenuSpec`. In `ApplyMenuState`, remove both `convert.IsEnabled = _hasItems` and `edit.IsEnabled = _hasItems`; their children keep their own flags, and Presets stays enabled. Root items are pushed to Windows only when the menu is built, so a rebuild would otherwise freeze the Edit menu at whatever the queue state was then.
 - [ ] Add Preset opens `PresetDialog` pre-filled from `PresetCapturer.Capture`. After OK, append to `Config.Presets`, call `Config.Save()` and rebuild with `_menuBar?.Attach(BuildMenuSpec())` once the dialog has closed. Manage Presets rebuilds the same way when `Changed` is true.
@@ -265,6 +267,7 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 - [ ] Translate every new string in all six languages, reusing each language's existing word for "preset".
 - [ ] Remove every `#, fuzzy` flag on new entries. Window titles must have no `&` and no trailing `...`.
 - [ ] Add `&Presets` to `ConvertMenuStrings` in `TranslationCatalogTests`, and a new `PresetsMenuStrings` with `&Add Preset...` and `&Manage Presets...`.
+- [ ] Add `PresetDialogStrings` and `ManagePresetsDialogStrings` with the control texts under Technical details, because a clash there sends Alt+letter to the wrong control. Where a language clashes, change the mnemonic of a new string, not an existing one.
 - [ ] Run `Compile-Translations.ps1`.
 - [ ] validation commands pass, including `TranslationCatalogTests`
 
@@ -294,7 +297,7 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 - [ ] `README.md`: add presets and `--preset`.
 - [ ] `CHANGELOG.md` and `changelogs/1.2.0.0.md`: add presets ([#23](https://github.com/Oire/sic/issues/23)) and the behavior changes listed under Technical details.
-- [ ] `CLAUDE.md`: add the new classes and CLI option, and record the gotchas future work needs: the preset pin and `_isApplyingPreset`, why session formats go through `GetDropdownFormats`, and escaping names for the menu.
+- [ ] `CLAUDE.md`: add the new classes, the `Oire.Sic.Utils.Enums` namespace and the CLI option, and record the gotchas future work needs: the preset pin and `_isApplyingPreset`, why session formats go through `GetDropdownFormats`, and escaping names for the menu.
 - [ ] validation commands pass
 
 ## Technical details
@@ -347,7 +350,7 @@ A preset with no sizes is stored with `KeepProportions`, in `Normalize`, `Preset
 
 Entries that fail to deserialize, such as `"width": "300"`, count as dropped too. Because dropped entries would disappear from disk on the next save, `ConfigSerializer` calls `BackUpFile` first and tells the user how many were dropped.
 
-Names are at most 64 characters, trimmed, and unique ignoring case. Any script is fine, with or without diacritics, such as `Блог`, `Démarche administrative` or `בלוג`. `InvalidCharacters` means control characters and nothing else.
+Names are at most 64 characters, trimmed, and unique ignoring case. Any script is fine, with or without diacritics, such as `Блог`, `Démarche administrative` or `בלוג`. `InvalidCharacters` means control characters and nothing else. `CleanName` means a name typed with a decomposed `é` still matches one stored composed.
 
 ### ResizeValidator
 
@@ -384,7 +387,7 @@ CLI mapping in `RunCli`, which always passes `KeepProportions`:
 - Resize off: no sizes, and `KeepProportions`.
 - Text that isn't a valid size is left out.
 - Crop keeps both sizes.
-- Keep proportions leaves out only the box SIC! filled itself (`autoFilledBox`), because that value was calculated for one image and would turn the preset into a fit-inside-a-box. Everything the user typed stays, so typing both sizes with nothing selected keeps both.
+- Keep proportions leaves out only what SIC! filled itself (`autoFilledBox`, which is both boxes for `Both`), because those values were calculated for one image and would turn the preset into a fit-inside-a-box. Everything the user typed stays, so typing both sizes with nothing selected keeps both.
 
 ### ApplyPreset
 
@@ -410,28 +413,30 @@ private void ApplyPreset(ConversionPreset preset) {
     _presetSizesPinned = preset.Resizes;
     _autoFilledBox = DimensionBox.None;
     UpdatePreview();
-    statusLabel.Text = _("Preset applied: {0}", preset.Name);
+    statusLabel.Text = _("Preset applied: {0}", PresetValidator.EscapeAmpersands(preset.Name));
 }
 ```
 
 ### Dialog layouts
 
-`PresetDialog` has 3 columns (AutoSize, Percent 50, Percent 50) and 8 AutoSize rows:
+`PresetDialog` has 3 columns (AutoSize, Percent 50, Percent 50), 8 rows (six AutoSize, then Percent 100, then AutoSize) and a `ClientSize` of 440x300:
 
-1. Name label; name box spanning columns 2 and 3
-2. Format label; format dropdown spanning columns 2 and 3
-3. Resize checkbox spanning all 3 columns
-4. Resize mode label; Keep proportions radio button; Crop radio button
-5. Width label; width box spanning columns 2 and 3
-6. Height label; height box spanning columns 2 and 3
-7. Hint label spanning all 3 columns
-8. Empty cell; OK; Cancel
+1. `&Name:` label; name box spanning columns 2 and 3
+2. `Target &Format:` label; format dropdown spanning columns 2 and 3
+3. `Resi&ze` checkbox spanning all 3 columns
+4. `Resize &Mode:` label; resize mode dropdown spanning columns 2 and 3
+5. `&Width:` label; width box spanning columns 2 and 3
+6. `&Height:` label; height box spanning columns 2 and 3
+7. Hint label spanning all 3 columns, with `AutoSize = false`, so it wraps inside the row that absorbs spare height
+8. Empty cell; `&OK`; `&Cancel`
 
-`ManagePresetsDialog` has 4 columns (Percent 25 each) and 3 rows (AutoSize, Percent 100, AutoSize):
+Without the Percent row, `TableLayoutPanel` hands spare height to the last row and the buttons grow tall, by a different amount in each language.
 
-1. "Presets" label spanning all 4 columns
+`ManagePresetsDialog` has 4 columns (Percent 25 each), 3 rows (AutoSize, Percent 100, AutoSize) and a `ClientSize` of 440x320:
+
+1. `Pre&sets:` label spanning all 4 columns
 2. Presets `ListBox` spanning all 4 columns
-3. Add; Edit; Remove; Close
+3. `&Add...`; `&Edit...`; `&Remove`; `&Close`
 
 ### CLI precedence
 
@@ -466,6 +471,7 @@ The default output path is built after the supported-format check, under `if (st
 ## Post-completion
 
 - Test the whole preset flow by keyboard with JAWS and NVDA: Convert > Presets on an empty queue, Add Preset, the hint, validation messages and focus, Manage Presets, and Remove.
+- Check that JAWS and NVDA read the hint in the preset dialog, which is a label outside the tab order. If they don't, set `AccessibleDescription` on the two size boxes in the constructor.
 - Confirm a preset's sizes survive adding, selecting and removing images, and that a height-only preset keeps its width box empty.
 - Convert a mixed portrait and landscape batch with a width-only preset, and confirm every result is 300 px wide.
 - Apply a preset with a format unticked in Settings, and confirm the format stays in the dropdown until SIC! closes.

@@ -13,7 +13,8 @@ It's the second of four plans. `88-test-coverage` must be merged first. `23-cust
 - [ ] A user with an existing `Sic.cfg` keeps every setting after upgrading, and the old file becomes `Sic.cfg.bak`.
 - [ ] One bad value in `Sic.cfg` or `sic.json` loses only that value, not the other settings, and the file is backed up first.
 - [ ] An invalid `language` value falls back to the system language instead of stopping SIC! at startup.
-- [ ] A `sic.json` that isn't valid JSON is kept as `sic.json.bad`, reported to the user, and never silently overwritten. No backup is ever overwritten.
+- [ ] A `sic.json` that isn't valid JSON, or isn't a JSON object, is kept as `sic.json.bad`, reported to the user, and never silently overwritten. No `sic.json` backup is ever overwritten.
+- [ ] After a recovery, the next start is silent, with no repeated message and no second backup.
 - [ ] A `sic.json` that can't be read is never replaced, and the user is told changes won't be saved this session.
 - [ ] A failed config save in CLI mode writes to stderr and never opens a message box.
 - [ ] A CLI run with a missing output folder uses the default for that run and doesn't change the saved setting.
@@ -40,7 +41,7 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 ### Files involved
 
 - Config: `src/Sic/Utils/Config.cs`, `src/Sic/Utils/Constants/App.cs`
-- Call sites, unchanged in use: `src/Sic/Program.cs`, `MainWindow.cs`, `SettingsDialog.cs`, `AddFolderDialog.cs`
+- Call sites: `src/Sic/Program.cs` and `SettingsDialog.cs`, which Task 4 changes, and `MainWindow.cs` and `AddFolderDialog.cs`, unchanged in use
 - GUI startup: `Program.Main`; window messages: `MainWindow.cs`, which already has a `[DllImport("user32.dll")]` at line 43
 - Project: `src/Sic/Sic.csproj`
 - Docs: `README.md`, `CHANGELOG.md`, `changelogs/1.2.0.0.md`, `CLAUDE.md`, `src/Sic/help/*/manual.html`
@@ -90,9 +91,9 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 #### Steps
 
-- [ ] Add `GeneralSettings` with the same nine properties, defaults and XML docs as `Config.SectionGeneral`, plus `GetEnabledFormatKeys()`. `EnabledFormats` becomes a `List<string>`, empty by default. Leave `Config.cs` alone until Task 4.
+- [ ] Add `GeneralSettings` with the same nine properties, defaults and XML docs as `Config.SectionGeneral`, plus `GetEnabledFormatKeys()`. `EnabledFormats` becomes a `List<string>`, empty by default, and its XML doc stops calling it comma-separated. `GetEnabledFormatKeys` skips null and blank entries with `IsNullOrWhiteSpace`, then trims. Leave `Config.cs` alone until Task 4.
 - [ ] Add `AppConfig` and `ConfigLoadResult` as described under Technical details.
-- [ ] tests for `GeneralSettings` defaults, and for `GetEnabledFormatKeys`: an empty list, entries with spaces, and blank entries
+- [ ] tests for `GeneralSettings` defaults, and for `GetEnabledFormatKeys`: an empty list, entries with spaces, and `[null, " ", "JPG"]`
 - [ ] validation commands pass
 
 ### Task 2: Read legacy Sic.cfg files
@@ -110,6 +111,7 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 - [ ] Add `LegacyConfigReader.Parse(string content)` returning `GeneralSettings`. It's a small hand parser following the rules under Technical details, and it does not use SharpConfig. `Read(path)` loads the file and calls `Parse`, letting I/O exceptions propagate.
 - [ ] A bad value for one key keeps that key's default, logs a warning and carries on.
 - [ ] tests for every captured fixture: the exact value comes back, including a UTF-8 BOM added by the test
+- [ ] tests for `EnabledFormats`: a captured `JPG,PNG,WEBP` fixture, `JPG, ,PNG,`, and an empty `EnabledFormats=`
 - [ ] tests for the older four-key file: missing keys keep their defaults
 - [ ] tests for bad input: an invalid bool or enum, an invalid `Language`, a line with no `=`, an unclosed `[General`, a missing section, unknown keys, and empty content
 - [ ] validation commands pass
@@ -125,18 +127,20 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 #### Steps
 
 - [ ] In `App.cs`, add `ConfigFileName = "sic.json"` and `LegacyConfigFileName = "Sic.cfg"`. Keep `ConfigFileExtension` until Task 4.
-- [ ] Add `ConfigSerializer` with a `static readonly JsonSerializerOptions` as under Technical details, `Load(folder)` returning a `ConfigLoadResult`, and `Save(path, config)` as under Technical details.
-- [ ] Add `BackUpFile(path)`, which keeps the newest copy as `sic.json.bad` and first renames an existing `.bad` to `sic.json.bad.<yyyyMMdd-HHmmss>`, so no backup is overwritten. The presets plan reuses it.
-- [ ] Implement the load flow under Technical details. It takes a folder argument and shows no UI, so tests can use temporary folders. It builds complete translated messages for `LoadError` and `SaveError`, and the corrupt-file message names `sic.json.bad`.
-- [ ] tests for loading: valid file, missing `general`, null `enabledFormats`, `language` and `lastInputFolder`, blank `outputFolder`, a hand-edited file with comments and trailing commas, and a file with a UTF-8 BOM
+- [ ] Add `ConfigSerializer` with a `static readonly JsonSerializerOptions` as under Technical details, `Load(folder, isPortable)` returning a `ConfigLoadResult`, and `Save(path, config)` as under Technical details. `Config` passes `App.IsPortable`; the argument exists because that value is always true under `dotnet test`.
+- [ ] Add `BackUpFile(path)`, which first renames an existing `.bad` to `sic.json.bad.<yyyyMMdd-HHmmss>`, adding a number if that name is taken, then copies `sic.json` to `sic.json.bad`. It never moves `sic.json`, and no backup is overwritten. The presets plan reuses it.
+- [ ] Implement the load flow under Technical details. It takes a folder argument and shows no UI, so tests can use temporary folders. It builds complete translated messages for `LoadError` and `SaveError`, using `_n` for counts, and the corrupt-file message names `sic.json.bad`. `ConfigSerializerTests` goes in the `StaticStateCollection`, because the class calls `_()`.
+- [ ] tests for loading: valid file, missing `general`, null `enabledFormats`, `language` and `lastInputFolder`, blank `outputFolder`, a hand-edited file with comments and trailing commas, a hand-edited `"OutputFolder"` with different case, and a file with a UTF-8 BOM
+- [ ] tests for shape: `[]`, `5` and `null` as the root take the corrupt-file path; `"general": []` keeps defaults, counts as bad and is backed up; `"enabledFormats": [null, " ", "JPG"]` loads as `["JPG"]`
 - [ ] tests for encoding: a file saved in a legacy code page, which isn't valid UTF-8, takes the corrupt-file path and loses nothing
-- [ ] tests for per-value recovery: `"updateCheckInterval": "Hourly"`, `"confirmExitWithQueue": 5` and `"enabledFormats": "JPG,PNG"` keep their defaults, every other setting survives, the file is backed up, and the message names the count. An invalid `language` becomes `System`.
+- [ ] tests for per-value recovery: `"updateCheckInterval": "Hourly"`, `"updateCheckInterval": 99`, `"confirmExitWithQueue": 5`, `"enabledFormats": "JPG,PNG"` and an invalid `language` all keep their defaults, every other setting survives, the file is backed up, and the message names the count
+- [ ] tests for repair: after a recovery `sic.json` holds the repaired settings and a second `Load` reports nothing and creates no second backup; a failed repair write is reported through `SaveError`; two recoveries within one second keep both backups
 - [ ] tests for round trips: every setting, with Cyrillic and Hebrew in `outputFolder` written as readable text rather than `\u` escapes
 - [ ] tests for the saved file: it's pretty-printed, one property per line, and UTF-8 with no BOM
 - [ ] tests for the default output folder: saved as `""`, loaded back as the current `App.DefaultOutputFolder`, including for migrated values; a custom folder stays as it is; `config.General.OutputFolder` still holds the full path after `Save`
-- [ ] tests for portable migration: a legacy `OutputFolder` ending in `\userdata\Converted` from another location becomes the default in portable mode only, ignoring case and trailing separators
+- [ ] tests for portable migration: a legacy `OutputFolder` ending in `\userdata\Converted` from another location becomes the default with `isPortable` true and stays as it is with `isPortable` false, ignoring case and trailing separators
 - [ ] tests for migration: `sic.json` is created, `Sic.cfg` becomes `Sic.cfg.bak`, and an existing `sic.json` always wins over `Sic.cfg`
-- [ ] tests for failure paths: corrupt JSON moves to `sic.json.bad` without loss; with `sic.json.bad` held open, corrupt `sic.json` keeps its exact bytes and `SavesBlocked` is true; an existing `.bad` is rotated, not replaced; a locked `sic.json` sets `SavesBlocked` and changes nothing; a locked `Sic.cfg` keeps the file and sets `SavesBlocked`
+- [ ] tests for failure paths: corrupt JSON is copied to `sic.json.bad` without loss, and `sic.json` is replaced with defaults; with `sic.json.bad` held open, corrupt `sic.json` keeps its exact bytes and `SavesBlocked` is true; an existing `.bad` is rotated, not replaced; a locked `sic.json` sets `SavesBlocked` and changes nothing; a locked `Sic.cfg` keeps the file and sets `SavesBlocked`
 - [ ] tests for atomic saves: a failed save leaves the previous file intact and no temporary file behind
 - [ ] validation commands pass
 
@@ -178,7 +182,7 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 - [ ] Add `SingleInstanceGuard` as under Technical details: `TryAcquire(dataFolder)`, `Dispose`, `ActivateExisting(dataFolder)`, `GetActivationMessage(dataFolder)` and `GetInstanceKey(dataFolder)`.
 - [ ] In `Program.Main`, on the GUI path only, before `Config.Load`: keep the guard in `internal static SingleInstanceGuard? InstanceGuard` for the app's lifetime. If it can't be acquired, call `ActivateExisting` and return `ExitCode.Success` without showing anything.
-- [ ] In `MainWindow`, keep `GetActivationMessage(App.DataFolder)` in a `static readonly` field, because an instance field that isn't set yet equals `WM_NULL`, and override `WndProc`. On that message, as Notika does, call `BeginInvoke` and return, so nothing runs inside the message tick. The queued method calls `ShowWindow(Handle, SW_RESTORE)` if `IsIconic(Handle)`, so a maximized window stays maximized, then brings forward `GetLastActivePopup(Handle)`, so an open modal dialog gets focus rather than the disabled main window. These window P/Invokes stay private in `MainWindow`, beside the one at line 43.
+- [ ] In `MainWindow`, keep `SingleInstanceGuard.GetActivationMessage(Utils.Constants.App.DataFolder)` in a `static readonly` field, because an instance field that isn't set yet equals `WM_NULL`, and override `WndProc`. The file has no `App` alias, hence the full name. On that message, as Notika does, call `BeginInvoke` and return, so nothing runs inside the message tick. The queued method calls `ShowWindow(Handle, SW_RESTORE)` if `IsIconic(Handle)`, so a maximized window stays maximized, then brings forward `GetLastActivePopup(Handle)`, so an open modal dialog gets focus rather than the disabled main window. These window P/Invokes stay private in `MainWindow`, beside the one at line 43.
 - [ ] tests for `TryAcquire`: a second acquire for the same folder returns null, a different folder succeeds, and acquiring works again after `Dispose`
 - [ ] tests for `Dispose`: it's idempotent, and disposing from another thread lets the next `TryAcquire` succeed
 - [ ] tests for `GetActivationMessage`: the same non-zero value for the same folder, and different values for different folders
@@ -215,7 +219,7 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 - [ ] `README.md`: replace the `Sic.cfg` mention and "SharpConfig-based settings".
 - [ ] `CHANGELOG.md` and `changelogs/1.2.0.0.md`: add the automatic move to `sic.json`, the single-instance behavior, and the behavior changes under Technical details.
 - [ ] Remove `sharpconfig-huanlin` from any remaining mention outside `docs/plans`.
-- [ ] `CLAUDE.md`: update the config references, the settings section and the dependency table. Document `SingleInstanceGuard`, and note that #35 will need to forward file paths to the running instance, because arguments mean CLI mode today.
+- [ ] `CLAUDE.md`: update the config references, the settings section, including both places that call `EnabledFormats` comma-separated, and the dependency table. Document `SingleInstanceGuard`, and note that #35 will need to forward file paths to the running instance, because arguments mean CLI mode today.
 - [ ] validation commands pass
 
 ## Technical details
@@ -259,7 +263,9 @@ public sealed record ConfigLoadResult(
 
 ### JsonSerializerOptions
 
-`WriteIndented = true`, `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`, `PropertyNameCaseInsensitive = true`, `DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull`, `ReadCommentHandling = JsonCommentHandling.Skip`, `AllowTrailingCommas = true`, `Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping`, and a `JsonStringEnumConverter`.
+`WriteIndented = true`, `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`, `PropertyNameCaseInsensitive = true`, `DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull`, `ReadCommentHandling = JsonCommentHandling.Skip`, `AllowTrailingCommas = true`, `Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping`, and `new JsonStringEnumConverter(allowIntegerValues: false)`. The default converter accepts any integer, so `"updateCheckInterval": 99` would silently turn off update checks.
+
+These options don't reach `JsonDocument`, so parse with `new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true }`. `TryGetProperty` is case-sensitive, so enumerate each object's properties and match names with `OrdinalIgnoreCase`. Each value is then deserialized with the options above.
 
 The encoder is about values, such as folder paths and preset names. The default would write `Блог` as `\u0411\u043B\u043E\u0433`, which is still UTF-8 but unreadable in a text editor. Comments are a different matter: `Skip` tolerates them when reading, but they aren't kept, so the next save removes them.
 
@@ -267,10 +273,10 @@ The encoder is about values, such as folder paths and preset names. The default 
 
 ### Load flow
 
-Every path that produces values finishes with the same clean-up: a null `general` becomes defaults, null strings become their defaults, a blank `outputFolder` becomes `App.DefaultOutputFolder`, and a `language` that isn't `System` or a valid culture name becomes `System`.
+Every path that produces values finishes with the same clean-up: a null `general` becomes defaults, null strings become their defaults, a null `enabledFormats` becomes empty and loses any null or blank entries, a blank `outputFolder` becomes `App.DefaultOutputFolder`, and a `language` that isn't `System` or a valid culture name becomes `System`.
 
-1. If `sic.json` exists, read its bytes with sharing allowed (`FileShare.ReadWrite | FileShare.Delete`), skip a UTF-8 BOM, decode with `new UTF8Encoding(false, throwOnInvalidBytes: true)`, and parse the text with `JsonDocument`. Bytes that aren't valid UTF-8 count as invalid JSON (step 2). Read `general` one property at a time, deserializing each value to its property's type. A value of the wrong type or an unknown enum name keeps its default and counts as bad. If anything was bad, call `BackUpFile` before going on, and report how many values were reset. If that backup fails, set `SavesBlocked`.
-2. If the file isn't valid JSON, call `BackUpFile`, use defaults, write a new `sic.json` and report the error, naming `sic.json.bad`. If the backup fails, set `SavesBlocked`, write nothing, and leave `sic.json` in place.
+1. If `sic.json` exists, read its bytes with sharing allowed (`FileShare.ReadWrite | FileShare.Delete`), skip a UTF-8 BOM, decode with `new UTF8Encoding(false, throwOnInvalidBytes: true)`, and parse the text with `JsonDocument`. Bytes that aren't valid UTF-8 count as invalid JSON (step 2). Read `general` one property at a time, deserializing each value to its property's type. A value of the wrong type, an unknown enum name or an invalid `language` keeps its default and counts as bad, and so does a `general` that isn't an object. If anything was bad, call `BackUpFile`, write the repaired config with `Save`, and report how many values were reset, so the next start is silent. Report a failed write through `SaveError`. If the backup fails, set `SavesBlocked` and write nothing.
+2. If the file isn't valid JSON (`catch (Exception ex) when (ex is JsonException or DecoderFallbackException)`), or its root isn't an object, call `BackUpFile`, use defaults, replace `sic.json` through `Save` and report the error, naming `sic.json.bad`. If the backup fails, set `SavesBlocked`, write nothing, and leave `sic.json` in place.
 3. If `sic.json` can't be read (I/O or access error), use defaults, set `SavesBlocked`, and report the error. The file is left untouched.
 4. If `sic.json` doesn't exist and `Sic.cfg` does, read it with `LegacyConfigReader`. If reading fails, use defaults, set `SavesBlocked`, leave `Sic.cfg` alone and report the error, so the next run tries again. Otherwise write `sic.json`, and only after that succeeds move `Sic.cfg` to `Sic.cfg.bak`, overwriting an older one. A failed rename is logged and is harmless, because `sic.json` wins from then on. A failed write keeps `Sic.cfg` as it is, reports the error, and the migrated values are used for this run.
 5. If neither exists, create the data folder, write defaults, and report any failure.
@@ -316,7 +322,7 @@ Parser rules:
 
 ### SingleInstanceGuard
 
-- `GetInstanceKey(dataFolder)`: the first 16 hex characters of the SHA-256 of the full path, upper-cased, with any trailing backslash removed. Keying on the data folder is what lets separate copies run side by side, since each has its own config.
+- `GetInstanceKey(dataFolder)`: take `Path.GetFullPath(dataFolder).TrimEnd('\\').ToUpperInvariant()`, then the first 16 characters of `Convert.ToHexString` of the SHA-256 of its UTF-8 bytes. Keying on the data folder is what lets separate copies run side by side, since each has its own config.
 - `TryAcquire(dataFolder)`: `new Mutex(initiallyOwned: true, $@"Local\Oire.Sic.{key}", out var createdNew)`. If `createdNew` is false, dispose it and return null. No `WaitOne`, so ownership can't be abandoned in a way that matters: a crashed process's handle closes and the mutex disappears with it.
 - `TryAcquire` catches `UnauthorizedAccessException`, logs it and returns null. A normal launch beside an elevated copy would otherwise land in `Program.Main`'s catch and show a false "Unable to start" error. Activation is best effort in that case, because Windows blocks the broadcast to an elevated window.
 - `Dispose` only closes the handle. It never calls `ReleaseMutex`, which throws on any thread but the owner, and the portable updater disposes the guard from another thread. It's idempotent. Closing the last handle destroys the mutex, so the next process gets `createdNew == true`.
@@ -340,6 +346,10 @@ The mutex is a kernel object that vanishes when SIC! exits, so it leaves nothing
 - An invalid language value no longer stops SIC! at startup.
 - A CLI save failure now goes to stderr instead of a message box.
 - A CLI run no longer saves a reset of a missing output folder, so an unplugged drive doesn't lose the custom folder.
+
+### Known limits
+
+- `Config.Load` runs before `SetLanguage`, so its messages use the Windows language rather than the one chosen in Settings. Today's error messages already behave this way.
 
 ### Out of scope
 

@@ -39,11 +39,11 @@ There are no e2e tests.
 - Updater: `src/Sic/Services/UpdateService.cs` (`ToFrequency`)
 - Catalogs: `src/Sic/locale/{de,es,fr,he,ru,uk}/Sic.po`
 - Project and CI: `src/Sic/Sic.csproj`, `Sic.sln`, `.github/workflows/dotnet.yml`, `.github/dependabot.yml`, `installer/build-installer.ps1`
-- Translation tools: `src/Sic/locale/scripts/Compile-Translations.ps1`
+- Translation tools: `src/Sic/locale/scripts/Compile-Translations.ps1`, `Update-Translations.ps1`, `src/Sic/locale/README.md`
 
 ### Patterns to follow
 
-- Test project: copy `C:\repos\Oire\plan-cake\tests\PlanCake.Tests\PlanCake.Tests.csproj`. Keep its `net10.0-windows`, `UseWindowsForms`, `Platforms`, `Platform`, analyzer, `IsPackable`, `IsTestProject` and `PreserveCompilationContext` properties, its package versions (`xunit` 2.9.3, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `AwesomeAssertions`, `Microsoft.CodeAnalysis.NetAnalyzers`) and its `PrivateAssets` pattern. Leave out `Jint`, `Corpus` and `coverlet.collector`.
+- Test project: copy `C:\repos\Oire\plan-cake\tests\PlanCake.Tests\PlanCake.Tests.csproj`. Keep its `net10.0-windows`, `UseWindowsForms`, `Platforms`, `Platform`, analyzer, `IsPackable` and `IsTestProject` properties, its package versions (`xunit` 2.9.3, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `AwesomeAssertions`, `Microsoft.CodeAnalysis.NetAnalyzers`) and its `PrivateAssets` pattern. Leave out `Jint`, `Corpus`, `coverlet.collector`, and `PreserveCompilationContext` with its comment, which only exists for Coverlet.
 - Assertions: `using AwesomeAssertions;`, as in `plan-cake/tests`.
 - Non-parallel collection: `C:\repos\Oire\plan-cake\tests\PlanCake.Tests\LocalizationCollection.cs`, with `[CollectionDefinition(Name, DisableParallelization = true)]` on a `public sealed class` holding a `Name` constant.
 
@@ -69,6 +69,7 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - One task at a time; the validation commands pass before the next task starts.
 - These tests describe the code as it is. If one finds a real bug, do not change behavior silently: record it in this plan with a "⚠️" prefix and tell the user.
 - A failing catalog entry is a real finding too. Report it rather than rewriting a translation to make a test pass.
+- A test that exposes a real bug or a bad catalog entry stays in the code with `Skip = "⚠️ ..."` naming the problem, and the problem goes in this plan. The validation commands keep passing, and the test isn't weakened.
 - Tests never touch the user's real data. The test output folder contains a `userdata` folder, so `App.IsPortable` is true and `App.DataFolder` stays inside `bin` (Task 1).
 - When scope changes, update this plan: new tasks get a "➕" prefix, blockers a "⚠️" prefix.
 
@@ -80,6 +81,7 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 - Create: `tests/Sic.Tests/Sic.Tests.csproj`
 - Create: `tests/Sic.Tests/TestIsolationTests.cs`
+- Create: `tests/Sic.Tests/TestDataFolder.cs`
 - Create: `tests/Sic.Tests/UrlHelperTests.cs`
 - Modify: `Sic.sln`
 - Modify: `src/Sic/Sic.csproj`
@@ -88,20 +90,22 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - Modify: `installer/build-installer.ps1`
 - Modify: `src/Sic/locale/scripts/Compile-Translations.ps1`
 - Modify: `src/Sic/locale/scripts/Update-Translations.ps1`
+- Modify: `src/Sic/locale/README.md`
 
 #### Steps
 
 - [ ] Create the project from the PlanCake pattern, with `AssemblyName` `Sic.Tests`, `RootNamespace` `Oire.Sic.Tests`, `IsPublishable` false, and a project reference to `src/Sic/Sic.csproj`.
 - [ ] Add `<InternalsVisibleTo Include="Sic.Tests" />` to `Sic.csproj`, and add the test project to `Sic.sln` with Debug|x64 and Release|x64 entries.
 - [ ] Add an after-build target to the test project that creates `$(OutDir)userdata` and `$(OutDir)locale\de`, and a guard test asserting that `App.IsPortable` is true and `App.DataFolder` is under the test output folder.
-- [ ] Add `TestDataFolder.Clear()`, deleting `Sic.cfg`, `sic.json` and their backups from `App.DataFolder`, for tests in this and later plans that place config files there.
+- [ ] Add `TestDataFolder.Clear()`, deleting every `Sic.cfg*` and `sic.json*` file from `App.DataFolder`, which also covers later backups such as `sic.json.bad.<timestamp>`, for tests in this and later plans that place config files there.
 - [ ] In `build-installer.ps1`, rename `$SolutionPath` to `$ProjectPath` pointing at `src\Sic\Sic.csproj`, with the error text "Project file not found", and pass exactly `$ProjectPath, "--configuration", "Release", "/verbosity:minimal"`. Do not copy PlanCake's `--output` or `--runtime`: here `$PublishOutputPath` is defined after the publish, and PlanCake's folder is different.
 - [ ] Confirm with `.\installer\build-installer.ps1 -NoSign`, which deletes `bin\x64\Release` first, so an old `Sic.exe` can't pass the check. The new `Sic.exe` must be in `src\Sic\bin\x64\Release\win-x64\publish`, with no `xunit*` or `Sic.Tests*` files beside it.
-- [ ] Make `Compile-Translations.ps1` and `Update-Translations.ps1` find `msgfmt` and `msgmerge` on the `PATH` through `Get-Command` before trying the two GnuWin32 folders, because later plans run both. The owner has mlocati's gettext build, in `%LOCALAPPDATA%\Programs\gettext-iconv\bin`, so change both install hints to `winget install mlocati.GetText`.
-- [ ] Make `Update-Translations.ps1` restore CRLF after each `msgmerge`, without adding a BOM. `msgmerge` writes LF, so every update would otherwise be a whole-file diff. Confirm by running the script with no new strings: `git diff` must show no line-ending changes.
+- [ ] Make `Compile-Translations.ps1` and `Update-Translations.ps1` find `msgfmt` and `msgmerge` on the `PATH` through `Get-Command`, using `.Source` as `build-installer.ps1` does for 7-Zip, then in `$env:LOCALAPPDATA\Programs\gettext-iconv\bin`, where mlocati's gettext build installs, then in the two GnuWin32 folders. Later plans run both scripts. Change the install hint in both scripts and in `src/Sic/locale/README.md` to `winget install mlocati.GetText`.
+- [ ] Make `Update-Translations.ps1` restore CRLF after each `msgmerge` with the code under Technical details, inside `if ($LASTEXITCODE -eq 0)` and before the backup is removed, so a failed write still reaches the catch block's restore. `msgmerge` writes LF, so every update would otherwise be a whole-file diff.
+- [ ] Confirm by running the script twice with no new strings, then discard the changes. `msgmerge` rewrites a catalog even when it's in sync, so this does exercise the code. `git diff --stat` must show only a few lines per catalog, where `msgmerge` moves the `Language:` header, and the second run must add nothing.
 - [ ] tests for `UrlHelper.IsValidHttpUrl`: valid http and https links, including surrounding spaces
 - [ ] tests for `UrlHelper.IsValidHttpUrl`: other schemes, relative links and empty input
-- [ ] Add a `Test` step running `dotnet test --no-build` after `Build` in `dotnet.yml`, and `timeout-minutes: 20` on the job, so a hung socket test can't hold the runner. In `dependabot.yml`, replace `FluentAssertions*` with `AwesomeAssertions*` and remove `coverlet*`.
+- [ ] Add a `Test` step running `dotnet test --no-build` after `Build` in `dotnet.yml`, and `timeout-minutes: 20` on the job, so a hung socket test can't hold the runner. In `dependabot.yml`, replace `FluentAssertions*` with `AwesomeAssertions*`, and remove `coverlet*` and `Moq*`.
 - [ ] validation commands pass
 
 ### Task 2: Test format lists and output paths
@@ -153,7 +157,7 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 #### Steps
 
 - [ ] tests for `FindSizeFitProposals`: every proposal is under budget, the first is `Recommended`, and ranking is resolution, then quality, then size
-- [ ] tests for limits: `maxWidth` is respected, an impossible budget gives an empty list, `maxBytes` of 0 is handled, and ICO and GIF are never proposed. Derive budgets from a measured encode.
+- [ ] tests for limits: `maxWidth` is respected, an impossible budget gives an empty list, `maxBytes` of 0 throws `ArgumentOutOfRangeException`, and ICO and GIF are never proposed. Derive budgets from a measured encode.
 - [ ] tests for `ConvertToProposal`: the written file matches the advertised `FileSize` exactly, and an unsupported format fails
 - [ ] tests for progress and cancellation: each format is reported as its turn starts, and a canceled token stops the search. Add a small synchronous `IProgress<string>` that appends to a list, and can cancel a token on its first report. `Progress<T>` posts callbacks asynchronously, so asserting right after the search would race.
 - [ ] Keep images small and include AVIF in one test only, because it is by far the slowest format.
@@ -168,11 +172,12 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - Create: `tests/Sic.Tests/LocalizationTests.cs`
 - Create: `tests/Sic.Tests/UpdateIntervalTests.cs`
 - Create: `tests/Sic.Tests/StaticStateCollection.cs`
+- Create: `tests/Sic.Tests/StaticStateTestBase.cs`
 - Modify: `src/Sic/Services/UpdateService.cs`
 
 #### Steps
 
-- [ ] Add `StaticStateCollection` on the PlanCake pattern, for tests that touch `Config`, `Console` or `Localization`, and a base class that calls `Localization.SetLanguage("en-US")` in its constructor and `Dispose`, because `SetLanguage` writes `CultureInfo.DefaultThreadCurrentCulture` process-wide.
+- [ ] Add `StaticStateCollection` on the PlanCake pattern, for tests that touch `Config`, `Console` or `Localization`, and a `StaticStateTestBase` class that calls `Localization.SetLanguage("en-US")` in its constructor and `Dispose`, because `SetLanguage` writes `CultureInfo.DefaultThreadCurrentCulture` process-wide.
 - [ ] tests for `FileHelper.EnumerateImageFiles`: top folder only, recursive, several extensions, and an inaccessible folder being skipped, using a Deny ACE for the current user that's removed in `finally`. `IsCloudPlaceholder` returns false for a normal file.
 - [ ] tests for `ImageItem`, in the non-parallel collection because it calls `_()`: the byte, KB and MB boundaries in `GetSizeDisplay`, and the dimension and description text, under a fixed culture
 - [ ] tests for `Localization`, in the non-parallel collection: English source text, placeholders and plurals; `SetLanguage("de")` keeps `de`, and `pl-PL` falls back to `en-US`. Assert no translated text. A neutral culture such as `pl` resolves oddly because `Path.Combine(LocalesFolder, "")` exists: record that with a "⚠️" as a possible bug.
@@ -206,8 +211,8 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - [ ] Add `PoCatalog`, a small reader for `Sic.po` that finds the repository root by walking up to `Sic.sln`, and lists languages from `locale/*/Sic.po` on disk rather than hard-coding them. It handles multi-line strings and plural entries, skips the header and obsolete `#~` entries, and ties a `#, fuzzy` flag to the entry after it, because today's flags all sit on obsolete entries.
 - [ ] tests over all languages: no fuzzy entries and no empty `msgstr`
 - [ ] tests for placeholders on singular entries: each `msgstr` uses the same `{0}`-style placeholders as its `msgid`.
-- [ ] tests for placeholders on plural entries: every `msgstr[i]` uses only placeholders found in `msgid_plural`, the last form matches `msgid_plural` exactly, and `msgstr[0]` may omit a placeholder only when `msgid` has none. Russian and Ukrainian `msgstr[0]` need `{0}`, because that form also covers 21, 31 and so on.
-- [ ] Add one `TheoryData` per menu level in `BuildMenuSpec` (`FileMenuStrings`, `EditMenuStrings`, `ConvertMenuStrings`, `HelpMenuStrings`), and test that no level has duplicate mnemonics in any language. A duplicate throws `ArgumentException` at startup. Use `MenuTextFormatter.ExtractMnemonic` from `Oire.WinForms.NativeControls`. A listed `msgid` missing from a catalog fails the test, so a renamed string can't pass silently.
+- [ ] tests for placeholders on plural entries: every `msgstr[i]` uses only placeholders found in `msgid_plural`, the last form matches `msgid_plural` exactly, and `msgstr[0]` may omit a placeholder only when `msgid` has none. In a language whose `Plural-Forms` has `nplurals` above 2, as Russian and Ukrainian do, `msgstr[0]` needs `{0}`, because that form also covers 21, 31 and so on.
+- [ ] Add one `TheoryData` per menu level in `BuildMenuSpec` (`TopLevelMenuStrings` for the bar itself, then `FileMenuStrings`, `EditMenuStrings`, `ConvertMenuStrings`, `HelpMenuStrings`), and test that no level has duplicate mnemonics in any language. A duplicate throws `ArgumentException` at startup. Use `MenuTextFormatter.ExtractMnemonic` from `Oire.WinForms.NativeControls`. A listed `msgid` missing from a catalog fails the test, so a renamed string can't pass silently.
 - [ ] validation commands pass
 
 ### Task 8: Update project documentation
@@ -229,6 +234,19 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 ### Test isolation
 
 `App.IsPortable` is `Directory.Exists(Path.Combine(AppContext.BaseDirectory, "userdata"))`, so a `userdata` folder in the test output makes every path under `App.DataFolder` land in `bin`. The guard test in Task 1 fails loudly if that ever stops being true.
+
+### Restoring CRLF
+
+These scripts run under Windows PowerShell 5.1, where `Get-Content -Raw` reads the UTF-8 catalogs as ANSI and `Set-Content -Encoding UTF8` adds a BOM, so use .NET directly. `msgmerge` can also leave a file as it was, so the replacement must not touch lines that already end in CRLF.
+
+```powershell
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+$merged = [System.IO.File]::ReadAllText($poFile, $utf8NoBom)
+$crlf = [regex]::Replace($merged, '(?<!\r)\n', "`r`n")
+if ($crlf -cne $merged) {
+    [System.IO.File]::WriteAllText($poFile, $crlf, $utf8NoBom)
+}
+```
 
 ### Out of scope
 
