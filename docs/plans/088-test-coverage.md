@@ -158,12 +158,12 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 #### Steps
 
-- [ ] tests for `FindSizeFitProposals`: every proposal is under budget, the first is `Recommended`, and ranking is resolution, then quality, then size
-- [ ] tests for limits: `maxWidth` is respected, an impossible budget gives an empty list, `maxBytes` of 0 throws `ArgumentOutOfRangeException`, and ICO and GIF are never proposed. Derive budgets from a measured encode.
-- [ ] tests for `ConvertToProposal`: the written file matches the advertised `FileSize` exactly, and an unsupported format fails
-- [ ] tests for progress and cancellation: each format is reported as its turn starts, and a canceled token stops the search. Add a small synchronous `IProgress<string>` that appends to a list, and can cancel a token on its first report. `Progress<T>` posts callbacks asynchronously, so asserting right after the search would race.
-- [ ] Keep images small and include AVIF in one test only, because it is by far the slowest format.
-- [ ] validation commands pass
+- [x] tests for `FindSizeFitProposals`: every proposal is under budget, the first is `Recommended`, and ranking is resolution, then quality, then size
+- [x] tests for limits: `maxWidth` is respected, an impossible budget gives an empty list, `maxBytes` of 0 throws `ArgumentOutOfRangeException`, and ICO and GIF are never proposed. Derive budgets from a measured encode.
+- [x] tests for `ConvertToProposal`: the written file matches the advertised `FileSize` exactly, and an unsupported format fails
+- [x] tests for progress and cancellation: each format is reported as its turn starts, and a canceled token stops the search. Add a small synchronous `IProgress<string>` that appends to a list, and can cancel a token on its first report. `Progress<T>` posts callbacks asynchronously, so asserting right after the search would race.
+- [x] Keep images small and include AVIF in one test only, because it is by far the slowest format.
+- [x] validation commands pass
 
 ### Task 5: Test utilities and models
 
