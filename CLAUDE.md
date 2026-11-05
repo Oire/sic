@@ -11,12 +11,24 @@ It uses structured logging (Serilog), file-based configuration (SharpConfig), an
 ## Build Commands
 
 ```bash
-dotnet build              # Build the solution (Debug|x64 by default)
-dotnet build -c Release   # Release build
-dotnet publish -c Release # Publish as single-file executable
+dotnet build                                   # Build the solution (Debug|x64 by default)
+dotnet build -c Release                        # Release build
+dotnet test                                    # Run the tests (tests/Sic.Tests, xUnit + AwesomeAssertions)
+dotnet format --verify-no-changes              # Format check, as CI runs it
+dotnet publish src/Sic/Sic.csproj -c Release   # Publish as single-file executable
 ```
 
-There are no test projects or linting commands configured yet.
+Publish the csproj, not the solution: the solution also holds the test project, which must never reach the published output.
+
+### Tests
+
+`tests/Sic.Tests` covers the conversion engine, fit to file size, output paths, utilities, the CLI (through `Program.RunCli`, which is `internal` for that) and the `Sic.po` catalogs. CI runs `dotnet test --no-build` after the build. A few rules keep the suite honest:
+
+- **Isolation through `userdata`.** An after-build target creates `userdata` (and `locale\de`) in the test output folder, and a `[ModuleInitializer]` (`TestAssemblySetup`) creates `userdata` again before any test runs, so `App.IsPortable` is true and `App.DataFolder` stays inside `bin` even under `dotnet test --no-build` after the folder was deleted. Tests never touch the real `%APPDATA%\Oire\Sic`: `TestDataFolder.Clear()`, which removes config files a test placed there, throws unless the data folder is inside the test output, and `TestIsolationTests` checks the same.
+- **One non-parallel collection for static state.** `Config`, `Console` and `Localization` are static, and `Localization.SetLanguage` changes the culture of the whole process, so tests that touch them, or assert text returned by `_()`, go in `[Collection(StaticStateCollection.Name)]` and derive from `StaticStateTestBase`, which resets the language to `en-US`.
+- **Never assert translated text.** `.mo` files aren't in git, and the catalog is named from `Environment.ProcessPath`, so under `dotnet test` translations never load. English text from `_()` is safe to assert; translated text is not. Don't assert the text of `System.CommandLine`'s own errors either, since it follows `CurrentUICulture`.
+- **No binary fixtures.** `TestImages` generates images with Magick in a temporary folder. Size budgets come from a measured encode, never from constants, because Magick noise isn't seeded.
+- A test that exposes a real bug stays, with `Skip = "⚠️ ..."` naming the problem, rather than being weakened.
 
 ### Localization scripts
 
@@ -47,7 +59,11 @@ Keep the designer's English `Text` as-is — it's what the visual designer shows
 
 Note that `Update-Translations.ps1` fuzzy-matches new titles against the similarly worded menu items, so freshly merged title entries arrive with `&` mnemonics and trailing `...` and a `#, fuzzy` flag. Fix the `msgstr` and drop the flag — window titles carry neither.
 
-**Languages ship as three parallel pieces**, and a new one is only half-added if any is missing: `locale/<code>/Sic.po` + `.mo` (UI strings), `help/<code>/manual.html` (user manual, resolved by culture name then two-letter code, falling back to `en`), and `installer/Languages/Custom.<code>.isl` wired into the `[Languages]` section of `installer/sic.iss`. Add the code to `SatelliteResourceLanguages` in the csproj as well, or NuGet dependencies (NetSparkle's update UI) stay untranslated. The Settings language dropdown needs no code change — it lists every `locale/` subdirectory that holds a `Sic.mo`, named by the culture's native name.
+`dotnet test` fails until every merged entry is translated in every language and no `#, fuzzy` flag is left, the header's included; `TranslationCatalogTests` checks all catalogs on disk, and also fails on a catalog whose header declares no `Plural-Forms`.
+
+**Menu mnemonics are tested per level.** `TranslationCatalogTests` keeps one string array per level of `MainWindow.BuildMenuSpec` (`TopLevelMenu`, `FileMenu`, `EditMenu`, `ConvertMenu`, `HelpMenu`) and fails if two items on a level share a mnemonic in any language, because `NativeMenuSpec` throws `ArgumentException` at startup on a clash. When you add, rename or move a menu item, update the matching array too; `MenuLists_MatchBuildMenuSpec` reads `BuildMenuSpec` from `MainWindow.cs` and fails until the arrays match it.
+
+**Languages ship as three parallel pieces**, and a new one is only half-added if any is missing: `locale/<code>/Sic.po` + `.mo` (UI strings), `help/<code>/manual.html` (user manual, resolved by culture name then two-letter code, falling back to `en`), and `installer/Languages/Custom.<code>.isl` wired into the `[Languages]` section of `installer/sic.iss`. Add the code to `SatelliteResourceLanguages` in `src/Sic/Sic.csproj` as well (not the test project, which keeps only `en` on purpose), or NuGet dependencies (NetSparkle's update UI) stay untranslated. The Settings language dropdown needs no code change — it lists every `locale/` subdirectory that holds a `Sic.mo`, named by the culture's native name.
 
 Hebrew is right-to-left; see `Utils/TextDirection.cs` and `Utils/DialogHelper.cs` below.
 
@@ -65,7 +81,8 @@ Hebrew is right-to-left; see `Utils/TextDirection.cs` and `Utils/DialogHelper.cs
 - `LoadFromFile`, `LoadFromStream`, `LoadFromBytes`, `LoadFromUrl` — create `ImageItem` from various sources
 - `Convert` — converts an `ImageItem` to a target format with optional resize, writes to disk
 - `CreateMultiSizeIco` — one ICO holding several sizes of an image (Convert > Create Multi-size ICO…)
-- Every ICO, from `Convert` too, is written by `WriteIco`: Magick's encoder switches to PNG only *above* 256 px, whatever the compression or format settings, so the 256 px frame Windows uses comes out as a ~260 KB uncompressed bitmap. `WriteIco` lets Magick write the file (keeping its 512 px limit and its encoding of the smaller frames), then swaps such a frame's bitmap for the same pixels as a 32-bit PNG, as Windows' own icons store it.
+- Every ICO, from `Convert` too, is written by `WriteIco`: Magick's encoder switches to PNG only *above* 256 px, whatever the compression or format settings, so the 256 px frame Windows uses comes out as a ~260 KB uncompressed bitmap. `WriteIco` lets Magick write the file (keeping its 512 px limit and its encoding of the smaller frames), then swaps the bitmap of any frame with a side of 256 px or more for the same pixels as a 32-bit PNG, as Windows' own icons store it, and writes 0 (meaning 256 or more) for that side in the directory. It goes by the frame's own size, not the directory's: Magick writes a 300x200 frame as a bitmap with a directory width of 44 (300 mod 256). Magick checks the 512 px limit on the first frame only, so `WriteIco` checks every frame itself first and throws `ArgumentException` without writing anything when one is over 512 px.
+- ICO has no signature Magick detects, so bytes with no file name to go by (a pasted or downloaded icon) fail with "no decode delegate". Every decode of in-memory bytes therefore goes through `ReadImage`, which recognizes the ICO header (`IsIcoData`: reserved 0, type 1, at least one image), reads it with `MagickFormat.Ico` and keeps the largest frame, as `LoadFromFile` does for an `.ico` file. Such items report `OriginalFormat` "Ico".
 - `GeneratePreview` — produces a `Bitmap` for the preview panel
 - `GenerateOutputPath`, `GetConflictRenamePath` — output path logic with conflict resolution
 - `GetSupportedFormats` — all SIC! format keys in canonical order; `GetEnabledFormats(enabledKeys)` filters them to the user-selected subset (issue #47), preserving order and never returning an empty list
@@ -101,7 +118,7 @@ Tab page `Text` doesn't honor `&` mnemonics — navigate tabs with Ctrl+Tab / Ct
 - `Config.cs` — Static config manager using SharpConfig. Reads/writes `%APPDATA%/Oire/Sic/Sic.cfg` with a `[General]` section (Language, OutputFolder, SaveToSourceFolder, LastInputFolder, ConfirmExitWithQueue, CheckForUpdatesOnStartup, UpdateCheckInterval, DetectClipboardData, EnabledFormats). `SaveToSourceFolder` (issue #33), when on, writes converted files next to each original instead of into `OutputFolder`; clipboard/URL items have no source folder and fall back to `OutputFolder`. `EnabledFormats` is a comma-separated list of SIC! format keys shown in the target dropdown (empty = all); parse it via `GetEnabledFormatKeys()` and filter with `ImageConverter.GetEnabledFormats(...)`. Accepts `isGui` parameter to route errors to MessageBox (GUI) or stderr (CLI).
 - `FileHelper.cs` — Cloud placeholder detection (OneDrive/SharePoint recall attributes) and image file enumeration with glob patterns.
 - `UrlHelper.cs` — Single source of truth for link validation: `IsValidHttpUrl(text, out url)` trims input and checks for an absolute http(s) URL. Used by the "Add by link" dialog, Ctrl+V paste, and clipboard auto-detection so all three validate links identically.
-- `Localization.cs` — Wraps GetText.NET with convenience methods: `_()`, `_n()`, `_p()`, `_pn()` for translations. Loads `.mo` files from the `locale/` folder relative to the executable. Falls back through language parents to `en-US`.
+- `Localization.cs` — Wraps GetText.NET with convenience methods: `_()`, `_n()`, `_p()`, `_pn()` for translations. Loads `.mo` files from the `locale/` folder relative to the executable. Falls back through language parents to `en-US`. `HasLocaleFolder` ignores an empty culture name: a neutral culture such as `pl` has the invariant culture as its parent, and its empty name would otherwise make `Path.Combine(LocalesFolder, "")` the locale folder itself, which always exists.
 - `TextDirection.cs` — Right-to-left support (Hebrew). `Apply(form)` sets `RightToLeft` from the active culture and walks the control tree setting `RightToLeftLayout`, which — unlike `RightToLeft` — is *not* ambient and only exists on `Form`, `ListView`, `TabControl` and `ProgressBar`. Every form calls it immediately after `Localizer.Localize`, and `MainWindow.ApplyLocalization` calls it again so a live language switch re-mirrors the window. The hand-built file-conflict dialog in `MainWindow.ResolveFileConflict` calls it too.
 - `DialogHelper.cs` — `Show(text, caption, buttons, icon)`, a one-method wrapper over `MessageBox.Show`. WinForms mirrors a message box only when passed `MessageBoxOptions.RtlReading | RightAlign`, and those cannot be inherited from the owning form, so **every** message box in SIC! goes through here — never call `MessageBox.Show` directly.
 - `Constants/App.cs` — Application metadata, data folder paths (`%APPDATA%/Oire/Sic/`), file extensions.
@@ -254,7 +271,7 @@ Without the `|x64` suffix the command fails with a "Multiple matches" error.
 
 ## Code Conventions
 
-- **Namespaces:** `Oire.Sic`, `Oire.Sic.Models`, `Oire.Sic.Services`, `Oire.Sic.Utils`, `Oire.Sic.Utils.Constants`
+- **Namespaces:** `Oire.Sic`, `Oire.Sic.Models`, `Oire.Sic.Services`, `Oire.Sic.Utils`, `Oire.Sic.Utils.Constants`, and `Oire.Sic.Tests` (tests/Sic.Tests)
 - **Nullable reference types** are enabled; **all warnings are treated as errors** — code must compile cleanly
 - **Implicit usings** are enabled (no explicit `using System;` etc.)
 - **.NET analyzers** at latest analysis level are enforced

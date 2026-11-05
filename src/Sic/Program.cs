@@ -134,7 +134,7 @@ internal static class Program {
         }
 
         Config.General.OutputFolder = App.DefaultOutputFolder;
-        Config.Save();
+        Config.Save(showGui);
 
         try {
             Directory.CreateDirectory(App.DefaultOutputFolder);
@@ -143,7 +143,7 @@ internal static class Program {
         }
     }
 
-    private static int RunCli(string[] args) {
+    internal static int RunCli(string[] args) {
         Config.Load(isGui: false);
         Localization.SetLanguage(Config.General.Language);
         EnsureOutputFolderExists(showGui: false);
@@ -190,9 +190,14 @@ internal static class Program {
             } else if (!string.IsNullOrWhiteSpace(format)) {
                 targetFormat = format.TrimStart('.').ToUpperInvariant();
                 targetFormat = targetFormat == "JPEG" ? "JPG" : targetFormat == "TIF" ? "TIFF" : targetFormat;
+                // A link is named exactly as LoadFromUrl names it: unescaped, cleaned of characters
+                // a file name can't hold, never an empty ".jpg".
                 var baseName = isUrl
-                    ? Path.GetFileNameWithoutExtension(inputUri!.AbsolutePath)
+                    ? Path.GetFileNameWithoutExtension(UrlHelper.GetDownloadFileName(inputUri!))
                     : Path.GetFileNameWithoutExtension(input);
+                if (string.IsNullOrWhiteSpace(baseName)) {
+                    baseName = UrlHelper.DefaultDownloadName;
+                }
                 var ext = ImageConverter.GetFileExtension(targetFormat);
                 var outputFolder = Config.General.OutputFolder;
                 if (string.IsNullOrWhiteSpace(outputFolder)) {

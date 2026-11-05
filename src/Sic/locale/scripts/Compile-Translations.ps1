@@ -5,30 +5,14 @@ param(
     [string]$Language = ""
 )
 
-# Import the Get-CatalogName function
+# Import the shared helper functions
 . (Join-Path $PSScriptRoot "Get-CatalogName.ps1")
+. (Join-Path $PSScriptRoot "Find-GettextTool.ps1")
 
 # Get the catalog name automatically
 $catalogName = Get-CatalogName
 
-# Find msgfmt tool
-$msgfmt = $null
-$possiblePaths = @(
-    "C:\Program Files (x86)\GnuWin32\bin\msgfmt.exe",
-    "C:\Program Files\GnuWin32\bin\msgfmt.exe"
-)
-
-foreach ($path in $possiblePaths) {
-    if (Test-Path $path) {
-        $msgfmt = $path
-        break
-    }
-}
-
-if (!$msgfmt) {
-    Write-Error "❌ msgfmt not found. Install gettext tools: winget install GnuWin32.GetText"
-    exit 1
-}
+$msgfmt = Find-GettextTool msgfmt
 
 # Adjust paths to work from scripts subfolder
 $LocaleRoot = Split-Path $PSScriptRoot -Parent

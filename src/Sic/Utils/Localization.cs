@@ -36,17 +36,24 @@ internal static class Localization {
             : new CultureInfo(_languageOverride);
 
         // Check if locale files exist for this culture
-        if (!Directory.Exists(Path.Combine(App.LocalesFolder, culture.Name))) {
-            if (!Directory.Exists(Path.Combine(App.LocalesFolder, culture.Parent.Name))) {
+        if (!HasLocaleFolder(culture.Name)) {
+            culture = HasLocaleFolder(culture.Parent.Name)
+                // Use parent culture (e.g., "de" instead of "de-AT")
+                ? new CultureInfo(culture.Parent.Name)
                 // Fall back to English if no locale files found
-                culture = new CultureInfo("en-US");
-            } else {
-                // Use parent culture (e.g., "en" instead of "en-US")
-                culture = new CultureInfo(culture.Parent.Name);
-            }
+                : new CultureInfo("en-US");
         }
 
         return culture;
+    }
+
+    /// <summary>
+    /// Whether <c>locale/&lt;cultureName&gt;</c> exists. The invariant culture, which is the parent
+    /// of a neutral culture such as "pl", has an empty name, and an empty name would otherwise
+    /// point at the locale folder itself.
+    /// </summary>
+    private static bool HasLocaleFolder(string cultureName) {
+        return !string.IsNullOrEmpty(cultureName) && Directory.Exists(Path.Combine(App.LocalesFolder, cultureName));
     }
 
     private static Catalog? _stringsCatalog;

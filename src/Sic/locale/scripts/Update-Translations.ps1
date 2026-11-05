@@ -6,8 +6,9 @@ param(
     [string]$PotFile = "../messages.pot"
 )
 
-# Import the Get-CatalogName function
+# Import the shared helper functions
 . (Join-Path $PSScriptRoot "Get-CatalogName.ps1")
+. (Join-Path $PSScriptRoot "Find-GettextTool.ps1")
 
 # Get the catalog name automatically
 $catalogName = Get-CatalogName
@@ -21,24 +22,7 @@ if (!(Test-Path $PotPath)) {
     exit 1
 }
 
-# Find msgmerge tool
-$msgmerge = $null
-$possiblePaths = @(
-    "C:\Program Files (x86)\GnuWin32\bin\msgmerge.exe",
-    "C:\Program Files\GnuWin32\bin\msgmerge.exe"
-)
-
-foreach ($path in $possiblePaths) {
-    if (Test-Path $path) {
-        $msgmerge = $path
-        break
-    }
-}
-
-if (!$msgmerge) {
-    Write-Error "❌ msgmerge not found. Install gettext tools: winget install GnuWin32.GetText"
-    exit 1
-}
+$msgmerge = Find-GettextTool msgmerge
 
 # Get languages to update
 $languages = @()
@@ -76,6 +60,16 @@ foreach ($lang in $languages) {
         & "$msgmerge" --update --backup=off "$poFile" "$PotPath"
 
         if ($LASTEXITCODE -eq 0) {
+            # msgmerge writes LF; restore the repository's CRLF so an update isn't a whole-file diff.
+            # .NET rather than Get-Content/Set-Content: under Windows PowerShell 5.1 those read UTF-8
+            # as ANSI and write a BOM. Lines already ending in CRLF are left alone.
+            $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+            $merged = [System.IO.File]::ReadAllText($poFile, $utf8NoBom)
+            $crlf = [regex]::Replace($merged, '(?<!\r)\n', "`r`n")
+            if ($crlf -cne $merged) {
+                [System.IO.File]::WriteAllText($poFile, $crlf, $utf8NoBom)
+            }
+
             Write-Host "✅ Updated $lang successfully" -ForegroundColor Green
             # Remove backup on success
             Remove-Item $backupFile -ErrorAction SilentlyContinue

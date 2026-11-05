@@ -6,7 +6,7 @@ This directory contains translation files and scripts for managing localization 
 
 1. Install gettext tools:
    ```powershell
-   winget install GnuWin32.GetText
+   winget install mlocati.GetText
    ```
 
 2. Install GetText.NET.Extractor:
@@ -86,6 +86,7 @@ cd scripts
 4. **Edit translations** in the `.po` files
 5. **Compile to binary**: `cd scripts && .\Compile-Translations.ps1`
 6. **Build project**: `dotnet build -c Release`
+7. **Run the tests**: `dotnet test` (from the repository root). The catalog checks fail on any `#, fuzzy` flag (the header's included), a header with no `Plural-Forms`, an empty `msgstr`, a missing plural form, a `{0}`-style placeholder that differs from the source, or two items on one menu level sharing a mnemonic. CI runs the same checks.
 
 ## Directory Structure
 

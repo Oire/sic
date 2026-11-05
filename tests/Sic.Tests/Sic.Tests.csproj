@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>Sic.Tests</AssemblyName>
+    <RootNamespace>Oire.Sic.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>x64</Platforms>
+    <Platform>x64</Platform>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+    <IsPublishable>false</IsPublishable>
+    <IsTestProject>true</IsTestProject>
+    <!-- Only English satellites: NetSparkle ships a JA resource that otherwise warns (NETSDK1187). -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.403" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Sic\Sic.csproj" />
+  </ItemGroup>
+
+  <!-- A userdata folder beside the test assembly makes App.IsPortable true, so App.DataFolder
+       stays inside bin and no test ever touches the real %APPDATA%\Oire\Sic. The locale\de
+       folder exists locally (the .mo files are copied) but not in CI, where .mo files are not
+       in git; creating it makes Localization.GetCurrentCulture behave the same in both. -->
+  <Target Name="CreateTestDataFolders" AfterTargets="Build">
+    <MakeDir Directories="$(OutDir)userdata;$(OutDir)locale\de" />
+  </Target>
+
+</Project>

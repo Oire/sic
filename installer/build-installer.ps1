@@ -31,7 +31,7 @@ param(
 # Script directory and paths
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $ScriptDir
-$SolutionPath = Join-Path $RepoRoot "sic.sln"
+$ProjectPath = Join-Path $RepoRoot "src\Sic\Sic.csproj"
 $IssPath = Join-Path $ScriptDir "sic.iss"
 $OutputDir = Join-Path $ScriptDir "Output"
 
@@ -51,9 +51,9 @@ if (!$SkipBuild -and (Test-Path $BuildOutputPath)) {
     Remove-Item -Path $BuildOutputPath -Recurse -Force
 }
 
-# Check if solution file exists
-if (!(Test-Path $SolutionPath)) {
-    Write-Error "Solution file not found at: $SolutionPath"
+# Check if project file exists
+if (!(Test-Path $ProjectPath)) {
+    Write-Error "Project file not found at: $ProjectPath"
     exit 1
 }
 
@@ -196,7 +196,9 @@ if (!$SkipBuild) {
 
     try {
         $BuildArgs = @(
-            $SolutionPath,
+            $ProjectPath,
+            "--configuration",
+            "Release",
             "/verbosity:minimal"
         )
 
