@@ -198,10 +198,10 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 #### Steps
 
-- [ ] Run `Extract-Strings.ps1`, then `Update-Translations.ps1`.
-- [ ] Translate every new string in all six languages, and remove the `#, fuzzy` flag from each new entry.
-- [ ] Run `Compile-Translations.ps1`.
-- [ ] validation commands pass, including `TranslationCatalogTests`
+- [x] Run `Extract-Strings.ps1`, then `Update-Translations.ps1`.
+- [x] Translate every new string in all six languages, and remove the `#, fuzzy` flag from each new entry.
+- [x] Run `Compile-Translations.ps1`.
+- [x] validation commands pass, including `TranslationCatalogTests`
 
 ### Task 7: Update the manuals and documentation
 
