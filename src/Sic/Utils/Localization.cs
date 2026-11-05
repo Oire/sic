@@ -27,6 +27,27 @@ internal static class Localization {
         CultureInfo.DefaultThreadCurrentCulture = culture;
     }
 
+    /// <summary>
+    /// Whether <paramref name="language"/> can be stored as the UI language: exactly
+    /// <see cref="App.SystemLanguageName"/>, or the name of a culture Windows knows. Anything else
+    /// would make <see cref="GetCurrentCulture"/> throw at startup.
+    /// </summary>
+    public static bool IsValidLanguageName(string? language) {
+        if (string.IsNullOrWhiteSpace(language)) {
+            return false;
+        }
+
+        if (language == App.SystemLanguageName) {
+            return true;
+        }
+
+        try {
+            return CultureInfo.GetCultureInfo(language, predefinedOnly: true).Name.Length > 0;
+        } catch (CultureNotFoundException) {
+            return false;
+        }
+    }
+
     public static CultureInfo GetCurrentCulture() {
         CultureInfo culture;
 

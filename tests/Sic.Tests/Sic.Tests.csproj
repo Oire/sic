@@ -34,6 +34,11 @@
     <ProjectReference Include="..\..\src\Sic\Sic.csproj" />
   </ItemGroup>
 
+  <!-- Sic.cfg files captured from SharpConfig before it was removed, read by LegacyConfigReaderTests. -->
+  <ItemGroup>
+    <None Update="Fixtures\**\*.cfg" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <!-- A userdata folder beside the test assembly makes App.IsPortable true, so App.DataFolder
        stays inside bin and no test ever touches the real %APPDATA%\Oire\Sic. The locale\de
        folder exists locally (the .mo files are copied) but not in CI, where .mo files are not

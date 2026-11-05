@@ -107,14 +107,14 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 #### Steps
 
-- [ ] While the package is still referenced, write a temporary test that saves each path vector under Technical details with the real SharpConfig (`Section.FromObject("General", settings)` on `Config.SectionGeneral`, then `SaveToFile`). Commit the captured files as literal fixtures, delete the temporary test, and copy the fixtures to the test output. Add a hand-written four-key fixture with an empty `LastInputFolder=` line, matching the oldest real files.
-- [ ] Add `LegacyConfigReader.Parse(string content)` returning `GeneralSettings`. It's a small hand parser following the rules under Technical details, and it does not use SharpConfig. `Read(path)` loads the file and calls `Parse`, letting I/O exceptions propagate.
-- [ ] A bad value for one key keeps that key's default, logs a warning and carries on.
-- [ ] tests for every captured fixture: the exact value comes back, including a UTF-8 BOM added by the test
-- [ ] tests for `EnabledFormats`: a captured `JPG,PNG,WEBP` fixture, `JPG, ,PNG,`, and an empty `EnabledFormats=`
-- [ ] tests for the older four-key file: missing keys keep their defaults
-- [ ] tests for bad input: an invalid bool or enum, an invalid `Language`, a line with no `=`, an unclosed `[General`, a missing section, unknown keys, and empty content
-- [ ] validation commands pass
+- [x] While the package is still referenced, write a temporary test that saves each path vector under Technical details with the real SharpConfig (`Section.FromObject("General", settings)` on `Config.SectionGeneral`, then `SaveToFile`). Commit the captured files as literal fixtures, delete the temporary test, and copy the fixtures to the test output. Add a hand-written four-key fixture with an empty `LastInputFolder=` line, matching the oldest real files.
+- [x] Add `LegacyConfigReader.Parse(string content)` returning `GeneralSettings`. It's a small hand parser following the rules under Technical details, and it does not use SharpConfig. `Read(path)` loads the file and calls `Parse`, letting I/O exceptions propagate.
+- [x] A bad value for one key keeps that key's default, logs a warning and carries on.
+- [x] tests for every captured fixture: the exact value comes back, including a UTF-8 BOM added by the test
+- [x] tests for `EnabledFormats`: a captured `JPG,PNG,WEBP` fixture, `JPG, ,PNG,`, and an empty `EnabledFormats=`
+- [x] tests for the older four-key file: missing keys keep their defaults
+- [x] tests for bad input: an invalid bool or enum, an invalid `Language`, a line with no `=`, an unclosed `[General`, a missing section, unknown keys, and empty content
+- [x] validation commands pass
 
 ### Task 3: Store configuration as JSON with migration and recovery
 
