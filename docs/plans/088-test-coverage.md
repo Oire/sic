@@ -118,13 +118,13 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 #### Steps
 
-- [ ] Add `TestImages`, which generates small images with Magick in a temporary folder and deletes them afterwards. Use gradients or Magick's noise rather than solid colors where encoded size matters, and commit no binary fixtures.
-- [ ] tests for `GetSupportedFormats` order, and `GetEnabledFormats`: filtering, canonical order, null or empty input, and never returning an empty list
-- [ ] tests for `GetSizeFitFormats`: ICO and GIF removed, and an empty result when only those are enabled
-- [ ] tests for `GetFileExtension`, `IsSameFormat` and `ShouldSkipConversion`, including JPEG and TIFF spellings and a resize forcing a re-encode
-- [ ] tests for `GenerateOutputPath`: default folder, `saveToSourceFolder`, clipboard and URL items falling back to the output folder, and a folder-relative `BasePath`
-- [ ] tests for `GetConflictRenamePath`: `_1`, then `_2` when `_1` exists
-- [ ] validation commands pass
+- [x] Add `TestImages`, which generates small images with Magick in a temporary folder and deletes them afterwards. Use gradients or Magick's noise rather than solid colors where encoded size matters, and commit no binary fixtures.
+- [x] tests for `GetSupportedFormats` order, and `GetEnabledFormats`: filtering, canonical order, null or empty input, and never returning an empty list
+- [x] tests for `GetSizeFitFormats`: ICO and GIF removed, and an empty result when only those are enabled
+- [x] tests for `GetFileExtension`, `IsSameFormat` and `ShouldSkipConversion`, including JPEG and TIFF spellings and a resize forcing a re-encode
+- [x] tests for `GenerateOutputPath`: default folder, `saveToSourceFolder`, clipboard and URL items falling back to the output folder, and a folder-relative `BasePath`
+- [x] tests for `GetConflictRenamePath`: `_1`, then `_2` when `_1` exists
+- [x] validation commands pass
 
 ### Task 3: Test loading, conversion, resizing, ICO output and previews
 
