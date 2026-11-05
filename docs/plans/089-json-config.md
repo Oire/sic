@@ -126,23 +126,23 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 #### Steps
 
-- [ ] In `App.cs`, add `ConfigFileName = "sic.json"` and `LegacyConfigFileName = "Sic.cfg"`. Keep `ConfigFileExtension` until Task 4.
-- [ ] Add `ConfigSerializer` with a `static readonly JsonSerializerOptions` as under Technical details, `Load(folder, isPortable)` returning a `ConfigLoadResult`, and `Save(path, config)` as under Technical details. `Config` passes `App.IsPortable`; the argument exists because that value is always true under `dotnet test`.
-- [ ] Add `BackUpFile(path)`, which first renames an existing `.bad` to `sic.json.bad.<yyyyMMdd-HHmmss>`, adding a number if that name is taken, then copies `sic.json` to `sic.json.bad`. It never moves `sic.json`, and no backup is overwritten. The presets plan reuses it.
-- [ ] Implement the load flow under Technical details. It takes a folder argument and shows no UI, so tests can use temporary folders. It builds complete translated messages for `LoadError` and `SaveError`, using `_n` for counts, and the corrupt-file message names `sic.json.bad`. `ConfigSerializerTests` goes in the `StaticStateCollection`, because the class calls `_()`.
-- [ ] tests for loading: valid file, missing `general`, null `enabledFormats`, `language` and `lastInputFolder`, blank `outputFolder`, a hand-edited file with comments and trailing commas, a hand-edited `"OutputFolder"` with different case, and a file with a UTF-8 BOM
-- [ ] tests for shape: `[]`, `5` and `null` as the root take the corrupt-file path; `"general": []` keeps defaults, counts as bad and is backed up; `"enabledFormats": [null, " ", "JPG"]` loads as `["JPG"]`
-- [ ] tests for encoding: a file saved in a legacy code page, which isn't valid UTF-8, takes the corrupt-file path and loses nothing
-- [ ] tests for per-value recovery: `"updateCheckInterval": "Hourly"`, `"updateCheckInterval": 99`, `"confirmExitWithQueue": 5`, `"enabledFormats": "JPG,PNG"` and an invalid `language` all keep their defaults, every other setting survives, the file is backed up, and the message names the count
-- [ ] tests for repair: after a recovery `sic.json` holds the repaired settings and a second `Load` reports nothing and creates no second backup; a failed repair write is reported through `SaveError`; two recoveries within one second keep both backups
-- [ ] tests for round trips: every setting, with Cyrillic and Hebrew in `outputFolder` written as readable text rather than `\u` escapes
-- [ ] tests for the saved file: it's pretty-printed, one property per line, and UTF-8 with no BOM
-- [ ] tests for the default output folder: saved as `""`, loaded back as the current `App.DefaultOutputFolder`, including for migrated values; a custom folder stays as it is; `config.General.OutputFolder` still holds the full path after `Save`
-- [ ] tests for portable migration: a legacy `OutputFolder` ending in `\userdata\Converted` from another location becomes the default with `isPortable` true and stays as it is with `isPortable` false, ignoring case and trailing separators
-- [ ] tests for migration: `sic.json` is created, `Sic.cfg` becomes `Sic.cfg.bak`, and an existing `sic.json` always wins over `Sic.cfg`
-- [ ] tests for failure paths: corrupt JSON is copied to `sic.json.bad` without loss, and `sic.json` is replaced with defaults; with `sic.json.bad` held open, corrupt `sic.json` keeps its exact bytes and `SavesBlocked` is true; an existing `.bad` is rotated, not replaced; a locked `sic.json` sets `SavesBlocked` and changes nothing; a locked `Sic.cfg` keeps the file and sets `SavesBlocked`
-- [ ] tests for atomic saves: a failed save leaves the previous file intact and no temporary file behind
-- [ ] validation commands pass
+- [x] In `App.cs`, add `ConfigFileName = "sic.json"` and `LegacyConfigFileName = "Sic.cfg"`. Keep `ConfigFileExtension` until Task 4.
+- [x] Add `ConfigSerializer` with a `static readonly JsonSerializerOptions` as under Technical details, `Load(folder, isPortable)` returning a `ConfigLoadResult`, and `Save(path, config)` as under Technical details. `Config` passes `App.IsPortable`; the argument exists because that value is always true under `dotnet test`.
+- [x] Add `BackUpFile(path)`, which first renames an existing `.bad` to `sic.json.bad.<yyyyMMdd-HHmmss>`, adding a number if that name is taken, then copies `sic.json` to `sic.json.bad`. It never moves `sic.json`, and no backup is overwritten. The presets plan reuses it.
+- [x] Implement the load flow under Technical details. It takes a folder argument and shows no UI, so tests can use temporary folders. It builds complete translated messages for `LoadError` and `SaveError`, using `_n` for counts, and the corrupt-file message names `sic.json.bad`. `ConfigSerializerTests` goes in the `StaticStateCollection`, because the class calls `_()`.
+- [x] tests for loading: valid file, missing `general`, null `enabledFormats`, `language` and `lastInputFolder`, blank `outputFolder`, a hand-edited file with comments and trailing commas, a hand-edited `"OutputFolder"` with different case, and a file with a UTF-8 BOM
+- [x] tests for shape: `[]`, `5` and `null` as the root take the corrupt-file path; `"general": []` keeps defaults, counts as bad and is backed up; `"enabledFormats": [null, " ", "JPG"]` loads as `["JPG"]`
+- [x] tests for encoding: a file saved in a legacy code page, which isn't valid UTF-8, takes the corrupt-file path and loses nothing
+- [x] tests for per-value recovery: `"updateCheckInterval": "Hourly"`, `"updateCheckInterval": 99`, `"confirmExitWithQueue": 5`, `"enabledFormats": "JPG,PNG"` and an invalid `language` all keep their defaults, every other setting survives, the file is backed up, and the message names the count
+- [x] tests for repair: after a recovery `sic.json` holds the repaired settings and a second `Load` reports nothing and creates no second backup; a failed repair write is reported through `SaveError`; two recoveries within one second keep both backups
+- [x] tests for round trips: every setting, with Cyrillic and Hebrew in `outputFolder` written as readable text rather than `\u` escapes
+- [x] tests for the saved file: it's pretty-printed, one property per line, and UTF-8 with no BOM
+- [x] tests for the default output folder: saved as `""`, loaded back as the current `App.DefaultOutputFolder`, including for migrated values; a custom folder stays as it is; `config.General.OutputFolder` still holds the full path after `Save`
+- [x] tests for portable migration: a legacy `OutputFolder` ending in `\userdata\Converted` from another location becomes the default with `isPortable` true and stays as it is with `isPortable` false, ignoring case and trailing separators
+- [x] tests for migration: `sic.json` is created, `Sic.cfg` becomes `Sic.cfg.bak`, and an existing `sic.json` always wins over `Sic.cfg`
+- [x] tests for failure paths: corrupt JSON is copied to `sic.json.bad` without loss, and `sic.json` is replaced with defaults; with `sic.json.bad` held open, corrupt `sic.json` keeps its exact bytes and `SavesBlocked` is true; an existing `.bad` is rotated, not replaced; a locked `sic.json` sets `SavesBlocked` and changes nothing; a locked `Sic.cfg` keeps the file and sets `SavesBlocked`
+- [x] tests for atomic saves: a failed save leaves the previous file intact and no temporary file behind
+- [x] validation commands pass
 
 ### Task 4: Switch Config to JSON and remove SharpConfig
 
