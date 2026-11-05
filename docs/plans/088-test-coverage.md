@@ -17,7 +17,7 @@ It's the first of four plans, and it comes first so that the JSON config, preset
 - [x] Every `Sic.po` catalog is checked for empty entries, fuzzy entries, mismatched placeholders and duplicate menu mnemonics.
 - [x] Tests never touch the real `%APPDATA%\Oire\Sic` folder, and a test proves it.
 - [x] `build-installer.ps1` still produces the single-file `Sic.exe`, and no test files reach the published output.
-- [ ] all validation commands pass
+- [x] all validation commands pass
 
 ## Validation commands
 
@@ -227,10 +227,10 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 #### Steps
 
-- [ ] `CLAUDE.md`: replace "There are no test projects" with `dotnet test`, the real format command `dotnet format --verify-no-changes`, test isolation through `userdata`, the non-parallel collection, and the rule against asserting translated text.
-- [ ] `README.md`: mention `dotnet test` wherever build commands are listed.
-- [ ] `README.md` lines 55 and 133 and `CLAUDE.md` say `dotnet publish -c Release` at solution level. Point them at the csproj, now that the solution includes tests.
-- [ ] validation commands pass
+- [x] `CLAUDE.md`: replace "There are no test projects" with `dotnet test`, the real format command `dotnet format --verify-no-changes`, test isolation through `userdata`, the non-parallel collection, and the rule against asserting translated text.
+- [x] `README.md`: mention `dotnet test` wherever build commands are listed.
+- [x] `README.md` lines 55 and 133 and `CLAUDE.md` say `dotnet publish -c Release` at solution level. Point them at the csproj, now that the solution includes tests.
+- [x] validation commands pass
 
 ## Technical details
 

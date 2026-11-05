@@ -47,12 +47,13 @@ Alternatively, build from source:
 git clone https://github.com/Oire/sic.git
 cd sic
 dotnet build
+dotnet test
 ```
 
 For a single-file executable:
 
 ```bash
-dotnet publish -c Release
+dotnet publish src/Sic/Sic.csproj -c Release
 ```
 
 ## Usage
@@ -128,9 +129,10 @@ To run SIC! in portable mode, create an empty `userdata` folder next to `Sic.exe
 Requires [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 
 ```bash
-dotnet build              # Debug build (x64)
-dotnet build -c Release   # Release build
-dotnet publish -c Release # Single-file executable
+dotnet build                                   # Debug build (x64)
+dotnet build -c Release                        # Release build
+dotnet test                                    # Run the tests
+dotnet publish src/Sic/Sic.csproj -c Release   # Single-file executable
 ```
 
 ## Building the Installer

@@ -11,12 +11,24 @@ It uses structured logging (Serilog), file-based configuration (SharpConfig), an
 ## Build Commands
 
 ```bash
-dotnet build              # Build the solution (Debug|x64 by default)
-dotnet build -c Release   # Release build
-dotnet publish -c Release # Publish as single-file executable
+dotnet build                                   # Build the solution (Debug|x64 by default)
+dotnet build -c Release                        # Release build
+dotnet test                                    # Run the tests (tests/Sic.Tests, xUnit + AwesomeAssertions)
+dotnet format --verify-no-changes              # Format check, as CI runs it
+dotnet publish src/Sic/Sic.csproj -c Release   # Publish as single-file executable
 ```
 
-There are no test projects or linting commands configured yet.
+Publish the csproj, not the solution: the solution also holds the test project, which must never reach the published output.
+
+### Tests
+
+`tests/Sic.Tests` covers the conversion engine, fit to file size, output paths, utilities, the CLI (through `Program.RunCli`, which is `internal` for that) and the `Sic.po` catalogs. CI runs `dotnet test --no-build` after the build. A few rules keep the suite honest:
+
+- **Isolation through `userdata`.** An after-build target creates `userdata` (and `locale\de`) in the test output folder, so `App.IsPortable` is true and `App.DataFolder` stays inside `bin`. Tests never touch the real `%APPDATA%\Oire\Sic`; `TestIsolationTests` fails loudly if that stops being true. `TestDataFolder.Clear()` removes config files a test placed there.
+- **One non-parallel collection for static state.** `Config`, `Console` and `Localization` are static, and `Localization.SetLanguage` changes the culture of the whole process, so tests that touch them, or assert text returned by `_()`, go in `[Collection(StaticStateCollection.Name)]` and derive from `StaticStateTestBase`, which resets the language to `en-US`.
+- **Never assert translated text.** `.mo` files aren't in git, and the catalog is named from `Environment.ProcessPath`, so under `dotnet test` translations never load. English text from `_()` is safe to assert; translated text is not. Don't assert the text of `System.CommandLine`'s own errors either, since it follows `CurrentUICulture`.
+- **No binary fixtures.** `TestImages` generates images with Magick in a temporary folder. Size budgets come from a measured encode, never from constants, because Magick noise isn't seeded.
+- A test that exposes a real bug stays, with `Skip = "⚠️ ..."` naming the problem, rather than being weakened.
 
 ### Localization scripts
 
