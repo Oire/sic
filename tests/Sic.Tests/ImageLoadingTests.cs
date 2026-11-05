@@ -10,6 +10,18 @@ namespace Oire.Sic.Tests;
 public sealed class ImageLoadingTests: IDisposable {
     private const long OverDownloadLimit = 101L * 1024 * 1024;
 
+    // How long a download test may run before it counts as hung. The stub stalls forever on purpose,
+    // and HttpClient.Timeout doesn't cover reading the body, so without this bound a regression would
+    // show up as a CI job timeout instead of a failing test.
+    private static readonly TimeSpan HangLimit = TimeSpan.FromSeconds(30);
+
+    /// <summary>A synchronous <see cref="IProgress{T}"/> that records every report.</summary>
+    private sealed class RecordingProgress<T>: IProgress<T> {
+        public List<T> Reports { get; } = [];
+
+        public void Report(T value) => Reports.Add(value);
+    }
+
     private readonly TestImages _images = new();
 
     public void Dispose() {
@@ -56,6 +68,16 @@ public sealed class ImageLoadingTests: IDisposable {
     public void LoadFromFile_FailsOnACorruptFile() {
         var path = Path.Combine(_images.Folder, "corrupt.png");
         File.WriteAllText(path, "This is not a PNG file.");
+
+        var act = () => ImageConverter.LoadFromFile(path);
+
+        act.Should().Throw<MagickException>();
+    }
+
+    [Fact]
+    public void LoadFromFile_FailsOnACorruptIco() {
+        var path = Path.Combine(_images.Folder, "corrupt.ico");
+        File.WriteAllText(path, "This is not an ICO file.");
 
         var act = () => ImageConverter.LoadFromFile(path);
 
@@ -111,6 +133,19 @@ public sealed class ImageLoadingTests: IDisposable {
         ImageConverter.IsSameFormat(item, "JPG").Should().BeTrue("Magick reported {0}", item.OriginalFormat);
     }
 
+    [Fact(Skip = "⚠️ ICO has no signature Magick can detect, so new MagickImage(bytes) fails with "
+        + "'no decode delegate' and LoadFromBytes, LoadFromStream and LoadFromUrl all reject a valid ICO. "
+        + "See docs/plans/088-test-coverage.md, review round 1.")]
+    public void LoadFromBytes_ReadsAMultiSizeIcoByItsLargestFrame() {
+        var bytes = File.ReadAllBytes(_images.CreateMultiFrameIco("icon.ico"));
+
+        var item = ImageConverter.LoadFromBytes(bytes, "icon.ico");
+
+        item.OriginalFormat.Should().Be("Ico");
+        item.Width.Should().Be(64);
+        item.Height.Should().Be(32);
+    }
+
     [Fact]
     public void LoadFromBytes_FailsOnCorruptData() {
         var act = () => ImageConverter.LoadFromBytes(Encoding.ASCII.GetBytes("This is not an image."), "clipboard.png");
@@ -146,6 +181,20 @@ public sealed class ImageLoadingTests: IDisposable {
     }
 
     [Fact]
+    public async Task LoadFromUrl_ReportsProgressUpToTheWholeFile() {
+        var data = TestImages.CreateBytes(200, 150, MagickFormat.Bmp);
+        using var server = new StubHttpServer();
+        var url = server.Serve("/photo.bmp", data, "image/bmp");
+        var progress = new RecordingProgress<(long BytesRead, long? TotalBytes)>();
+
+        await ImageConverter.LoadFromUrl(url, progress: progress).WaitAsync(HangLimit);
+
+        progress.Reports.Should().NotBeEmpty();
+        progress.Reports.Select(r => r.BytesRead).Should().BeInAscendingOrder();
+        progress.Reports[^1].Should().Be(((long)data.Length, (long?)data.Length));
+    }
+
+    [Fact]
     public async Task LoadFromUrl_ReportsAnHtmlPageAsUnsupported() {
         using var server = new StubHttpServer();
         var html = "<!DOCTYPE html><html><head><title>Photos</title></head><body><p>Hello</p></body></html>";
@@ -172,7 +221,9 @@ public sealed class ImageLoadingTests: IDisposable {
         var url = server.ServeStalled("/slow.png", 1024 * 1024, [0x89, (byte)'P', (byte)'N', (byte)'G']);
         using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(300));
 
-        var act = () => ImageConverter.LoadFromUrl(url, cancellation.Token);
+        // A token that no longer reaches the read would hang on the stalled stub; the outer bound
+        // turns that into a TimeoutException, which fails the assertion.
+        var act = () => ImageConverter.LoadFromUrl(url, cancellation.Token).WaitAsync(HangLimit);
 
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
@@ -184,13 +235,36 @@ public sealed class ImageLoadingTests: IDisposable {
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
+    [Theory]
+    [InlineData("not a link")]
+    [InlineData("images/photo.png")]
+    public async Task LoadFromUrl_RejectsSomethingThatIsNotAnAbsoluteLink(string url) {
+        var act = () => ImageConverter.LoadFromUrl(url);
+
+        await act.Should().ThrowAsync<UriFormatException>();
+    }
+
     [Fact]
     public async Task LoadFromUrl_RejectsADeclaredSizeAbove100MB() {
         using var server = new StubHttpServer();
         var url = server.ServeStalled("/huge.png", OverDownloadLimit, []);
+        // Without the length check the read would hang on the stalled stub. The token turns that
+        // into an OperationCanceledException, which fails the assertion instead of the CI job.
+        using var cancellation = new CancellationTokenSource(HangLimit);
 
-        var act = () => ImageConverter.LoadFromUrl(url);
+        var act = () => ImageConverter.LoadFromUrl(url, cancellation.Token);
 
-        await act.Should().ThrowAsync<InvalidOperationException>();
+        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("File is too large*");
+    }
+
+    [Fact]
+    public async Task LoadFromUrl_StopsReadingAbove100MBWhenNoSizeIsDeclared() {
+        using var server = new StubHttpServer();
+        var url = server.ServeUnsized("/endless.png", OverDownloadLimit);
+        using var cancellation = new CancellationTokenSource(HangLimit);
+
+        var act = () => ImageConverter.LoadFromUrl(url, cancellation.Token);
+
+        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("Download exceeded*");
     }
 }

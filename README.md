@@ -210,6 +210,7 @@ src/Sic/
       App.cs                      # App metadata and paths
       ExitCode.cs                 # CLI exit code constants
       Logging.cs                  # Log file paths and templates
+tests/Sic.Tests/                  # xUnit tests (dotnet test): conversion, fit to file size, CLI, catalogs
 ```
 
 ## License

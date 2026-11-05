@@ -6,8 +6,9 @@ param(
     [string]$PotFile = "../messages.pot"
 )
 
-# Import the Get-CatalogName function
+# Import the shared helper functions
 . (Join-Path $PSScriptRoot "Get-CatalogName.ps1")
+. (Join-Path $PSScriptRoot "Find-GettextTool.ps1")
 
 # Get the catalog name automatically
 $catalogName = Get-CatalogName
@@ -21,30 +22,7 @@ if (!(Test-Path $PotPath)) {
     exit 1
 }
 
-# Find msgmerge: on the PATH first, then where mlocati's gettext build installs it, then GnuWin32
-$msgmerge = $null
-$msgmergeCmd = Get-Command msgmerge -ErrorAction SilentlyContinue
-if ($msgmergeCmd) {
-    $msgmerge = $msgmergeCmd.Source
-} else {
-    $possiblePaths = @(
-        (Join-Path $env:LOCALAPPDATA "Programs\gettext-iconv\bin\msgmerge.exe"),
-        "C:\Program Files (x86)\GnuWin32\bin\msgmerge.exe",
-        "C:\Program Files\GnuWin32\bin\msgmerge.exe"
-    )
-
-    foreach ($path in $possiblePaths) {
-        if (Test-Path $path) {
-            $msgmerge = $path
-            break
-        }
-    }
-}
-
-if (!$msgmerge) {
-    Write-Error "❌ msgmerge not found. Install gettext tools: winget install mlocati.GetText"
-    exit 1
-}
+$msgmerge = Find-GettextTool msgmerge
 
 # Get languages to update
 $languages = @()

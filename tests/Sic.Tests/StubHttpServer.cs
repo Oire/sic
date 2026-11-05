@@ -9,11 +9,12 @@ namespace Oire.Sic.Tests;
 /// A minimal HTTP/1.1 server on the loopback address, for tests that download images. Each path
 /// is mapped to a canned response; any other path gets a 404. Every connection is closed after
 /// one response. Responses can claim a <c>Content-Length</c> they never deliver and then stall,
-/// which is how tests exercise cancellation and the download size limit without sending
-/// megabytes.
+/// which is how tests exercise cancellation and the declared download size limit without sending
+/// megabytes. They can also leave the length out and stream zeros until the connection closes,
+/// which is the only way to reach the limit on the bytes actually read.
 /// </summary>
 internal sealed class StubHttpServer: IDisposable {
-    private static readonly StubResponse NotFound = new(404, "text/plain", Encoding.ASCII.GetBytes("Not found"), null, false);
+    private static readonly StubResponse NotFound = new(404, "text/plain", Encoding.ASCII.GetBytes("Not found"), null, false, 0);
 
     private readonly TcpListener _listener = new(IPAddress.Loopback, 0);
     private readonly CancellationTokenSource _stopping = new();
@@ -33,7 +34,7 @@ internal sealed class StubHttpServer: IDisposable {
 
     /// <summary>Serves <paramref name="body"/> with status 200 at <paramref name="path"/> and returns its full URL.</summary>
     public string Serve(string path, byte[] body, string contentType) {
-        return Map(path, new StubResponse(200, contentType, body, null, false));
+        return Map(path, new StubResponse(200, contentType, body, null, false, 0));
     }
 
     /// <summary>
@@ -41,7 +42,15 @@ internal sealed class StubHttpServer: IDisposable {
     /// <paramref name="body"/>, then nothing more until the server is disposed. Returns the full URL.
     /// </summary>
     public string ServeStalled(string path, long declaredLength, byte[] body) {
-        return Map(path, new StubResponse(200, "application/octet-stream", body, declaredLength, true));
+        return Map(path, new StubResponse(200, "application/octet-stream", body, declaredLength, true, 0));
+    }
+
+    /// <summary>
+    /// Sends the headers of a 200 response with no <c>Content-Length</c>, then
+    /// <paramref name="length"/> zero bytes, then closes the connection. Returns the full URL.
+    /// </summary>
+    public string ServeUnsized(string path, long length) {
+        return Map(path, new StubResponse(200, "application/octet-stream", [], null, false, length));
     }
 
     /// <summary>The full URL of <paramref name="path"/>, whether or not anything is served there.</summary>
@@ -74,13 +83,23 @@ internal sealed class StubHttpServer: IDisposable {
                 var path = await ReadRequestPathAsync(stream, cancellationToken).ConfigureAwait(false);
                 var response = path is not null && _responses.TryGetValue(path, out var mapped) ? mapped : NotFound;
                 var reason = response.Status == 200 ? "OK" : "Not Found";
+                var length = response.UnsizedLength > 0
+                    ? string.Empty
+                    : $"Content-Length: {response.DeclaredLength ?? response.Body.Length}\r\n";
                 var header = $"HTTP/1.1 {response.Status} {reason}\r\n"
                     + $"Content-Type: {response.ContentType}\r\n"
-                    + $"Content-Length: {response.DeclaredLength ?? response.Body.Length}\r\n"
+                    + length
                     + "Connection: close\r\n\r\n";
 
                 await stream.WriteAsync(Encoding.ASCII.GetBytes(header), cancellationToken).ConfigureAwait(false);
                 await stream.WriteAsync(response.Body, cancellationToken).ConfigureAwait(false);
+
+                var chunk = new byte[64 * 1024];
+                for (var sent = 0L; sent < response.UnsizedLength; sent += chunk.Length) {
+                    var count = (int)Math.Min(chunk.Length, response.UnsizedLength - sent);
+                    await stream.WriteAsync(chunk.AsMemory(0, count), cancellationToken).ConfigureAwait(false);
+                }
+
                 await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
 
                 if (response.Stall) {
@@ -141,5 +160,5 @@ internal sealed class StubHttpServer: IDisposable {
         _stopping.Dispose();
     }
 
-    private sealed record StubResponse(int Status, string ContentType, byte[] Body, long? DeclaredLength, bool Stall);
+    private sealed record StubResponse(int Status, string ContentType, byte[] Body, long? DeclaredLength, bool Stall, long UnsizedLength);
 }

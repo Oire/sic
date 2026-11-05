@@ -25,4 +25,9 @@ public class TestIsolationTests {
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
         );
     }
+
+    [Fact]
+    public void DefaultOutputFolder_IsUnderTheTestOutputFolder() {
+        Path.GetFullPath(App.DefaultOutputFolder).Should().StartWith(Path.GetFullPath(AppContext.BaseDirectory));
+    }
 }

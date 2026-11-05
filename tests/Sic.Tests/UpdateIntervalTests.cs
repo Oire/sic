@@ -16,11 +16,6 @@ public class UpdateIntervalTests {
     }
 
     [Fact]
-    public void ToFrequency_GivesNullForNever() {
-        UpdateService.ToFrequency(UpdateCheckInterval.Never).Should().BeNull();
-    }
-
-    [Fact]
     public void ToFrequency_CoversEveryInterval() {
         foreach (var interval in Enum.GetValues<UpdateCheckInterval>()) {
             var frequency = UpdateService.ToFrequency(interval);

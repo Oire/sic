@@ -3,6 +3,7 @@ using ImageMagick;
 using Oire.Sic.Utils;
 using Oire.Sic.Utils.Constants;
 using Xunit;
+using ImageConverter = Oire.Sic.Services.ImageConverter;
 
 namespace Oire.Sic.Tests;
 
@@ -68,16 +69,6 @@ public sealed class CliTests: StaticStateTestBase {
 
     private string Output(string fileName) => Path.Combine(_images.Folder, "out", fileName);
 
-    private static MagickImageInfo ReadInfo(string path) => new(File.ReadAllBytes(path));
-
-    private static void ShouldBeImage(string path, MagickFormat format, int width, int height) {
-        File.Exists(path).Should().BeTrue("{0} should have been written", path);
-        var info = ReadInfo(path);
-        info.Format.Should().Be(format);
-        ((int)info.Width).Should().Be(width);
-        ((int)info.Height).Should().Be(height);
-    }
-
     private static void ShouldFail(CliResult result) {
         result.ExitCode.Should().Be(ExitCode.Error);
         result.Error.Should().NotBeNullOrWhiteSpace();
@@ -96,7 +87,7 @@ public sealed class CliTests: StaticStateTestBase {
         result.ExitCode.Should().Be(ExitCode.Success);
         result.Error.Should().BeEmpty();
         result.Output.Trim().Should().Be($"Converted: {output}");
-        ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
     }
 
     [Fact]
@@ -107,7 +98,7 @@ public sealed class CliTests: StaticStateTestBase {
         var result = Run("--input", input, "--output", output);
 
         result.ExitCode.Should().Be(ExitCode.Success);
-        ShouldBeImage(output, MagickFormat.WebP, 40, 30);
+        TestImages.ShouldBeImage(output, MagickFormat.WebP, 40, 30);
     }
 
     [Fact]
@@ -118,7 +109,7 @@ public sealed class CliTests: StaticStateTestBase {
         var result = Run("-i", input, "-o", output);
 
         result.ExitCode.Should().Be(ExitCode.Success);
-        ShouldBeImage(output, MagickFormat.Gif, 40, 30);
+        TestImages.ShouldBeImage(output, MagickFormat.Gif, 40, 30);
     }
 
     [Theory]
@@ -139,7 +130,7 @@ public sealed class CliTests: StaticStateTestBase {
         result.ExitCode.Should().Be(ExitCode.Success);
         result.Error.Should().BeEmpty();
         result.Output.Trim().Should().Be($"Converted: {output}");
-        ShouldBeImage(output, expected, 40, 30);
+        TestImages.ShouldBeImage(output, expected, 40, 30);
     }
 
     [Fact]
@@ -151,7 +142,7 @@ public sealed class CliTests: StaticStateTestBase {
         var result = Run("-i", input, "-f", "avif");
 
         result.ExitCode.Should().Be(ExitCode.Success);
-        ShouldBeImage(output, MagickFormat.Avif, 40, 30);
+        TestImages.ShouldBeImage(output, MagickFormat.Avif, 40, 30);
     }
 
     [Fact]
@@ -162,7 +153,7 @@ public sealed class CliTests: StaticStateTestBase {
         var result = Run("-i", input, "-o", output, "-f", "webp");
 
         result.ExitCode.Should().Be(ExitCode.Success);
-        ShouldBeImage(output, MagickFormat.Bmp, 40, 30);
+        TestImages.ShouldBeImage(output, MagickFormat.Bmp, 40, 30);
     }
 
     [Theory]
@@ -184,7 +175,7 @@ public sealed class CliTests: StaticStateTestBase {
             var header = File.ReadAllBytes(output).AsSpan(0, 4).ToArray();
             header.Should().Equal(0, 0, 1, 0);
         } else {
-            ShouldBeImage(output, expected, 40, 30);
+            TestImages.ShouldBeImage(output, expected, 40, 30);
         }
     }
 
@@ -198,7 +189,7 @@ public sealed class CliTests: StaticStateTestBase {
 
         result.ExitCode.Should().Be(ExitCode.Success);
         result.Error.Should().BeEmpty();
-        ShouldBeImage(output, MagickFormat.WebP, 40, 30);
+        TestImages.ShouldBeImage(output, MagickFormat.WebP, 40, 30);
     }
 
     [Fact]
@@ -212,7 +203,35 @@ public sealed class CliTests: StaticStateTestBase {
 
         result.ExitCode.Should().Be(ExitCode.Success);
         result.Output.Trim().Should().Be($"Converted: {output}");
-        ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
+    }
+
+    [Fact]
+    public void Url_WithFormat_UnescapesTheNameInTheLink() {
+        var baseName = UniqueName("cli url");
+        using var server = new StubHttpServer();
+        var url = server.Serve($"/images/{Uri.EscapeDataString(baseName)}.png", TestImages.CreateBytes(40, 30, MagickFormat.Png), "image/png");
+        var output = DefaultFolderOutput(baseName, ".jpg");
+
+        var result = Run("-i", url, "--format", "jpg");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        result.Output.Trim().Should().Be($"Converted: {output}");
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
+    }
+
+    [Fact]
+    public void Url_WithFormat_NamesALinkWithoutAFileNameLikeTheGuiDoes() {
+        using var server = new StubHttpServer();
+        var url = server.Serve("/", TestImages.CreateBytes(40, 30, MagickFormat.Png), "image/png");
+        var output = DefaultFolderOutput("downloaded_image", ".jpg");
+
+        var result = Run("-i", url, "--format", "jpg");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        result.Output.Trim().Should().Be($"Converted: {output}");
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
+        File.Exists(Path.Combine(App.DefaultOutputFolder, ".jpg")).Should().BeFalse();
     }
 
     [Theory]
@@ -229,7 +248,7 @@ public sealed class CliTests: StaticStateTestBase {
         var result = Run("-i", input, "-o", output, "--resize", resize);
 
         result.ExitCode.Should().Be(ExitCode.Success);
-        ShouldBeImage(output, MagickFormat.Jpeg, width, height);
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, width, height);
     }
 
     [Fact]
@@ -240,7 +259,7 @@ public sealed class CliTests: StaticStateTestBase {
         var result = Run("-i", input, "-o", output, "-r", "50x");
 
         result.ExitCode.Should().Be(ExitCode.Success);
-        ShouldBeImage(output, MagickFormat.Png, 50, 25);
+        TestImages.ShouldBeImage(output, MagickFormat.Png, 50, 25);
     }
 
     [Theory]
@@ -253,7 +272,7 @@ public sealed class CliTests: StaticStateTestBase {
         var result = Run("-i", input, "-o", output, "-r", "50x50", cropOption);
 
         result.ExitCode.Should().Be(ExitCode.Success);
-        ShouldBeImage(output, MagickFormat.Png, 50, 50);
+        TestImages.ShouldBeImage(output, MagickFormat.Png, 50, 50);
     }
 
     // Skipping
@@ -283,7 +302,7 @@ public sealed class CliTests: StaticStateTestBase {
 
         result.ExitCode.Should().Be(ExitCode.Success);
         result.Output.Trim().Should().Be($"Converted: {output}");
-        ShouldBeImage(output, MagickFormat.Png, 20, 15);
+        TestImages.ShouldBeImage(output, MagickFormat.Png, 20, 15);
     }
 
     // Failure
@@ -339,7 +358,7 @@ public sealed class CliTests: StaticStateTestBase {
         var lines = result.Error.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         lines.Should().Equal(
             "Unsupported format: XYZ",
-            "Supported formats: " + string.Join(", ", Services.ImageConverter.GetSupportedFormats()));
+            "Supported formats: " + string.Join(", ", ImageConverter.GetSupportedFormats()));
         File.Exists(output).Should().BeFalse();
     }
 
@@ -447,7 +466,7 @@ public sealed class CliTests: StaticStateTestBase {
         var missingFolder = Path.Combine(_images.Folder, "gone");
         Config.Load(isGui: false);
         Config.General.OutputFolder = missingFolder;
-        Config.Save();
+        Config.Save(isGui: false);
         var baseName = UniqueName("cli-fallback");
         var input = _images.Create(baseName + ".png", 40, 30);
         var output = DefaultFolderOutput(baseName, ".jpg");
@@ -456,9 +475,17 @@ public sealed class CliTests: StaticStateTestBase {
 
         result.ExitCode.Should().Be(ExitCode.Success);
         result.Error.Trim().Should().Be($"Warning! The output folder \"{missingFolder}\" no longer exists. Using default folder.");
-        Config.General.OutputFolder.Should().Be(App.DefaultOutputFolder);
         Directory.Exists(missingFolder).Should().BeFalse();
-        ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
+
+        // The reset must reach the file, or the warning would come back on every run.
+        Config.Load(isGui: false);
+        Config.General.OutputFolder.Should().Be(App.DefaultOutputFolder);
+        var secondOutput = DefaultFolderOutput(baseName, ".webp");
+        var second = Run("-i", input, "-f", "webp");
+        second.ExitCode.Should().Be(ExitCode.Success);
+        second.Error.Should().BeEmpty();
+        File.Exists(secondOutput).Should().BeTrue();
     }
 
     [Fact]

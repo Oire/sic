@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using ImageMagick;
 using Oire.Sic.Models;
 using Xunit;
 using ImageConverter = Oire.Sic.Services.ImageConverter;
@@ -183,7 +182,7 @@ public class ImageConverterFormatTests {
     [Fact]
     public void ShouldSkipConversion_SkipsALoadedJpegFileConvertedToJpg() {
         using var images = new TestImages();
-        var item = ImageConverter.LoadFromFile(images.Create("photo.jpg", 32, 24, MagickFormat.Jpeg));
+        var item = ImageConverter.LoadFromFile(images.Create("photo.jpg", 32, 24));
 
         ImageConverter.ShouldSkipConversion(item, "JPG", null, null).Should().BeTrue();
         ImageConverter.ShouldSkipConversion(item, "JPG", 16, null).Should().BeFalse();

@@ -451,8 +451,11 @@ public static class ImageConverter {
     /// format settings say, so the 256 px frame Windows uses for large icons comes out as an
     /// uncompressed bitmap of about 260 KB. Windows has read PNG frames since Vista and stores its own
     /// 256 px icons that way. Magick still writes the file, which keeps its encoding of the smaller
-    /// frames and its 512 px limit; a frame of 256 px or more that it left as a bitmap is then
-    /// replaced by the same pixels as a 32-bit PNG.
+    /// frames and its 512 px limit; a frame with a side of 256 px or more that it left as a bitmap is
+    /// then replaced by the same pixels as a 32-bit PNG, and its directory entry gets 0 for that side.
+    /// The frame's own size decides, not the directory: Magick writes a 300x200 frame as a bitmap
+    /// with a directory width of 44 (300 mod 256). Magick checks the 512 px limit on the first frame
+    /// only.
     /// </remarks>
     private static void WriteIco(MagickImageCollection frames, string outputPath) {
         const int HeaderSize = 6;
@@ -475,11 +478,11 @@ public static class ImageConverter {
             var offset = (int)BinaryPrimitives.ReadUInt32LittleEndian(entry[12..]);
             var payload = ico.AsSpan(offset, size);
 
-            // A width or height of 0 in the directory means 256 px or more.
-            var large = entry[0] == 0 || entry[1] == 0;
-            var matchesFrame = count == frames.Count && (frames[i].Width >= 256 || frames[i].Height >= 256);
+            // Decide on the frame's real size, not the directory's: Magick stores a side over 256 px
+            // as that size mod 256 (44 for 300 px), so the directory alone misses a 300x200 frame.
+            var large = count == frames.Count && (frames[i].Width >= 256 || frames[i].Height >= 256);
 
-            if (large && matchesFrame && !payload.StartsWith(pngSignature)) {
+            if (large && !payload.StartsWith(pngSignature)) {
                 payloads[i] = frames[i].ToByteArray(MagickFormat.Png32);
                 reencoded[i] = true;
             } else {
@@ -501,6 +504,9 @@ public static class ImageConverter {
             var entry = result.AsSpan(HeaderSize + (i * EntrySize), EntrySize);
 
             if (reencoded[i]) {
+                // A width or height of 0 in the directory means 256 px or more.
+                entry[0] = frames[i].Width >= 256 ? (byte)0 : (byte)frames[i].Width;
+                entry[1] = frames[i].Height >= 256 ? (byte)0 : (byte)frames[i].Height;
                 entry[2] = 0; // color count: none, the frame is not paletted
                 BinaryPrimitives.WriteUInt16LittleEndian(entry[4..], 1); // planes
                 BinaryPrimitives.WriteUInt16LittleEndian(entry[6..], 32); // bits per pixel

@@ -20,6 +20,7 @@ public sealed class SizeFitTests: IDisposable {
     private static readonly string[] ExcludedAndPng = ["ICO", "GIF", "PNG"];
     private static readonly string[] ExcludedOnly = ["ICO", "GIF"];
     private static readonly string[] JpgOnly = ["JPG"];
+    private static readonly string[] PngOnly = ["PNG"];
 
     private readonly TestImages _images = new();
 
@@ -44,7 +45,7 @@ public sealed class SizeFitTests: IDisposable {
     }
 
     private ImageItem CreateSource(int width = SourceWidth, int height = SourceHeight) {
-        return ImageConverter.LoadFromFile(_images.Create("source.png", width, height, noise: true));
+        return _images.CreateItem("source.png", width, height, noise: true);
     }
 
     /// <summary>
@@ -53,7 +54,22 @@ public sealed class SizeFitTests: IDisposable {
     /// constants would not hold from run to run.
     /// </summary>
     private static long MeasureFullSize(ImageItem item, MagickFormat format, uint? quality = null) {
+        return MeasureAt(item, format, item.Width, item.Height, quality);
+    }
+
+    /// <summary>
+    /// The size of <paramref name="item"/> resized to <paramref name="width"/> by
+    /// <paramref name="height"/> and encoded as <paramref name="format"/>, the way the search measures
+    /// a trial encode.
+    /// </summary>
+    private static long MeasureAt(ImageItem item, MagickFormat format, int width, int height, uint? quality = null) {
         using var image = new MagickImage(item.FilePath!);
+        if (width < (int)image.Width || height < (int)image.Height) {
+            image.Resize(new MagickGeometry((uint)width, (uint)height) {
+                IgnoreAspectRatio = true,
+            });
+        }
+
         if (quality.HasValue) {
             image.Quality = quality.Value;
         }
@@ -168,8 +184,66 @@ public sealed class SizeFitTests: IDisposable {
             proposal.Width.Should().BeLessThanOrEqualTo(160);
             proposal.FileSize.Should().BeLessThanOrEqualTo(budget);
             ((double)proposal.Height).Should().BeApproximately(proposal.Width * (double)SourceHeight / SourceWidth, 1.0);
-            Math.Min(proposal.Width, proposal.Height).Should().BeGreaterThanOrEqualTo(16, "SIC! never shrinks below 16 px");
         }
+    }
+
+    [Fact]
+    public void FindSizeFitProposals_ShrinksDownTo16PxOnTheSmallerSide() {
+        var item = CreateSource();
+        // The floor: 16 px on the smaller side, 240 * 16 / 180 = 21 px on the other.
+        var budget = MeasureAt(item, MagickFormat.Png, 21, 16);
+
+        var proposals = ImageConverter.FindSizeFitProposals(item, PngOnly, budget, null);
+
+        var proposal = proposals.Should().ContainSingle().Subject;
+        Math.Min(proposal.Width, proposal.Height).Should().Be(16);
+        proposal.FileSize.Should().BeLessThanOrEqualTo(budget);
+    }
+
+    [Fact]
+    public void FindSizeFitProposals_NeverShrinksBelow16PxOnTheSmallerSide() {
+        var item = CreateSource();
+        var budget = MeasureAt(item, MagickFormat.Png, 21, 16) - 1;
+
+        var proposals = ImageConverter.FindSizeFitProposals(item, PngOnly, budget, null);
+
+        proposals.Should().BeEmpty("a smaller image would fit, but SIC! never goes below 16 px");
+    }
+
+    [Fact]
+    public void FindSizeFitProposals_GoesDownToQuality45AtFullSize() {
+        var item = CreateSource();
+        var budget = MeasureFullSize(item, MagickFormat.Jpeg, 45);
+
+        var proposals = ImageConverter.FindSizeFitProposals(item, JpgOnly, budget, null);
+
+        proposals.Should().Contain(p => !p.Resized && p.Quality >= 45);
+    }
+
+    [Fact]
+    public void FindSizeFitProposals_NeverGoesBelowQuality45AtFullSize() {
+        var item = CreateSource();
+        var budget = MeasureFullSize(item, MagickFormat.Jpeg, 45) - 1;
+
+        var proposals = ImageConverter.FindSizeFitProposals(item, JpgOnly, budget, null);
+
+        proposals.Should().NotBeEmpty("a shrunk JPG at quality 95 still fits");
+        proposals.Should().OnlyContain(p => p.Resized, "full size would need a quality below 45");
+    }
+
+    [Fact]
+    public void FindSizeFitProposals_OffersAnImageAt16PxOrLessOnlyAsItIs() {
+        var item = CreateSource(12, 12);
+        var size = MeasureFullSize(item, MagickFormat.Png);
+
+        var fits = ImageConverter.FindSizeFitProposals(item, PngOnly, size, null);
+        var tooSmall = ImageConverter.FindSizeFitProposals(item, PngOnly, size - 1, null);
+
+        var proposal = fits.Should().ContainSingle().Subject;
+        proposal.Width.Should().Be(12);
+        proposal.Height.Should().Be(12);
+        proposal.Resized.Should().BeFalse();
+        tooSmall.Should().BeEmpty("an image already under 16 px is never shrunk");
     }
 
     [Fact]
@@ -217,7 +291,7 @@ public sealed class SizeFitTests: IDisposable {
 
     [Fact]
     public void FindSizeFitProposals_FailsForAnItemWithNoData() {
-        var act = () => ImageConverter.FindSizeFitProposals(new ImageItem { FileName = "empty.png" }, FastFormats, 1000, null);
+        var act = () => ImageConverter.FindSizeFitProposals(TestImages.EmptyItem(), FastFormats, 1000, null);
 
         act.Should().Throw<InvalidOperationException>();
     }
@@ -236,10 +310,8 @@ public sealed class SizeFitTests: IDisposable {
 
             new FileInfo(output).Length.Should().Be(proposal.FileSize, "the {0} file must match its proposal", proposal);
             var info = new MagickImageInfo(output);
-            ((int)info.Width).Should().Be(proposal.Width);
-            ((int)info.Height).Should().Be(proposal.Height);
-            var decoded = new ImageItem { OriginalFormat = info.Format.ToString() };
-            ImageConverter.IsSameFormat(decoded, proposal.Format).Should().BeTrue("Magick decoded the output as {0}", info.Format);
+            TestImages.ReadSize(output).Should().Be((proposal.Width, proposal.Height));
+            TestImages.ShouldBeFormat(info.Format, proposal.Format);
         }
     }
 
@@ -254,6 +326,24 @@ public sealed class SizeFitTests: IDisposable {
         ImageConverter.ConvertToProposal(item, proposals[0], output);
 
         new FileInfo(output).Length.Should().Be(proposals[0].FileSize);
+    }
+
+    [Fact]
+    public void ConvertToProposal_FailsForAnItemWithNoData() {
+        var output = Path.Combine(_images.Folder, "empty.jpg");
+        var proposal = new SizeFitProposal {
+            Format = "JPG",
+            Width = SourceWidth,
+            Height = SourceHeight,
+            Quality = 90,
+            FileSize = 1000,
+            Resized = false,
+        };
+
+        var act = () => ImageConverter.ConvertToProposal(TestImages.EmptyItem(), proposal, output);
+
+        act.Should().Throw<InvalidOperationException>();
+        File.Exists(output).Should().BeFalse();
     }
 
     [Theory]
@@ -291,6 +381,20 @@ public sealed class SizeFitTests: IDisposable {
 
     [Fact]
     public void FindSizeFitProposals_StopsWhenCanceledDuringTheSearch() {
+        // A single format, so the only checks left after the cancel are the ones inside the search:
+        // the one at the top of each format's turn can't catch it.
+        var item = CreateSource();
+        using var cancellation = new CancellationTokenSource();
+        var progress = new RecordingProgress(cancellation);
+
+        var act = () => ImageConverter.FindSizeFitProposals(item, JpgOnly, MeasureFullSize(item, MagickFormat.Png) / 4, null, progress, cancellation.Token);
+
+        act.Should().Throw<OperationCanceledException>();
+        progress.Reports.Should().Equal("JPG");
+    }
+
+    [Fact]
+    public void FindSizeFitProposals_StartsNoFurtherFormatOnceCanceled() {
         var item = CreateSource();
         using var cancellation = new CancellationTokenSource();
         var progress = new RecordingProgress(cancellation);

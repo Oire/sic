@@ -134,7 +134,7 @@ internal static class Program {
         }
 
         Config.General.OutputFolder = App.DefaultOutputFolder;
-        Config.Save();
+        Config.Save(showGui);
 
         try {
             Directory.CreateDirectory(App.DefaultOutputFolder);
@@ -190,9 +190,14 @@ internal static class Program {
             } else if (!string.IsNullOrWhiteSpace(format)) {
                 targetFormat = format.TrimStart('.').ToUpperInvariant();
                 targetFormat = targetFormat == "JPEG" ? "JPG" : targetFormat == "TIF" ? "TIFF" : targetFormat;
+                // LocalPath is unescaped ("my%20photo" becomes "my photo"). A link with no file
+                // name gets the same fallback LoadFromUrl gives it, never an empty ".jpg".
                 var baseName = isUrl
-                    ? Path.GetFileNameWithoutExtension(inputUri!.AbsolutePath)
+                    ? Path.GetFileNameWithoutExtension(inputUri!.LocalPath)
                     : Path.GetFileNameWithoutExtension(input);
+                if (string.IsNullOrWhiteSpace(baseName)) {
+                    baseName = "downloaded_image";
+                }
                 var ext = ImageConverter.GetFileExtension(targetFormat);
                 var outputFolder = Config.General.OutputFolder;
                 if (string.IsNullOrWhiteSpace(outputFolder)) {

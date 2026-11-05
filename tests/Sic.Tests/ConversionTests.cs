@@ -25,16 +25,11 @@ public sealed class ConversionTests: IDisposable {
         return data;
     }
 
-    private string Output(string fileName) => Path.Combine(_images.Folder, "out", fileName);
+    /// <summary>A path inside a folder that doesn't exist.</summary>
+    private string PathInMissingFolder(string fileName) => Path.Combine(_images.Folder, "missing", fileName);
 
     private ImageItem CreateSource(string format, int width, int height) {
-        var path = _images.Create("source" + ImageConverter.GetFileExtension(format), width, height);
-        return ImageConverter.LoadFromFile(path);
-    }
-
-    private static (int Width, int Height) ReadSize(string path) {
-        var info = new MagickImageInfo(File.ReadAllBytes(path));
-        return ((int)info.Width, (int)info.Height);
+        return _images.CreateItem("source" + ImageConverter.GetFileExtension(format), width, height);
     }
 
     [Theory]
@@ -47,15 +42,19 @@ public sealed class ConversionTests: IDisposable {
 
         var bytes = File.ReadAllBytes(output);
         if (target == "ICO") {
-            // LoadFromFile names any .ico file "Ico" from its extension, so check the header instead.
-            var entries = IcoTests.ReadDirectory(bytes);
+            // LoadFromFile names any .ico file "Ico" from its extension, so check the header, then
+            // decode the frame itself to catch a corrupt or truncated payload.
+            var entries = IcoFile.ReadDirectory(bytes);
             entries.Should().ContainSingle();
             entries[0].Width.Should().Be(48);
             entries[0].Height.Should().Be(32);
+            using var frames = new MagickImageCollection(bytes, MagickFormat.Ico);
+            frames.Should().ContainSingle();
+            ((int)frames[0].Width).Should().Be(48);
+            ((int)frames[0].Height).Should().Be(32);
         } else {
             using var image = new MagickImage(bytes);
-            var decoded = new ImageItem { OriginalFormat = image.Format.ToString() };
-            ImageConverter.IsSameFormat(decoded, target).Should().BeTrue("Magick decoded the output as {0}", image.Format);
+            TestImages.ShouldBeFormat(image.Format, target);
             ((int)image.Width).Should().Be(48);
             ((int)image.Height).Should().Be(32);
         }
@@ -69,7 +68,7 @@ public sealed class ConversionTests: IDisposable {
         ImageConverter.Convert(item, "WEBP", output, null, null);
 
         new MagickImageInfo(output).Format.Should().Be(MagickFormat.WebP);
-        ReadSize(output).Should().Be((48, 32));
+        TestImages.ReadSize(output).Should().Be((48, 32));
     }
 
     [Theory]
@@ -87,8 +86,50 @@ public sealed class ConversionTests: IDisposable {
     }
 
     [Fact]
+    public void Convert_UsesTheLargestFrameOfAMultiSizeIcoFile() {
+        var item = ImageConverter.LoadFromFile(_images.CreateMultiFrameIco("icon.ico"));
+        var output = Path.Combine(_images.Folder, "icon.png");
+
+        ImageConverter.Convert(item, "PNG", output, null, null);
+
+        TestImages.ReadSize(output).Should().Be((64, 32));
+    }
+
+    [Fact(Skip = "⚠️ ICO has no signature Magick can detect, so LoadMagickImage's in-memory ICO branch, "
+        + "new MagickImageCollection(bytes) with no format, fails with 'no decode delegate'. "
+        + "See docs/plans/088-test-coverage.md, review round 1.")]
+    public void Convert_UsesTheLargestFrameOfAMultiSizeIcoHeldInMemory() {
+        // Built by hand, the way LoadFromBytes would describe it, because LoadFromBytes can't read ICO
+        // bytes either (see ImageLoadingTests).
+        var bytes = File.ReadAllBytes(_images.CreateMultiFrameIco("icon.ico"));
+        var item = new ImageItem { ImageData = bytes, OriginalFormat = "Ico", FileName = "icon.ico" };
+        var output = Path.Combine(_images.Folder, "icon.png");
+
+        ImageConverter.Convert(item, "PNG", output, null, null);
+
+        TestImages.ReadSize(output).Should().Be((64, 32));
+    }
+
+    [Fact]
+    public void Convert_KeepsTheSourceQualityWhenResizingToTheSameFormat() {
+        var source = Path.Combine(_images.Folder, "source.jpg");
+        using (var image = TestImages.CreateImage(200, 100, noise: true)) {
+            image.Quality = 60;
+            image.Write(source);
+        }
+
+        var resized = Path.Combine(_images.Folder, "resized.jpg");
+        ImageConverter.Convert(ImageConverter.LoadFromFile(source), "JPG", resized, 100, null);
+        var fromPng = Path.Combine(_images.Folder, "from-png.jpg");
+        ImageConverter.Convert(CreateSource("PNG", 200, 100), "JPG", fromPng, 100, null);
+
+        new MagickImageInfo(resized).Quality.Should().Be(60);
+        new MagickImageInfo(fromPng).Quality.Should().NotBe(60, "only a same-format conversion keeps the source quality");
+    }
+
+    [Fact]
     public void Convert_FailsForAnItemWithNoData() {
-        var item = new ImageItem { FileName = "empty.png", OriginalFormat = "Png" };
+        var item = TestImages.EmptyItem();
 
         var act = () => ImageConverter.Convert(item, "JPG", Path.Combine(_images.Folder, "empty.jpg"), null, null);
 
@@ -107,7 +148,7 @@ public sealed class ConversionTests: IDisposable {
 
         ImageConverter.Convert(item, "PNG", output, newWidth, newHeight);
 
-        ReadSize(output).Should().Be((expectedWidth, expectedHeight));
+        TestImages.ReadSize(output).Should().Be((expectedWidth, expectedHeight));
     }
 
     [Theory]
@@ -121,7 +162,7 @@ public sealed class ConversionTests: IDisposable {
 
         ImageConverter.Convert(item, "PNG", output, boxWidth, boxHeight, ResizeMode.KeepProportions);
 
-        ReadSize(output).Should().Be((expectedWidth, expectedHeight));
+        TestImages.ReadSize(output).Should().Be((expectedWidth, expectedHeight));
     }
 
     [Theory]
@@ -136,7 +177,7 @@ public sealed class ConversionTests: IDisposable {
 
         ImageConverter.Convert(item, "JPG", output, cropWidth, cropHeight, ResizeMode.Crop);
 
-        ReadSize(output).Should().Be((cropWidth, cropHeight));
+        TestImages.ReadSize(output).Should().Be((cropWidth, cropHeight));
     }
 
     [Fact]
@@ -146,14 +187,14 @@ public sealed class ConversionTests: IDisposable {
 
         ImageConverter.Convert(item, "PNG", output, 150, null, ResizeMode.Crop);
 
-        ReadSize(output).Should().Be((150, 100));
+        TestImages.ReadSize(output).Should().Be((150, 100));
     }
 
     [Fact]
     public void Convert_FailsWhenTheOutputFolderIsMissing() {
         var item = CreateSource("PNG", 48, 32);
 
-        var act = () => ImageConverter.Convert(item, "JPG", Output("converted.jpg"), null, null);
+        var act = () => ImageConverter.Convert(item, "JPG", PathInMissingFolder("converted.jpg"), null, null);
 
         act.Should().Throw<MagickException>();
     }

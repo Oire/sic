@@ -4,15 +4,15 @@
 
 SIC! has no automated tests. This plan adds a test project and covers the code that exists today: conversion, resizing, ICO output, fit to file size, output paths, utilities, translation catalogs and the CLI.
 
-It changes no behavior. PR #91 already fixed five duplicate menu mnemonics in Russian and Ukrainian; Task 7 adds the test that stops them coming back.
+It changes no behavior, apart from three fixes made in review round 1 (see the last task). PR #91 already fixed five duplicate menu mnemonics in Russian and Ukrainian; Task 7 adds the test that stops them coming back.
 
 It's the first of four plans, and it comes first so that the JSON config, presets and portable work all refactor tested code. The order is `88-test-coverage`, `89-json-config`, `23-custom-presets`, `90-portable-no-traces`, each as its own pull request.
 
 ## Done when
 
-- [ ] `dotnet test` passes locally and in CI.
-- [ ] Every public method of `ImageConverter` has tests for success, and for failure wherever a failure path exists.
-- [ ] Every target format is tested from every source format that SIC! can write.
+- [ ] `dotnet test` passes locally and in CI. (local: passing; CI: pending the PR run)
+- [x] Every public method of `ImageConverter` has tests for success, and for failure wherever a failure path exists.
+- [x] Every target format is tested from every source format that SIC! can write.
 - [x] The CLI's options, exit codes and error output are tested end to end through `Program.RunCli`.
 - [x] Every `Sic.po` catalog is checked for empty entries, fuzzy entries, mismatched placeholders and duplicate menu mnemonics.
 - [x] Tests never touch the real `%APPDATA%\Oire\Sic` folder, and a test proves it.
@@ -106,6 +106,7 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - [x] tests for `UrlHelper.IsValidHttpUrl`: valid http and https links, including surrounding spaces
 - [x] tests for `UrlHelper.IsValidHttpUrl`: other schemes, relative links and empty input
 - [x] Add a `Test` step running `dotnet test --no-build` after `Build` in `dotnet.yml`, and `timeout-minutes: 20` on the job, so a hung socket test can't hold the runner. In `dependabot.yml`, replace `FluentAssertions*` with `AwesomeAssertions*`, and remove `coverlet*` and `Moq*`.
+- [x] ➕ Set `SatelliteResourceLanguages` to `en` in the test project: NetSparkle's JA resource otherwise raises NETSDK1187, which warnings-as-errors turns into a build failure.
 - [x] validation commands pass
 
 ### Task 2: Test format lists and output paths
@@ -146,7 +147,7 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - [x] tests for resizing: keep proportions with width only, height only and both (the fit-inside-a-box case, in portrait and landscape), and crop giving exact dimensions
 - [x] tests for `CreateMultiSizeIco` and ICO output from `Convert`: the frame list, the 256 px frame stored as PNG (read the ICO directory and check the PNG signature), and the 512 px limit
 - [x] tests for `GeneratePreview`: the bitmap fits the maximum size, and an item with no data fails. It always scales to the box, so keep-proportions resizing doesn't change its size; test resize settings with crop instead: 300x200 cropped to 100x100 in a 480x480 box gives 480x480, against 480x320 without crop.
-- ⚠️ Bug found: `Convert` to ICO of an image with one side over 256 px and the other under it, such as 300x200, writes a bitmap frame whose directory width is 44 (300 mod 256) instead of 0. Magick switches to PNG only when both sides exceed 256 px or one is exactly 256, and `WriteIco` re-encodes only frames whose directory byte is already 0, so the frame stays an uncompressed bitmap of about 250 KB under a wrong width. Square icons and the multi-size presets are unaffected. `IcoTests.Convert_StoresAnIcoWithOneSideOver256PxAsPng` is skipped until this is fixed.
+- ⚠️ Bug found: `Convert` to ICO of an image with one side over 256 px and the other under it, such as 300x200, writes a bitmap frame whose directory width is 44 (300 mod 256) instead of 0. Magick switches to PNG only when both sides exceed 256 px or one is exactly 256, and `WriteIco` re-encodes only frames whose directory byte is already 0, so the frame stays an uncompressed bitmap of about 250 KB under a wrong width. Square icons and the multi-size presets are unaffected. Fixed in review round 1, and `IcoTests.Convert_StoresAnIcoWithOneSideOver256PxAsPng` runs again.
 - Note: Magick's 512 px check applies to the first frame only, so `CreateMultiSizeIco` with `[16, 513]` writes a 513 px frame without complaint. The ICO presets never go above 256 px, so the UI can't reach it; `[513]` alone throws as expected.
 - [x] validation commands pass
 
@@ -230,6 +231,16 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - [x] `CLAUDE.md`: replace "There are no test projects" with `dotnet test`, the real format command `dotnet format --verify-no-changes`, test isolation through `userdata`, the non-parallel collection, and the rule against asserting translated text.
 - [x] `README.md`: mention `dotnet test` wherever build commands are listed.
 - [x] `README.md` lines 55 and 133 and `CLAUDE.md` say `dotnet publish -c Release` at solution level. Point them at the csproj, now that the solution includes tests.
+- [x] validation commands pass
+
+### ➕ Review round 1: fixes and missing tests
+
+- [x] `WriteIco` decides on the frame's own size and writes 0 into the directory for each side of 256 px or more, so a 300x200 frame is stored as PNG under a correct directory entry (the Task 3 bug).
+- [x] The CLI's `--format` with a link names the output from the unescaped link path, and a link with no file name gets `downloaded_image`, as `LoadFromUrl` names it, instead of a file called `.jpg`.
+- [x] `Config.Save` takes `isGui`, and the CLI's output-folder fallback passes `false`, so a failed save in a headless run writes to stderr instead of opening a message box.
+- [x] Tests added for the streamed 100 MB limit (a stub response with no `Content-Length`), download progress, a malformed link, a corrupt `.ico`, `ConvertToProposal` with no data, the 16 px and quality 45 floors, the as-is branch for an image of 16 px or less, cancellation inside a single format's search, keeping the source quality on a same-format resize, decoding ICO output in the format theory, multi-size ICO conversion and preview, the CLI's bare and percent-encoded links, and the saved output-folder reset.
+- [x] The catalog reader reports a fuzzy header and a missing `Plural-Forms` instead of assuming two forms, and a test checks the menu arrays against `MainWindow.BuildMenuSpec`.
+- ⚠️ Bug found: ICO has no signature Magick can detect, so ICO bytes held in memory fail with "no decode delegate". `LoadFromBytes`, `LoadFromStream` and `LoadFromUrl` reject a valid ICO (a pasted or downloaded icon), and `LoadMagickImage`'s in-memory ICO branch, `new MagickImageCollection(bytes)` with no format, can't decode one either. ICO files on disk work, because Magick goes by the `.ico` extension. `ImageLoadingTests.LoadFromBytes_ReadsAMultiSizeIcoByItsLargestFrame`, `ConversionTests.Convert_UsesTheLargestFrameOfAMultiSizeIcoHeldInMemory` and `PreviewTests.GeneratePreview_ShowsTheLargestFrameOfAMultiSizeIcoHeldInMemory` are skipped until this is fixed.
 - [x] validation commands pass
 
 ## Technical details

@@ -85,7 +85,7 @@ public class Config {
         }
     }
 
-    public static void Save() {
+    public static void Save(bool isGui = true) {
         Cfg.Remove("General");
         Cfg.Add(Section.FromObject("General", General));
 
@@ -93,7 +93,7 @@ public class Config {
             Cfg.SaveToFile(ConfigFileName);
         } catch (Exception ex) {
             Log.Error("Failed to save config: {Error}", ex.Message);
-            ReportError(_("Unable to save configuration: {0}", ex.Message), isGui: true);
+            ReportError(_("Unable to save configuration: {0}", ex.Message), isGui);
         }
     }
 

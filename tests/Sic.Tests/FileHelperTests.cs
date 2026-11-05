@@ -10,19 +10,17 @@ public sealed class FileHelperTests: IDisposable {
     private static readonly string[] PngOnly = ["*.png"];
     private static readonly string[] PngAndJpg = ["*.png", "*.jpg"];
 
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "Sic.Tests", Guid.NewGuid().ToString("N"));
+    private readonly TestImages _images = new();
 
-    public FileHelperTests() {
-        Directory.CreateDirectory(_root);
-    }
+    private string Root => _images.Folder;
 
     public void Dispose() {
-        Directory.Delete(_root, recursive: true);
+        _images.Dispose();
     }
 
     /// <summary>Creates an empty file at <paramref name="relativePath"/> under the root.</summary>
     private string Touch(string relativePath) {
-        var path = Path.Combine(_root, relativePath);
+        var path = Path.Combine(Root, relativePath);
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         File.WriteAllBytes(path, []);
         return path;
@@ -34,7 +32,7 @@ public sealed class FileHelperTests: IDisposable {
         Touch(Path.Combine("sub", "b.png"));
         Touch("c.txt");
 
-        var files = FileHelper.EnumerateImageFiles(_root, PngOnly, SearchOption.TopDirectoryOnly);
+        var files = FileHelper.EnumerateImageFiles(Root, PngOnly, SearchOption.TopDirectoryOnly);
 
         files.Should().BeEquivalentTo([top]);
     }
@@ -45,7 +43,7 @@ public sealed class FileHelperTests: IDisposable {
         var nested = Touch(Path.Combine("sub", "deeper", "b.png"));
         Touch(Path.Combine("sub", "c.txt"));
 
-        var files = FileHelper.EnumerateImageFiles(_root, PngOnly, SearchOption.AllDirectories);
+        var files = FileHelper.EnumerateImageFiles(Root, PngOnly, SearchOption.AllDirectories);
 
         files.Should().BeEquivalentTo([top, nested]);
     }
@@ -56,7 +54,7 @@ public sealed class FileHelperTests: IDisposable {
         var png = Touch("b.png");
         Touch("c.gif");
 
-        var files = FileHelper.EnumerateImageFiles(_root, PngAndJpg, SearchOption.TopDirectoryOnly);
+        var files = FileHelper.EnumerateImageFiles(Root, PngAndJpg, SearchOption.TopDirectoryOnly);
 
         files.Should().Equal(png, jpg);
     }
@@ -64,7 +62,7 @@ public sealed class FileHelperTests: IDisposable {
     [Fact]
     public void EnumerateImageFiles_SkipsAnInaccessibleFolder() {
         var visible = Touch("a.png");
-        var lockedFolder = Path.Combine(_root, "locked");
+        var lockedFolder = Path.Combine(Root, "locked");
         Touch(Path.Combine("locked", "hidden.png"));
 
         var user = WindowsIdentity.GetCurrent().User!;
@@ -79,7 +77,7 @@ public sealed class FileHelperTests: IDisposable {
             var listLocked = () => Directory.GetFiles(lockedFolder);
             listLocked.Should().Throw<UnauthorizedAccessException>();
 
-            var files = FileHelper.EnumerateImageFiles(_root, PngOnly, SearchOption.AllDirectories).ToList();
+            var files = FileHelper.EnumerateImageFiles(Root, PngOnly, SearchOption.AllDirectories).ToList();
 
             files.Should().BeEquivalentTo([visible]);
         } finally {
@@ -98,7 +96,7 @@ public sealed class FileHelperTests: IDisposable {
 
     [Fact]
     public void IsCloudPlaceholder_IsTrueForAMissingFile() {
-        var path = Path.Combine(_root, "missing.png");
+        var path = Path.Combine(Root, "missing.png");
 
         FileHelper.IsCloudPlaceholder(path).Should().BeTrue();
     }

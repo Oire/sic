@@ -25,8 +25,9 @@ public sealed partial class TranslationCatalogTests {
 
     public static TheoryData<string> Languages => [.. PoCatalog.Languages];
 
-    // One set per level of MainWindow.BuildMenuSpec. Keep them in step with it: a duplicate
-    // mnemonic within a level makes NativeMenuSpec throw ArgumentException at startup.
+    // One set per level of MainWindow.BuildMenuSpec: a duplicate mnemonic within a level makes
+    // NativeMenuSpec throw ArgumentException at startup. MenuLists_MatchBuildMenuSpec fails when
+    // the arrays above and the menu drift apart.
     public static TheoryData<string, string[]> TopLevelMenuStrings => ForEveryLanguage(TopLevelMenu);
 
     public static TheoryData<string, string[]> FileMenuStrings => ForEveryLanguage(FileMenu);
@@ -49,6 +50,18 @@ public sealed partial class TranslationCatalogTests {
 
         catalog.Entries.Should().NotBeEmpty();
         catalog.Entries.Where(entry => entry.IsFuzzy).Should().BeEmpty();
+    }
+
+    [Theory]
+    [MemberData(nameof(Languages))]
+    public void Catalog_HasNoFuzzyHeader(string language) {
+        PoCatalog.Load(language).IsHeaderFuzzy.Should().BeFalse("msgfmt drops a fuzzy header, and its Plural-Forms with it");
+    }
+
+    [Theory]
+    [MemberData(nameof(Languages))]
+    public void Catalog_DeclaresPluralForms(string language) {
+        PoCatalog.Load(language).PluralFormCount.Should().HaveValue().And.BeGreaterThan(0);
     }
 
     [Theory]
@@ -152,6 +165,31 @@ public sealed partial class TranslationCatalogTests {
     }
 
     [Fact]
+    public void MenuLists_MatchBuildMenuSpec() {
+        var source = File.ReadAllText(Path.Combine(PoCatalog.RepositoryRoot, "src", "Sic", "MainWindow.cs"));
+        var start = source.IndexOf("NativeMenuSpec BuildMenuSpec()", StringComparison.Ordinal);
+        start.Should().BeGreaterThanOrEqualTo(0, "MainWindow.cs should still build its menu in BuildMenuSpec");
+        var end = source.IndexOf("ApplyMenuState(spec);", start, StringComparison.Ordinal);
+        end.Should().BeGreaterThan(start, "BuildMenuSpec should still end by applying the menu state");
+
+        // Each AddMenu call opens a level; the .Add calls after it are that level's items.
+        var levels = new List<(string Title, List<string> Items)>();
+        foreach (Match call in MenuCallPattern().Matches(source[start..end])) {
+            if (call.Groups["call"].Value == "AddMenu") {
+                levels.Add((call.Groups["text"].Value, []));
+            } else {
+                levels.Should().NotBeEmpty("menu items are added inside a menu");
+                levels[^1].Items.Add(call.Groups["text"].Value);
+            }
+        }
+
+        levels.Select(level => level.Title).Should().Equal(TopLevelMenu);
+        levels.Select(level => level.Items).Should().BeEquivalentTo(
+            [FileMenu, EditMenu, ConvertMenu, HelpMenu],
+            options => options.WithStrictOrdering());
+    }
+
+    [Fact]
     public void EnglishMenus_HaveNoDuplicateMnemonics() {
         foreach (var level in new[] { TopLevelMenu, FileMenu, EditMenu, ConvertMenu, HelpMenu }) {
             DuplicateMnemonics(level).Should().BeEmpty();
@@ -184,4 +222,8 @@ public sealed partial class TranslationCatalogTests {
 
     [GeneratedRegex(@"\{\d+(?:,-?\d+)?(?::[^{}]*)?\}")]
     private static partial Regex PlaceholderPattern();
+
+    /// <summary>The first <c>_("...")</c> argument of an <c>AddMenu</c> or <c>.Add</c> call.</summary>
+    [GeneratedRegex(@"(?<call>AddMenu|\.Add)\(\s*_\(""(?<text>[^""]*)""\)")]
+    private static partial Regex MenuCallPattern();
 }

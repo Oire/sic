@@ -7,19 +7,17 @@ using ImageConverter = Oire.Sic.Services.ImageConverter;
 namespace Oire.Sic.Tests;
 
 public sealed class OutputPathTests: IDisposable {
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "Sic.Tests", Guid.NewGuid().ToString("N"));
+    private readonly TestImages _images = new();
 
-    public OutputPathTests() {
-        Directory.CreateDirectory(_root);
-    }
+    private string Root => _images.Folder;
 
     public void Dispose() {
-        Directory.Delete(_root, recursive: true);
+        _images.Dispose();
     }
 
-    private string Output => Path.Combine(_root, "Output");
+    private string Output => Path.Combine(Root, "Output");
 
-    private string Source => Path.Combine(_root, "Source");
+    private string Source => Path.Combine(Root, "Source");
 
     private ImageItem FileItem(string relativePath) {
         var path = Path.Combine(Source, relativePath);
@@ -51,11 +49,6 @@ public sealed class OutputPathTests: IDisposable {
         var path = ImageConverter.GenerateOutputPath(FileItem("photo.png"), "TIFF", outputFolder);
 
         path.Should().Be(Path.Combine(App.DefaultOutputFolder, "photo.tiff"));
-    }
-
-    [Fact]
-    public void GenerateOutputPath_DefaultOutputFolderIsInsideTheTestOutput() {
-        Path.GetFullPath(App.DefaultOutputFolder).Should().StartWith(Path.GetFullPath(AppContext.BaseDirectory));
     }
 
     [Fact]
@@ -113,29 +106,29 @@ public sealed class OutputPathTests: IDisposable {
 
     [Fact]
     public void GetConflictRenamePath_AddsUnderscoreOne() {
-        var existing = Path.Combine(_root, "photo.jpg");
+        var existing = Path.Combine(Root, "photo.jpg");
         File.WriteAllBytes(existing, [0]);
 
-        ImageConverter.GetConflictRenamePath(existing).Should().Be(Path.Combine(_root, "photo_1.jpg"));
+        ImageConverter.GetConflictRenamePath(existing).Should().Be(Path.Combine(Root, "photo_1.jpg"));
     }
 
     [Fact]
     public void GetConflictRenamePath_AddsUnderscoreTwoWhenUnderscoreOneExists() {
-        var existing = Path.Combine(_root, "photo.jpg");
+        var existing = Path.Combine(Root, "photo.jpg");
         File.WriteAllBytes(existing, [0]);
-        File.WriteAllBytes(Path.Combine(_root, "photo_1.jpg"), [0]);
+        File.WriteAllBytes(Path.Combine(Root, "photo_1.jpg"), [0]);
 
-        ImageConverter.GetConflictRenamePath(existing).Should().Be(Path.Combine(_root, "photo_2.jpg"));
+        ImageConverter.GetConflictRenamePath(existing).Should().Be(Path.Combine(Root, "photo_2.jpg"));
     }
 
     [Fact]
     public void GetConflictRenamePath_SkipsEveryTakenNumber() {
-        var existing = Path.Combine(_root, "photo.jpg");
+        var existing = Path.Combine(Root, "photo.jpg");
         File.WriteAllBytes(existing, [0]);
-        File.WriteAllBytes(Path.Combine(_root, "photo_1.jpg"), [0]);
-        File.WriteAllBytes(Path.Combine(_root, "photo_2.jpg"), [0]);
-        File.WriteAllBytes(Path.Combine(_root, "photo_4.jpg"), [0]);
+        File.WriteAllBytes(Path.Combine(Root, "photo_1.jpg"), [0]);
+        File.WriteAllBytes(Path.Combine(Root, "photo_2.jpg"), [0]);
+        File.WriteAllBytes(Path.Combine(Root, "photo_4.jpg"), [0]);
 
-        ImageConverter.GetConflictRenamePath(existing).Should().Be(Path.Combine(_root, "photo_3.jpg"));
+        ImageConverter.GetConflictRenamePath(existing).Should().Be(Path.Combine(Root, "photo_3.jpg"));
     }
 }

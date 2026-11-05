@@ -19,17 +19,17 @@ internal sealed record PoEntry(string MsgId, string? MsgIdPlural, IReadOnlyList<
 
 /// <summary>
 /// A small reader for SIC!'s gettext catalogs, enough to check them: multi-line strings and
-/// plural entries are handled, the header is read for <c>nplurals</c> and then skipped, and
-/// obsolete <c>#~</c> entries are skipped. A flag such as <c>#, fuzzy</c> belongs to the entry
-/// after it, which is how every flag in today's catalogs sits on an obsolete entry.
+/// plural entries are handled, the header is read for its flags and <c>nplurals</c> and then
+/// skipped, and obsolete <c>#~</c> entries are skipped. A flag such as <c>#, fuzzy</c> belongs to
+/// the entry after it, which is how every flag in today's catalogs sits on an obsolete entry. A
+/// blank line ends an entry, so comments with no <c>msgid</c> after them are dropped.
 /// </summary>
 internal sealed partial class PoCatalog {
     private static readonly Lazy<string> RepositoryRootValue = new(FindRepositoryRoot);
 
-    private PoCatalog(string language, string path, int pluralFormCount, IReadOnlyList<PoEntry> entries) {
-        Language = language;
-        FilePath = path;
+    private PoCatalog(int? pluralFormCount, bool isHeaderFuzzy, IReadOnlyList<PoEntry> entries) {
         PluralFormCount = pluralFormCount;
+        IsHeaderFuzzy = isHeaderFuzzy;
         Entries = entries;
     }
 
@@ -46,12 +46,17 @@ internal sealed partial class PoCatalog {
             .Select(folder => Path.GetFileName(folder))
             .Order(StringComparer.Ordinal)];
 
-    public string Language { get; }
+    /// <summary>
+    /// The <c>nplurals</c> value from the header's <c>Plural-Forms</c>, or null when the header
+    /// is missing or declares none.
+    /// </summary>
+    public int? PluralFormCount { get; }
 
-    public string FilePath { get; }
-
-    /// <summary>The <c>nplurals</c> value from the header's <c>Plural-Forms</c>.</summary>
-    public int PluralFormCount { get; }
+    /// <summary>
+    /// Whether the header carries <c>#, fuzzy</c>. msgfmt drops a fuzzy header, and its
+    /// <c>Plural-Forms</c> with it.
+    /// </summary>
+    public bool IsHeaderFuzzy { get; }
 
     /// <summary>Every live entry, without the header and without obsolete entries.</summary>
     public IReadOnlyList<PoEntry> Entries { get; }
@@ -61,16 +66,14 @@ internal sealed partial class PoCatalog {
         var lines = File.ReadAllLines(path, Encoding.UTF8);
         var entries = new List<PoEntry>();
         string? header = null;
+        var isHeaderFuzzy = false;
         var builder = new EntryBuilder();
 
         void Flush() {
-            if (builder.IsEmpty) {
-                return;
-            }
-
-            if (!builder.IsObsolete) {
+            if (builder.HasMsgId && !builder.IsObsolete) {
                 if (builder.MsgId.Length == 0) {
-                    header = builder.MsgStrs.GetValueOrDefault(0, string.Empty);
+                    header = builder.HeaderText;
+                    isHeaderFuzzy = builder.IsFuzzy;
                 } else {
                     entries.Add(builder.Build());
                 }
@@ -99,7 +102,6 @@ internal sealed partial class PoCatalog {
                     builder.IsFuzzy |= line[2..].Split(',').Any(flag => flag.Trim() == "fuzzy");
                 }
 
-                builder.Touch();
                 continue;
             }
 
@@ -130,9 +132,9 @@ internal sealed partial class PoCatalog {
         var plurals = header is null ? null : NPluralsPattern().Match(header);
         var pluralFormCount = plurals is { Success: true }
             ? int.Parse(plurals.Groups[1].Value, CultureInfo.InvariantCulture)
-            : 2;
+            : (int?)null;
 
-        return new PoCatalog(language, path, pluralFormCount, entries);
+        return new PoCatalog(pluralFormCount, isHeaderFuzzy, entries);
     }
 
     /// <summary>The entry for <paramref name="msgId"/>, or null when the catalog lacks it.</summary>
@@ -188,7 +190,7 @@ internal sealed partial class PoCatalog {
         private bool _hasPlural;
         private int _line;
 
-        public bool IsEmpty { get; private set; } = true;
+        public bool HasMsgId { get; private set; }
 
         public bool IsObsolete { get; set; }
 
@@ -198,14 +200,13 @@ internal sealed partial class PoCatalog {
 
         public string MsgId => _msgId.ToString();
 
-        public Dictionary<int, string> MsgStrs => _msgStrs.ToDictionary(pair => pair.Key, pair => pair.Value.ToString());
-
-        public void Touch() => IsEmpty = false;
+        /// <summary>The first translation, which for the header entry is the header itself.</summary>
+        public string HeaderText => _msgStrs.TryGetValue(0, out var text) ? text.ToString() : string.Empty;
 
         public void Start(string keyword, int? form, int line) {
-            IsEmpty = false;
             switch (keyword) {
                 case "msgid":
+                    HasMsgId = true;
                     _line = line;
                     _current = _msgId;
                     break;

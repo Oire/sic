@@ -13,9 +13,7 @@ public sealed class PreviewTests: IDisposable {
         _images.Dispose();
     }
 
-    private ImageItem CreateSource(int width, int height) {
-        return ImageConverter.LoadFromFile(_images.Create("source.png", width, height));
-    }
+    private ImageItem CreateSource(int width, int height) => _images.CreateItem("source.png", width, height);
 
     [Theory]
     [InlineData(1000, 500, 200, 200, 200, 100)]
@@ -37,6 +35,31 @@ public sealed class PreviewTests: IDisposable {
 
         preview.Width.Should().Be(480);
         preview.Height.Should().Be(320);
+    }
+
+    [Fact]
+    public void GeneratePreview_ShowsTheLargestFrameOfAMultiSizeIcoFile() {
+        var item = ImageConverter.LoadFromFile(_images.CreateMultiFrameIco("icon.ico"));
+
+        using var preview = ImageConverter.GeneratePreview(item, 480, 480);
+
+        // Only the 64x32 frame gives a 2:1 preview; the 16 and 32 px frames are square.
+        preview.Width.Should().Be(480);
+        preview.Height.Should().Be(240);
+    }
+
+    [Fact(Skip = "⚠️ ICO has no signature Magick can detect, so LoadMagickImage's in-memory ICO branch, "
+        + "new MagickImageCollection(bytes) with no format, fails with 'no decode delegate'. "
+        + "See docs/plans/088-test-coverage.md, review round 1.")]
+    public void GeneratePreview_ShowsTheLargestFrameOfAMultiSizeIcoHeldInMemory() {
+        // Built by hand, because LoadFromBytes can't read ICO bytes either (see ImageLoadingTests).
+        var bytes = File.ReadAllBytes(_images.CreateMultiFrameIco("icon.ico"));
+        var item = new ImageItem { ImageData = bytes, OriginalFormat = "Ico", FileName = "icon.ico" };
+
+        using var preview = ImageConverter.GeneratePreview(item, 480, 480);
+
+        preview.Width.Should().Be(480);
+        preview.Height.Should().Be(240);
     }
 
     [Fact]
@@ -62,9 +85,7 @@ public sealed class PreviewTests: IDisposable {
 
     [Fact]
     public void GeneratePreview_FailsForAnItemWithNoData() {
-        var item = new ImageItem { FileName = "empty.png", OriginalFormat = "Png" };
-
-        var act = () => ImageConverter.GeneratePreview(item, 480, 480);
+        var act = () => ImageConverter.GeneratePreview(TestImages.EmptyItem(), 480, 480);
 
         act.Should().Throw<InvalidOperationException>();
     }
