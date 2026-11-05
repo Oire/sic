@@ -247,7 +247,7 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 ### Test isolation
 
-`App.IsPortable` is `Directory.Exists(Path.Combine(AppContext.BaseDirectory, "userdata"))`, so a `userdata` folder in the test output makes every path under `App.DataFolder` land in `bin`. The guard test in Task 1 fails loudly if that ever stops being true.
+`App.IsPortable` is `Directory.Exists(Path.Combine(AppContext.BaseDirectory, "userdata"))`, so a `userdata` folder in the test output makes every path under `App.DataFolder` land in `bin`. A module initializer in the test assembly creates that folder before any test runs, `TestDataFolder.Clear()` refuses to delete anything unless the data folder is inside the test output, and the guard test in Task 1 checks the same.
 
 ### Restoring CRLF
 

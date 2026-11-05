@@ -38,4 +38,28 @@ public class UrlHelperTests {
         UrlHelper.IsValidHttpUrl(text, out var url).Should().BeFalse();
         url.Should().BeEmpty();
     }
+
+    [Theory]
+    [InlineData("http://example.com/images/photo.png", "photo.png")]
+    [InlineData("http://example.com/my%20photo.png", "my photo.png")]
+    [InlineData("http://example.com/photo.png?size=large#top", "photo.png")]
+    [InlineData("http://example.com/C%3Aphoto.png", "C_photo.png")]
+    [InlineData("http://example.com/File:Photo.png", "File_Photo.png")]
+    [InlineData("http://example.com/a%5Cb.png", "a_b.png")]
+    [InlineData("http://example.com/a%2Fb.png", "a_b.png")]
+    [InlineData("http://example.com/a%3Fb.png", "a_b.png")]
+    [InlineData("http://example.com/%2A%22%3C%3E%7C.png", "_____.png")]
+    [InlineData("http://example.com/photo.png.%20.", "photo.png")]
+    public void GetDownloadFileName_UnescapesAndCleansTheLastSegment(string link, string expected) {
+        UrlHelper.GetDownloadFileName(new Uri(link)).Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData("http://example.com")]
+    [InlineData("http://example.com/")]
+    [InlineData("http://example.com/images/")]
+    [InlineData("http://example.com/%20%20")]
+    public void GetDownloadFileName_FallsBackForALinkWithoutAFileName(string link) {
+        UrlHelper.GetDownloadFileName(new Uri(link)).Should().Be(UrlHelper.DefaultDownloadName);
+    }
 }

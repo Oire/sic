@@ -190,13 +190,13 @@ internal static class Program {
             } else if (!string.IsNullOrWhiteSpace(format)) {
                 targetFormat = format.TrimStart('.').ToUpperInvariant();
                 targetFormat = targetFormat == "JPEG" ? "JPG" : targetFormat == "TIF" ? "TIFF" : targetFormat;
-                // LocalPath is unescaped ("my%20photo" becomes "my photo"). A link with no file
-                // name gets the same fallback LoadFromUrl gives it, never an empty ".jpg".
+                // A link is named exactly as LoadFromUrl names it: unescaped, cleaned of characters
+                // a file name can't hold, never an empty ".jpg".
                 var baseName = isUrl
-                    ? Path.GetFileNameWithoutExtension(inputUri!.LocalPath)
+                    ? Path.GetFileNameWithoutExtension(UrlHelper.GetDownloadFileName(inputUri!))
                     : Path.GetFileNameWithoutExtension(input);
                 if (string.IsNullOrWhiteSpace(baseName)) {
-                    baseName = "downloaded_image";
+                    baseName = UrlHelper.DefaultDownloadName;
                 }
                 var ext = ImageConverter.GetFileExtension(targetFormat);
                 var outputFolder = Config.General.OutputFolder;

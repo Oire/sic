@@ -220,6 +220,25 @@ public sealed class CliTests: StaticStateTestBase {
         TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
     }
 
+    [Theory]
+    [InlineData("%3A")]
+    [InlineData("%5C")]
+    [InlineData("%3F")]
+    public void Url_WithFormat_KeepsTheOutputInTheOutputFolder(string escapedCharacter) {
+        // "C%3A..." would otherwise decode to the rooted "C:...", which Path.Combine lets replace
+        // the output folder; a backslash would add a folder and "?" would make the write throw.
+        var unique = UniqueName("cli");
+        using var server = new StubHttpServer();
+        var url = server.Serve($"/images/C{escapedCharacter}{unique}.png", TestImages.CreateBytes(40, 30, MagickFormat.Png), "image/png");
+        var output = DefaultFolderOutput($"C_{unique}", ".jpg");
+
+        var result = Run("-i", url, "--format", "jpg");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        result.Output.Trim().Should().Be($"Converted: {output}");
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
+    }
+
     [Fact]
     public void Url_WithFormat_NamesALinkWithoutAFileNameLikeTheGuiDoes() {
         using var server = new StubHttpServer();

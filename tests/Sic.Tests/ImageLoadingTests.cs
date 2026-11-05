@@ -180,6 +180,19 @@ public sealed class ImageLoadingTests: IDisposable {
         item.FileName.Should().Be("downloaded_image");
     }
 
+    [Theory]
+    [InlineData("/C%3Aphoto.png", "C_photo.png")]
+    [InlineData("/images/a%5Cb.png", "a_b.png")]
+    [InlineData("/images/a%3Fb.png", "a_b.png")]
+    public async Task LoadFromUrl_CleansCharactersAFileNameCannotHold(string path, string expected) {
+        using var server = new StubHttpServer();
+        var url = server.Serve(path, TestImages.CreateBytes(40, 30, MagickFormat.Png), "image/png");
+
+        var item = await ImageConverter.LoadFromUrl(url);
+
+        item.FileName.Should().Be(expected);
+    }
+
     [Fact]
     public async Task LoadFromUrl_ReportsProgressUpToTheWholeFile() {
         var data = TestImages.CreateBytes(200, 150, MagickFormat.Bmp);

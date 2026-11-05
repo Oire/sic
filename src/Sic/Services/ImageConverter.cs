@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Net.Http;
 using ImageMagick;
 using Oire.Sic.Models;
+using Oire.Sic.Utils;
 using Serilog;
 using App = Oire.Sic.Utils.Constants.App;
 
@@ -247,11 +248,7 @@ public static class ImageConverter {
         }
 
         var data = ms.ToArray();
-        var fileName = Path.GetFileName(uri.LocalPath);
-
-        if (string.IsNullOrWhiteSpace(fileName)) {
-            fileName = "downloaded_image";
-        }
+        var fileName = UrlHelper.GetDownloadFileName(uri);
 
         // The link resolved and downloaded, but the bytes may be an HTML page or some other
         // non-image resource. Translate Magick's decode failure into a clear domain error so
