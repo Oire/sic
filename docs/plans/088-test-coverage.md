@@ -138,15 +138,17 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 #### Steps
 
-- [ ] tests for `LoadFromFile`, `LoadFromStream` and `LoadFromBytes`: dimensions, size and format; a corrupt file; a missing file
-- [ ] Add `StubHttpServer`, a small `TcpListener` server on the loopback address that Task 6 reuses.
-- [ ] tests for `LoadFromUrl` against the stub: an image, an HTML page giving `UnsupportedImageException`, a 404, cancellation, an `ftp://` link, and a faked `Content-Length` above 100 MB
-- [ ] tests for `Convert`: a theory over every source format to every target format, checking that the output decodes as the target format at the same size. `LoadFromFile` reports `Ico` from the file extension alone, so check ICO output by reading its header.
-- [ ] tests for `Convert` failures: an unsupported target gives `ArgumentException`, and an item with no data gives `InvalidOperationException`
-- [ ] tests for resizing: keep proportions with width only, height only and both (the fit-inside-a-box case, in portrait and landscape), and crop giving exact dimensions
-- [ ] tests for `CreateMultiSizeIco` and ICO output from `Convert`: the frame list, the 256 px frame stored as PNG (read the ICO directory and check the PNG signature), and the 512 px limit
-- [ ] tests for `GeneratePreview`: the bitmap fits the maximum size, and an item with no data fails. It always scales to the box, so keep-proportions resizing doesn't change its size; test resize settings with crop instead: 300x200 cropped to 100x100 in a 480x480 box gives 480x480, against 480x320 without crop.
-- [ ] validation commands pass
+- [x] tests for `LoadFromFile`, `LoadFromStream` and `LoadFromBytes`: dimensions, size and format; a corrupt file; a missing file
+- [x] Add `StubHttpServer`, a small `TcpListener` server on the loopback address that Task 6 reuses.
+- [x] tests for `LoadFromUrl` against the stub: an image, an HTML page giving `UnsupportedImageException`, a 404, cancellation, an `ftp://` link, and a faked `Content-Length` above 100 MB
+- [x] tests for `Convert`: a theory over every source format to every target format, checking that the output decodes as the target format at the same size. `LoadFromFile` reports `Ico` from the file extension alone, so check ICO output by reading its header.
+- [x] tests for `Convert` failures: an unsupported target gives `ArgumentException`, and an item with no data gives `InvalidOperationException`
+- [x] tests for resizing: keep proportions with width only, height only and both (the fit-inside-a-box case, in portrait and landscape), and crop giving exact dimensions
+- [x] tests for `CreateMultiSizeIco` and ICO output from `Convert`: the frame list, the 256 px frame stored as PNG (read the ICO directory and check the PNG signature), and the 512 px limit
+- [x] tests for `GeneratePreview`: the bitmap fits the maximum size, and an item with no data fails. It always scales to the box, so keep-proportions resizing doesn't change its size; test resize settings with crop instead: 300x200 cropped to 100x100 in a 480x480 box gives 480x480, against 480x320 without crop.
+- ⚠️ Bug found: `Convert` to ICO of an image with one side over 256 px and the other under it, such as 300x200, writes a bitmap frame whose directory width is 44 (300 mod 256) instead of 0. Magick switches to PNG only when both sides exceed 256 px or one is exactly 256, and `WriteIco` re-encodes only frames whose directory byte is already 0, so the frame stays an uncompressed bitmap of about 250 KB under a wrong width. Square icons and the multi-size presets are unaffected. `IcoTests.Convert_StoresAnIcoWithOneSideOver256PxAsPng` is skipped until this is fixed.
+- Note: Magick's 512 px check applies to the first frame only, so `CreateMultiSizeIco` with `[16, 513]` writes a 513 px frame without complaint. The ICO presets never go above 256 px, so the UI can't reach it; `[513]` alone throws as expected.
+- [x] validation commands pass
 
 ### Task 4: Test fit to file size
 
