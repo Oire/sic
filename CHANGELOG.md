@@ -2,22 +2,6 @@
 
 All notable changes to SIC! (Simple Image Converter) will be documented in this file.
 
-## [1.3.0] — unreleased
-
-### Fixes
-
-- Converting an image with one side of 256 px or more and the other smaller, such as 300x200, to ICO now stores it as PNG with the right dimensions. It used to come out as an uncompressed bitmap of about 250 KB with the wrong width recorded in the file.
-- Icons added by link, such as a site's `favicon.ico`, are now accepted. SIC! used to reject them as not an image, although it opened the same icon from a file.
-- Converting an image larger than 512 px to ICO now fails with a clear message about the 512x512 px limit instead of an internal error, and every size of a multi-size icon is checked, not only the first.
-- A language set to a code SIC! has no translation for, such as `pl`, now falls back to English as intended.
-- Command line: converting a link with `--format` names the output after the file in the link, or `downloaded_image` when the link has no file name, instead of writing a file called `.jpg`.
-- A downloaded image's file name no longer keeps characters a file name can't hold, so an escaped slash in a link can't place the converted file outside the output folder.
-- Command line: when SIC! can't save its settings, it now says so in the console instead of opening a message box.
-
-### Other
-
-- SIC! now has automated tests, run on every change: conversion, resizing, ICO output, fit to file size, the command line and the translation catalogs ([#88](https://github.com/Oire/sic/issues/88)).
-
 ## [1.2.0.0] — unreleased
 
 ### Changes
@@ -30,10 +14,18 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 ### Fixes
 
 - The main window now shows the SIC! icon in its title bar and in Alt+Tab instead of the generic Windows Forms one.
+- Converting an image with one side of 256 px or more and the other smaller, such as 300x200, to ICO now stores it as PNG with the right dimensions. It used to come out as an uncompressed bitmap of about 250 KB with the wrong width recorded in the file.
+- Icons added by link, such as a site's `favicon.ico`, are now accepted. SIC! used to reject them as not an image, although it opened the same icon from a file.
+- Converting an image larger than 512 px to ICO now fails with a clear message about the 512x512 px limit instead of an internal error, and every size of a multi-size icon is checked, not only the first.
+- A language set to a code SIC! has no translation for, such as `pl`, now falls back to English as intended.
+- Command line: converting a link with `--format` names the output after the file in the link, or `downloaded_image` when the link has no file name, instead of writing a file called `.jpg`.
+- A downloaded image's file name no longer keeps characters a file name can't hold, so an escaped slash in a link can't place the converted file outside the output folder.
+- Command line: when SIC! can't save its settings, it now says so in the console instead of opening a message box.
 
 ### Other
 
 - SIC! can now be installed and updated through WinGet.
+- SIC! now has automated tests, run on every change: conversion, resizing, ICO output, fit to file size, the command line and the translation catalogs ([#88](https://github.com/Oire/sic/issues/88)).
 
 ## [1.1.0.22] — 2026-08-21
 
