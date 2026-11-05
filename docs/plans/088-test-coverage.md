@@ -14,7 +14,7 @@ It's the first of four plans, and it comes first so that the JSON config, preset
 - [ ] Every public method of `ImageConverter` has tests for success, and for failure wherever a failure path exists.
 - [ ] Every target format is tested from every source format that SIC! can write.
 - [x] The CLI's options, exit codes and error output are tested end to end through `Program.RunCli`.
-- [ ] Every `Sic.po` catalog is checked for empty entries, fuzzy entries, mismatched placeholders and duplicate menu mnemonics.
+- [x] Every `Sic.po` catalog is checked for empty entries, fuzzy entries, mismatched placeholders and duplicate menu mnemonics.
 - [x] Tests never touch the real `%APPDATA%\Oire\Sic` folder, and a test proves it.
 - [x] `build-installer.ps1` still produces the single-file `Sic.exe`, and no test files reach the published output.
 - [ ] all validation commands pass
@@ -211,12 +211,12 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 #### Steps
 
-- [ ] Add `PoCatalog`, a small reader for `Sic.po` that finds the repository root by walking up to `Sic.sln`, and lists languages from `locale/*/Sic.po` on disk rather than hard-coding them. It handles multi-line strings and plural entries, skips the header and obsolete `#~` entries, and ties a `#, fuzzy` flag to the entry after it, because today's flags all sit on obsolete entries.
-- [ ] tests over all languages: no fuzzy entries and no empty `msgstr`
-- [ ] tests for placeholders on singular entries: each `msgstr` uses the same `{0}`-style placeholders as its `msgid`.
-- [ ] tests for placeholders on plural entries: every `msgstr[i]` uses only placeholders found in `msgid_plural`, the last form matches `msgid_plural` exactly, and `msgstr[0]` may omit a placeholder only when `msgid` has none. In a language whose `Plural-Forms` has `nplurals` above 2, as Russian and Ukrainian do, `msgstr[0]` needs `{0}`, because that form also covers 21, 31 and so on.
-- [ ] Add one `TheoryData` per menu level in `BuildMenuSpec` (`TopLevelMenuStrings` for the bar itself, then `FileMenuStrings`, `EditMenuStrings`, `ConvertMenuStrings`, `HelpMenuStrings`), and test that no level has duplicate mnemonics in any language. A duplicate throws `ArgumentException` at startup. Use `MenuTextFormatter.ExtractMnemonic` from `Oire.WinForms.NativeControls`. A listed `msgid` missing from a catalog fails the test, so a renamed string can't pass silently.
-- [ ] validation commands pass
+- [x] Add `PoCatalog`, a small reader for `Sic.po` that finds the repository root by walking up to `Sic.sln`, and lists languages from `locale/*/Sic.po` on disk rather than hard-coding them. It handles multi-line strings and plural entries, skips the header and obsolete `#~` entries, and ties a `#, fuzzy` flag to the entry after it, because today's flags all sit on obsolete entries.
+- [x] tests over all languages: no fuzzy entries and no empty `msgstr`
+- [x] tests for placeholders on singular entries: each `msgstr` uses the same `{0}`-style placeholders as its `msgid`.
+- [x] tests for placeholders on plural entries: every `msgstr[i]` uses only placeholders found in `msgid_plural`, the last form matches `msgid_plural` exactly, and `msgstr[0]` may omit a placeholder only when `msgid` has none. In a language whose `Plural-Forms` has `nplurals` above 2, as Russian and Ukrainian do, `msgstr[0]` needs `{0}`, because that form also covers 21, 31 and so on.
+- [x] Add one `TheoryData` per menu level in `BuildMenuSpec` (`TopLevelMenuStrings` for the bar itself, then `FileMenuStrings`, `EditMenuStrings`, `ConvertMenuStrings`, `HelpMenuStrings`), and test that no level has duplicate mnemonics in any language. A duplicate throws `ArgumentException` at startup. Use `MenuTextFormatter.ExtractMnemonic` from `Oire.WinForms.NativeControls`. A listed `msgid` missing from a catalog fails the test, so a renamed string can't pass silently.
+- [x] validation commands pass
 
 ### Task 8: Update project documentation
 
