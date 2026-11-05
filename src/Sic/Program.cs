@@ -143,7 +143,7 @@ internal static class Program {
         }
     }
 
-    private static int RunCli(string[] args) {
+    internal static int RunCli(string[] args) {
         Config.Load(isGui: false);
         Localization.SetLanguage(Config.General.Language);
         EnsureOutputFolderExists(showGui: false);

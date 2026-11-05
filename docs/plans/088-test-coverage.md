@@ -13,7 +13,7 @@ It's the first of four plans, and it comes first so that the JSON config, preset
 - [ ] `dotnet test` passes locally and in CI.
 - [ ] Every public method of `ImageConverter` has tests for success, and for failure wherever a failure path exists.
 - [ ] Every target format is tested from every source format that SIC! can write.
-- [ ] The CLI's options, exit codes and error output are tested end to end through `Program.RunCli`.
+- [x] The CLI's options, exit codes and error output are tested end to end through `Program.RunCli`.
 - [ ] Every `Sic.po` catalog is checked for empty entries, fuzzy entries, mismatched placeholders and duplicate menu mnemonics.
 - [x] Tests never touch the real `%APPDATA%\Oire\Sic` folder, and a test proves it.
 - [x] `build-installer.ps1` still produces the single-file `Sic.exe`, and no test files reach the published output.
@@ -196,11 +196,11 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 #### Steps
 
-- [ ] Make `Program.RunCli` internal, and call it directly with stderr captured through `Console.SetError`, in the non-parallel collection.
-- [ ] tests for success: `-i` with `-o`, `-i` with `--format`, a URL input through `StubHttpServer`, `JPEG` and `TIF` spellings, every `--resize` form, and `--crop`
-- [ ] tests for failure: missing input, no extension on `--output`, neither `--output` nor `--format`, an unsupported format, invalid `--resize` values, `--crop` with one size, a corrupt input file, and a URL giving 404. Each returns `ExitCode.Error` and writes to stderr. Assert the exact text "Either --output or --format must be specified.", because the presets plan changes that message.
-- [ ] tests for skipping: same format, no resize, returns `ExitCode.Success`
-- [ ] validation commands pass
+- [x] Make `Program.RunCli` internal, and call it directly with stderr captured through `Console.SetError`, in the non-parallel collection.
+- [x] tests for success: `-i` with `-o`, `-i` with `--format`, a URL input through `StubHttpServer`, `JPEG` and `TIF` spellings, every `--resize` form, and `--crop`
+- [x] tests for failure: missing input, no extension on `--output`, neither `--output` nor `--format`, an unsupported format, invalid `--resize` values, `--crop` with one size, a corrupt input file, and a URL giving 404. Each returns `ExitCode.Error` and writes to stderr. Assert the exact text "Either --output or --format must be specified.", because the presets plan changes that message.
+- [x] tests for skipping: same format, no resize, returns `ExitCode.Success`
+- [x] validation commands pass
 
 ### Task 7: Check the translation catalogs
 
