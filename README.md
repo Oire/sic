@@ -109,7 +109,7 @@ sic -i avatar.png -o avatar.ico -r 128x128
 
 ## Configuration
 
-Settings are stored in `%APPDATA%\Oire\Sic\Sic.cfg` (or `userdata\Sic.cfg` in portable mode):
+Settings are stored as JSON in `%APPDATA%\Oire\Sic\sic.json` (or `userdata\sic.json` in portable mode). A `Sic.cfg` from SIC! 1.1 or earlier is migrated automatically on first start and kept as `Sic.cfg.bak`. The settings are:
 
 - **Output folder** — where converted files are saved (default: `Converted` subfolder in the data directory)
 - **Save converted images in the same folder as the original** — write each converted file next to its source file instead of into the output folder; clipboard captures and downloaded links still go to the output folder (default: off)
@@ -123,6 +123,10 @@ Settings are stored in `%APPDATA%\Oire\Sic\Sic.cfg` (or `userdata\Sic.cfg` in po
 ### Portable Mode
 
 To run SIC! in portable mode, create an empty `userdata` folder next to `Sic.exe`. When this folder is present, all application data — configuration, converted images, and logs — is stored there instead of in `%APPDATA%`. This is useful for running from a USB drive or keeping everything self-contained.
+
+### One window per data folder
+
+Only one SIC! window runs per data folder: starting SIC! again brings the open window forward, along with any dialog open in it, instead of opening a second one. Copies with their own data folder, such as two portable copies or a portable and an installed copy, run side by side, and the command line always runs, even while the window is open.
 
 ## Building
 
@@ -192,6 +196,9 @@ src/Sic/
   FitToSizeResultsDialog.cs/.Designer.cs # Fit to file size: ranked results picker
   ProgressDialog.cs/.Designer.cs  # Progress dialog for batch operations
   Models/
+    AppConfig.cs                  # The whole of sic.json
+    ConfigLoadResult.cs           # Loaded settings plus any message for the user
+    GeneralSettings.cs            # The general section of sic.json
     ImageItem.cs                  # Image queue item data model
     ResizeMode.cs                 # Resize mode enum (KeepProportions, Crop)
     SizeFitProposal.cs            # One viable fit-to-file-size result
@@ -200,9 +207,12 @@ src/Sic/
     UpdateService.cs              # NetSparkle update checks
     UnsupportedImageException.cs  # Thrown when content loads but isn't a decodable image
   Utils/
-    Config.cs                     # SharpConfig-based settings
+    Config.cs                     # Settings the app runs with, loaded from sic.json
+    ConfigSerializer.cs           # sic.json reading, migration, recovery and atomic saving
     FileHelper.cs                 # Cloud placeholder detection, file enumeration
+    LegacyConfigReader.cs         # Reads Sic.cfg files from SIC! 1.1 and earlier
     Localization.cs               # GetText.NET wrapper
+    SingleInstanceGuard.cs        # One GUI per data folder
     UrlHelper.cs                  # http(s) link validation
     Enums/
       UpdateCheckInterval.cs      # Background update-check frequency

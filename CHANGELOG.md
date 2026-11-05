@@ -10,6 +10,8 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 - **Smaller icons**: the 256 px image in an ICO file is now stored as PNG, as in Windows' own icons, instead of as an uncompressed bitmap. A multi-size icon made with the Windows application preset drops from about 285 KB to about 85 KB, with the same pixels.
 - **Signed by Oire Software**: the installer, its uninstaller and `sic.exe` now carry Oire Software's digital signature ([#86](https://github.com/Oire/sic/issues/86)). When you install, Windows' permission prompt names Oire Software as the verified publisher instead of an unknown one, and a file's **Properties** show the signature on the **Digital Signatures** tab. Windows SmartScreen may still warn for a while after a release; the manual's Installation section explains what to check.
 - The publisher shown in Windows' list of installed apps is now **Oire Software**, the company's name as registered and as the signature gives it.
+- **Settings in JSON**: settings are now stored in `sic.json` instead of `Sic.cfg`, in the same folder ([#89](https://github.com/Oire/sic/issues/89)). The first start of this version moves your settings over automatically and keeps the old file as `Sic.cfg.bak`; to go back to 1.1 with your old settings, rename it back to `Sic.cfg`. A value SIC! can't use is reset to its default on its own, keeping every other setting, and a damaged file is kept as `sic.json.bad` and reported rather than silently replaced. If the file can't be read at all, SIC! says so and leaves it untouched, and changes made in that session aren't saved.
+- **One window at a time**: starting SIC! while it's already running brings the open window forward, or the dialog open in it, instead of opening a second window that could overwrite the first one's settings ([#89](https://github.com/Oire/sic/issues/89)). Copies with their own settings, such as portable copies in different folders or a portable and an installed copy, still run side by side, and the command line still runs while the window is open.
 
 ### Fixes
 
@@ -21,6 +23,9 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 - Command line: converting a link with `--format` names the output after the file in the link, or `downloaded_image` when the link has no file name, instead of writing a file called `.jpg`.
 - A downloaded image's file name no longer keeps characters a file name can't hold, so an escaped slash in a link can't place the converted file outside the output folder.
 - Command line: when SIC! can't save its settings, it now says so in the console instead of opening a message box.
+- One bad value in the settings file no longer makes SIC! discard all the others, and a language setting SIC! doesn't recognize no longer stops it from starting: it falls back to the system language.
+- A portable copy moved to another folder or drive letter now keeps saving to its own `Converted` folder. It used to keep the old copy's full path, writing there if it still existed or warning that the output folder no longer existed.
+- Command line: when the custom output folder is missing, for instance on a drive that is unplugged, SIC! now uses the default folder for that run only, and no longer forgets the custom one.
 
 ### Other
 

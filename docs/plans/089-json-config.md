@@ -19,11 +19,11 @@ It's the second of four plans. `88-test-coverage` must be merged first. `23-cust
 - [x] A failed config save in CLI mode writes to stderr and never opens a message box.
 - [x] A CLI run with a missing output folder uses the default for that run and doesn't change the saved setting.
 - [x] A portable copy that moves or changes drive letter keeps using its own `Converted` folder, including a 1.1 `userdata` folder copied into a new 1.2 folder.
-- [ ] `sharpconfig-huanlin` is no longer referenced in the code, the project file or the docs.
+- [x] `sharpconfig-huanlin` is no longer referenced in the code, the project file or the docs.
 - [ ] Starting SIC! while it's already running brings the existing window forward, even with a modal dialog open, and starts no second window.
 - [ ] Two portable copies in different folders, or a portable and an installed copy, can run side by side.
 - [ ] The CLI still runs while the GUI is open.
-- [ ] all validation commands pass
+- [x] all validation commands pass
 
 ## Validation commands
 
@@ -215,12 +215,12 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 #### Steps
 
-- [ ] All seven manuals: replace `Sic.cfg` with `sic.json` at the existing mention, say settings migrate automatically, and say that starting SIC! again brings the open window forward.
-- [ ] `README.md`: replace the `Sic.cfg` mention and "SharpConfig-based settings".
-- [ ] `CHANGELOG.md` and `changelogs/1.2.0.0.md`: add the automatic move to `sic.json`, the single-instance behavior, and the behavior changes under Technical details.
-- [ ] Remove `sharpconfig-huanlin` from any remaining mention outside `docs/plans`.
-- [ ] `CLAUDE.md`: update the config references, the settings section, including both places that call `EnabledFormats` comma-separated, and the dependency table. Document `SingleInstanceGuard`, and note that #35 will need to forward file paths to the running instance, because arguments mean CLI mode today.
-- [ ] validation commands pass
+- [x] All seven manuals: replace `Sic.cfg` with `sic.json` at the existing mention, say settings migrate automatically, and say that starting SIC! again brings the open window forward.
+- [x] `README.md`: replace the `Sic.cfg` mention and "SharpConfig-based settings".
+- [x] `CHANGELOG.md` and `changelogs/1.2.0.0.md`: add the automatic move to `sic.json`, the single-instance behavior, and the behavior changes under Technical details.
+- [x] Remove `sharpconfig-huanlin` from any remaining mention outside `docs/plans`.
+- [x] `CLAUDE.md`: update the config references, the settings section, including both places that call `EnabledFormats` comma-separated, and the dependency table. Document `SingleInstanceGuard`, and note that #35 will need to forward file paths to the running instance, because arguments mean CLI mode today.
+- [x] validation commands pass
 
 ## Technical details
 

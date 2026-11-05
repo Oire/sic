@@ -175,6 +175,7 @@ footer {
     <dt>Portable</dt>
     <dd>If a <code>userdata</code> folder exists next to the executable, SIC! runs in portable mode. All data (configuration, converted files, logs) is stored in that <code>userdata</code> folder instead of <code>%APPDATA%</code>. This lets you run SIC! from a USB drive or any folder without leaving traces on the system.</dd>
 </dl>
+<p>Only one SIC! window runs at a time. If you start SIC! while it's already open, no second window opens: the open window comes forward instead, and if a dialog such as Settings is open in it, that dialog gets the focus. Sometimes Windows only makes its taskbar button flash. Portable copies in different folders, or a portable copy and an installed one, each keep their own settings and can run side by side. The <a href="#cli">command line</a> can always be used, even while the window is open.</p>
 
 <h2 id="adding-images">Adding images</h2>
 <p>There are several ways to add images to the queue:</p>
@@ -292,7 +293,7 @@ footer {
     <dt>Target formats to show in the list</dt>
     <dd>Tick the formats you want to see in the <strong>Target Format</strong> dropdown of the main window, and untick the ones you never convert to. At least one format must stay ticked. Leaving them all ticked also means that formats added in future versions of SIC! appear automatically.</dd>
 </dl>
-<p>Settings are stored in <code>Sic.cfg</code> inside the application data directory (see <a href="#installation">Installation modes</a> for the exact location).</p>
+<p>Settings are stored in <code>sic.json</code> inside the application data directory (see <a href="#installation">Installation modes</a> for the exact location). When you upgrade from SIC! 1.1 or earlier, your settings move over from the old <code>Sic.cfg</code> file automatically the first time SIC! starts, and the old file is kept as <code>Sic.cfg.bak</code>.</p>
 
 <h2 id="updates">Software updates</h2>
 <p>SIC! can check for new versions automatically. By default an update check runs on startup and then once a day while the application is running, but both behaviors are configurable in <a href="#settings">Settings</a> — you can turn the startup check off and choose the background frequency (or disable background checks entirely). You can always check manually via <strong>Help > Check for Updates</strong>.</p>
