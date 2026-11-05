@@ -15,8 +15,8 @@ It's the first of four plans, and it comes first so that the JSON config, preset
 - [ ] Every target format is tested from every source format that SIC! can write.
 - [ ] The CLI's options, exit codes and error output are tested end to end through `Program.RunCli`.
 - [ ] Every `Sic.po` catalog is checked for empty entries, fuzzy entries, mismatched placeholders and duplicate menu mnemonics.
-- [ ] Tests never touch the real `%APPDATA%\Oire\Sic` folder, and a test proves it.
-- [ ] `build-installer.ps1` still produces the single-file `Sic.exe`, and no test files reach the published output.
+- [x] Tests never touch the real `%APPDATA%\Oire\Sic` folder, and a test proves it.
+- [x] `build-installer.ps1` still produces the single-file `Sic.exe`, and no test files reach the published output.
 - [ ] all validation commands pass
 
 ## Validation commands
@@ -94,19 +94,19 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 #### Steps
 
-- [ ] Create the project from the PlanCake pattern, with `AssemblyName` `Sic.Tests`, `RootNamespace` `Oire.Sic.Tests`, `IsPublishable` false, and a project reference to `src/Sic/Sic.csproj`.
-- [ ] Add `<InternalsVisibleTo Include="Sic.Tests" />` to `Sic.csproj`, and add the test project to `Sic.sln` with Debug|x64 and Release|x64 entries.
-- [ ] Add an after-build target to the test project that creates `$(OutDir)userdata` and `$(OutDir)locale\de`, and a guard test asserting that `App.IsPortable` is true and `App.DataFolder` is under the test output folder.
-- [ ] Add `TestDataFolder.Clear()`, deleting every `Sic.cfg*` and `sic.json*` file from `App.DataFolder`, which also covers later backups such as `sic.json.bad.<timestamp>`, for tests in this and later plans that place config files there.
-- [ ] In `build-installer.ps1`, rename `$SolutionPath` to `$ProjectPath` pointing at `src\Sic\Sic.csproj`, with the error text "Project file not found", and pass exactly `$ProjectPath, "--configuration", "Release", "/verbosity:minimal"`. Do not copy PlanCake's `--output` or `--runtime`: here `$PublishOutputPath` is defined after the publish, and PlanCake's folder is different.
-- [ ] Confirm with `.\installer\build-installer.ps1 -NoSign`, which deletes `bin\x64\Release` first, so an old `Sic.exe` can't pass the check. The new `Sic.exe` must be in `src\Sic\bin\x64\Release\win-x64\publish`, with no `xunit*` or `Sic.Tests*` files beside it.
-- [ ] Make `Compile-Translations.ps1` and `Update-Translations.ps1` find `msgfmt` and `msgmerge` on the `PATH` through `Get-Command`, using `.Source` as `build-installer.ps1` does for 7-Zip, then in `$env:LOCALAPPDATA\Programs\gettext-iconv\bin`, where mlocati's gettext build installs, then in the two GnuWin32 folders. Later plans run both scripts. Change the install hint in both scripts and in `src/Sic/locale/README.md` to `winget install mlocati.GetText`.
-- [ ] Make `Update-Translations.ps1` restore CRLF after each `msgmerge` with the code under Technical details, inside `if ($LASTEXITCODE -eq 0)` and before the backup is removed, so a failed write still reaches the catch block's restore. `msgmerge` writes LF, so every update would otherwise be a whole-file diff.
-- [ ] Confirm by running the script twice with no new strings, then discard the changes. `msgmerge` rewrites a catalog even when it's in sync, so this does exercise the code. `git diff --stat` must show only a few lines per catalog, where `msgmerge` moves the `Language:` header, and the second run must add nothing.
-- [ ] tests for `UrlHelper.IsValidHttpUrl`: valid http and https links, including surrounding spaces
-- [ ] tests for `UrlHelper.IsValidHttpUrl`: other schemes, relative links and empty input
-- [ ] Add a `Test` step running `dotnet test --no-build` after `Build` in `dotnet.yml`, and `timeout-minutes: 20` on the job, so a hung socket test can't hold the runner. In `dependabot.yml`, replace `FluentAssertions*` with `AwesomeAssertions*`, and remove `coverlet*` and `Moq*`.
-- [ ] validation commands pass
+- [x] Create the project from the PlanCake pattern, with `AssemblyName` `Sic.Tests`, `RootNamespace` `Oire.Sic.Tests`, `IsPublishable` false, and a project reference to `src/Sic/Sic.csproj`.
+- [x] Add `<InternalsVisibleTo Include="Sic.Tests" />` to `Sic.csproj`, and add the test project to `Sic.sln` with Debug|x64 and Release|x64 entries.
+- [x] Add an after-build target to the test project that creates `$(OutDir)userdata` and `$(OutDir)locale\de`, and a guard test asserting that `App.IsPortable` is true and `App.DataFolder` is under the test output folder.
+- [x] Add `TestDataFolder.Clear()`, deleting every `Sic.cfg*` and `sic.json*` file from `App.DataFolder`, which also covers later backups such as `sic.json.bad.<timestamp>`, for tests in this and later plans that place config files there.
+- [x] In `build-installer.ps1`, rename `$SolutionPath` to `$ProjectPath` pointing at `src\Sic\Sic.csproj`, with the error text "Project file not found", and pass exactly `$ProjectPath, "--configuration", "Release", "/verbosity:minimal"`. Do not copy PlanCake's `--output` or `--runtime`: here `$PublishOutputPath` is defined after the publish, and PlanCake's folder is different.
+- [x] Confirm with `.\installer\build-installer.ps1 -NoSign`, which deletes `bin\x64\Release` first, so an old `Sic.exe` can't pass the check. The new `Sic.exe` must be in `src\Sic\bin\x64\Release\win-x64\publish`, with no `xunit*` or `Sic.Tests*` files beside it.
+- [x] Make `Compile-Translations.ps1` and `Update-Translations.ps1` find `msgfmt` and `msgmerge` on the `PATH` through `Get-Command`, using `.Source` as `build-installer.ps1` does for 7-Zip, then in `$env:LOCALAPPDATA\Programs\gettext-iconv\bin`, where mlocati's gettext build installs, then in the two GnuWin32 folders. Later plans run both scripts. Change the install hint in both scripts and in `src/Sic/locale/README.md` to `winget install mlocati.GetText`.
+- [x] Make `Update-Translations.ps1` restore CRLF after each `msgmerge` with the code under Technical details, inside `if ($LASTEXITCODE -eq 0)` and before the backup is removed, so a failed write still reaches the catch block's restore. `msgmerge` writes LF, so every update would otherwise be a whole-file diff.
+- [x] Confirm by running the script twice with no new strings, then discard the changes. `msgmerge` rewrites a catalog even when it's in sync, so this does exercise the code. `git diff --stat` must show only a few lines per catalog, where `msgmerge` moves the `Language:` header, and the second run must add nothing. Done: the second run added nothing and CRLF held. `de`, `fr`, `ru` and `uk` moved only the header lines; `es` and `he` also had their hand-split `#:` reference lines joined, a one-time reformat the next real merge will carry.
+- [x] tests for `UrlHelper.IsValidHttpUrl`: valid http and https links, including surrounding spaces
+- [x] tests for `UrlHelper.IsValidHttpUrl`: other schemes, relative links and empty input
+- [x] Add a `Test` step running `dotnet test --no-build` after `Build` in `dotnet.yml`, and `timeout-minutes: 20` on the job, so a hung socket test can't hold the runner. In `dependabot.yml`, replace `FluentAssertions*` with `AwesomeAssertions*`, and remove `coverlet*` and `Moq*`.
+- [x] validation commands pass
 
 ### Task 2: Test format lists and output paths
 

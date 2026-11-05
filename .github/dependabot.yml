@@ -16,9 +16,7 @@ updates:
       test-dependencies:
         patterns:
           - "xunit*"
-          - "FluentAssertions*"
-          - "Moq*"
-          - "coverlet*"
+          - "AwesomeAssertions*"
     commit-message:
       prefix: "Deps"
       prefix-development: "Deps-dev"

@@ -12,6 +12,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 20
 
     steps:
     - uses: actions/checkout@v7
@@ -31,3 +32,6 @@ jobs:
 
     - name: Build
       run: dotnet build --no-restore
+
+    - name: Test
+      run: dotnet test --no-build

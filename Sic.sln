@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sic", "src\Sic\Sic.csproj", "{EC447D7E-8FBB-4A66-AE63-02A272B21617}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sic.Tests", "tests\Sic.Tests\Sic.Tests.csproj", "{3B6E2F1A-8C4D-4E5F-9A7B-2D1C0E9F8A61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{EC447D7E-8FBB-4A66-AE63-02A272B21617}.Debug|x64.Build.0 = Debug|x64
 		{EC447D7E-8FBB-4A66-AE63-02A272B21617}.Release|x64.ActiveCfg = Release|x64
 		{EC447D7E-8FBB-4A66-AE63-02A272B21617}.Release|x64.Build.0 = Release|x64
+		{3B6E2F1A-8C4D-4E5F-9A7B-2D1C0E9F8A61}.Debug|x64.ActiveCfg = Debug|x64
+		{3B6E2F1A-8C4D-4E5F-9A7B-2D1C0E9F8A61}.Debug|x64.Build.0 = Debug|x64
+		{3B6E2F1A-8C4D-4E5F-9A7B-2D1C0E9F8A61}.Release|x64.ActiveCfg = Release|x64
+		{3B6E2F1A-8C4D-4E5F-9A7B-2D1C0E9F8A61}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

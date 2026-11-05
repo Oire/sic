@@ -6,7 +6,7 @@ This directory contains translation files and scripts for managing localization 
 
 1. Install gettext tools:
    ```powershell
-   winget install GnuWin32.GetText
+   winget install mlocati.GetText
    ```
 
 2. Install GetText.NET.Extractor:

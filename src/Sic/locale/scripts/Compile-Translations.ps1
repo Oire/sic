@@ -11,22 +11,28 @@ param(
 # Get the catalog name automatically
 $catalogName = Get-CatalogName
 
-# Find msgfmt tool
+# Find msgfmt: on the PATH first, then where mlocati's gettext build installs it, then GnuWin32
 $msgfmt = $null
-$possiblePaths = @(
-    "C:\Program Files (x86)\GnuWin32\bin\msgfmt.exe",
-    "C:\Program Files\GnuWin32\bin\msgfmt.exe"
-)
+$msgfmtCmd = Get-Command msgfmt -ErrorAction SilentlyContinue
+if ($msgfmtCmd) {
+    $msgfmt = $msgfmtCmd.Source
+} else {
+    $possiblePaths = @(
+        (Join-Path $env:LOCALAPPDATA "Programs\gettext-iconv\bin\msgfmt.exe"),
+        "C:\Program Files (x86)\GnuWin32\bin\msgfmt.exe",
+        "C:\Program Files\GnuWin32\bin\msgfmt.exe"
+    )
 
-foreach ($path in $possiblePaths) {
-    if (Test-Path $path) {
-        $msgfmt = $path
-        break
+    foreach ($path in $possiblePaths) {
+        if (Test-Path $path) {
+            $msgfmt = $path
+            break
+        }
     }
 }
 
 if (!$msgfmt) {
-    Write-Error "❌ msgfmt not found. Install gettext tools: winget install GnuWin32.GetText"
+    Write-Error "❌ msgfmt not found. Install gettext tools: winget install mlocati.GetText"
     exit 1
 }
 

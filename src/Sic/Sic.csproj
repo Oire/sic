@@ -55,6 +55,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="Sic.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
         <!-- ApplicationIcon puts the icon in the exe for File Explorer and shortcuts, but a form
              still shows the WinForms default: MainWindow loads this copy for its own. -->
         <EmbeddedResource Include="sic.ico" LogicalName="sic.ico" />
