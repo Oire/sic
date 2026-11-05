@@ -91,10 +91,10 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 #### Steps
 
-- [ ] Add `GeneralSettings` with the same nine properties, defaults and XML docs as `Config.SectionGeneral`, plus `GetEnabledFormatKeys()`. `EnabledFormats` becomes a `List<string>`, empty by default, and its XML doc stops calling it comma-separated. `GetEnabledFormatKeys` skips null and blank entries with `IsNullOrWhiteSpace`, then trims. Leave `Config.cs` alone until Task 4.
-- [ ] Add `AppConfig` and `ConfigLoadResult` as described under Technical details.
-- [ ] tests for `GeneralSettings` defaults, and for `GetEnabledFormatKeys`: an empty list, entries with spaces, and `[null, " ", "JPG"]`
-- [ ] validation commands pass
+- [x] Add `GeneralSettings` with the same nine properties, defaults and XML docs as `Config.SectionGeneral`, plus `GetEnabledFormatKeys()`. `EnabledFormats` becomes a `List<string>`, empty by default, and its XML doc stops calling it comma-separated. `GetEnabledFormatKeys` skips null and blank entries with `IsNullOrWhiteSpace`, then trims. Leave `Config.cs` alone until Task 4.
+- [x] Add `AppConfig` and `ConfigLoadResult` as described under Technical details.
+- [x] tests for `GeneralSettings` defaults, and for `GetEnabledFormatKeys`: an empty list, entries with spaces, and `[null, " ", "JPG"]`
+- [x] validation commands pass
 
 ### Task 2: Read legacy Sic.cfg files
 
