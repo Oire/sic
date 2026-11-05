@@ -189,11 +189,11 @@ public static class ImageConverter {
         stream.CopyTo(ms);
         var data = ms.ToArray();
 
-        using var image = new MagickImage(data);
+        using var image = ReadImage(data);
 
         return new ImageItem {
             ImageData = data,
-            OriginalFormat = image.Format.ToString(),
+            OriginalFormat = GetFormatName(image, data),
             FileName = fileName,
             Width = (int)image.Width,
             Height = (int)image.Height,
@@ -202,11 +202,11 @@ public static class ImageConverter {
     }
 
     public static ImageItem LoadFromBytes(byte[] data, string fileName) {
-        using var image = new MagickImage(data);
+        using var image = ReadImage(data);
 
         return new ImageItem {
             ImageData = data,
-            OriginalFormat = image.Format.ToString(),
+            OriginalFormat = GetFormatName(image, data),
             FileName = fileName,
             Width = (int)image.Width,
             Height = (int)image.Height,
@@ -257,7 +257,7 @@ public static class ImageConverter {
 
         return new ImageItem {
             ImageData = data,
-            OriginalFormat = image.Format.ToString(),
+            OriginalFormat = GetFormatName(image, data),
             FileName = fileName,
             Width = (int)image.Width,
             Height = (int)image.Height,
@@ -270,10 +270,43 @@ public static class ImageConverter {
     /// Magick.NET to tell "this isn't an image" apart from a real processing fault.</summary>
     private static MagickImage DecodeImage(byte[] data) {
         try {
-            return new MagickImage(data);
+            return ReadImage(data);
         } catch (MagickException ex) {
             throw new UnsupportedImageException("The content is not a supported image.", ex);
         }
+    }
+
+    /// <summary>
+    /// Decodes raw bytes, reading an ICO as one and keeping its largest frame, as
+    /// <see cref="LoadFromFile"/> does for an ICO file.
+    /// </summary>
+    /// <remarks>
+    /// ICO has no signature Magick detects, so without a file name to go by (a pasted or downloaded
+    /// icon) it fails with "no decode delegate". The ICO header tells it apart instead.
+    /// </remarks>
+    private static MagickImage ReadImage(byte[] data) {
+        if (IsIcoData(data)) {
+            return SelectLargestIcoFrame(new MagickImageCollection(data, new MagickReadSettings { Format = MagickFormat.Ico }));
+        }
+
+        return new MagickImage(data);
+    }
+
+    /// <summary>
+    /// Whether <paramref name="data"/> starts with an ICO header: a reserved 0, the image type 1
+    /// (2 would be a cursor) and at least one image.
+    /// </summary>
+    private static bool IsIcoData(ReadOnlySpan<byte> data) {
+        return data.Length >= 6
+            && BinaryPrimitives.ReadUInt16LittleEndian(data) == 0
+            && BinaryPrimitives.ReadUInt16LittleEndian(data[2..]) == 1
+            && BinaryPrimitives.ReadUInt16LittleEndian(data[4..]) > 0;
+    }
+
+    /// <summary>The <see cref="ImageItem.OriginalFormat"/> for decoded bytes: "Ico" for an icon, as
+    /// <see cref="LoadFromFile"/> reports it, since a frame may itself be a PNG.</summary>
+    private static string GetFormatName(MagickImage image, byte[] data) {
+        return IsIcoData(data) ? "Ico" : image.Format.ToString();
     }
 
     public static void Convert(ImageItem item, string targetFormat, string outputPath, int? width, int? height, ResizeMode mode = ResizeMode.KeepProportions) {
@@ -452,12 +485,21 @@ public static class ImageConverter {
     /// then replaced by the same pixels as a 32-bit PNG, and its directory entry gets 0 for that side.
     /// The frame's own size decides, not the directory: Magick writes a 300x200 frame as a bitmap
     /// with a directory width of 44 (300 mod 256). Magick checks the 512 px limit on the first frame
-    /// only.
+    /// only, so every frame is checked here first, and nothing is written when one is too large.
     /// </remarks>
+    /// <exception cref="ArgumentException">A frame has a side over 512 px.</exception>
     private static void WriteIco(MagickImageCollection frames, string outputPath) {
         const int HeaderSize = 6;
         const int EntrySize = 16;
+        const uint MaxIcoSide = 512;
         ReadOnlySpan<byte> pngSignature = [0x89, (byte)'P', (byte)'N', (byte)'G'];
+
+        var tooLarge = frames.FirstOrDefault(f => f.Width > MaxIcoSide || f.Height > MaxIcoSide);
+        if (tooLarge is not null) {
+            throw new ArgumentException(
+                $"An ICO image can be at most {MaxIcoSide}x{MaxIcoSide} px, but this one is {tooLarge.Width}x{tooLarge.Height} px.",
+                nameof(frames));
+        }
 
         byte[] ico;
         using (var stream = new MemoryStream()) {
@@ -885,11 +927,7 @@ public static class ImageConverter {
 
     private static MagickImage LoadMagickImage(ImageItem item) {
         if (item.ImageData is not null) {
-            if (string.Equals(item.OriginalFormat, "Ico", StringComparison.OrdinalIgnoreCase)) {
-                return SelectLargestIcoFrame(new MagickImageCollection(item.ImageData));
-            }
-
-            return new MagickImage(item.ImageData);
+            return ReadImage(item.ImageData);
         }
 
         if (!string.IsNullOrWhiteSpace(item.FilePath)) {

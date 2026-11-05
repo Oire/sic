@@ -60,13 +60,16 @@ public sealed class IcoTests: IDisposable {
         ((int)decoded[0].Width).Should().Be(512);
     }
 
-    [Fact]
-    public void CreateMultiSizeIco_FailsAbove512PxWithoutWritingAFile() {
+    [Theory]
+    [InlineData(new uint[] { 513 })]
+    [InlineData(new uint[] { 16, 513 })]
+    [InlineData(new uint[] { 16, 32, 600, 48 })]
+    public void CreateMultiSizeIco_FailsWhenAnyFrameIsAbove512PxWithoutWritingAFile(uint[] sizes) {
         var path = Output("icon.ico");
 
-        var act = () => ImageConverter.CreateMultiSizeIco(CreateSource(64, 64), path, [513]);
+        var act = () => ImageConverter.CreateMultiSizeIco(CreateSource(64, 64), path, sizes);
 
-        act.Should().Throw<MagickException>();
+        act.Should().Throw<ArgumentException>().WithMessage("*at most 512x512 px*");
         File.Exists(path).Should().BeFalse();
     }
 
@@ -126,7 +129,7 @@ public sealed class IcoTests: IDisposable {
 
         var act = () => ImageConverter.Convert(CreateSource(600, 400), "ICO", path, null, null);
 
-        act.Should().Throw<MagickException>();
+        act.Should().Throw<ArgumentException>().WithMessage("*600x400 px*");
         File.Exists(path).Should().BeFalse();
     }
 }

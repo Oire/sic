@@ -67,9 +67,7 @@ public sealed class LocalizationTests: StaticStateTestBase {
         Localization.GetCurrentCulture().Name.Should().Be("de");
     }
 
-    [Fact(Skip = "⚠️ A neutral culture without a locale folder, such as \"pl\", resolves to the invariant "
-        + "culture instead of en-US: its parent is the invariant culture, whose empty name makes "
-        + "Path.Combine(LocalesFolder, \"\") the locale folder itself, which exists.")]
+    [Fact]
     public void SetLanguage_FallsBackToEnglishForANeutralLanguageWithoutALocaleFolder() {
         Localization.SetLanguage("pl");
 

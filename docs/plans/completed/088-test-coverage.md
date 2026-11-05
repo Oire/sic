@@ -243,6 +243,15 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 - ⚠️ Bug found: ICO has no signature Magick can detect, so ICO bytes held in memory fail with "no decode delegate". `LoadFromBytes`, `LoadFromStream` and `LoadFromUrl` reject a valid ICO (a pasted or downloaded icon), and `LoadMagickImage`'s in-memory ICO branch, `new MagickImageCollection(bytes)` with no format, can't decode one either. ICO files on disk work, because Magick goes by the `.ico` extension. `ImageLoadingTests.LoadFromBytes_ReadsAMultiSizeIcoByItsLargestFrame`, `ConversionTests.Convert_UsesTheLargestFrameOfAMultiSizeIcoHeldInMemory` and `PreviewTests.GeneratePreview_ShowsTheLargestFrameOfAMultiSizeIcoHeldInMemory` are skipped until this is fixed.
 - [x] validation commands pass
 
+### ➕ Follow-up: the bugs left open
+
+Fixed on the same branch after the pull request was opened, at the user's request:
+
+- [x] ICO bytes in memory: `ReadImage` recognizes the ICO header, reads it as ICO and keeps the largest frame, for `LoadFromBytes`, `LoadFromStream`, `LoadFromUrl` and every in-memory conversion and preview. The three skipped tests run again, with new ones for a stream and a download.
+- [x] Neutral culture fallback: `GetCurrentCulture` ignores the invariant parent's empty name, so `pl` falls back to `en-US`. Its test runs again.
+- [x] 512 px limit: `WriteIco` checks every frame and throws `ArgumentException` without writing a file, so `[16, 513]` now fails as `[513]` does.
+- [x] validation commands pass: 463 tests, none skipped
+
 ## Technical details
 
 ### Test isolation

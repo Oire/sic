@@ -95,9 +95,7 @@ public sealed class ConversionTests: IDisposable {
         TestImages.ReadSize(output).Should().Be((64, 32));
     }
 
-    [Fact(Skip = "⚠️ ICO has no signature Magick can detect, so LoadMagickImage's in-memory ICO branch, "
-        + "new MagickImageCollection(bytes) with no format, fails with 'no decode delegate'. "
-        + "See docs/plans/088-test-coverage.md, review round 1.")]
+    [Fact]
     public void Convert_UsesTheLargestFrameOfAMultiSizeIcoHeldInMemory() {
         // Built by hand, the way LoadFromBytes would describe it, because LoadFromBytes can't read ICO
         // bytes either (see ImageLoadingTests).

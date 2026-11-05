@@ -48,9 +48,7 @@ public sealed class PreviewTests: IDisposable {
         preview.Height.Should().Be(240);
     }
 
-    [Fact(Skip = "⚠️ ICO has no signature Magick can detect, so LoadMagickImage's in-memory ICO branch, "
-        + "new MagickImageCollection(bytes) with no format, fails with 'no decode delegate'. "
-        + "See docs/plans/088-test-coverage.md, review round 1.")]
+    [Fact]
     public void GeneratePreview_ShowsTheLargestFrameOfAMultiSizeIcoHeldInMemory() {
         // Built by hand, because LoadFromBytes can't read ICO bytes either (see ImageLoadingTests).
         var bytes = File.ReadAllBytes(_images.CreateMultiFrameIco("icon.ico"));

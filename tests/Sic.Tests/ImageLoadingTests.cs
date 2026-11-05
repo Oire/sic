@@ -133,9 +133,7 @@ public sealed class ImageLoadingTests: IDisposable {
         ImageConverter.IsSameFormat(item, "JPG").Should().BeTrue("Magick reported {0}", item.OriginalFormat);
     }
 
-    [Fact(Skip = "⚠️ ICO has no signature Magick can detect, so new MagickImage(bytes) fails with "
-        + "'no decode delegate' and LoadFromBytes, LoadFromStream and LoadFromUrl all reject a valid ICO. "
-        + "See docs/plans/088-test-coverage.md, review round 1.")]
+    [Fact]
     public void LoadFromBytes_ReadsAMultiSizeIcoByItsLargestFrame() {
         var bytes = File.ReadAllBytes(_images.CreateMultiFrameIco("icon.ico"));
 
@@ -168,6 +166,30 @@ public sealed class ImageLoadingTests: IDisposable {
         item.Height.Should().Be(30);
         item.FileSize.Should().Be(data.Length);
         ImageConverter.IsSameFormat(item, "PNG").Should().BeTrue("Magick reported {0}", item.OriginalFormat);
+    }
+
+    [Fact]
+    public void LoadFromStream_ReadsAMultiSizeIcoByItsLargestFrame() {
+        using var stream = File.OpenRead(_images.CreateMultiFrameIco("icon.ico"));
+
+        var item = ImageConverter.LoadFromStream(stream, "icon.ico");
+
+        item.OriginalFormat.Should().Be("Ico");
+        item.Width.Should().Be(64);
+        item.Height.Should().Be(32);
+    }
+
+    [Fact]
+    public async Task LoadFromUrl_DownloadsAnIco() {
+        var data = File.ReadAllBytes(_images.CreateMultiFrameIco("icon.ico"));
+        using var server = new StubHttpServer();
+        var url = server.Serve("/favicon.ico", data, "image/x-icon");
+
+        var item = await ImageConverter.LoadFromUrl(url);
+
+        item.OriginalFormat.Should().Be("Ico");
+        item.Width.Should().Be(64);
+        item.Height.Should().Be(32);
     }
 
     [Fact]
