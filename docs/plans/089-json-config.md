@@ -180,14 +180,14 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 #### Steps
 
-- [ ] Add `SingleInstanceGuard` as under Technical details: `TryAcquire(dataFolder)`, `Dispose`, `ActivateExisting(dataFolder)`, `GetActivationMessage(dataFolder)` and `GetInstanceKey(dataFolder)`.
-- [ ] In `Program.Main`, on the GUI path only, before `Config.Load`: keep the guard in `internal static SingleInstanceGuard? InstanceGuard` for the app's lifetime. If it can't be acquired, call `ActivateExisting` and return `ExitCode.Success` without showing anything.
-- [ ] In `MainWindow`, keep `SingleInstanceGuard.GetActivationMessage(Utils.Constants.App.DataFolder)` in a `static readonly` field, because an instance field that isn't set yet equals `WM_NULL`, and override `WndProc`. The file has no `App` alias, hence the full name. On that message, as Notika does, call `BeginInvoke` and return, so nothing runs inside the message tick. The queued method calls `ShowWindow(Handle, SW_RESTORE)` if `IsIconic(Handle)`, so a maximized window stays maximized, then brings forward `GetLastActivePopup(Handle)`, so an open modal dialog gets focus rather than the disabled main window. These window P/Invokes stay private in `MainWindow`, beside the one at line 43.
-- [ ] tests for `TryAcquire`: a second acquire for the same folder returns null, a different folder succeeds, and acquiring works again after `Dispose`
-- [ ] tests for `Dispose`: it's idempotent, and disposing from another thread lets the next `TryAcquire` succeed
-- [ ] tests for `GetActivationMessage`: the same non-zero value for the same folder, and different values for different folders
-- [ ] tests for `GetInstanceKey`: stable, and the same for paths differing only by case or a trailing backslash
-- [ ] validation commands pass
+- [x] Add `SingleInstanceGuard` as under Technical details: `TryAcquire(dataFolder)`, `Dispose`, `ActivateExisting(dataFolder)`, `GetActivationMessage(dataFolder)` and `GetInstanceKey(dataFolder)`.
+- [x] In `Program.Main`, on the GUI path only, before `Config.Load`: keep the guard in `internal static SingleInstanceGuard? InstanceGuard` for the app's lifetime. If it can't be acquired, call `ActivateExisting` and return `ExitCode.Success` without showing anything.
+- [x] In `MainWindow`, keep `SingleInstanceGuard.GetActivationMessage(Utils.Constants.App.DataFolder)` in a `static readonly` field, because an instance field that isn't set yet equals `WM_NULL`, and override `WndProc`. The file has no `App` alias, hence the full name. On that message, as Notika does, call `BeginInvoke` and return, so nothing runs inside the message tick. The queued method calls `ShowWindow(Handle, SW_RESTORE)` if `IsIconic(Handle)`, so a maximized window stays maximized, then brings forward `GetLastActivePopup(Handle)`, so an open modal dialog gets focus rather than the disabled main window. These window P/Invokes stay private in `MainWindow`, beside the one at line 43.
+- [x] tests for `TryAcquire`: a second acquire for the same folder returns null, a different folder succeeds, and acquiring works again after `Dispose`
+- [x] tests for `Dispose`: it's idempotent, and disposing from another thread lets the next `TryAcquire` succeed
+- [x] tests for `GetActivationMessage`: the same non-zero value for the same folder, and different values for different folders
+- [x] tests for `GetInstanceKey`: stable, and the same for paths differing only by case or a trailing backslash
+- [x] validation commands pass
 
 ### Task 6: Translate the new strings
 

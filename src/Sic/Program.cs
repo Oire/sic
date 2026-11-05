@@ -13,6 +13,12 @@ using LogLevel = Serilog.Events.LogEventLevel;
 namespace Oire.Sic;
 
 internal static class Program {
+    /// <summary>
+    /// The GUI's single-instance guard, held for the app's lifetime. Null in CLI mode, which may
+    /// run beside the GUI.
+    /// </summary>
+    internal static SingleInstanceGuard? InstanceGuard { get; private set; }
+
     [STAThread]
     static int Main(string[] args) {
         ConfigureLogging();
@@ -52,6 +58,14 @@ internal static class Program {
                 return RunCli(args);
             }
 
+            // One GUI per data folder: a second launch brings the running window forward and
+            // exits before it reads or writes the config.
+            InstanceGuard = SingleInstanceGuard.TryAcquire(App.DataFolder);
+            if (InstanceGuard is null) {
+                SingleInstanceGuard.ActivateExisting(App.DataFolder);
+                return ExitCode.Success;
+            }
+
             ApplicationConfiguration.Initialize();
             Config.Load();
             Localization.SetLanguage(Config.General.Language);
@@ -78,6 +92,7 @@ internal static class Program {
 
             return ExitCode.Error;
         } finally {
+            InstanceGuard?.Dispose();
             Log.CloseAndFlush();
         }
     }
