@@ -120,7 +120,9 @@ internal static class Program {
             return;
         }
 
-        // Custom folder is gone — warn and reset
+        // Custom folder is gone: the GUI warns and resets it for good. The CLI only uses the
+        // default for this run, because it runs beside the GUI without the single-instance guard,
+        // and a drive that is merely unplugged shouldn't cost the custom folder.
         Log.Warning("Custom output folder no longer exists: {Folder}", outputFolder);
 
         if (showGui) {
@@ -128,13 +130,13 @@ internal static class Program {
                 _("The output folder \"{0}\" no longer exists. The default folder will be used.", outputFolder),
                 _("Output Folder Not Found"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Config.General.OutputFolder = App.DefaultOutputFolder;
+            Config.Save();
         } else {
             Console.Error.WriteLine(
                 _("Warning! The output folder \"{0}\" no longer exists. Using default folder.", outputFolder));
+            Config.General.OutputFolder = App.DefaultOutputFolder;
         }
-
-        Config.General.OutputFolder = App.DefaultOutputFolder;
-        Config.Save(showGui);
 
         try {
             Directory.CreateDirectory(App.DefaultOutputFolder);

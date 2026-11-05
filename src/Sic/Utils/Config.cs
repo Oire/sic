@@ -1,99 +1,59 @@
-using SharpConfig;
+using Oire.Sic.Models;
 using Serilog;
-using Oire.Sic.Utils.Enums;
 using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
 
 namespace Oire.Sic.Utils;
 
-public class Config {
-    private static readonly string ConfigFileName = Path.Combine(App.DataFolder, $"{App.Name}.{App.ConfigFileExtension}");
+/// <summary>
+/// The settings SIC! runs with, stored in <c>sic.json</c> in the data folder through
+/// <see cref="ConfigSerializer"/>. Errors go to a message box in the GUI and to stderr in the CLI.
+/// </summary>
+public static class Config {
+    private static readonly string ConfigFilePath = Path.Combine(App.DataFolder, App.ConfigFileName);
 
-    public static SectionGeneral General { get; private set; } = new();
-    private static Configuration Cfg { get; set; } = new();
+    private static AppConfig _config = new();
+    private static bool _isGui = true;
+    private static bool _savesBlocked;
 
-    #region Config Section Classes
-    public class SectionGeneral {
-        public string Language { get; set; } = "System";
-        public string OutputFolder { get; set; } = App.DefaultOutputFolder;
+    public static GeneralSettings General => _config.General;
 
-        /// <summary>When <c>true</c>, converted files are written next to their source file
-        /// instead of into <see cref="OutputFolder"/> (issue #33). Items that have no source
-        /// folder — clipboard captures and downloaded links — still fall back to
-        /// <see cref="OutputFolder"/>. Opt-in; off by default.</summary>
-        public bool SaveToSourceFolder { get; set; }
-
-        public string LastInputFolder { get; set; } = "";
-        public bool ConfirmExitWithQueue { get; set; } = true;
-
-        /// <summary>When <c>true</c>, the app performs a single silent update check shortly
-        /// after the main window opens. A check that fails (no network, server down) is
-        /// logged and otherwise ignored — it never interrupts startup or shows an error.</summary>
-        public bool CheckForUpdatesOnStartup { get; set; } = true;
-
-        /// <summary>When <c>true</c>, SIC! offers (via a prompt) to add usable clipboard
-        /// content — raw image data, image files, or an image link — whenever the window opens
-        /// or regains focus. Each distinct clipboard payload is offered at most once, so
-        /// re-focusing never re-prompts for the same data. Opt-in; off by default.</summary>
-        public bool DetectClipboardData { get; set; }
-
-        /// <summary>Comma-separated list of SIC! format keys (e.g. <c>"JPG,PNG,WEBP"</c>) to show
-        /// in the target-format dropdown, letting users hide formats they never convert to
-        /// (issue #47). An empty value means "show every supported format" — the default — so a
-        /// fresh or upgraded config naturally exposes all formats. Parse it via
-        /// <see cref="GetEnabledFormatKeys"/>.</summary>
-        public string EnabledFormats { get; set; } = "";
-
-        /// <summary>The configured <see cref="EnabledFormats"/> split into individual format keys,
-        /// trimmed and with blanks dropped. Empty when no restriction is set (all formats shown).</summary>
-        public IEnumerable<string> GetEnabledFormatKeys() =>
-            EnabledFormats.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        /// <summary>How often the app checks for updates in the background while it runs.
-        /// <see cref="UpdateCheckInterval.Never"/> disables the background loop. Independent of
-        /// <see cref="CheckForUpdatesOnStartup"/>: either, both, or neither may be active.</summary>
-        public UpdateCheckInterval UpdateCheckInterval { get; set; } = UpdateCheckInterval.Daily;
-    }
-
-    #endregion
-
+    /// <summary>
+    /// Loads <c>sic.json</c>, migrating a legacy <c>Sic.cfg</c> or repairing bad values as needed,
+    /// and reports any problem the way <paramref name="isGui"/> says, which <see cref="Save"/>
+    /// then follows too.
+    /// </summary>
     public static void Load(bool isGui = true) {
-        try {
-            Cfg = Configuration.LoadFromFile(ConfigFileName);
-            General = Cfg["General"].ToObject<SectionGeneral>();
+        _isGui = isGui;
+        var result = ConfigSerializer.Load(App.DataFolder, App.IsPortable);
+        _config = result.Config;
+        _savesBlocked = result.SavesBlocked;
 
-            if (string.IsNullOrWhiteSpace(General.OutputFolder)) {
-                General.OutputFolder = App.DefaultOutputFolder;
-            }
-        } catch (FileNotFoundException) {
-            Cfg = new Configuration();
-            General = new SectionGeneral();
-            Cfg.Add(Section.FromObject("General", General));
+        // The serializer's messages are complete and translated, so they go out as they are.
+        if (result.LoadError is not null) {
+            ReportError(result.LoadError, isGui);
+        }
 
-            try {
-                if (!Directory.Exists(App.DataFolder)) {
-                    Directory.CreateDirectory(App.DataFolder);
-                }
-                Cfg.SaveToFile(ConfigFileName);
-            } catch (Exception ex) {
-                Log.Error("Failed to save initial config: {Error}", ex.Message);
-                ReportError(_("Unable to save configuration: {0}", ex.Message), isGui);
-            }
-        } catch (Exception ex) {
-            Log.Error("Failed to load config: {Error}", ex.Message);
-            ReportError(_("Unable to load configuration: {0}", ex.Message), isGui);
+        if (result.SaveError is not null) {
+            ReportError(result.SaveError, isGui);
         }
     }
 
-    public static void Save(bool isGui = true) {
-        Cfg.Remove("General");
-        Cfg.Add(Section.FromObject("General", General));
+    /// <summary>
+    /// Writes the current settings to <c>sic.json</c>. Does nothing but log when <see cref="Load"/>
+    /// couldn't read the file, so a read failure never replaces the user's settings with defaults.
+    /// </summary>
+    public static void Save() {
+        if (_savesBlocked) {
+            Log.Warning("Not saving {Path}: it couldn't be read at startup", ConfigFilePath);
+            return;
+        }
 
         try {
-            Cfg.SaveToFile(ConfigFileName);
-        } catch (Exception ex) {
-            Log.Error("Failed to save config: {Error}", ex.Message);
-            ReportError(_("Unable to save configuration: {0}", ex.Message), isGui);
+            ConfigSerializer.Save(ConfigFilePath, _config);
+        } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
+            Log.Error(ex, "Failed to save {Path}", ConfigFilePath);
+            ReportError(_("Unable to save configuration: {0}", ex.Message), _isGui);
         }
     }
 

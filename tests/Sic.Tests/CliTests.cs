@@ -481,11 +481,31 @@ public sealed class CliTests: StaticStateTestBase {
     // Configuration
 
     [Fact]
-    public void MissingCustomOutputFolder_WarnsAndFallsBackToTheDefault() {
+    public void LegacyConfig_MigratesOnACliRun() {
+        var customFolder = Path.Combine(_images.Folder, "custom");
+        Directory.CreateDirectory(customFolder);
+        var legacyPath = Path.Combine(App.DataFolder, App.LegacyConfigFileName);
+        File.WriteAllText(legacyPath, $"[General]\r\nLanguage=System\r\nOutputFolder={customFolder}\r\n");
+        var input = _images.Create("photo.png", 40, 30);
+
+        var result = Run("-i", input, "-f", "jpg");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        result.Error.Should().BeEmpty();
+        TestImages.ShouldBeImage(Path.Combine(customFolder, "photo.jpg"), MagickFormat.Jpeg, 40, 30);
+        File.Exists(Path.Combine(App.DataFolder, App.ConfigFileName)).Should().BeTrue();
+        File.Exists(legacyPath + ".bak").Should().BeTrue();
+        File.Exists(legacyPath).Should().BeFalse();
+    }
+
+    [Fact]
+    public void MissingCustomOutputFolder_WarnsAndUsesTheDefaultWithoutSavingIt() {
         var missingFolder = Path.Combine(_images.Folder, "gone");
         Config.Load(isGui: false);
         Config.General.OutputFolder = missingFolder;
-        Config.Save(isGui: false);
+        Config.Save();
+        var configPath = Path.Combine(App.DataFolder, App.ConfigFileName);
+        var savedBytes = File.ReadAllBytes(configPath);
         var baseName = UniqueName("cli-fallback");
         var input = _images.Create(baseName + ".png", 40, 30);
         var output = DefaultFolderOutput(baseName, ".jpg");
@@ -497,14 +517,10 @@ public sealed class CliTests: StaticStateTestBase {
         Directory.Exists(missingFolder).Should().BeFalse();
         TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 40, 30);
 
-        // The reset must reach the file, or the warning would come back on every run.
+        // An unplugged drive must not cost the custom folder: the saved setting stays as it was.
+        File.ReadAllBytes(configPath).Should().Equal(savedBytes);
         Config.Load(isGui: false);
-        Config.General.OutputFolder.Should().Be(App.DefaultOutputFolder);
-        var secondOutput = DefaultFolderOutput(baseName, ".webp");
-        var second = Run("-i", input, "-f", "webp");
-        second.ExitCode.Should().Be(ExitCode.Success);
-        second.Error.Should().BeEmpty();
-        File.Exists(secondOutput).Should().BeTrue();
+        Config.General.OutputFolder.Should().Be(missingFolder);
     }
 
     [Fact]
@@ -513,6 +529,6 @@ public sealed class CliTests: StaticStateTestBase {
 
         Run("-i", input, "-o", Output("photo.jpg"));
 
-        File.Exists(Path.Combine(App.DataFolder, $"{App.Name}.{App.ConfigFileExtension}")).Should().BeTrue();
+        File.Exists(Path.Combine(App.DataFolder, App.ConfigFileName)).Should().BeTrue();
     }
 }

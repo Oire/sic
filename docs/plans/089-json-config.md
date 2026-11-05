@@ -10,15 +10,15 @@ It's the second of four plans. `88-test-coverage` must be merged first. `23-cust
 
 ## Done when
 
-- [ ] A user with an existing `Sic.cfg` keeps every setting after upgrading, and the old file becomes `Sic.cfg.bak`.
-- [ ] One bad value in `Sic.cfg` or `sic.json` loses only that value, not the other settings, and the file is backed up first.
-- [ ] An invalid `language` value falls back to the system language instead of stopping SIC! at startup.
-- [ ] A `sic.json` that isn't valid JSON, or isn't a JSON object, is kept as `sic.json.bad`, reported to the user, and never silently overwritten. No `sic.json` backup is ever overwritten.
-- [ ] After a recovery, the next start is silent, with no repeated message and no second backup.
-- [ ] A `sic.json` that can't be read is never replaced, and the user is told changes won't be saved this session.
-- [ ] A failed config save in CLI mode writes to stderr and never opens a message box.
-- [ ] A CLI run with a missing output folder uses the default for that run and doesn't change the saved setting.
-- [ ] A portable copy that moves or changes drive letter keeps using its own `Converted` folder, including a 1.1 `userdata` folder copied into a new 1.2 folder.
+- [x] A user with an existing `Sic.cfg` keeps every setting after upgrading, and the old file becomes `Sic.cfg.bak`.
+- [x] One bad value in `Sic.cfg` or `sic.json` loses only that value, not the other settings, and the file is backed up first.
+- [x] An invalid `language` value falls back to the system language instead of stopping SIC! at startup.
+- [x] A `sic.json` that isn't valid JSON, or isn't a JSON object, is kept as `sic.json.bad`, reported to the user, and never silently overwritten. No `sic.json` backup is ever overwritten.
+- [x] After a recovery, the next start is silent, with no repeated message and no second backup.
+- [x] A `sic.json` that can't be read is never replaced, and the user is told changes won't be saved this session.
+- [x] A failed config save in CLI mode writes to stderr and never opens a message box.
+- [x] A CLI run with a missing output folder uses the default for that run and doesn't change the saved setting.
+- [x] A portable copy that moves or changes drive letter keeps using its own `Converted` folder, including a 1.1 `userdata` folder copied into a new 1.2 folder.
 - [ ] `sharpconfig-huanlin` is no longer referenced in the code, the project file or the docs.
 - [ ] Starting SIC! while it's already running brings the existing window forward, even with a modal dialog open, and starts no second window.
 - [ ] Two portable copies in different folders, or a portable and an installed copy, can run side by side.
@@ -158,16 +158,16 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 
 #### Steps
 
-- [ ] Rewrite `Config` over `ConfigSerializer`, keeping `Config.General`, `Load(isGui)` and `Save()` so existing call sites don't change.
-- [ ] `Load` stores `isGui` in a field and passes `ConfigLoadResult`'s messages to `ReportError` unchanged. `Save` uses that field instead of the hardcoded `isGui: true`, and only logs when `SavesBlocked` is set. `ReportError` stays private.
-- [ ] When saves are blocked, the load error says changes won't be saved this session.
-- [ ] In `Program.EnsureOutputFolderExists`, with `showGui: false`, warn on stderr and use the default for this run without calling `Config.Save()`. The CLI is the one writer the guard doesn't cover, and today an unplugged drive permanently resets the custom folder.
-- [ ] In `SettingsDialog`, assign `EnabledFormats` a list, empty when every format is ticked.
-- [ ] Remove `ConfigFileExtension`, update the `SettingsDialog.cs` cref to `GeneralSettings`, then delete `SectionGeneral` and the `sharpconfig-huanlin` package reference.
-- [ ] tests in the non-parallel collection: with `Load(isGui: false)` and `sic.json` held open, `Save()` writes to stderr and returns; `SavesBlocked` skips the write
-- [ ] tests through `Program.RunCli`, starting and ending with `TestDataFolder.Clear()`: a `Sic.cfg` with `Language=System` and an existing temporary `OutputFolder` placed in `App.DataFolder` migrates on a CLI run, output lands in that folder, and `sic.json` and `Sic.cfg.bak` appear
-- [ ] tests through `Program.RunCli`: a missing custom output folder warns, writes to the default folder, and leaves `sic.json` unchanged
-- [ ] validation commands pass
+- [x] Rewrite `Config` over `ConfigSerializer`, keeping `Config.General`, `Load(isGui)` and `Save()` so existing call sites don't change.
+- [x] `Load` stores `isGui` in a field and passes `ConfigLoadResult`'s messages to `ReportError` unchanged. `Save` uses that field instead of the hardcoded `isGui: true`, and only logs when `SavesBlocked` is set. `ReportError` stays private.
+- [x] When saves are blocked, the load error says changes won't be saved this session.
+- [x] In `Program.EnsureOutputFolderExists`, with `showGui: false`, warn on stderr and use the default for this run without calling `Config.Save()`. The CLI is the one writer the guard doesn't cover, and today an unplugged drive permanently resets the custom folder.
+- [x] In `SettingsDialog`, assign `EnabledFormats` a list, empty when every format is ticked.
+- [x] Remove `ConfigFileExtension`, update the `SettingsDialog.cs` cref to `GeneralSettings`, then delete `SectionGeneral` and the `sharpconfig-huanlin` package reference.
+- [x] tests in the non-parallel collection: with `Load(isGui: false)` and `sic.json` held open, `Save()` writes to stderr and returns; `SavesBlocked` skips the write
+- [x] tests through `Program.RunCli`, starting and ending with `TestDataFolder.Clear()`: a `Sic.cfg` with `Language=System` and an existing temporary `OutputFolder` placed in `App.DataFolder` migrates on a CLI run, output lands in that folder, and `sic.json` and `Sic.cfg.bak` appear
+- [x] tests through `Program.RunCli`: a missing custom output folder warns, writes to the default folder, and leaves `sic.json` unchanged
+- [x] validation commands pass
 
 ### Task 5: Allow one GUI per data folder
 

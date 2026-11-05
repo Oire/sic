@@ -4,7 +4,6 @@ public static class App {
     public const string Name = "Sic";
     public const string ManufacturerNameShort = "Oire";
     public const string ManufacturerNameFull = "Oire Software";
-    public const string ConfigFileExtension = "cfg";
     public const string ConfigFileName = "sic.json";
     public const string LegacyConfigFileName = "Sic.cfg";
     public static readonly bool IsPortable = Directory.Exists(Path.Combine(AppContext.BaseDirectory, "userdata"));

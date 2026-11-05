@@ -1,5 +1,6 @@
 using System.Globalization;
 using GetText.WindowsForms;
+using Oire.Sic.Models;
 using Oire.Sic.Utils;
 using Oire.Sic.Utils.Enums;
 using Serilog;
@@ -144,7 +145,7 @@ public partial class SettingsDialog: Form {
     /// <summary>
     /// Builds one real <see cref="CheckBox"/> per supported target format, ticking the ones currently
     /// shown in the main window's dropdown (issue #47). An empty
-    /// <see cref="Config.SectionGeneral.EnabledFormats"/> means "all formats", so on first use every box
+    /// <see cref="GeneralSettings.EnabledFormats"/> means "all formats", so on first use every box
     /// starts checked. Individual checkboxes are used instead of a <see cref="CheckedListBox"/> because
     /// that control doesn't reliably announce toggle state changes to screen readers.
     /// </summary>
@@ -231,7 +232,7 @@ public partial class SettingsDialog: Form {
         // Store empty when every format is ticked, so any format added in a future version is
         // shown automatically instead of being silently filtered out by a stale saved list.
         var allSelected = selectedFormats.Count == _formatCheckBoxes.Count;
-        Config.General.EnabledFormats = allSelected ? "" : string.Join(",", selectedFormats);
+        Config.General.EnabledFormats = allSelected ? [] : selectedFormats;
         var selectedDisplay = languageComboBox.SelectedItem as string;
         Config.General.Language = selectedDisplay != null && _languageMap.TryGetValue(selectedDisplay, out var code)
             ? code
