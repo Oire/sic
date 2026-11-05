@@ -111,15 +111,21 @@ public sealed partial class TranslationCatalogTests {
         mismatches.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Every form after the first covers counts that need the number, such as 2 to 4 and 22 to 24
+    /// in Russian and Ukrainian as well as the last form, so each keeps every placeholder.
+    /// </summary>
     [Theory]
     [MemberData(nameof(Languages))]
-    public void PluralEntries_KeepEveryPlaceholderInTheLastForm(string language) {
+    public void PluralEntries_KeepEveryPlaceholderInEveryFormAfterTheFirst(string language) {
         var catalog = PoCatalog.Load(language);
 
         var mismatches = catalog.Entries
-            .Where(entry => entry.IsPlural && entry.MsgStrs.Count > 0)
-            .Where(entry => !Placeholders(entry.MsgStrs[^1]).SetEquals(Placeholders(entry.MsgIdPlural!)))
-            .Select(entry => $"{entry} -> \"{entry.MsgStrs[^1]}\"");
+            .Where(entry => entry.IsPlural)
+            .SelectMany(entry => entry.MsgStrs
+                .Skip(1)
+                .Where(text => !Placeholders(text).SetEquals(Placeholders(entry.MsgIdPlural!)))
+                .Select(text => $"{entry} -> \"{text}\""));
 
         mismatches.Should().BeEmpty();
     }
