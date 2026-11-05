@@ -179,12 +179,13 @@ Never add FluentAssertions. Do not add Moq; the code under test is static, so te
 
 #### Steps
 
-- [ ] Add `StaticStateCollection` on the PlanCake pattern, for tests that touch `Config`, `Console` or `Localization`, and a `StaticStateTestBase` class that calls `Localization.SetLanguage("en-US")` in its constructor and `Dispose`, because `SetLanguage` writes `CultureInfo.DefaultThreadCurrentCulture` process-wide.
-- [ ] tests for `FileHelper.EnumerateImageFiles`: top folder only, recursive, several extensions, and an inaccessible folder being skipped, using a Deny ACE for the current user that's removed in `finally`. `IsCloudPlaceholder` returns false for a normal file.
-- [ ] tests for `ImageItem`, in the non-parallel collection because it calls `_()`: the byte, KB and MB boundaries in `GetSizeDisplay`, and the dimension and description text, under a fixed culture
-- [ ] tests for `Localization`, in the non-parallel collection: English source text, placeholders and plurals; `SetLanguage("de")` keeps `de`, and `pl-PL` falls back to `en-US`. Assert no translated text. A neutral culture such as `pl` resolves oddly because `Path.Combine(LocalesFolder, "")` exists: record that with a "⚠️" as a possible bug.
-- [ ] Make `UpdateService.ToFrequency` internal, then test every `UpdateCheckInterval`, including `Never` giving null.
-- [ ] validation commands pass
+- [x] Add `StaticStateCollection` on the PlanCake pattern, for tests that touch `Config`, `Console` or `Localization`, and a `StaticStateTestBase` class that calls `Localization.SetLanguage("en-US")` in its constructor and `Dispose`, because `SetLanguage` writes `CultureInfo.DefaultThreadCurrentCulture` process-wide.
+- [x] tests for `FileHelper.EnumerateImageFiles`: top folder only, recursive, several extensions, and an inaccessible folder being skipped, using a Deny ACE for the current user that's removed in `finally`. `IsCloudPlaceholder` returns false for a normal file.
+- [x] tests for `ImageItem`, in the non-parallel collection because it calls `_()`: the byte, KB and MB boundaries in `GetSizeDisplay`, and the dimension and description text, under a fixed culture
+- [x] tests for `Localization`, in the non-parallel collection: English source text, placeholders and plurals; `SetLanguage("de")` keeps `de`, and `pl-PL` falls back to `en-US`. Assert no translated text. A neutral culture such as `pl` resolves oddly because `Path.Combine(LocalesFolder, "")` exists: record that with a "⚠️" as a possible bug.
+- [x] Make `UpdateService.ToFrequency` internal, then test every `UpdateCheckInterval`, including `Never` giving null.
+- ⚠️ Possible bug: `Localization.GetCurrentCulture` resolves a neutral culture without a locale folder, such as `pl`, to the invariant culture instead of `en-US`. Its parent is the invariant culture, whose empty name makes `Path.Combine(LocalesFolder, "")` the locale folder itself, which exists. `LocalizationTests.SetLanguage_FallsBackToEnglishForANeutralLanguageWithoutALocaleFolder` is skipped until this is fixed. Regional variants such as `pl-PL` and `de-AT` resolve correctly.
+- [x] validation commands pass
 
 ### Task 6: Test the existing CLI
 

@@ -73,7 +73,7 @@ internal sealed class UpdateService: IDisposable {
 
     /// <summary>Maps an interval to a loop period, or <c>null</c> for
     /// <see cref="UpdateCheckInterval.Never"/> (loop disabled).</summary>
-    private static TimeSpan? ToFrequency(UpdateCheckInterval interval) => interval switch {
+    internal static TimeSpan? ToFrequency(UpdateCheckInterval interval) => interval switch {
         UpdateCheckInterval.Daily => TimeSpan.FromDays(1),
         UpdateCheckInterval.EveryThreeDays => TimeSpan.FromDays(3),
         UpdateCheckInterval.Weekly => TimeSpan.FromDays(7),
