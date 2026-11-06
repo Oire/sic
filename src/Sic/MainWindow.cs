@@ -564,7 +564,7 @@ public partial class MainWindow: Form {
         var outputFolder = Config.General.OutputFolder;
 
         if (!string.IsNullOrWhiteSpace(outputFolder)
-            && outputFolder != Utils.Constants.App.DefaultOutputFolder
+            && !Utils.Constants.App.IsDefaultOutputFolder(outputFolder)
             && !Directory.Exists(outputFolder)) {
             Log.Warning("Custom output folder no longer exists: {Folder}", outputFolder);
             DialogHelper.Show(

@@ -13,6 +13,12 @@ using LogLevel = Serilog.Events.LogEventLevel;
 namespace Oire.Sic;
 
 internal static class Program {
+    /// <summary>
+    /// The GUI's single-instance guard, held for the app's lifetime. Null in CLI mode, which may
+    /// run beside the GUI.
+    /// </summary>
+    internal static SingleInstanceGuard? InstanceGuard { get; private set; }
+
     [STAThread]
     static int Main(string[] args) {
         ConfigureLogging();
@@ -52,7 +58,28 @@ internal static class Program {
                 return RunCli(args);
             }
 
+            // Before any window, the activation listener included: WinForms refuses to change
+            // these settings once one exists.
             ApplicationConfiguration.Initialize();
+
+            // One GUI per data folder: a second launch brings the running window forward and
+            // exits before it reads or writes the config.
+            InstanceGuard = SingleInstanceGuard.TryAcquire(App.DataFolder);
+            if (InstanceGuard is null) {
+                if (!SingleInstanceGuard.ActivateExisting(App.DataFolder)) {
+                    // Nothing came forward, so say why nothing opens rather than exit in silence.
+                    DialogHelper.Show(
+                        _("SIC! is already running. Press Alt+Tab to switch to it."),
+                        Application.ProductName ?? "SIC!",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                return ExitCode.Success;
+            }
+
+            // Answers a second launch from here on, while a startup message box is open too.
+            using var activationListener = new ActivationListener(App.DataFolder);
+
             Config.Load();
             Localization.SetLanguage(Config.General.Language);
             EnsureOutputFolderExists(showGui: true);
@@ -78,6 +105,7 @@ internal static class Program {
 
             return ExitCode.Error;
         } finally {
+            InstanceGuard?.Dispose();
             Log.CloseAndFlush();
         }
     }
@@ -105,7 +133,7 @@ internal static class Program {
         }
 
         // Default folder: always create silently
-        if (outputFolder == App.DefaultOutputFolder) {
+        if (App.IsDefaultOutputFolder(outputFolder)) {
             try {
                 Directory.CreateDirectory(outputFolder);
             } catch (Exception ex) {
@@ -120,7 +148,9 @@ internal static class Program {
             return;
         }
 
-        // Custom folder is gone — warn and reset
+        // Custom folder is gone: the GUI warns and resets it for good. The CLI only uses the
+        // default for this run, because it runs beside the GUI without the single-instance guard,
+        // and a drive that is merely unplugged shouldn't cost the custom folder.
         Log.Warning("Custom output folder no longer exists: {Folder}", outputFolder);
 
         if (showGui) {
@@ -128,13 +158,13 @@ internal static class Program {
                 _("The output folder \"{0}\" no longer exists. The default folder will be used.", outputFolder),
                 _("Output Folder Not Found"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Config.General.OutputFolder = App.DefaultOutputFolder;
+            Config.Save();
         } else {
             Console.Error.WriteLine(
                 _("Warning! The output folder \"{0}\" no longer exists. Using default folder.", outputFolder));
+            Config.General.OutputFolder = App.DefaultOutputFolder;
         }
-
-        Config.General.OutputFolder = App.DefaultOutputFolder;
-        Config.Save(showGui);
 
         try {
             Directory.CreateDirectory(App.DefaultOutputFolder);

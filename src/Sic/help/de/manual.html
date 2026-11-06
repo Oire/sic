@@ -175,6 +175,7 @@ footer {
     <dt>Portabel</dt>
     <dd>Wenn neben der ausführbaren Datei ein <code>userdata</code>-Ordner existiert, läuft SIC! im portablen Modus. Alle Daten (Konfiguration, konvertierte Dateien, Protokolle) werden in diesem <code>userdata</code>-Ordner anstatt in <code>%APPDATA%</code> gespeichert. So können Sie SIC! von einem USB-Stick oder einem beliebigen Ordner ausführen, ohne Spuren im System zu hinterlassen.</dd>
 </dl>
+<p>Es läuft immer nur ein SIC!-Fenster. Wenn Sie SIC! starten, während es bereits geöffnet ist, öffnet sich kein zweites Fenster: Stattdessen wird das geöffnete Fenster in den Vordergrund geholt, und ist darin gerade ein Dialog wie die Einstellungen geöffnet, erhält dieser den Fokus. Lässt Windows das Fenster nicht in den Vordergrund, meldet SIC! stattdessen, dass es bereits läuft: Wechseln Sie mit <kbd>Alt+Tab</kbd> dorthin, oder erreichen Sie mit <kbd>Windows+T</kbd> seine Schaltfläche in der Taskleiste. Portable Kopien in verschiedenen Ordnern oder eine portable und eine installierte Kopie haben jeweils eigene Einstellungen und können gleichzeitig laufen. Die <a href="#cli">Kommandozeile</a> lässt sich jederzeit verwenden, auch während das Fenster geöffnet ist.</p>
 
 <h2 id="adding-images">Bilder hinzufügen</h2>
 <p>Es gibt mehrere Möglichkeiten, Bilder zur Warteschlange hinzuzufügen:</p>
@@ -292,7 +293,7 @@ footer {
     <dt>In der Liste anzuzeigende Zielformate</dt>
     <dd>Aktivieren Sie die Formate, die im Auswahlfeld <strong>Zielformat</strong> des Hauptfensters erscheinen sollen, und deaktivieren Sie die, in die Sie nie konvertieren. Mindestens ein Format muss aktiviert bleiben. Bleiben alle aktiviert, erscheinen auch Formate automatisch, die in künftigen Versionen von SIC! hinzukommen.</dd>
 </dl>
-<p>Einstellungen werden in <code>Sic.cfg</code> innerhalb des Anwendungsdatenverzeichnisses gespeichert (den genauen Speicherort finden Sie unter <a href="#installation">Installationsmodi</a>).</p>
+<p>Einstellungen werden in <code>sic.json</code> innerhalb des Anwendungsdatenverzeichnisses gespeichert (den genauen Speicherort finden Sie unter <a href="#installation">Installationsmodi</a>). Wenn Sie von SIC! 1.1 oder älter aktualisieren, werden Ihre Einstellungen beim ersten Start automatisch aus der alten Datei <code>Sic.cfg</code> übernommen; die alte Datei bleibt als <code>Sic.cfg.bak</code> erhalten.</p>
 
 <h2 id="updates">Softwareaktualisierungen</h2>
 <p>SIC! kann automatisch nach neuen Versionen suchen. Standardmäßig erfolgt eine Aktualisierungsprüfung beim Start und dann einmal täglich, solange die Anwendung läuft, aber beide Verhaltensweisen lassen sich in den <a href="#settings">Einstellungen</a> konfigurieren — Sie können die Prüfung beim Start deaktivieren und die Häufigkeit der Hintergrundprüfung wählen (oder Hintergrundprüfungen ganz abschalten). Sie können jederzeit manuell über <strong>Hilfe > Nach Updates suchen</strong> prüfen.</p>
@@ -374,6 +375,9 @@ sic -i photo.jpg -f png --resize 800x</pre>
 
     <dt>Der Ausgabeordner existiert nicht mehr</dt>
     <dd>Wenn der benutzerdefinierte Ausgabeordner gelöscht oder verschoben wurde, warnt SIC! Sie und verwendet den Standard-Ordner <code>Converted</code>.</dd>
+
+    <dt>SIC! meldet zurückgesetzte Einstellungen oder eine beschädigte Einstellungsdatei</dt>
+    <dd>SIC! bewahrt eine Kopie der ursprünglichen Datei als <code>sic.json.bad</code> im Anwendungsdatenverzeichnis auf. Waren nur einzelne Werte ungültig, werden nur diese auf ihre Standardwerte zurückgesetzt, und Ihre übrigen Einstellungen bleiben erhalten; war die ganze Datei beschädigt, startet SIC! mit den Standardeinstellungen. Um die alte Datei zurückzubekommen, etwa um sie von Hand zu korrigieren, schließen Sie SIC! und benennen Sie die Kopie in <code>sic.json</code> um. Meldet SIC!, dass Änderungen in dieser Sitzung nicht gespeichert werden, hielt ein anderes Programm wie ein Synchronisierungsprogramm oder ein Virenscanner die Datei geöffnet: Schließen Sie SIC!, warten Sie einen Moment und starten Sie es erneut.</dd>
 </dl>
 </main>
 

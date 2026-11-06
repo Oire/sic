@@ -175,6 +175,7 @@ footer {
     <dt>Portable</dt>
     <dd>Si un dossier <code>userdata</code> existe à côté de l'exécutable, SIC! fonctionne en mode portable. Toutes les données (configuration, fichiers convertis, journaux) sont stockées dans ce dossier <code>userdata</code> au lieu de <code>%APPDATA%</code>. Cela vous permet d'exécuter SIC! depuis une clé USB ou n'importe quel dossier sans laisser de traces sur le système.</dd>
 </dl>
+<p>Une seule fenêtre de SIC! fonctionne à la fois. Si vous lancez SIC! alors qu'il est déjà ouvert, aucune deuxième fenêtre ne s'ouvre : la fenêtre déjà ouverte passe au premier plan et, si une boîte de dialogue comme les Paramètres y est ouverte, c'est elle qui reçoit le focus. Si Windows ne laisse pas la fenêtre passer au premier plan, SIC! vous indique plutôt qu'il est déjà ouvert : appuyez sur <kbd>Alt+Tab</kbd> pour y basculer, ou sur <kbd>Windows+T</kbd> pour atteindre son bouton dans la barre des tâches. Des copies portables situées dans des dossiers différents, ou une copie portable et une copie installée, ont chacune leurs propres paramètres et peuvent fonctionner en même temps. La <a href="#cli">ligne de commande</a> reste toujours utilisable, même lorsque la fenêtre est ouverte.</p>
 
 <h2 id="adding-images">Ajouter des images</h2>
 <p>Il existe plusieurs façons d'ajouter des images à la file :</p>
@@ -292,7 +293,7 @@ footer {
     <dt>Formats cibles à afficher dans la liste</dt>
     <dd>Cochez les formats que vous souhaitez voir dans la liste déroulante <strong>Format cible</strong> de la fenêtre principale, et décochez ceux vers lesquels vous ne convertissez jamais. Au moins un format doit rester coché. Si vous les laissez tous cochés, les formats ajoutés dans les futures versions de SIC! apparaîtront automatiquement.</dd>
 </dl>
-<p>Les paramètres sont stockés dans <code>Sic.cfg</code> à l'intérieur du répertoire de données de l'application (voir <a href="#installation">Modes d'installation</a> pour l'emplacement exact).</p>
+<p>Les paramètres sont stockés dans <code>sic.json</code> à l'intérieur du répertoire de données de l'application (voir <a href="#installation">Modes d'installation</a> pour l'emplacement exact). Si vous effectuez la mise à jour depuis SIC! 1.1 ou une version antérieure, vos paramètres sont repris automatiquement de l'ancien fichier <code>Sic.cfg</code> au premier démarrage, et l'ancien fichier est conservé sous le nom <code>Sic.cfg.bak</code>.</p>
 
 <h2 id="updates">Mises à jour logicielles</h2>
 <p>SIC! peut vérifier automatiquement la disponibilité de nouvelles versions. Par défaut, une vérification est effectuée au démarrage, puis une fois par jour tant que l'application est en cours d'exécution, mais ces deux comportements sont configurables dans les <a href="#settings">Paramètres</a> — vous pouvez désactiver la vérification au démarrage et choisir la fréquence en arrière-plan (ou désactiver entièrement les vérifications en arrière-plan). Vous pouvez à tout moment vérifier manuellement via <strong>Aide > Vérifier les mises à jour</strong>.</p>
@@ -374,6 +375,9 @@ sic -i photo.jpg -f png --resize 800x</pre>
 
     <dt>Le dossier de sortie n'existe plus</dt>
     <dd>Si le dossier de sortie personnalisé a été supprimé ou déplacé, SIC! vous avertira et utilisera le dossier par défaut <code>Converted</code>.</dd>
+
+    <dt>SIC! indique que des paramètres ont été réinitialisés ou que le fichier de paramètres est endommagé</dt>
+    <dd>SIC! conserve une copie du fichier d'origine sous le nom <code>sic.json.bad</code> dans le répertoire de données de l'application. Si seules certaines valeurs étaient invalides, seules celles-ci reprennent leur valeur par défaut et vos autres paramètres sont conservés ; si tout le fichier était endommagé, SIC! démarre avec les paramètres par défaut. Pour récupérer l'ancien fichier, par exemple pour le corriger à la main, fermez SIC! et renommez la copie en <code>sic.json</code>. Si SIC! indique que les modifications ne seront pas enregistrées pendant cette session, un autre programme, comme un client de synchronisation ou un antivirus, tenait le fichier ouvert : fermez SIC!, patientez un instant et relancez-le.</dd>
 </dl>
 </main>
 
