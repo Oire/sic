@@ -20,9 +20,9 @@ It's the second of four plans. `88-test-coverage` must be merged first. `23-cust
 - [x] A CLI run with a missing output folder uses the default for that run and doesn't change the saved setting.
 - [x] A portable copy that moves or changes drive letter keeps using its own `Converted` folder, including a 1.1 `userdata` folder copied into a new 1.2 folder.
 - [x] `sharpconfig-huanlin` is no longer referenced in the code, the project file or the docs.
-- [ ] Starting SIC! while it's already running brings the existing window forward, even with a modal dialog open, and starts no second window.
-- [ ] Two portable copies in different folders, or a portable and an installed copy, can run side by side.
-- [ ] The CLI still runs while the GUI is open.
+- [x] Starting SIC! while it's already running brings the existing window forward, even with a modal dialog open, and starts no second window.
+- [x] Two portable copies in different folders, or a portable and an installed copy, can run side by side.
+- [x] The CLI still runs while the GUI is open.
 - [x] all validation commands pass
 
 ## Validation commands
