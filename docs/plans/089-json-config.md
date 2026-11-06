@@ -187,6 +187,8 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 - [x] tests for `Dispose`: it's idempotent, and disposing from another thread lets the next `TryAcquire` succeed
 - [x] tests for `GetActivationMessage`: the same non-zero value for the same folder, and different values for different folders
 - [x] tests for `GetInstanceKey`: stable, and the same for paths differing only by case or a trailing backslash
+- [x] ➕ Review: the broadcast reached only `MainWindow`, so a second launch did nothing while a startup message box was open, and it exited in silence whenever Windows refused the foreground. Replace it with `ActivationListener`, a message-only window `Program.Main` creates right after the guard, which restores the thread's main window and names the window to focus; the second launch finds it by title, asks it with `SendMessageTimeout`, focuses the answer itself, and says "SIC! is already running. Press Alt+Tab to switch to it." when nothing came forward. `MainWindow`'s `WndProc` override and its window P/Invokes go, and `ApplicationConfiguration.Initialize()` moves before the guard, because it must precede every window.
+- [x] ➕ tests for the hand-over: no listener, a listener with a visible window, with none, for another folder, and after it's disposed
 - [x] validation commands pass
 
 ### Task 6: Translate the new strings
@@ -201,6 +203,7 @@ Unaffected, already checked: `installer/sic.iss` (its uninstaller removes the wh
 - [x] Run `Extract-Strings.ps1`, then `Update-Translations.ps1`.
 - [x] Translate every new string in all six languages, and remove the `#, fuzzy` flag from each new entry.
 - [x] Run `Compile-Translations.ps1`.
+- [x] ➕ Translate the 14 menu shortcut labels from `BuildMenuSpec`, which had never been extracted, using each manual's key names.
 - [x] validation commands pass, including `TranslationCatalogTests`
 
 ### Task 7: Update the manuals and documentation
@@ -349,7 +352,8 @@ The mutex is a kernel object that vanishes when SIC! exits, so it leaves nothing
 
 ### Known limits
 
-- `Config.Load` runs before `SetLanguage`, so its messages use the Windows language rather than the one chosen in Settings. Today's error messages already behave this way.
+- `Config.Load` runs before `SetLanguage`, so its messages use the Windows language rather than the one chosen in Settings. Today's error messages already behave this way. The "SIC! is already running" message of a second launch does too, since that launch never reads the config.
+- In the moment between the listener being destroyed at the end of `Program.Main` and the guard being closed, a second launch finds no listener and says SIC! is already running although it is just exiting. Starting it again then works.
 
 ### Out of scope
 
@@ -361,7 +365,7 @@ The mutex is a kernel object that vanishes when SIC! exits, so it leaves nothing
 - Run the GUI against a real installed `Sic.cfg` on Windows 10 and 11, and confirm settings carry over.
 - Run the portable ZIP with an existing `userdata` folder containing `Sic.cfg`.
 - Move a portable folder to another drive letter, and confirm no "output folder no longer exists" message appears.
-- With JAWS and NVDA: start SIC! a second time, with the window normal, minimized, maximized then minimized, and with Settings open, and confirm focus lands where it should.
+- With JAWS and NVDA: start SIC! a second time, with the window normal, minimized, maximized then minimized, and with Settings open, and confirm focus lands where it should. Do the same while a startup message box is open (a damaged `sic.json`), and confirm the "already running" message is announced when Windows refuses the foreground, for instance after clicking another window during the launch.
 - Run two portable copies side by side, and a portable beside an installed copy. Run the CLI while the GUI is open.
 - Start SIC! normally while an elevated copy runs, and confirm there's no error dialog.
 - A downgrade to 1.1 won't read `sic.json`. To recover the old settings, rename `Sic.cfg.bak` back to `Sic.cfg`.

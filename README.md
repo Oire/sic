@@ -126,7 +126,7 @@ To run SIC! in portable mode, create an empty `userdata` folder next to `Sic.exe
 
 ### One window per data folder
 
-Only one SIC! window runs per data folder: starting SIC! again brings the open window forward, along with any dialog open in it, instead of opening a second one. Copies with their own data folder, such as two portable copies or a portable and an installed copy, run side by side, and the command line always runs, even while the window is open.
+Only one SIC! window runs per data folder: starting SIC! again brings the open window forward, along with any dialog open in it, instead of opening a second one. If Windows doesn't let it come forward, SIC! says it's already running, so a second launch never ends in silence. Copies with their own data folder, such as two portable copies or a portable and an installed copy, run side by side, and the command line always runs, even while the window is open.
 
 ## Building
 
@@ -207,6 +207,7 @@ src/Sic/
     UpdateService.cs              # NetSparkle update checks
     UnsupportedImageException.cs  # Thrown when content loads but isn't a decodable image
   Utils/
+    ActivationListener.cs         # Answers a second launch in the running GUI
     Config.cs                     # Settings the app runs with, loaded from sic.json
     ConfigSerializer.cs           # sic.json reading, migration, recovery and atomic saving
     FileHelper.cs                 # Cloud placeholder detection, file enumeration

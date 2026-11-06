@@ -43,26 +43,6 @@ public partial class MainWindow: Form {
     [DllImport("user32.dll")]
     private static extern uint GetClipboardSequenceNumber();
 
-    // Sent by a second launch for the same data folder (see SingleInstanceGuard). Static, so it's
-    // set before any window message arrives: an instance field that isn't set yet is 0, which is
-    // WM_NULL.
-    private static readonly int ActivationMessage =
-        SingleInstanceGuard.GetActivationMessage(Utils.Constants.App.DataFolder);
-
-    private const int SW_RESTORE = 9;
-
-    [DllImport("user32.dll")]
-    private static extern bool IsIconic(IntPtr hWnd);
-
-    [DllImport("user32.dll")]
-    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetLastActivePopup(IntPtr hWnd);
-
-    [DllImport("user32.dll")]
-    private static extern bool SetForegroundWindow(IntPtr hWnd);
-
     private readonly System.Windows.Forms.Timer _previewDebounceTimer = new() { Interval = 300 };
     private readonly ObjectPropertiesStore _localizationStore = new();
     // Created in OnShown (after the window handle exists, which NetSparkle's update UI needs).
@@ -249,42 +229,6 @@ public partial class MainWindow: Form {
         // SetMenu needs a window to attach to, so this cannot happen in the constructor.
         _menuBar = new NativeMenuBar(this);
         _menuBar.Attach(BuildMenuSpec());
-    }
-
-    /// <inheritdoc />
-    protected override void WndProc(ref Message m) {
-        // A second launch asked this window to come forward. Queue the work and return, so
-        // nothing runs inside this message's tick.
-        if (ActivationMessage != 0 && m.Msg == ActivationMessage) {
-            if (!IsDisposed && !Disposing) {
-                BeginInvoke(ActivateFromSecondLaunch);
-            }
-
-            return;
-        }
-
-        base.WndProc(ref m);
-    }
-
-    /// <summary>
-    /// Brings SIC! forward for a second launch: restores the window if it's minimized, keeping a
-    /// maximized one maximized, then focuses the last active popup, so an open modal dialog gets
-    /// focus rather than the disabled main window. Best effort: Windows may only flash the
-    /// taskbar button.
-    /// </summary>
-    private void ActivateFromSecondLaunch() {
-        if (IsDisposed || !IsHandleCreated) {
-            return;
-        }
-
-        if (IsIconic(Handle)) {
-            ShowWindow(Handle, SW_RESTORE);
-        }
-
-        var target = GetLastActivePopup(Handle);
-        if (!SetForegroundWindow(target == IntPtr.Zero ? Handle : target)) {
-            Log.Debug("SingleInstance: SetForegroundWindow was refused");
-        }
     }
 
     /// <inheritdoc />
@@ -620,7 +564,7 @@ public partial class MainWindow: Form {
         var outputFolder = Config.General.OutputFolder;
 
         if (!string.IsNullOrWhiteSpace(outputFolder)
-            && outputFolder != Utils.Constants.App.DefaultOutputFolder
+            && !Utils.Constants.App.IsDefaultOutputFolder(outputFolder)
             && !Directory.Exists(outputFolder)) {
             Log.Warning("Custom output folder no longer exists: {Folder}", outputFolder);
             DialogHelper.Show(

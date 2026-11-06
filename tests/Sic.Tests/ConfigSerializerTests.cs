@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using AwesomeAssertions;
@@ -233,6 +234,8 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
     [Theory]
     [InlineData("updateCheckInterval", "\"Hourly\"")]
     [InlineData("updateCheckInterval", "99")]
+    [InlineData("updateCheckInterval", "\"Weekly, Never\"")]
+    [InlineData("updateCheckInterval", "\"Never,Monthly\"")]
     [InlineData("confirmExitWithQueue", "5")]
     [InlineData("confirmExitWithQueue", "null")]
     [InlineData("enabledFormats", "\"JPG,PNG\"")]
@@ -261,6 +264,51 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
         result.Config.General.DetectClipboardData.Should().BeFalse();
         result.Config.General.UpdateCheckInterval.Should().Be(UpdateCheckInterval.Daily);
         result.LoadError.Should().Contain("2 settings");
+    }
+
+    [Fact]
+    public void Load_CombinedEnumNamesBesideAnotherBadValue_RepairsTheFile() {
+        WriteJson("""{ "general": { "language": "de", "detectClipboardData": "yes", "updateCheckInterval": "Weekly, Never" } }""");
+
+        var result = Load();
+
+        result.LoadError.Should().Contain("2 settings");
+        result.SaveError.Should().BeNull();
+        result.Config.General.UpdateCheckInterval.Should().Be(UpdateCheckInterval.Daily);
+
+        var next = Load();
+        ShouldBeSilent(next);
+        next.Config.General.Language.Should().Be("de");
+        next.Config.General.UpdateCheckInterval.Should().Be(UpdateCheckInterval.Daily);
+    }
+
+    [Fact]
+    public void TrySave_ValueTheSerializerCannotWrite_ReturnsAnErrorAndKeepsTheFile() {
+        WriteJson(BuildJson());
+        var config = new AppConfig { General = { UpdateCheckInterval = (UpdateCheckInterval)6 } };
+
+        var error = ConfigSerializer.TrySave(JsonPath, config);
+
+        error.Should().StartWith("Unable to save configuration: ");
+        File.ReadAllText(JsonPath).Should().Be(BuildJson());
+        TempFiles().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Load_FileHeldOpenForAMoment_IsReadOnARetry() {
+        WriteJson(BuildJson());
+        var held = new FileStream(JsonPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        var release = new Thread(() => {
+            Thread.Sleep(100);
+            held.Dispose();
+        });
+        release.Start();
+
+        var result = Load();
+
+        release.Join();
+        ShouldBeSilent(result);
+        result.Config.General.Should().BeEquivalentTo(ValidSettings());
     }
 
     #endregion
@@ -503,6 +551,68 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
         result.Config.General.Should().BeEquivalentTo(new GeneralSettings());
         ShouldBeSilent(result);
         File.Exists(Path.Combine(folder, App.ConfigFileName)).Should().BeTrue();
+
+        // A file that wasn't complete JSON would take the corrupt-file path here.
+        var reloaded = ConfigSerializer.Load(folder, isPortable: true);
+        ShouldBeSilent(reloaded);
+        reloaded.Config.General.Should().BeEquivalentTo(new GeneralSettings());
+    }
+
+    [Fact]
+    public void Load_NoFilesWhenTheFolderCannotBeCreated_ReportsASaveErrorAndUsesDefaults() {
+        var file = Path.Combine(_folder, "file.txt");
+        File.WriteAllText(file, "");
+
+        var result = ConfigSerializer.Load(Path.Combine(file, "data"), isPortable: true);
+
+        result.SaveError.Should().StartWith("Unable to save configuration: ");
+        result.LoadError.Should().BeNull();
+        result.SavesBlocked.Should().BeFalse();
+        result.Config.General.Should().BeEquivalentTo(new GeneralSettings());
+    }
+
+    [Fact]
+    public void Load_LegacyFileWhenSicJsonCannotBeWritten_KeepsSicCfg() {
+        WriteLegacy("Language=de", "ConfirmExitWithQueue=False");
+
+        // File.Exists is false for a folder, so this takes the migration path, and no file can
+        // replace it.
+        Directory.CreateDirectory(JsonPath);
+
+        var result = Load();
+
+        result.SaveError.Should().StartWith("Unable to save configuration: ");
+        result.LoadError.Should().BeNull();
+        result.SavesBlocked.Should().BeFalse();
+        result.Config.General.Language.Should().Be("de");
+        result.Config.General.ConfirmExitWithQueue.Should().BeFalse();
+        File.Exists(LegacyPath).Should().BeTrue();
+        File.Exists(LegacyPath + ".bak").Should().BeFalse();
+        TempFiles().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Load_LegacyFileThatCannotBeRenamed_IsStillMigratedSilently() {
+        WriteLegacy("Language=de", "ConfirmExitWithQueue=False");
+
+        ConfigLoadResult result;
+
+        // Reading still works, but the open handle stops the rename.
+        using (new FileStream(LegacyPath, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+            result = Load();
+        }
+
+        ShouldBeSilent(result);
+        result.Config.General.Language.Should().Be("de");
+        result.Config.General.ConfirmExitWithQueue.Should().BeFalse();
+        File.Exists(JsonPath).Should().BeTrue();
+        File.Exists(LegacyPath).Should().BeTrue();
+        File.Exists(LegacyPath + ".bak").Should().BeFalse();
+
+        File.WriteAllText(LegacyPath, "[General]\r\nLanguage=fr\r\n");
+        var next = Load();
+        ShouldBeSilent(next);
+        next.Config.General.Should().BeEquivalentTo(result.Config.General);
     }
 
     #endregion
@@ -627,6 +737,36 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
         backup.Should().Be(BadPath);
         File.ReadAllText(JsonPath).Should().Be("{}");
         File.ReadAllText(BadPath).Should().Be("{}");
+    }
+
+    [Fact]
+    public void BackUpFile_WhenTheTimestampedNameIsTaken_AddsANumber() {
+        WriteJson("current");
+        File.WriteAllText(BadPath, "older backup");
+
+        // This second and the next, so the clock ticking over during the test changes nothing.
+        var now = DateTime.Now;
+        string[] taken = [
+            $"{BadPath}.{now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture)}",
+            $"{BadPath}.{now.AddSeconds(1).ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture)}",
+        ];
+
+        foreach (var path in taken) {
+            File.WriteAllText(path, Path.GetFileName(path));
+        }
+
+        ConfigSerializer.BackUpFile(JsonPath);
+
+        File.ReadAllText(BadPath).Should().Be("current");
+
+        foreach (var path in taken) {
+            File.ReadAllText(path).Should().Be(Path.GetFileName(path));
+        }
+
+        var numbered = Backups().Where(path => path.EndsWith("-1", StringComparison.Ordinal)).Should().ContainSingle().Subject;
+        RotatedBackupName().IsMatch(Path.GetFileName(numbered)).Should().BeTrue();
+        File.ReadAllText(numbered).Should().Be("older backup");
+        Backups().Should().HaveCount(4);
     }
 
     #endregion

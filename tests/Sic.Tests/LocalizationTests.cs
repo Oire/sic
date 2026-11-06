@@ -73,4 +73,32 @@ public sealed class LocalizationTests: StaticStateTestBase {
 
         Localization.GetCurrentCulture().Name.Should().Be("en-US");
     }
+
+    // Every name IsValidLanguageName accepts must be safe for GetCurrentCulture at startup.
+    [Theory]
+    [InlineData("System")]
+    [InlineData("de")]
+    [InlineData("de-AT")]
+    [InlineData("he")]
+    [InlineData("en-US")]
+    public void IsValidLanguageName_AcceptsNamesThatStartUp(string language) {
+        Localization.IsValidLanguageName(language).Should().BeTrue();
+
+        Localization.SetLanguage(language);
+        var culture = Localization.GetCurrentCulture;
+
+        culture.Should().NotThrow();
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("system")]
+    [InlineData("Klingon-Empire")]
+    [InlineData(" de")]
+    [InlineData("de ")]
+    public void IsValidLanguageName_RejectsOtherNames(string? language) {
+        Localization.IsValidLanguageName(language).Should().BeFalse();
+    }
 }

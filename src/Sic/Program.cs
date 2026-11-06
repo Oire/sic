@@ -58,15 +58,28 @@ internal static class Program {
                 return RunCli(args);
             }
 
+            // Before any window, the activation listener included: WinForms refuses to change
+            // these settings once one exists.
+            ApplicationConfiguration.Initialize();
+
             // One GUI per data folder: a second launch brings the running window forward and
             // exits before it reads or writes the config.
             InstanceGuard = SingleInstanceGuard.TryAcquire(App.DataFolder);
             if (InstanceGuard is null) {
-                SingleInstanceGuard.ActivateExisting(App.DataFolder);
+                if (!SingleInstanceGuard.ActivateExisting(App.DataFolder)) {
+                    // Nothing came forward, so say why nothing opens rather than exit in silence.
+                    DialogHelper.Show(
+                        _("SIC! is already running. Press Alt+Tab to switch to it."),
+                        Application.ProductName ?? "SIC!",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
                 return ExitCode.Success;
             }
 
-            ApplicationConfiguration.Initialize();
+            // Answers a second launch from here on, while a startup message box is open too.
+            using var activationListener = new ActivationListener(App.DataFolder);
+
             Config.Load();
             Localization.SetLanguage(Config.General.Language);
             EnsureOutputFolderExists(showGui: true);
@@ -120,7 +133,7 @@ internal static class Program {
         }
 
         // Default folder: always create silently
-        if (outputFolder == App.DefaultOutputFolder) {
+        if (App.IsDefaultOutputFolder(outputFolder)) {
             try {
                 Directory.CreateDirectory(outputFolder);
             } catch (Exception ex) {

@@ -21,4 +21,12 @@ public static class App {
     public const string SystemLanguageName = "System";
     public static readonly string LocalesFolder = Path.Combine(AppContext.BaseDirectory, "locale");
     public static readonly string HelpFolder = Path.Combine(AppContext.BaseDirectory, "help");
+
+    /// <summary>Whether <paramref name="folder"/> is <see cref="DefaultOutputFolder"/>, ignoring case and trailing separators.</summary>
+    public static bool IsDefaultOutputFolder(string? folder) =>
+        !string.IsNullOrWhiteSpace(folder)
+        && string.Equals(TrimSeparators(folder), TrimSeparators(DefaultOutputFolder), StringComparison.OrdinalIgnoreCase);
+
+    /// <summary><paramref name="folder"/> with forward slashes made backslashes and trailing ones removed.</summary>
+    public static string TrimSeparators(string folder) => folder.Replace('/', '\\').TrimEnd('\\');
 }

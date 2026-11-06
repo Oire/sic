@@ -175,7 +175,7 @@ footer {
     <dt>Portable</dt>
     <dd>If a <code>userdata</code> folder exists next to the executable, SIC! runs in portable mode. All data (configuration, converted files, logs) is stored in that <code>userdata</code> folder instead of <code>%APPDATA%</code>. This lets you run SIC! from a USB drive or any folder without leaving traces on the system.</dd>
 </dl>
-<p>Only one SIC! window runs at a time. If you start SIC! while it's already open, no second window opens: the open window comes forward instead, and if a dialog such as Settings is open in it, that dialog gets the focus. Sometimes Windows only makes its taskbar button flash. Portable copies in different folders, or a portable copy and an installed one, each keep their own settings and can run side by side. The <a href="#cli">command line</a> can always be used, even while the window is open.</p>
+<p>Only one SIC! window runs at a time. If you start SIC! while it's already open, no second window opens: the open window comes forward instead, and if a dialog such as Settings is open in it, that dialog gets the focus. If Windows doesn't let the window come forward, SIC! tells you it's already running instead: press <kbd>Alt+Tab</kbd> to switch to it, or <kbd>Windows+T</kbd> to reach its taskbar button. Portable copies in different folders, or a portable copy and an installed one, each keep their own settings and can run side by side. The <a href="#cli">command line</a> can always be used, even while the window is open.</p>
 
 <h2 id="adding-images">Adding images</h2>
 <p>There are several ways to add images to the queue:</p>
@@ -375,6 +375,9 @@ sic -i photo.jpg -f png --resize 800x</pre>
 
     <dt>The output folder no longer exists</dt>
     <dd>If the custom output folder has been deleted or moved, SIC! will warn you and fall back to the default <code>Converted</code> folder.</dd>
+
+    <dt>SIC! says settings were reset or the settings file is damaged</dt>
+    <dd>SIC! keeps a copy of the original file as <code>sic.json.bad</code> in the application data directory. If only some values were invalid, just those go back to their defaults and your other settings are kept; if the whole file was damaged, SIC! starts with the default settings. To get the old file back, for example to fix it by hand, close SIC! and rename the copy to <code>sic.json</code>. If SIC! says changes won't be saved this session, another program, such as a sync client or an antivirus, was holding the file: close SIC!, wait a moment and start it again.</dd>
 </dl>
 </main>
 

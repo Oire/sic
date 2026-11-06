@@ -31,11 +31,11 @@ public static class Config {
 
         // The serializer's messages are complete and translated, so they go out as they are.
         if (result.LoadError is not null) {
-            ReportError(result.LoadError, isGui);
+            ReportError(result.LoadError);
         }
 
         if (result.SaveError is not null) {
-            ReportError(result.SaveError, isGui);
+            ReportError(result.SaveError);
         }
     }
 
@@ -49,16 +49,13 @@ public static class Config {
             return;
         }
 
-        try {
-            ConfigSerializer.Save(ConfigFilePath, _config);
-        } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
-            Log.Error(ex, "Failed to save {Path}", ConfigFilePath);
-            ReportError(_("Unable to save configuration: {0}", ex.Message), _isGui);
+        if (ConfigSerializer.TrySave(ConfigFilePath, _config) is { } error) {
+            ReportError(error);
         }
     }
 
-    private static void ReportError(string message, bool isGui) {
-        if (isGui) {
+    private static void ReportError(string message) {
+        if (_isGui) {
             DialogHelper.Show(message, _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         } else {
             Console.Error.WriteLine(message);

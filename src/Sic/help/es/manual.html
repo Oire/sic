@@ -175,7 +175,7 @@ footer {
     <dt>Portátil</dt>
     <dd>Si junto al ejecutable existe una carpeta <code>userdata</code>, SIC! funciona en modo portátil. Todos los datos (configuración, archivos convertidos y registros) se guardan en esa carpeta <code>userdata</code> en lugar de en <code>%APPDATA%</code>. Así puede ejecutar SIC! desde una memoria USB o desde cualquier carpeta sin dejar rastro en el sistema.</dd>
 </dl>
-<p>Solo se ejecuta una ventana de SIC! a la vez. Si inicia SIC! cuando ya está abierto, no se abre una segunda ventana: la que está abierta pasa a primer plano y, si tiene abierto un cuadro de diálogo como Configuración, ese cuadro de diálogo recibe el foco. A veces Windows solo hace parpadear su botón en la barra de tareas. Las copias portátiles en carpetas distintas, o una copia portátil y otra instalada, tienen cada una su propia configuración y pueden ejecutarse a la vez. La <a href="#cli">línea de comandos</a> se puede usar siempre, aunque la ventana esté abierta.</p>
+<p>Solo se ejecuta una ventana de SIC! a la vez. Si inicia SIC! cuando ya está abierto, no se abre una segunda ventana: la que está abierta pasa a primer plano y, si tiene abierto un cuadro de diálogo como Configuración, ese cuadro de diálogo recibe el foco. Si Windows no deja que la ventana pase a primer plano, SIC! le avisa de que ya se está ejecutando: pulse <kbd>Alt+Tab</kbd> para cambiar a ella, o <kbd>Windows+T</kbd> para llegar a su botón en la barra de tareas. Las copias portátiles en carpetas distintas, o una copia portátil y otra instalada, tienen cada una su propia configuración y pueden ejecutarse a la vez. La <a href="#cli">línea de comandos</a> se puede usar siempre, aunque la ventana esté abierta.</p>
 
 <h2 id="adding-images">Añadir imágenes</h2>
 <p>Hay varias maneras de añadir imágenes a la cola:</p>
@@ -375,6 +375,9 @@ sic -i foto.jpg -f png --resize 800x</pre>
 
     <dt>La carpeta de salida ya no existe</dt>
     <dd>Si la carpeta de salida personalizada se ha eliminado o movido, SIC! se lo advertirá y volverá a la carpeta <code>Converted</code> predeterminada.</dd>
+
+    <dt>SIC! indica que se restablecieron ajustes o que el archivo de configuración está dañado</dt>
+    <dd>SIC! guarda una copia del archivo original como <code>sic.json.bad</code> en el directorio de datos de la aplicación. Si solo algunos valores no eran válidos, solo esos vuelven a sus valores predeterminados y el resto de su configuración se conserva; si todo el archivo estaba dañado, SIC! se inicia con la configuración predeterminada. Para recuperar el archivo anterior, por ejemplo para corregirlo a mano, cierre SIC! y cambie el nombre de la copia a <code>sic.json</code>. Si SIC! indica que los cambios no se guardarán en esta sesión, otro programa, como un cliente de sincronización o un antivirus, tenía el archivo abierto: cierre SIC!, espere un momento y vuelva a iniciarlo.</dd>
 </dl>
 </main>
 

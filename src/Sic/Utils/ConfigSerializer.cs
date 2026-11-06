@@ -20,12 +20,14 @@ namespace Oire.Sic.Utils;
 internal static class ConfigSerializer {
     private const string BackupSuffix = ".bad";
     private const string LegacyBackupSuffix = ".bak";
-    private const int MoveAttempts = 5;
-    private static readonly TimeSpan MoveRetryDelay = TimeSpan.FromMilliseconds(100);
+    private const int RetryAttempts = 5;
+    private static readonly TimeSpan RetryDelay = TimeSpan.FromMilliseconds(100);
 
     /// <summary>
     /// The options for every value in <c>sic.json</c>. Integers are refused for enums, because the
-    /// default converter would take <c>99</c> and silently turn off update checks.
+    /// default converter would take <c>99</c> and silently turn off update checks. The converter
+    /// still combines a list such as <c>"Weekly, Never"</c> into a value no member has, so
+    /// <see cref="ReadGeneral"/> checks every enum it reads as well.
     /// </summary>
     internal static readonly JsonSerializerOptions Options = new() {
         WriteIndented = true,
@@ -66,15 +68,16 @@ internal static class ConfigSerializer {
         var jsonPath = Path.Combine(folder, App.ConfigFileName);
         var legacyPath = Path.Combine(folder, App.LegacyConfigFileName);
 
-        if (File.Exists(jsonPath)) {
-            return LoadJson(jsonPath);
+        // Null when sic.json vanished after File.Exists: it's then treated as missing.
+        if (File.Exists(jsonPath) && LoadJson(jsonPath) is { } result) {
+            return result;
         }
 
         if (File.Exists(legacyPath)) {
             return MigrateLegacy(jsonPath, legacyPath, isPortable);
         }
 
-        return CreateDefaults(folder, jsonPath);
+        return CreateDefaults(jsonPath);
     }
 
     /// <summary>
@@ -91,7 +94,7 @@ internal static class ConfigSerializer {
             ?? throw new InvalidOperationException("The configuration serialized to null.");
 
         if (node[PropertyName(nameof(AppConfig.General))] is JsonObject general
-            && IsDefaultOutputFolder(config.General.OutputFolder)) {
+            && App.IsDefaultOutputFolder(config.General.OutputFolder)) {
             general[PropertyName(nameof(GeneralSettings.OutputFolder))] = "";
         }
 
@@ -143,11 +146,15 @@ internal static class ConfigSerializer {
         return backupPath;
     }
 
-    private static ConfigLoadResult LoadJson(string jsonPath) {
+    /// <returns>The result, or <see langword="null"/> when the file no longer exists.</returns>
+    private static ConfigLoadResult? LoadJson(string jsonPath) {
         byte[] bytes;
 
         try {
-            bytes = ReadShared(jsonPath);
+            bytes = ReadSharedWithRetry(jsonPath);
+        } catch (FileNotFoundException) {
+            Log.Information("{Path} was removed before it could be read", jsonPath);
+            return null;
         } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
             Log.Error(ex, "Failed to read {Path}", jsonPath);
             return Blocked(_(
@@ -265,20 +272,11 @@ internal static class ConfigSerializer {
         return new ConfigLoadResult(config, null, null, SavesBlocked: false);
     }
 
-    private static ConfigLoadResult CreateDefaults(string folder, string jsonPath) {
+    /// <summary>Writes the defaults. <see cref="Save"/> creates the data folder if it's missing.</summary>
+    private static ConfigLoadResult CreateDefaults(string jsonPath) {
         var config = new AppConfig();
         CleanUp(config);
-        string? saveError;
-
-        try {
-            Directory.CreateDirectory(folder);
-            saveError = TrySave(jsonPath, config);
-        } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
-            Log.Error(ex, "Failed to create {Folder}", folder);
-            saveError = SaveErrorMessage(ex);
-        }
-
-        return new ConfigLoadResult(config, null, saveError, SavesBlocked: false);
+        return new ConfigLoadResult(config, null, TrySave(jsonPath, config), SavesBlocked: false);
     }
 
     /// <summary>
@@ -342,6 +340,14 @@ internal static class ConfigSerializer {
                 continue;
             }
 
+            // The enum converter ORs a list such as "Weekly, Never" into a value no member has.
+            if (property.PropertyType.IsEnum && (parsed is null || !Enum.IsDefined(property.PropertyType, parsed))) {
+                Log.Warning("sic.json: invalid value {Value} for {Name}, keeping the default",
+                    value.Value.GetRawText(), value.Name);
+                badValues++;
+                continue;
+            }
+
             property.SetValue(settings, parsed);
         }
 
@@ -350,8 +356,8 @@ internal static class ConfigSerializer {
 
     /// <summary>
     /// The clean-up every loaded config goes through: nulls become defaults, null and blank format
-    /// keys are dropped, a blank output folder becomes the default one, and an invalid language
-    /// becomes <c>System</c>.
+    /// keys are dropped, a blank output folder becomes the default one, an invalid language
+    /// becomes <c>System</c>, and an update interval no member has becomes the default.
     /// </summary>
     private static void CleanUp(AppConfig config) {
         config.General ??= new GeneralSettings();
@@ -366,18 +372,26 @@ internal static class ConfigSerializer {
             general.OutputFolder = App.DefaultOutputFolder;
         }
 
+        if (!Enum.IsDefined(general.UpdateCheckInterval)) {
+            general.UpdateCheckInterval = defaults.UpdateCheckInterval;
+        }
+
         general.LastInputFolder ??= defaults.LastInputFolder;
         general.EnabledFormats = general.EnabledFormats is null
             ? []
             : [.. general.EnabledFormats.Where(key => !string.IsNullOrWhiteSpace(key))];
     }
 
-    /// <summary>Saves and returns the translated error message, or <c>null</c> when the save worked.</summary>
-    private static string? TrySave(string path, AppConfig config) {
+    /// <summary>
+    /// Saves and returns the translated error message, or <c>null</c> when the save worked. Besides
+    /// I/O failures it catches a value the serializer can't write, so one bad setting never takes
+    /// down startup or a save.
+    /// </summary>
+    internal static string? TrySave(string path, AppConfig config) {
         try {
             Save(path, config);
             return null;
-        } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
+        } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or NotSupportedException) {
             Log.Error(ex, "Failed to save {Path}", path);
             return SaveErrorMessage(ex);
         }
@@ -389,6 +403,23 @@ internal static class ConfigSerializer {
         var config = new AppConfig();
         CleanUp(config);
         return new ConfigLoadResult(config, loadError, null, SavesBlocked: true);
+    }
+
+    /// <summary>
+    /// Reads the file, retrying briefly like <see cref="MoveWithRetry"/>: a parallel CLI run that
+    /// is replacing it, or an antivirus scanner, may hold it for a moment. A file that doesn't
+    /// exist fails at once with <see cref="FileNotFoundException"/>.
+    /// </summary>
+    private static byte[] ReadSharedWithRetry(string path) {
+        for (var attempt = 1; ; attempt++) {
+            try {
+                return ReadShared(path);
+            } catch (Exception ex) when (attempt < RetryAttempts
+                && ex is not FileNotFoundException
+                && ex is IOException or UnauthorizedAccessException) {
+                Thread.Sleep(RetryDelay);
+            }
+        }
     }
 
     /// <summary>Reads the whole file while letting others read, write or delete it.</summary>
@@ -411,8 +442,8 @@ internal static class ConfigSerializer {
             try {
                 File.Move(source, destination, overwrite: true);
                 return;
-            } catch (Exception ex) when (attempt < MoveAttempts && ex is IOException or UnauthorizedAccessException) {
-                Thread.Sleep(MoveRetryDelay);
+            } catch (Exception ex) when (attempt < RetryAttempts && ex is IOException or UnauthorizedAccessException) {
+                Thread.Sleep(RetryDelay);
             }
         }
     }
@@ -427,15 +458,8 @@ internal static class ConfigSerializer {
 
     private static string PropertyName(string name) => Options.PropertyNamingPolicy?.ConvertName(name) ?? name;
 
-    /// <summary>Whether <paramref name="folder"/> is <see cref="App.DefaultOutputFolder"/>, ignoring case and trailing separators.</summary>
-    private static bool IsDefaultOutputFolder(string? folder) =>
-        !string.IsNullOrWhiteSpace(folder)
-        && string.Equals(TrimSeparators(folder), TrimSeparators(App.DefaultOutputFolder), StringComparison.OrdinalIgnoreCase);
-
     /// <summary>Whether <paramref name="folder"/> is some portable copy's <c>userdata\Converted</c> folder.</summary>
     private static bool IsPortableDefaultOutputFolder(string? folder) =>
         !string.IsNullOrWhiteSpace(folder)
-        && TrimSeparators(folder).EndsWith(@"\userdata\Converted", StringComparison.OrdinalIgnoreCase);
-
-    private static string TrimSeparators(string folder) => folder.Replace('/', '\\').TrimEnd('\\');
+        && App.TrimSeparators(folder).EndsWith(@"\userdata\Converted", StringComparison.OrdinalIgnoreCase);
 }

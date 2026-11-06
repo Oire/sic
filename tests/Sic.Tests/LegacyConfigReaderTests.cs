@@ -134,19 +134,31 @@ public sealed class LegacyConfigReaderTests: IDisposable {
         settings.EnabledFormats.Should().BeEmpty();
     }
 
+    // Each spelling goes to a setting whose default is the opposite, so a rejected spelling fails.
     [Theory]
-    [InlineData("True", true)]
-    [InlineData("true", true)]
-    [InlineData("yes", true)]
-    [InlineData("1", true)]
-    [InlineData("False", false)]
-    [InlineData("false", false)]
-    [InlineData("no", false)]
-    [InlineData("0", false)]
-    public void Parse_BoolSpellings_AreAccepted(string value, bool expected) {
+    [InlineData("True")]
+    [InlineData("true")]
+    [InlineData("yes")]
+    [InlineData("1")]
+    public void Parse_TrueSpellings_AreAccepted(string value) {
+        new GeneralSettings().DetectClipboardData.Should().BeFalse();
+
         var settings = LegacyConfigReader.Parse($"[General]\r\nDetectClipboardData={value}\r\n");
 
-        settings.DetectClipboardData.Should().Be(expected);
+        settings.DetectClipboardData.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("False")]
+    [InlineData("false")]
+    [InlineData("no")]
+    [InlineData("0")]
+    public void Parse_FalseSpellings_AreAccepted(string value) {
+        new GeneralSettings().ConfirmExitWithQueue.Should().BeTrue();
+
+        var settings = LegacyConfigReader.Parse($"[General]\r\nConfirmExitWithQueue={value}\r\n");
+
+        settings.ConfirmExitWithQueue.Should().BeFalse();
     }
 
     [Fact]
@@ -240,6 +252,14 @@ public sealed class LegacyConfigReaderTests: IDisposable {
 
         settings.LastInputFolder.Should().Be(@"D:\In");
         settings.OutputFolder.Should().Be(@"C:\a;b");
+    }
+
+    [Fact]
+    public void Parse_CommentCharacterAfterABackslash_StaysInAnUnquotedValue() {
+        var settings = LegacyConfigReader.Parse("[General]\r\nOutputFolder=C:\\back\\#slash\r\nLastInputFolder=C:\\a\\;b\r\n");
+
+        settings.OutputFolder.Should().Be(@"C:\back\#slash");
+        settings.LastInputFolder.Should().Be(@"C:\a\;b");
     }
 
     [Theory]

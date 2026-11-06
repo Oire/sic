@@ -10,7 +10,7 @@ namespace Oire.Sic.Models;
 public sealed class GeneralSettings {
     /// <summary>The UI language: <c>"System"</c> to follow Windows, or a culture name such as
     /// <c>"de"</c>.</summary>
-    public string Language { get; set; } = "System";
+    public string Language { get; set; } = App.SystemLanguageName;
 
     /// <summary>The folder converted files are written to. At runtime this always holds a full path;
     /// the default <c>Converted</c> folder is saved as an empty string so a moved portable copy keeps

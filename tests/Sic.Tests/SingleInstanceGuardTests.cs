@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using AwesomeAssertions;
 using Oire.Sic.Utils;
 using Xunit;
@@ -6,7 +7,10 @@ namespace Oire.Sic.Tests;
 
 /// <summary>
 /// <see cref="SingleInstanceGuard"/> with folders unique to each test, so tests running in
-/// parallel never share a mutex. The folders are never created: the guard only uses their paths.
+/// parallel never share a mutex or a listener. The folders are never created: the guard only uses
+/// their paths. The hand-over tests stop short of <c>SetForegroundWindow</c>, which Windows grants
+/// or refuses depending on what has the foreground, so they check the window the running instance
+/// names instead.
 /// </summary>
 public sealed class SingleInstanceGuardTests {
     private static string NewFolder() =>
@@ -135,4 +139,92 @@ public sealed class SingleInstanceGuardTests {
         SingleInstanceGuard.GetInstanceKey(NewFolder())
             .Should().NotBe(SingleInstanceGuard.GetInstanceKey(NewFolder()));
     }
+
+    #region Hand-over to the running instance
+
+    [Fact]
+    public void RequestActivationTarget_NoListener_ReturnsZero() {
+        SingleInstanceGuard.RequestActivationTarget(NewFolder(), TimeSpan.Zero).Should().Be(IntPtr.Zero);
+    }
+
+    [Fact]
+    public void RequestActivationTarget_ListenerWithAWindow_ReturnsThatWindow() {
+        var folder = NewFolder();
+
+        RunOnStaThread(() => {
+            using var listener = new ActivationListener(folder);
+            using var form = new QuietForm();
+            form.Show();
+
+            SingleInstanceGuard.RequestActivationTarget(folder, TimeSpan.FromSeconds(1)).Should().Be(form.Handle);
+        });
+    }
+
+    [Fact]
+    public void RequestActivationTarget_ListenerWithNoVisibleWindow_ReturnsZero() {
+        var folder = NewFolder();
+
+        RunOnStaThread(() => {
+            using var listener = new ActivationListener(folder);
+            using var form = new QuietForm();
+            form.Show();
+            form.Hide();
+
+            SingleInstanceGuard.RequestActivationTarget(folder, TimeSpan.FromSeconds(1)).Should().Be(IntPtr.Zero);
+        });
+    }
+
+    [Fact]
+    public void RequestActivationTarget_ListenerForAnotherFolder_ReturnsZero() {
+        RunOnStaThread(() => {
+            using var listener = new ActivationListener(NewFolder());
+            using var form = new QuietForm();
+            form.Show();
+
+            SingleInstanceGuard.RequestActivationTarget(NewFolder(), TimeSpan.Zero).Should().Be(IntPtr.Zero);
+        });
+    }
+
+    [Fact]
+    public void RequestActivationTarget_AfterTheListenerIsDisposed_ReturnsZero() {
+        var folder = NewFolder();
+
+        RunOnStaThread(() => {
+            using var form = new QuietForm();
+            form.Show();
+            new ActivationListener(folder).Dispose();
+
+            SingleInstanceGuard.RequestActivationTarget(folder, TimeSpan.Zero).Should().Be(IntPtr.Zero);
+        });
+    }
+
+    /// <summary>Windows belong to the thread that creates them, and WinForms wants it STA.</summary>
+    private static void RunOnStaThread(Action action) {
+        ExceptionDispatchInfo? error = null;
+        var thread = new Thread(() => {
+            try {
+                action();
+            } catch (Exception ex) {
+                error = ExceptionDispatchInfo.Capture(ex);
+            }
+        });
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        thread.Join();
+        error?.Throw();
+    }
+
+    /// <summary>A visible window that never takes focus or a taskbar button, placed off screen.</summary>
+    private sealed class QuietForm: Form {
+        public QuietForm() {
+            StartPosition = FormStartPosition.Manual;
+            Location = new Point(-32000, -32000);
+            Size = new Size(100, 100);
+            ShowInTaskbar = false;
+        }
+
+        protected override bool ShowWithoutActivation => true;
+    }
+
+    #endregion
 }
