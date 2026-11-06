@@ -57,7 +57,10 @@ internal static class ConfigSerializer {
 
     /// <summary>
     /// Loads the configuration from <paramref name="folder"/>: <c>sic.json</c> if it exists,
-    /// otherwise a legacy <c>Sic.cfg</c>, otherwise defaults, which are then written.
+    /// otherwise a legacy <c>Sic.cfg</c>, otherwise defaults, which are then written. Migration and
+    /// first run only ever create <c>sic.json</c>, never replace it, so a CLI run and the GUI
+    /// starting together can't overwrite what the other just wrote: whichever loses reads the
+    /// winner's file instead.
     /// </summary>
     /// <param name="folder">The data folder holding the config files.</param>
     /// <param name="isPortable">Whether SIC! runs as portable, which lets a migrated
@@ -68,16 +71,29 @@ internal static class ConfigSerializer {
         var jsonPath = Path.Combine(folder, App.ConfigFileName);
         var legacyPath = Path.Combine(folder, App.LegacyConfigFileName);
 
-        // Null when sic.json vanished after File.Exists: it's then treated as missing.
-        if (File.Exists(jsonPath) && LoadJson(jsonPath) is { } result) {
-            return result;
-        }
+        for (var attempt = 1; ; attempt++) {
+            // Null when sic.json vanished after File.Exists: it's then treated as missing.
+            if (File.Exists(jsonPath) && LoadJson(jsonPath) is { } loaded) {
+                return loaded;
+            }
 
-        if (File.Exists(legacyPath)) {
-            return MigrateLegacy(jsonPath, legacyPath, isPortable);
-        }
+            // Null when another process moved the files on in the meantime: look again.
+            var created = File.Exists(legacyPath)
+                ? MigrateLegacy(jsonPath, legacyPath, isPortable)
+                : CreateDefaults(jsonPath);
 
-        return CreateDefaults(jsonPath);
+            if (created is not null) {
+                return created;
+            }
+
+            if (attempt == RetryAttempts) {
+                // Only if other processes keep creating and deleting sic.json: write nothing.
+                Log.Warning("{Path} kept appearing and vanishing, using the defaults without saving", jsonPath);
+                var config = new AppConfig();
+                CleanUp(config);
+                return new ConfigLoadResult(config, null, null, SavesBlocked: true);
+            }
+        }
     }
 
     /// <summary>
@@ -86,7 +102,13 @@ internal static class ConfigSerializer {
     /// folder is written as <c>""</c>; <paramref name="config"/> itself is never changed. Throws on
     /// failure, leaving the previous file intact and no temporary file behind.
     /// </summary>
-    public static void Save(string path, AppConfig config) {
+    public static void Save(string path, AppConfig config) => Write(path, config, overwrite: true);
+
+    /// <summary>
+    /// Writes as <see cref="Save"/> does. With <paramref name="overwrite"/> off an existing file is
+    /// left alone: the temporary file is then deleted and the result is <c>false</c>.
+    /// </summary>
+    private static bool Write(string path, AppConfig config, bool overwrite) {
         ArgumentNullException.ThrowIfNull(path);
         ArgumentNullException.ThrowIfNull(config);
 
@@ -113,11 +135,16 @@ internal static class ConfigSerializer {
                 stream.Flush(flushToDisk: true);
             }
 
-            MoveWithRetry(tempPath, fullPath);
+            if (MoveWithRetry(tempPath, fullPath, overwrite)) {
+                return true;
+            }
         } catch {
             TryDelete(tempPath);
             throw;
         }
+
+        TryDelete(tempPath);
+        return false;
     }
 
     /// <summary>
@@ -173,7 +200,9 @@ internal static class ConfigSerializer {
             }
 
             (config, badValues) = ReadConfig(document.RootElement);
-        } catch (Exception ex) when (ex is JsonException or DecoderFallbackException) {
+        } catch (Exception ex) when (ex is JsonException or DecoderFallbackException or InvalidOperationException) {
+            // InvalidOperationException: JsonDocument accepts a name with an unpaired surrogate
+            // such as "\uD800", which JsonProperty.Name then can't decode.
             Log.Error(ex, "{Path} is not valid JSON", jsonPath);
             return RecoverCorruptFile(jsonPath);
         }
@@ -235,11 +264,17 @@ internal static class ConfigSerializer {
     }
 
     /// <summary>Reads <c>Sic.cfg</c>, writes <c>sic.json</c> and only then renames <c>Sic.cfg</c> to <c>Sic.cfg.bak</c>.</summary>
-    private static ConfigLoadResult MigrateLegacy(string jsonPath, string legacyPath, bool isPortable) {
+    /// <returns>The result, or <see langword="null"/> when <c>Sic.cfg</c> vanished before it could
+    /// be read, or <c>sic.json</c> appeared and then vanished, so <see cref="Load"/> looks again.</returns>
+    internal static ConfigLoadResult? MigrateLegacy(string jsonPath, string legacyPath, bool isPortable) {
         var config = new AppConfig();
 
         try {
             config.General = LegacyConfigReader.Read(legacyPath);
+        } catch (FileNotFoundException) {
+            // Another process migrated it and renamed it to Sic.cfg.bak.
+            Log.Information("{Path} was removed before it could be read", legacyPath);
+            return null;
         } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
             Log.Error(ex, "Failed to read {Path}", legacyPath);
             return Blocked(_(
@@ -255,7 +290,10 @@ internal static class ConfigSerializer {
 
         CleanUp(config);
 
-        var saveError = TrySave(jsonPath, config);
+        if (!TryCreate(jsonPath, config, out var saveError)) {
+            // Another process migrated first, and renames Sic.cfg itself.
+            return LoadAfterLostRace(jsonPath);
+        }
 
         if (saveError is not null) {
             return new ConfigLoadResult(config, null, saveError, SavesBlocked: false);
@@ -273,10 +311,23 @@ internal static class ConfigSerializer {
     }
 
     /// <summary>Writes the defaults. <see cref="Save"/> creates the data folder if it's missing.</summary>
-    private static ConfigLoadResult CreateDefaults(string jsonPath) {
+    /// <returns>The result, or <see langword="null"/> when <c>sic.json</c> appeared and then
+    /// vanished, so <see cref="Load"/> looks again.</returns>
+    internal static ConfigLoadResult? CreateDefaults(string jsonPath) {
         var config = new AppConfig();
         CleanUp(config);
-        return new ConfigLoadResult(config, null, TrySave(jsonPath, config), SavesBlocked: false);
+
+        if (!TryCreate(jsonPath, config, out var saveError)) {
+            return LoadAfterLostRace(jsonPath);
+        }
+
+        return new ConfigLoadResult(config, null, saveError, SavesBlocked: false);
+    }
+
+    /// <summary>Reads the <c>sic.json</c> another process created while this one was about to.</summary>
+    private static ConfigLoadResult? LoadAfterLostRace(string jsonPath) {
+        Log.Information("{Path} was created by another process, reading it instead", jsonPath);
+        return LoadJson(jsonPath);
     }
 
     /// <summary>
@@ -397,6 +448,23 @@ internal static class ConfigSerializer {
         }
     }
 
+    /// <summary>
+    /// Creates <paramref name="path"/> unless it exists, for migration and first run. A failed
+    /// write is reported in <paramref name="saveError"/>, as <see cref="TrySave"/> does.
+    /// </summary>
+    /// <returns><c>false</c> only when <paramref name="path"/> already existed and was left alone.</returns>
+    private static bool TryCreate(string path, AppConfig config, out string? saveError) {
+        saveError = null;
+
+        try {
+            return Write(path, config, overwrite: false);
+        } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or NotSupportedException) {
+            Log.Error(ex, "Failed to save {Path}", path);
+            saveError = SaveErrorMessage(ex);
+            return true;
+        }
+    }
+
     private static string SaveErrorMessage(Exception ex) => _("Unable to save configuration: {0}", ex.Message);
 
     private static ConfigLoadResult Blocked(string loadError) {
@@ -434,14 +502,19 @@ internal static class ConfigSerializer {
         bytes.AsSpan().StartsWith(Utf8Bom) ? bytes.AsSpan(Utf8Bom.Length) : bytes;
 
     /// <summary>
-    /// Replaces <paramref name="destination"/>, retrying briefly: a parallel CLI run or an
-    /// antivirus scanner may have it open for a moment.
+    /// Moves <paramref name="source"/> to <paramref name="destination"/>, retrying briefly: a
+    /// parallel CLI run or an antivirus scanner may have it open for a moment. Without
+    /// <paramref name="overwrite"/> the move refuses an existing file in one step, so two
+    /// processes can't both create it.
     /// </summary>
-    private static void MoveWithRetry(string source, string destination) {
+    /// <returns><c>false</c> when <paramref name="overwrite"/> is off and the destination exists.</returns>
+    private static bool MoveWithRetry(string source, string destination, bool overwrite) {
         for (var attempt = 1; ; attempt++) {
             try {
-                File.Move(source, destination, overwrite: true);
-                return;
+                File.Move(source, destination, overwrite);
+                return true;
+            } catch (IOException) when (!overwrite && File.Exists(destination)) {
+                return false;
             } catch (Exception ex) when (attempt < RetryAttempts && ex is IOException or UnauthorizedAccessException) {
                 Thread.Sleep(RetryDelay);
             }

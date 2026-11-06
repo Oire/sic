@@ -189,6 +189,31 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
         File.ReadAllText(BadPath).Should().Be(json);
     }
 
+    [Theory]
+    [InlineData("""{"\uD800":0}""")]
+    [InlineData("""{ "general": { "\uDC00": true } }""")]
+    public void Load_NameWithAnUnpairedSurrogate_TakesTheCorruptFilePath(string json) {
+        WriteJson(json);
+
+        var result = Load();
+
+        result.Config.General.Should().BeEquivalentTo(new GeneralSettings());
+        result.LoadError.Should().Contain("sic.json.bad");
+        result.SavesBlocked.Should().BeFalse();
+        File.ReadAllText(BadPath).Should().Be(json);
+        Load().LoadError.Should().BeNull();
+    }
+
+    [Fact]
+    public void Load_ValueWithAnUnpairedSurrogate_DoesNotStopTheLoad() {
+        WriteJson("""{ "general": { "language": "\uD800", "detectClipboardData": true } }""");
+
+        var result = Load();
+
+        result.Config.General.Language.Should().Be(new GeneralSettings().Language);
+        result.LoadError.Should().NotBeNull();
+    }
+
     [Fact]
     public void Load_GeneralThatIsNotAnObject_KeepsDefaultsAndCountsAsBad() {
         WriteJson("""{ "general": [] }""");
@@ -613,6 +638,48 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
         var next = Load();
         ShouldBeSilent(next);
         next.Config.General.Should().BeEquivalentTo(result.Config.General);
+    }
+
+    // The next three call the step Load takes after finding no sic.json, with the files as another
+    // process left them in the meantime.
+
+    [Fact]
+    public void CreateDefaults_SicJsonCreatedAfterTheCheck_IsKeptAndRead() {
+        var json = BuildJson();
+        WriteJson(json);
+
+        var result = ConfigSerializer.CreateDefaults(JsonPath);
+
+        result.Should().NotBeNull();
+        ShouldBeSilent(result!);
+        result!.Config.General.Should().BeEquivalentTo(ValidSettings());
+        File.ReadAllText(JsonPath).Should().Be(json);
+        TempFiles().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void MigrateLegacy_SicJsonCreatedAfterTheCheck_IsKeptAndRead() {
+        var json = BuildJson();
+        WriteJson(json);
+        WriteLegacy("Language=fr", "OutputFolder=D:\\Legacy");
+
+        var result = ConfigSerializer.MigrateLegacy(JsonPath, LegacyPath, isPortable: true);
+
+        result.Should().NotBeNull();
+        ShouldBeSilent(result!);
+        result!.Config.General.Should().BeEquivalentTo(ValidSettings());
+        File.ReadAllText(JsonPath).Should().Be(json);
+        TempFiles().Should().BeEmpty();
+
+        // Renaming it is the winner's job.
+        File.Exists(LegacyPath).Should().BeTrue();
+    }
+
+    [Fact]
+    public void MigrateLegacy_SicCfgRenamedAfterTheCheck_ReturnsNullAndWritesNothing() {
+        ConfigSerializer.MigrateLegacy(JsonPath, LegacyPath, isPortable: true).Should().BeNull();
+
+        File.Exists(JsonPath).Should().BeFalse();
     }
 
     #endregion
