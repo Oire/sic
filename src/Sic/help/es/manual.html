@@ -118,6 +118,7 @@ footer {
     <li><a href="#resizing">Redimensionar</a></li>
     <li><a href="#multi-size-ico">Crear archivos ICO multitamaño</a></li>
     <li><a href="#fit-to-size">Ajustar una imagen a un tamaño de archivo</a></li>
+    <li><a href="#presets">Preajustes</a></li>
     <li><a href="#settings">Configuración</a></li>
     <li><a href="#updates">Actualizaciones del programa</a></li>
     <li><a href="#cli">Uso desde la línea de comandos</a></li>
@@ -137,8 +138,8 @@ footer {
     <dd>Cuatro menús en la parte superior de la ventana:
         <ul>
             <li><strong>Archivo</strong>: añadir imágenes (desde archivos, carpetas o enlaces), abrir la configuración o salir de la aplicación.</li>
-            <li><strong>Edición</strong>: quitar de la cola la imagen seleccionada o todas. Este menú está desactivado cuando la cola está vacía.</li>
-            <li><strong>Convertir</strong>: ejecutar la conversión, crear un ICO multitamaño o ajustar una imagen a un tamaño de archivo. Este menú está desactivado cuando la cola está vacía.</li>
+            <li><strong>Edición</strong>: quitar de la cola la imagen seleccionada o todas. Sus elementos no están disponibles mientras la cola está vacía.</li>
+            <li><strong>Convertir</strong>: ejecutar la conversión, crear un ICO multitamaño, ajustar una imagen a un tamaño de archivo, o aplicar y gestionar <a href="#presets">preajustes</a>. Los elementos que necesitan imágenes no están disponibles mientras la cola está vacía; el submenú <strong>Preajustes</strong> está siempre disponible.</li>
             <li><strong>Ayuda</strong>: abrir este manual, buscar actualizaciones, donar o ver el cuadro de diálogo «Acerca de».</li>
         </ul>
     </dd>
@@ -261,6 +262,51 @@ footer {
 </ul>
 <p>El resultado elegido se guarda siguiendo las reglas habituales de carpeta de salida y de conflicto de nombres, exactamente igual que en una conversión normal.</p>
 
+<h2 id="presets">Preajustes</h2>
+<p>Si suele convertir imágenes siempre de la misma manera (por ejemplo, imágenes WebP de 300 píxeles de ancho para un blog), guárdelo como preajuste y elíjalo por su nombre en lugar de ajustar a mano el formato y el redimensionado cada vez. Los preajustes están en el submenú <strong>Convertir &gt; Preajustes</strong>, que está disponible incluso con la cola vacía. Se guardan en <code>sic.json</code> junto con su configuración, y también se pueden usar desde la <a href="#cli">línea de comandos</a>.</p>
+<p>Estos preajustes no tienen nada que ver con los preajustes Favicon e Icono de aplicación del cuadro de diálogo de <a href="#multi-size-ico">ICO multitamaño</a>, que solo eligen los tamaños que se guardan en un archivo ICO.</p>
+
+<h3>Añadir un preajuste</h3>
+<ol>
+    <li>Elija <strong>Convertir &gt; Preajustes &gt; Añadir preajuste</strong>.</li>
+    <li>Escriba un nombre en <strong>Nombre</strong>. Los nombres pueden estar en cualquier idioma y tener hasta 64 caracteres; no pueden contener tabulaciones, saltos de línea ni otros caracteres de control, y dos preajustes no pueden compartir nombre, aunque se escriba con otras mayúsculas y minúsculas.</li>
+    <li>Elija el <strong>Formato de destino</strong>. Esta lista incluye siempre todos los formatos, también los que haya ocultado en la <a href="#settings">configuración</a>.</li>
+    <li>Para redimensionar además, marque <strong>Redimensionar</strong>, elija el <strong>Modo de redimensionado</strong> (<em>Mantener proporciones</em> o <em>Recortar</em>) y rellene <strong>Ancho</strong>, <strong>Alto</strong> o ambos, en píxeles del 1 al 65535. Deje <strong>Redimensionar</strong> sin marcar para que cada imagen conserve su propio tamaño.</li>
+    <li>Pulse <strong>Aceptar</strong>. El nuevo preajuste aparece enseguida en el submenú <strong>Preajustes</strong>.</li>
+</ol>
+<p>El cuadro de diálogo parte del formato y el redimensionado que tenga en ese momento la ventana principal, así que puede prepararlo todo allí, probarlo y después guardarlo. Los tamaños que haya escrito usted se conservan; los que SIC! rellenó a partir de la imagen seleccionada se omiten, porque solo sirven para esa imagen. A diferencia de la ventana principal, escribir un tamaño en este cuadro de diálogo nunca rellena el otro.</p>
+<p>Si algo no es correcto, por ejemplo si el nombre está vacío o ya existe, o si <em>Recortar</em> tiene un solo tamaño, SIC! le indica qué corregir y lleva el foco a ese campo.</p>
+
+<h3>Un tamaño o los dos</h3>
+<p>Con <em>Mantener proporciones</em>, un preajuste puede tener un tamaño o los dos, y la diferencia importa en un lote de imágenes de formas distintas:</p>
+<ul>
+    <li><strong>Solo un ancho</strong> (o solo un alto): cada imagen se escala exactamente a ese ancho (o alto), y el otro lado sigue las proporciones de la propia imagen. Un preajuste «Blog» con un ancho de 300 convierte una mezcla de fotos verticales y horizontales en imágenes que tienen todas 300 píxeles de ancho.</li>
+    <li><strong>Los dos</strong>: cada imagen se escala, manteniendo sus proporciones, al mayor tamaño que cabe dentro de ese recuadro.</li>
+</ul>
+<p>Con <em>Recortar</em>, los dos tamaños son obligatorios, y cada imagen queda exactamente de ese tamaño.</p>
+
+<h3>Aplicar un preajuste</h3>
+<p>Elija el preajuste por su nombre en <strong>Convertir &gt; Preajustes</strong>. SIC! rellena con él <strong>Formato de destino</strong>, <strong>Redimensionar</strong>, el modo de redimensionado, <strong>Ancho</strong> y <strong>Alto</strong>, y la barra de estado lo indica, por ejemplo <em>Preajuste aplicado: Blog</em>. Aplicar un preajuste no convierte nada: revise los ajustes, cambie los que quiera y luego use <strong>Convertir seleccionadas</strong> o <strong>Convertir todas</strong> como de costumbre. Mientras no haya preajustes, el submenú muestra <em>Aún no hay preajustes</em> encima de <strong>Añadir preajuste</strong> y <strong>Gestionar preajustes</strong>.</p>
+<p>Los tamaños de un preajuste se mantienen en los campos <strong>Ancho</strong> y <strong>Alto</strong> mientras añade, selecciona y quita imágenes: SIC! no los sustituye por las dimensiones de la imagen seleccionada, como hace normalmente, y un preajuste con solo un alto deja vacío el campo del ancho. En cuanto usted cambia un tamaño, marca o desmarca <strong>Redimensionar</strong> o cambia el modo de redimensionado, al seleccionar una imagen vuelven a rellenarse sus dimensiones como de costumbre.</p>
+<p>Si un preajuste convierte a un formato que ha desmarcado en <strong>Formatos de destino que se muestran en la lista</strong>, en la <a href="#settings">configuración</a>, se aplica igualmente: ese formato se añade a la lista desplegable <strong>Formato de destino</strong> y permanece en ella hasta que cierre SIC!.</p>
+
+<h3>Editar y quitar preajustes</h3>
+<p>Elija <strong>Convertir &gt; Preajustes &gt; Gestionar preajustes</strong>. La lista <strong>Preajustes</strong> muestra cada preajuste con un resumen de lo que hace, como <em>Blog: WEBP, ancho 300</em>, <em>Banner: WEBP, ajustar dentro de 800x600</em> o <em>Avatar: PNG, recortar a 128x128</em>.</p>
+<dl>
+    <dt>Añadir</dt>
+    <dd>Abre el mismo cuadro de diálogo que <strong>Añadir preajuste</strong>, vacío.</dd>
+
+    <dt>Editar</dt>
+    <dd>Abre el preajuste seleccionado en ese cuadro de diálogo. Puede cambiar cualquier cosa, también el nombre.</dd>
+
+    <dt>Quitar</dt>
+    <dd>Quita el preajuste seleccionado después de pedirle confirmación.</dd>
+
+    <dt>Cerrar</dt>
+    <dd>Cierra el cuadro de diálogo. <kbd>Esc</kbd> hace lo mismo.</dd>
+</dl>
+<p><strong>Editar</strong> y <strong>Quitar</strong> no están disponibles hasta que se selecciona un preajuste. Los cambios se guardan al cerrar el cuadro de diálogo, sea cual sea la forma de cerrarlo, y el submenú <strong>Preajustes</strong> se actualiza enseguida.</p>
+
 <h2 id="settings">Configuración</h2>
 <p>Abra <strong>Archivo &gt; Configuración</strong> (<kbd>Ctrl+,</kbd>) para configurar SIC!. El cuadro de diálogo está organizado en dos pestañas, <strong>General</strong> e <strong>Imágenes</strong>. Pulse <kbd>Ctrl+Tab</kbd> para moverse entre pestañas.</p>
 
@@ -304,7 +350,9 @@ footer {
 <pre>sic -i entrada.png -o salida.jpg
 sic --input foto.bmp --output foto.webp
 sic -i avatar.png -o avatar.ico --resize 128x128
-sic -i foto.jpg -f png --resize 800x</pre>
+sic -i foto.jpg -f png --resize 800x
+sic -i foto.png --preset Blog
+sic -i foto.png -p "Banner de producto" -o banner.jpg</pre>
 <dl>
     <dt><code>--input</code>, <code>-i</code> (obligatorio)</dt>
     <dd>Ruta de la imagen de origen.</dd>
@@ -319,9 +367,18 @@ sic -i foto.jpg -f png --resize 800x</pre>
     <dd>Redimensiona la imagen. Formato: <code>AnchoxAlto</code>, <code>Anchox</code> (solo el ancho) o <code>xAlto</code> (solo el alto).</dd>
 
     <dt><code>--crop</code>, <code>-c</code></dt>
-    <dd>Recorta en lugar de escalar proporcionalmente. Requiere tanto el ancho como el alto en <code>--resize</code>.</dd>
+    <dd>Recorta en lugar de escalar proporcionalmente. Requiere tanto el ancho como el alto, de <code>--resize</code> o del preajuste.</dd>
+
+    <dt><code>--preset</code>, <code>-p</code></dt>
+    <dd>Convierte con un <a href="#presets">preajuste</a> guardado, usando su formato y su redimensionado. Las mayúsculas y minúsculas dan igual; ponga entre comillas un nombre con espacios. Si ningún preajuste tiene ese nombre, SIC! muestra <em>Preajuste desconocido:</em> con el nombre, seguido de <em>Preajustes disponibles:</em> y sus nombres (o de <em>No hay preajustes guardados.</em>), y termina con un error, aunque <code>--output</code> o <code>--format</code> hubieran hecho innecesario el preajuste.</dd>
 </dl>
-<p>Hay que indicar <code>--output</code> o <code>--format</code> (pero no ambos).</p>
+<p>Hay que indicar al menos una de las opciones <code>--output</code>, <code>--format</code> o <code>--preset</code>. Cuando más de una indica un formato, gana la extensión de <code>--output</code>, después <code>--format</code> y, por último, el preajuste. Sin <code>--output</code>, el archivo convertido se guarda en la carpeta de salida indicada en la <a href="#settings">configuración</a>, con el nombre del archivo de origen.</p>
+<p>Las opciones que indique explícitamente tienen prioridad sobre la parte correspondiente de un preajuste:</p>
+<ul>
+    <li><code>--resize</code> sustituye los tamaños y el modo de redimensionado del preajuste: la imagen se escala proporcionalmente, o se recorta si además indica <code>--crop</code>.</li>
+    <li><code>--crop</code> sin <code>--resize</code> conserva los tamaños del preajuste y recorta a ellos, así que el preajuste necesita entonces un ancho y un alto.</li>
+    <li>Un preajuste que no redimensiona deja la imagen con su propio tamaño, salvo que indique <code>--resize</code>.</li>
+</ul>
 
 <h2 id="keyboard-shortcuts">Atajos de teclado</h2>
 <table>
@@ -377,7 +434,7 @@ sic -i foto.jpg -f png --resize 800x</pre>
     <dd>Si la carpeta de salida personalizada se ha eliminado o movido, SIC! se lo advertirá y volverá a la carpeta <code>Converted</code> predeterminada.</dd>
 
     <dt>SIC! indica que se restablecieron ajustes o que el archivo de configuración está dañado</dt>
-    <dd>SIC! guarda una copia del archivo original como <code>sic.json.bad</code> en el directorio de datos de la aplicación. Si solo algunos valores no eran válidos, solo esos vuelven a sus valores predeterminados y el resto de su configuración se conserva; si todo el archivo estaba dañado, SIC! se inicia con la configuración predeterminada. Para recuperar el archivo anterior, por ejemplo para corregirlo a mano, cierre SIC! y cambie el nombre de la copia a <code>sic.json</code>. Si SIC! indica que los cambios no se guardarán en esta sesión, otro programa, como un cliente de sincronización o un antivirus, tenía el archivo abierto: cierre SIC!, espere un momento y vuelva a iniciarlo.</dd>
+    <dd>SIC! guarda una copia del archivo original como <code>sic.json.bad</code> en el directorio de datos de la aplicación. Si solo algunos valores no eran válidos, solo esos vuelven a sus valores predeterminados y el resto de su configuración se conserva; si todo el archivo estaba dañado, SIC! se inicia con la configuración predeterminada. Si un <a href="#presets">preajuste</a> no se puede usar, por ejemplo después de editar <code>sic.json</code> a mano, solo se quita ese preajuste, el resto se conserva y SIC! le indica cuántos se quitaron. Para recuperar el archivo anterior, por ejemplo para corregirlo a mano, cierre SIC! y cambie el nombre de la copia a <code>sic.json</code>. Si SIC! indica que los cambios no se guardarán en esta sesión, otro programa, como un cliente de sincronización o un antivirus, tenía el archivo abierto: cierre SIC!, espere un momento y vuelva a iniciarlo.</dd>
 </dl>
 </main>
 

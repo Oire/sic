@@ -22,7 +22,7 @@ It's the third of four plans. `89-json-config` must be merged first.
 - [x] An invalid preset in a hand-edited `sic.json` drops only that preset, and is never lost silently: the file is backed up and the user is told.
 - [x] Saving Settings, or anything else, never loses presets.
 - [x] A size that SIC! fills in itself never triggers an "invalid size" error.
-- [ ] All new strings are translated into de, es, fr, he, ru and uk, and all 7 manuals are updated.
+- [x] All new strings are translated into de, es, fr, he, ru and uk, and all 7 manuals are updated.
 - [ ] all validation commands pass
 
 ## Validation commands
@@ -279,10 +279,10 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add a Presets section to the English manual: adding, applying, editing and removing, the rule that a preset fills in the controls without converting, one size versus both, and hidden formats. Say that ICO presets are a separate thing.
-- [ ] Document `--preset` and its precedence in the command-line section.
-- [ ] Translate all of this into the other six manuals, matching the structure and heading levels already there.
-- [ ] validation commands pass
+- [x] Add a Presets section to the English manual: adding, applying, editing and removing, the rule that a preset fills in the controls without converting, one size versus both, and hidden formats. Say that ICO presets are a separate thing.
+- [x] Document `--preset` and its precedence in the command-line section.
+- [x] Translate all of this into the other six manuals, matching the structure and heading levels already there.
+- [x] validation commands pass
 
 ### Task 11: Update project documentation
 

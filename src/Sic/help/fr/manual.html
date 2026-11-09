@@ -118,6 +118,7 @@ footer {
     <li><a href="#resizing">Redimensionnement</a></li>
     <li><a href="#multi-size-ico">Créer des fichiers ICO multi-tailles</a></li>
     <li><a href="#fit-to-size">Ajuster une image à une taille de fichier</a></li>
+    <li><a href="#presets">Préréglages</a></li>
     <li><a href="#settings">Paramètres</a></li>
     <li><a href="#updates">Mises à jour logicielles</a></li>
     <li><a href="#cli">Utilisation en ligne de commande</a></li>
@@ -137,8 +138,8 @@ footer {
     <dd>Quatre menus en haut de la fenêtre :
         <ul>
             <li><strong>Fichier</strong> — ajouter des images (depuis des fichiers, dossiers ou liens), ouvrir les paramètres ou quitter l'application.</li>
-            <li><strong>Édition</strong> — supprimer les images sélectionnées ou toutes les images de la file. Ce menu est désactivé lorsque la file est vide.</li>
-            <li><strong>Convertir</strong> — lancer la conversion, créer un ICO multi-tailles ou ajuster une image à une taille de fichier. Ce menu est désactivé lorsque la file est vide.</li>
+            <li><strong>Édition</strong> — supprimer les images sélectionnées ou toutes les images de la file. Ses éléments sont indisponibles tant que la file est vide.</li>
+            <li><strong>Convertir</strong> — lancer la conversion, créer un ICO multi-tailles, ajuster une image à une taille de fichier, ou appliquer et gérer des <a href="#presets">préréglages</a>. Les éléments qui demandent des images sont indisponibles tant que la file est vide ; le sous-menu <strong>Préréglages</strong> est toujours disponible.</li>
             <li><strong>Aide</strong> — ouvrir ce manuel, vérifier les mises à jour logicielles, faire un don ou afficher la boîte de dialogue À propos.</li>
         </ul>
     </dd>
@@ -261,6 +262,51 @@ footer {
 </ul>
 <p>Le résultat choisi est enregistré selon les règles habituelles de dossier de sortie et de conflit de nom de fichier, exactement comme lors d'une conversion normale.</p>
 
+<h2 id="presets">Préréglages</h2>
+<p>Si vous convertissez souvent des images de la même façon — par exemple en WebP de 300 pixels de large pour un blog —, enregistrez-le comme préréglage et choisissez-le par son nom au lieu de régler à la main le format et le redimensionnement à chaque fois. Les préréglages se trouvent dans le sous-menu <strong>Convertir > Préréglages</strong>, disponible même lorsque la file est vide. Ils sont enregistrés dans <code>sic.json</code> avec vos paramètres, et la <a href="#cli">ligne de commande</a> peut aussi les utiliser.</p>
+<p>Ces préréglages n'ont rien à voir avec les préréglages Favicon et Icône d'application de la boîte de dialogue <a href="#multi-size-ico">ICO multi-tailles</a>, qui choisissent seulement les tailles stockées dans un fichier ICO.</p>
+
+<h3>Ajouter un préréglage</h3>
+<ol>
+    <li>Choisissez <strong>Convertir > Préréglages > Ajouter un préréglage</strong>.</li>
+    <li>Saisissez un nom dans <strong>Nom</strong>. Les noms peuvent être dans n'importe quelle langue et compter jusqu'à 64 caractères ; ils ne peuvent contenir ni tabulations, ni sauts de ligne, ni autres caractères de contrôle, et deux préréglages ne peuvent pas porter le même nom, même écrit avec une autre casse.</li>
+    <li>Choisissez le <strong>Format cible</strong>. Cette liste contient toujours tous les formats, y compris ceux que vous avez masqués dans les <a href="#settings">Paramètres</a>.</li>
+    <li>Pour redimensionner en plus, cochez <strong>Redimensionner</strong>, choisissez le <strong>Mode de redimensionnement</strong> (<em>Garder les proportions</em> ou <em>Recadrer</em>) et remplissez <strong>Largeur</strong>, <strong>Hauteur</strong> ou les deux, en pixels de 1 à 65535. Laissez <strong>Redimensionner</strong> décoché pour que chaque image garde sa propre taille.</li>
+    <li>Appuyez sur <strong>OK</strong>. Le nouveau préréglage apparaît aussitôt dans le sous-menu <strong>Préréglages</strong>.</li>
+</ol>
+<p>La boîte de dialogue reprend d'abord le format et le redimensionnement réglés dans la fenêtre principale : vous pouvez donc tout préparer là-bas, essayer, puis enregistrer. Les tailles que vous avez saisies vous-même sont conservées ; celles que SIC! a remplies d'après l'image sélectionnée sont laissées de côté, car elles ne conviennent qu'à cette image. Contrairement à la fenêtre principale, saisir une taille dans cette boîte de dialogue ne remplit jamais l'autre.</p>
+<p>Si quelque chose ne va pas, par exemple si le nom est vide ou déjà pris, ou si <em>Recadrer</em> n'a qu'une taille, SIC! vous indique quoi corriger et place le focus dans le champ concerné.</p>
+
+<h3>Une taille ou les deux</h3>
+<p>Avec <em>Garder les proportions</em>, un préréglage peut contenir une taille ou les deux, et la différence compte pour un lot d'images de formes diverses :</p>
+<ul>
+    <li><strong>Une largeur seulement</strong> (ou une hauteur seulement) : chaque image est mise exactement à cette largeur (ou hauteur), et l'autre côté suit les proportions de l'image. Un préréglage « Blog » d'une largeur de 300 transforme un mélange de photos en portrait et en paysage en images qui font toutes 300 pixels de large.</li>
+    <li><strong>Les deux</strong> : chaque image est mise à l'échelle, en gardant ses proportions, à la plus grande taille qui tient dans ce cadre.</li>
+</ul>
+<p>Avec <em>Recadrer</em>, les deux tailles sont obligatoires, et chaque image sort exactement à cette taille.</p>
+
+<h3>Appliquer un préréglage</h3>
+<p>Choisissez le préréglage par son nom dans <strong>Convertir > Préréglages</strong>. SIC! en reprend le <strong>Format cible</strong>, <strong>Redimensionner</strong>, le mode de redimensionnement, la <strong>Largeur</strong> et la <strong>Hauteur</strong>, et la barre d'état l'annonce, par exemple <em>Préréglage appliqué : Blog</em>. Appliquer un préréglage ne convertit rien : vérifiez les réglages, modifiez-les si vous le souhaitez, puis utilisez <strong>Convertir la sélection</strong> ou <strong>Tout convertir</strong> comme d'habitude. Tant qu'il n'y a aucun préréglage, le sous-menu affiche <em>Aucun préréglage pour l'instant</em> au-dessus de <strong>Ajouter un préréglage</strong> et <strong>Gérer les préréglages</strong>.</p>
+<p>Les tailles d'un préréglage restent dans les champs <strong>Largeur</strong> et <strong>Hauteur</strong> pendant que vous ajoutez, sélectionnez et supprimez des images : SIC! ne les remplace pas par les dimensions de l'image sélectionnée, comme il le fait d'habitude, et un préréglage qui n'a qu'une hauteur laisse le champ de largeur vide. Dès que vous modifiez vous-même une taille, cochez ou décochez <strong>Redimensionner</strong> ou changez de mode de redimensionnement, sélectionner une image remplit de nouveau ses dimensions comme d'habitude.</p>
+<p>Si un préréglage convertit vers un format que vous avez décoché sous <strong>Formats cibles à afficher dans la liste</strong> dans les <a href="#settings">Paramètres</a>, il s'applique quand même : ce format est ajouté à la liste déroulante <strong>Format cible</strong> et y reste jusqu'à la fermeture de SIC!.</p>
+
+<h3>Modifier et supprimer des préréglages</h3>
+<p>Choisissez <strong>Convertir > Préréglages > Gérer les préréglages</strong>. La liste <strong>Préréglages</strong> affiche chaque préréglage avec un résumé de ce qu'il fait, comme <em>Blog : WEBP, largeur 300</em>, <em>Banner : WEBP, ajuster dans 800x600</em> ou <em>Avatar : PNG, recadrer en 128x128</em>.</p>
+<dl>
+    <dt>Ajouter</dt>
+    <dd>Ouvre la même boîte de dialogue que <strong>Ajouter un préréglage</strong>, vide.</dd>
+
+    <dt>Modifier</dt>
+    <dd>Ouvre le préréglage sélectionné dans cette boîte de dialogue. Vous pouvez tout changer, y compris le nom.</dd>
+
+    <dt>Supprimer</dt>
+    <dd>Supprime le préréglage sélectionné après vous avoir demandé confirmation.</dd>
+
+    <dt>Fermer</dt>
+    <dd>Ferme la boîte de dialogue. <kbd>Escape</kbd> fait de même.</dd>
+</dl>
+<p><strong>Modifier</strong> et <strong>Supprimer</strong> sont indisponibles tant qu'aucun préréglage n'est sélectionné. Vos modifications sont enregistrées à la fermeture de la boîte de dialogue, quelle que soit la façon de la fermer, et le sous-menu <strong>Préréglages</strong> est mis à jour aussitôt.</p>
+
 <h2 id="settings">Paramètres</h2>
 <p>Ouvrez <strong>Fichier > Paramètres</strong> (<kbd>Ctrl+,</kbd>) pour configurer SIC!. La fenêtre est organisée en deux onglets, <strong>Général</strong> et <strong>Images</strong>. Appuyez sur <kbd>Ctrl+Tab</kbd> pour passer d'un onglet à l'autre.</p>
 
@@ -304,7 +350,9 @@ footer {
 <pre>sic -i input.png -o output.jpg
 sic --input photo.bmp --output photo.webp
 sic -i avatar.png -o avatar.ico --resize 128x128
-sic -i photo.jpg -f png --resize 800x</pre>
+sic -i photo.jpg -f png --resize 800x
+sic -i photo.png --preset Blog
+sic -i photo.png -p "Bannière produit" -o banniere.jpg</pre>
 <dl>
     <dt><code>--input</code>, <code>-i</code> (obligatoire)</dt>
     <dd>Chemin de l'image source.</dd>
@@ -319,9 +367,18 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <dd>Redimensionner l'image. Format : <code>LxH</code>, <code>Lx</code> (largeur uniquement) ou <code>xH</code> (hauteur uniquement).</dd>
 
     <dt><code>--crop</code>, <code>-c</code></dt>
-    <dd>Recadrer au lieu de mettre à l'échelle proportionnellement. Nécessite à la fois la largeur et la hauteur dans <code>--resize</code>.</dd>
+    <dd>Recadrer au lieu de mettre à l'échelle proportionnellement. Nécessite à la fois la largeur et la hauteur, venant de <code>--resize</code> ou du préréglage.</dd>
+
+    <dt><code>--preset</code>, <code>-p</code></dt>
+    <dd>Convertir avec un <a href="#presets">préréglage</a> enregistré, en reprenant son format et son redimensionnement. La casse n'a pas d'importance ; mettez entre guillemets un nom qui contient des espaces. Si aucun préréglage ne porte ce nom, SIC! affiche <em>Préréglage inconnu :</em> suivi du nom, puis <em>Préréglages disponibles :</em> et leurs noms (ou <em>Aucun préréglage enregistré.</em>), et se termine avec une erreur, même si <code>--output</code> ou <code>--format</code> auraient rendu le préréglage inutile.</dd>
 </dl>
-<p>Il faut fournir soit <code>--output</code>, soit <code>--format</code> (mais pas les deux).</p>
+<p>Il faut fournir au moins l'une des options <code>--output</code>, <code>--format</code> ou <code>--preset</code>. Lorsque plusieurs d'entre elles indiquent un format, l'extension de <code>--output</code> l'emporte, puis <code>--format</code>, puis le préréglage. Sans <code>--output</code>, le fichier converti est placé dans le dossier de sortie défini dans les <a href="#settings">Paramètres</a>, sous le nom du fichier source.</p>
+<p>Les options que vous indiquez explicitement l'emportent sur la partie correspondante d'un préréglage :</p>
+<ul>
+    <li><code>--resize</code> remplace les tailles et le mode de redimensionnement du préréglage : l'image est mise à l'échelle proportionnellement, ou recadrée si vous ajoutez <code>--crop</code>.</li>
+    <li><code>--crop</code> sans <code>--resize</code> garde les tailles du préréglage et recadre à ces tailles ; le préréglage doit alors avoir une largeur et une hauteur.</li>
+    <li>Un préréglage qui ne redimensionne pas laisse l'image à sa propre taille, sauf si vous indiquez <code>--resize</code>.</li>
+</ul>
 
 <h2 id="keyboard-shortcuts">Raccourcis clavier</h2>
 <table>
@@ -377,7 +434,7 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <dd>Si le dossier de sortie personnalisé a été supprimé ou déplacé, SIC! vous avertira et utilisera le dossier par défaut <code>Converted</code>.</dd>
 
     <dt>SIC! indique que des paramètres ont été réinitialisés ou que le fichier de paramètres est endommagé</dt>
-    <dd>SIC! conserve une copie du fichier d'origine sous le nom <code>sic.json.bad</code> dans le répertoire de données de l'application. Si seules certaines valeurs étaient invalides, seules celles-ci reprennent leur valeur par défaut et vos autres paramètres sont conservés ; si tout le fichier était endommagé, SIC! démarre avec les paramètres par défaut. Pour récupérer l'ancien fichier, par exemple pour le corriger à la main, fermez SIC! et renommez la copie en <code>sic.json</code>. Si SIC! indique que les modifications ne seront pas enregistrées pendant cette session, un autre programme, comme un client de synchronisation ou un antivirus, tenait le fichier ouvert : fermez SIC!, patientez un instant et relancez-le.</dd>
+    <dd>SIC! conserve une copie du fichier d'origine sous le nom <code>sic.json.bad</code> dans le répertoire de données de l'application. Si seules certaines valeurs étaient invalides, seules celles-ci reprennent leur valeur par défaut et vos autres paramètres sont conservés ; si tout le fichier était endommagé, SIC! démarre avec les paramètres par défaut. Si un <a href="#presets">préréglage</a> est inutilisable, par exemple après une modification de <code>sic.json</code> à la main, seul ce préréglage est supprimé, vos autres préréglages sont conservés et SIC! vous indique combien ont été supprimés. Pour récupérer l'ancien fichier, par exemple pour le corriger à la main, fermez SIC! et renommez la copie en <code>sic.json</code>. Si SIC! indique que les modifications ne seront pas enregistrées pendant cette session, un autre programme, comme un client de synchronisation ou un antivirus, tenait le fichier ouvert : fermez SIC!, patientez un instant et relancez-le.</dd>
 </dl>
 </main>
 
