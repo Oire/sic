@@ -207,13 +207,13 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Build the designer as one flat `TableLayoutPanel` with the grid and control texts under Technical details. Resize mode is a `DropDownList` `ComboBox` with plain `_("Keep proportions")` and `_("Crop")` items, added in the constructor. It can't be radio buttons in the table: arrow keys would walk through every control beside them, and reaching one by arrow or mnemonic would select it.
-- [ ] Constructor `PresetDialog(ConversionPreset? initial, IEnumerable<string> takenNames, bool isEdit)`. Follow the standard constructor order, and set the title to "Add Preset" or "Edit Preset". The dropdown lists `GetSupportedFormats()`, not only the enabled formats, and selects the first when `initial` is null. When editing, callers leave the preset's own name out of `takenNames`, so a case-only rename works.
-- [ ] Enable the resize mode, width and height fields from the Resize checkbox, as `FitToSizeDialog` does, but don't move focus when it's ticked, or the mode would be skipped. Run the enable routine once after loading `initial`, so an edited preset can't show a ticked box with disabled fields. Unlike the main window, typing one size must never auto-fill the other.
-- [ ] Add the hint: "With Keep proportions, fill in one size to scale every image to it, or both to fit images inside that box."
-- [ ] Validate in `OnFormClosing` with `PresetValidator.ValidateName`, and with `ResizeValidator.Validate` only when Resize is ticked, because stale text in a disabled box must not block OK. Show one specific message per error and move focus to the field.
-- [ ] Expose the outcome as `public ConversionPreset? Result { get; private set; }`. Its name goes through `CleanName`. With Resize unticked it has null sizes and `KeepProportions`.
-- [ ] validation commands pass
+- [x] Build the designer as one flat `TableLayoutPanel` with the grid and control texts under Technical details. Resize mode is a `DropDownList` `ComboBox` with plain `_("Keep proportions")` and `_("Crop")` items, added in the constructor. It can't be radio buttons in the table: arrow keys would walk through every control beside them, and reaching one by arrow or mnemonic would select it.
+- [x] Constructor `PresetDialog(ConversionPreset? initial, IEnumerable<string> takenNames, bool isEdit)`. Follow the standard constructor order, and set the title to "Add Preset" or "Edit Preset". The dropdown lists `GetSupportedFormats()`, not only the enabled formats, and selects the first when `initial` is null. When editing, callers leave the preset's own name out of `takenNames`, so a case-only rename works.
+- [x] Enable the resize mode, width and height fields from the Resize checkbox, as `FitToSizeDialog` does, but don't move focus when it's ticked, or the mode would be skipped. Run the enable routine once after loading `initial`, so an edited preset can't show a ticked box with disabled fields. Unlike the main window, typing one size must never auto-fill the other.
+- [x] Add the hint: "With Keep proportions, fill in one size to scale every image to it, or both to fit images inside that box."
+- [x] Validate in `OnFormClosing` with `PresetValidator.ValidateName`, and with `ResizeValidator.Validate` only when Resize is ticked, because stale text in a disabled box must not block OK. Show one specific message per error and move focus to the field.
+- [x] Expose the outcome as `public ConversionPreset? Result { get; private set; }`. Its name goes through `CleanName`. With Resize unticked it has null sizes and `KeepProportions`.
+- [x] validation commands pass
 
 ### Task 7: Add the Manage Presets dialog
 
