@@ -189,14 +189,14 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `_isApplyingPreset`, `_presetSizesPinned` and `DimensionBox _autoFilledBox` fields.
-- [ ] Add `ApplyPreset(ConversionPreset preset)` exactly as under Technical details. It doesn't use `_isAutoFilling`.
-- [ ] `WidthTextBox_TextChanged`, `HeightTextBox_TextChanged` and `ResizeModeRadioButton_CheckedChanged` return at once when `_isApplyingPreset` is set.
-- [ ] `ResizeCheckBox_CheckedChanged` still enables and disables the fields when `_isApplyingPreset` is set, but skips `PopulateResizeFieldsFromSelection` and `UpdatePreview`. It must not return early, or the boxes stay disabled.
-- [ ] `ImageListView_SelectedIndexChanged` skips `PopulateResizeFieldsFromSelection` while `_presetSizesPinned` is set.
-- [ ] Clear the pin when the user edits a size box, toggles the resize checkbox or switches the radio buttons, which means in those handlers when neither `_isApplyingPreset` nor `_isAutoFilling` is set.
-- [ ] Set `_autoFilledBox` in `AutoFillFromWidth` and `AutoFillFromHeight` when they write a box, and to `Both` in `PopulateResizeFieldsFromSelection`, which writes both. When the user edits a box, take that box out of the value, so `Both` becomes the other box alone. Set it to `None` in `ApplyPreset`.
-- [ ] validation commands pass
+- [x] Add `_isApplyingPreset`, `_presetSizesPinned` and `DimensionBox _autoFilledBox` fields.
+- [x] Add `ApplyPreset(ConversionPreset preset)` exactly as under Technical details. It doesn't use `_isAutoFilling`.
+- [x] `WidthTextBox_TextChanged`, `HeightTextBox_TextChanged` and `ResizeModeRadioButton_CheckedChanged` return at once when `_isApplyingPreset` is set.
+- [x] `ResizeCheckBox_CheckedChanged` still enables and disables the fields when `_isApplyingPreset` is set, but skips `PopulateResizeFieldsFromSelection` and `UpdatePreview`. It must not return early, or the boxes stay disabled.
+- [x] `ImageListView_SelectedIndexChanged` skips `PopulateResizeFieldsFromSelection` while `_presetSizesPinned` is set.
+- [x] Clear the pin when the user edits a size box, toggles the resize checkbox or switches the radio buttons, which means in those handlers when neither `_isApplyingPreset` nor `_isAutoFilling` is set.
+- [x] Set `_autoFilledBox` in `AutoFillFromWidth` and `AutoFillFromHeight` when they write a box, and to `Both` in `PopulateResizeFieldsFromSelection`, which writes both. When the user edits a box, take that box out of the value, so `Both` becomes the other box alone. Set it to `None` in `ApplyPreset`.
+- [x] validation commands pass
 
 ### Task 6: Add the preset editor dialog
 

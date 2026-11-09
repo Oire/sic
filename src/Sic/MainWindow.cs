@@ -24,6 +24,18 @@ public partial class MainWindow: Form {
     private bool _hasSelection;
     private bool _isAutoFilling;
     private bool _isLoadingFiles;
+
+    // Set while ApplyPreset writes the controls, so their handlers neither auto-fill nor clear
+    // the pin. Unlike _isAutoFilling, it's set once around the whole write.
+    private bool _isApplyingPreset;
+
+    // A preset's sizes stay in the boxes when the selection changes, until the user changes the
+    // resize controls; otherwise selecting an image would overwrite them with its own size.
+    private bool _presetSizesPinned;
+
+    // Which size boxes hold a value SIC! filled in from the selected image rather than one the
+    // user typed. PresetCapturer leaves those out of a new preset.
+    private DimensionBox _autoFilledBox;
     private int _clipboardImageCount;
 
     // Formats a preset put in the dropdown although Settings hides them. They stay until SIC!
@@ -1025,6 +1037,14 @@ public partial class MainWindow: Form {
         heightLabel.Enabled = enabled;
         heightTextBox.Enabled = enabled;
 
+        // ApplyPreset writes the sizes itself and updates the preview once it's done.
+        if (_isApplyingPreset)
+            return;
+
+        if (!_isAutoFilling) {
+            _presetSizesPinned = false;
+        }
+
         if (enabled) {
             PopulateResizeFieldsFromSelection();
         }
@@ -1040,12 +1060,20 @@ public partial class MainWindow: Form {
         try {
             widthTextBox.Text = Math.Min(_selectedItem.Width, ResizeValidator.MaxDimension).ToString();
             heightTextBox.Text = Math.Min(_selectedItem.Height, ResizeValidator.MaxDimension).ToString();
+            _autoFilledBox = DimensionBox.Both;
         } finally {
             _isAutoFilling = false;
         }
     }
 
     private void ResizeModeRadioButton_CheckedChanged(object? sender, EventArgs e) {
+        if (_isApplyingPreset)
+            return;
+
+        if (!_isAutoFilling) {
+            _presetSizesPinned = false;
+        }
+
         if (!cropRadioButton.Checked) {
             AutoFillFromWidth();
         }
@@ -1054,8 +1082,11 @@ public partial class MainWindow: Form {
     }
 
     private void WidthTextBox_TextChanged(object? sender, EventArgs e) {
-        if (_isAutoFilling)
+        if (_isApplyingPreset || _isAutoFilling)
             return;
+
+        _presetSizesPinned = false;
+        _autoFilledBox = WithoutBox(_autoFilledBox, DimensionBox.Width);
 
         if (!cropRadioButton.Checked && resizeCheckBox.Checked) {
             AutoFillFromWidth();
@@ -1065,8 +1096,11 @@ public partial class MainWindow: Form {
     }
 
     private void HeightTextBox_TextChanged(object? sender, EventArgs e) {
-        if (_isAutoFilling)
+        if (_isApplyingPreset || _isAutoFilling)
             return;
+
+        _presetSizesPinned = false;
+        _autoFilledBox = WithoutBox(_autoFilledBox, DimensionBox.Height);
 
         if (!cropRadioButton.Checked && resizeCheckBox.Checked) {
             AutoFillFromHeight();
@@ -1086,6 +1120,7 @@ public partial class MainWindow: Form {
         _isAutoFilling = true;
         try {
             heightTextBox.Text = newHeight.ToString();
+            _autoFilledBox = WithBox(_autoFilledBox, DimensionBox.Height);
         } finally {
             _isAutoFilling = false;
         }
@@ -1102,9 +1137,52 @@ public partial class MainWindow: Form {
         _isAutoFilling = true;
         try {
             widthTextBox.Text = newWidth.ToString();
+            _autoFilledBox = WithBox(_autoFilledBox, DimensionBox.Width);
         } finally {
             _isAutoFilling = false;
         }
+    }
+
+    // DimensionBox isn't a flags enum, so adding or removing one box is spelled out.
+    private static DimensionBox WithBox(DimensionBox value, DimensionBox box) => (value, box) switch {
+        (DimensionBox.None, _) => box,
+        _ when value == box => value,
+        _ => DimensionBox.Both,
+    };
+
+    private static DimensionBox WithoutBox(DimensionBox value, DimensionBox box) => (value, box) switch {
+        (DimensionBox.Both, DimensionBox.Width) => DimensionBox.Height,
+        (DimensionBox.Both, DimensionBox.Height) => DimensionBox.Width,
+        _ when value == box => DimensionBox.None,
+        _ => value,
+    };
+
+    /// <summary>
+    /// Fills in the format and resize controls from <paramref name="preset"/> without converting.
+    /// The preset's sizes are pinned, so selecting another image doesn't replace them.
+    /// </summary>
+    private void ApplyPreset(ConversionPreset preset) {
+        _isApplyingPreset = true;
+        try {
+            if (!formatComboBox.Items.Contains(preset.Format)) {
+                _sessionFormats.Add(preset.Format);
+                PopulateFormatComboBox();
+            }
+
+            formatComboBox.SelectedItem = preset.Format;
+            resizeCheckBox.Checked = preset.Resizes;
+            cropRadioButton.Checked = preset.ResizeMode == Models.ResizeMode.Crop;
+            keepProportionsRadioButton.Checked = preset.ResizeMode != Models.ResizeMode.Crop;
+            widthTextBox.Text = preset.Width?.ToString() ?? "";
+            heightTextBox.Text = preset.Height?.ToString() ?? "";
+        } finally {
+            _isApplyingPreset = false;
+        }
+
+        _presetSizesPinned = preset.Resizes;
+        _autoFilledBox = DimensionBox.None;
+        UpdatePreview();
+        statusLabel.Text = _("Preset applied: {0}", PresetValidator.EscapeAmpersands(preset.Name));
     }
 
     private void SchedulePreviewUpdate() {
@@ -1164,7 +1242,7 @@ public partial class MainWindow: Form {
         var item = _imageItems[index];
         _selectedItem = item;
 
-        if (resizeCheckBox.Checked && !widthTextBox.Focused && !heightTextBox.Focused) {
+        if (resizeCheckBox.Checked && !_presetSizesPinned && !widthTextBox.Focused && !heightTextBox.Focused) {
             PopulateResizeFieldsFromSelection();
         }
 
