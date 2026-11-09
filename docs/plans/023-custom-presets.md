@@ -17,8 +17,8 @@ It's the third of four plans. `89-json-config` must be merged first.
 - [ ] A height-only preset keeps its width box empty, with or without an image selected.
 - [ ] A preset targeting a format unticked in Settings still applies, and that format stays in the dropdown until SIC! closes.
 - [ ] A preset can be added, edited and removed with the keyboard, and the menu updates straight away.
-- [ ] `sic -i a.png --preset Blog` converts with the preset. An explicit `--output` extension, `--format`, `--resize` or `--crop` wins over the matching part of the preset.
-- [ ] An unknown `--preset` name exits with `ExitCode.Error` and lists the available presets on stderr.
+- [x] `sic -i a.png --preset Blog` converts with the preset. An explicit `--output` extension, `--format`, `--resize` or `--crop` wins over the matching part of the preset.
+- [x] An unknown `--preset` name exits with `ExitCode.Error` and lists the available presets on stderr.
 - [x] An invalid preset in a hand-edited `sic.json` drops only that preset, and is never lost silently: the file is backed up and the user is told.
 - [x] Saving Settings, or anything else, never loses presets.
 - [x] A size that SIC! fills in itself never triggers an "invalid size" error.
@@ -150,16 +150,16 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `PresetResolver` with `Find(presets, name)`, matching through `CleanName` and `NameComparer`, and `ResolveResize(preset, hasExplicitResize, explicitWidth, explicitHeight, crop)` returning `(int? Width, int? Height, ResizeMode Mode)`. It accepts a null preset, because every run goes through the merge, and follows the precedence under Technical details.
-- [ ] Add `var presetOption = new Option<string?>("--preset", "-p")` with a localized description, and register it on the root command.
-- [ ] Look the preset up before the format chain, so an unknown name fails even when the preset isn't needed. Unknown preset: log it, print the error and the available names to stderr, and return `ExitCode.Error`. Say so plainly when there are no presets.
-- [ ] Target format order: `--output` extension, then `--format`, then the preset. Update the "Either --output or --format" error to mention `--preset`, and update its assertion in `CliTests`.
-- [ ] Move the block that builds the default output path out of the `--format` branch, to after the supported-format check, under `if (string.IsNullOrWhiteSpace(output))`. It then also runs when only the preset gives the format, `-o` is never overwritten, and a bad `--format` no longer creates the output folder.
-- [ ] Keep the crop check on the `crop` flag, after the merge, so a preset with no sizes can't trigger it.
-- [ ] tests for `Find`: exact match, different case, `блог` finding `Блог`, `DÉMARCHE ADMINISTRATIVE` finding `Démarche administrative`, unknown name, empty list
-- [ ] tests for `ResolveResize`: a null preset; preset only; `--resize` replacing the preset's size and mode; `--crop` alone over a preset with both sizes; a preset with no resize
-- [ ] `CliTests`, writing a `sic.json` into `App.DataFolder` and using `TestDataFolder.Clear()`: preset only, with the default output path; `--output` extension beating the preset with the preset's sizes still applied; `-o noext --preset` keeping its existing error; `--format` beating it; `--crop` with a one-size preset giving the crop error; a preset name with spaces and non-Latin letters; an unknown preset's exit code and stderr, even with `--format`; no presets at all
-- [ ] validation commands pass
+- [x] Add `PresetResolver` with `Find(presets, name)`, matching through `CleanName` and `NameComparer`, and `ResolveResize(preset, hasExplicitResize, explicitWidth, explicitHeight, crop)` returning `(int? Width, int? Height, ResizeMode Mode)`. It accepts a null preset, because every run goes through the merge, and follows the precedence under Technical details.
+- [x] Add `var presetOption = new Option<string?>("--preset", "-p")` with a localized description, and register it on the root command.
+- [x] Look the preset up before the format chain, so an unknown name fails even when the preset isn't needed. Unknown preset: log it, print the error and the available names to stderr, and return `ExitCode.Error`. Say so plainly when there are no presets.
+- [x] Target format order: `--output` extension, then `--format`, then the preset. Update the "Either --output or --format" error to mention `--preset`, and update its assertion in `CliTests`.
+- [x] Move the block that builds the default output path out of the `--format` branch, to after the supported-format check, under `if (string.IsNullOrWhiteSpace(output))`. It then also runs when only the preset gives the format, `-o` is never overwritten, and a bad `--format` no longer creates the output folder.
+- [x] Keep the crop check on the `crop` flag, after the merge, so a preset with no sizes can't trigger it.
+- [x] tests for `Find`: exact match, different case, `блог` finding `Блог`, `DÉMARCHE ADMINISTRATIVE` finding `Démarche administrative`, unknown name, empty list
+- [x] tests for `ResolveResize`: a null preset; preset only; `--resize` replacing the preset's size and mode; `--crop` alone over a preset with both sizes; a preset with no resize
+- [x] `CliTests`, writing a `sic.json` into `App.DataFolder` and using `TestDataFolder.Clear()`: preset only, with the default output path; `--output` extension beating the preset with the preset's sizes still applied; `-o noext --preset` keeping its existing error; `--format` beating it; `--crop` with a one-size preset giving the crop error; a preset name with spaces and non-Latin letters; an unknown preset's exit code and stderr, even with `--format`; no presets at all
+- [x] validation commands pass
 
 ### Task 4: Add the testable preset helpers
 

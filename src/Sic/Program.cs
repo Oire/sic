@@ -185,6 +185,7 @@ internal static class Program {
         var formatOption = new Option<string?>("--format", "-f") { Description = _("Target format (e.g. jpg, png, webp). Used when --output is omitted.") };
         var resizeOption = new Option<string?>("--resize", "-r") { Description = _("Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)") };
         var cropOption = new Option<bool>("--crop", "-c") { Description = _("Use crop mode (scale to cover, then center-crop to exact dimensions)") };
+        var presetOption = new Option<string?>("--preset", "-p") { Description = _("Name of a saved preset to convert with. --output, --format, --resize and --crop override the matching part of it.") };
 
         var rootCommand = new RootCommand(_("SIC! — Simple Image Converter")) {
             inputOption,
@@ -192,6 +193,7 @@ internal static class Program {
             formatOption,
             resizeOption,
             cropOption,
+            presetOption,
         };
 
         rootCommand.SetAction((Func<ParseResult, int>)(parseResult => {
@@ -200,6 +202,7 @@ internal static class Program {
             var format = parseResult.GetValue(formatOption);
             var resize = parseResult.GetValue(resizeOption);
             var crop = parseResult.GetValue(cropOption);
+            var presetName = parseResult.GetValue(presetOption);
 
             var isUrl = Uri.TryCreate(input, UriKind.Absolute, out var inputUri)
                 && (inputUri.Scheme == Uri.UriSchemeHttp || inputUri.Scheme == Uri.UriSchemeHttps);
@@ -208,6 +211,27 @@ internal static class Program {
                 Log.Error("CLI: Input file not found: {Input}", input);
                 Console.Error.WriteLine(_("File not found: {0}", input));
                 return ExitCode.Error;
+            }
+
+            // Looked up before anything else needs it, so a mistyped name fails even when --output
+            // or --format would have made the preset unnecessary.
+            ConversionPreset? preset = null;
+            if (presetName is not null) {
+                preset = PresetResolver.Find(Config.Presets, presetName);
+                if (preset is null) {
+                    Log.Error("CLI: Unknown preset: {Preset}", presetName);
+                    Console.Error.WriteLine(_("Unknown preset: {0}", presetName));
+                    if (Config.Presets.Count == 0) {
+                        Console.Error.WriteLine(_("There are no saved presets."));
+                    } else {
+                        // One name per line, because a name may itself contain a comma.
+                        Console.Error.WriteLine(_("Available presets:"));
+                        foreach (var available in Config.Presets) {
+                            Console.Error.WriteLine("  " + available.Name);
+                        }
+                    }
+                    return ExitCode.Error;
+                }
             }
 
             string targetFormat;
@@ -222,6 +246,24 @@ internal static class Program {
             } else if (!string.IsNullOrWhiteSpace(format)) {
                 targetFormat = format.TrimStart('.').ToUpperInvariant();
                 targetFormat = targetFormat == "JPEG" ? "JPG" : targetFormat == "TIF" ? "TIFF" : targetFormat;
+            } else if (preset is not null) {
+                targetFormat = preset.Format;
+            } else {
+                Log.Error("CLI: None of --output, --format or --preset specified");
+                Console.Error.WriteLine(_("Either --output, --format or --preset must be specified."));
+                return ExitCode.Error;
+            }
+
+            var supportedFormats = ImageConverter.GetSupportedFormats();
+            if (!supportedFormats.Any(f => f.Equals(targetFormat, StringComparison.OrdinalIgnoreCase))) {
+                Log.Error("CLI: Unsupported format: {Format}", targetFormat);
+                Console.Error.WriteLine(_("Unsupported format: {0}", targetFormat));
+                Console.Error.WriteLine(_("Supported formats: {0}", string.Join(", ", supportedFormats)));
+                return ExitCode.Error;
+            }
+
+            // Only now, so -o is never overwritten and a bad --format never creates the folder.
+            if (string.IsNullOrWhiteSpace(output)) {
                 // A link is named exactly as LoadFromUrl names it: unescaped, cleaned of characters
                 // a file name can't hold, never an empty ".jpg".
                 var baseName = isUrl
@@ -237,22 +279,10 @@ internal static class Program {
                 }
                 Directory.CreateDirectory(outputFolder);
                 output = Path.Combine(outputFolder, baseName + ext);
-            } else {
-                Log.Error("CLI: Neither --output nor --format specified");
-                Console.Error.WriteLine(_("Either --output or --format must be specified."));
-                return ExitCode.Error;
-            }
-
-            var supportedFormats = ImageConverter.GetSupportedFormats();
-            if (!supportedFormats.Any(f => f.Equals(targetFormat, StringComparison.OrdinalIgnoreCase))) {
-                Log.Error("CLI: Unsupported format: {Format}", targetFormat);
-                Console.Error.WriteLine(_("Unsupported format: {0}", targetFormat));
-                Console.Error.WriteLine(_("Supported formats: {0}", string.Join(", ", supportedFormats)));
-                return ExitCode.Error;
             }
 
             int? width = null, height = null;
-            var resizeMode = crop ? ResizeMode.Crop : ResizeMode.KeepProportions;
+            var hasExplicitResize = !string.IsNullOrWhiteSpace(resize);
 
             if (!string.IsNullOrWhiteSpace(resize)) {
                 if (!ResizeValidator.TryParseSpec(resize, out var widthText, out var heightText)) {
@@ -279,6 +309,11 @@ internal static class Program {
                 }
             }
 
+            // --resize replaces the preset's sizes and mode; --crop alone only changes the mode.
+            ResizeMode resizeMode;
+            (width, height, resizeMode) = PresetResolver.ResolveResize(preset, hasExplicitResize, width, height, crop);
+
+            // On the --crop flag, after the merge, so a preset with no sizes can't trigger it.
             if (crop && (!width.HasValue || !height.HasValue)) {
                 Log.Error("CLI: Crop mode requires both width and height, got {Resize}", resize);
                 Console.Error.WriteLine(_("Crop mode requires both width and height (e.g. --resize 128x128 --crop)"));
