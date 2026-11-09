@@ -10,13 +10,13 @@ It's the third of four plans. `89-json-config` must be merged first.
 
 ## Done when
 
-- [ ] Convert > Presets lists saved presets, and offers Add Preset and Manage Presets, even when the queue is empty.
-- [ ] Choosing a preset fills in the format and resize controls without converting, and says so in the status bar.
+- [x] Convert > Presets lists saved presets, and offers Add Preset and Manage Presets, even when the queue is empty.
+- [x] Choosing a preset fills in the format and resize controls without converting, and says so in the status bar.
 - [ ] A preset's sizes survive adding, selecting and removing images until the user changes the resize controls.
 - [ ] A "Blog" preset (WEBP, keep proportions, width 300, no height) resizes a mixed batch of portrait and landscape images to 300 px wide.
 - [ ] A height-only preset keeps its width box empty, with or without an image selected.
 - [ ] A preset targeting a format unticked in Settings still applies, and that format stays in the dropdown until SIC! closes.
-- [ ] A preset can be added, edited and removed with the keyboard, and the menu updates straight away.
+- [x] A preset can be added, edited and removed with the keyboard, and the menu updates straight away.
 - [x] `sic -i a.png --preset Blog` converts with the preset. An explicit `--output` extension, `--format`, `--resize` or `--crop` wins over the matching part of the preset.
 - [x] An unknown `--preset` name exits with `ExitCode.Error` and lists the available presets on stderr.
 - [x] An invalid preset in a hand-edited `sic.json` drops only that preset, and is never lost silently: the file is backed up and the user is told.
@@ -246,12 +246,12 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `PresetMenuBuilder.AddTo(NativeMenuSpec convert, presets, onApply, onAdd, onManage)`, appending a separator and `convert.AddMenu(_("&Presets"), ...)`. It lists each preset through `PresetValidator.EscapeAmpersands`, then a separator, `_("&Add Preset...")` and `_("&Manage Presets...")`.
-- [ ] Show a disabled "No presets yet" item when the list is empty, so a screen reader user hears why the top of the menu has no presets.
-- [ ] Call it at the end of the Convert block in `BuildMenuSpec`. In `ApplyMenuState`, remove both `convert.IsEnabled = _hasItems` and `edit.IsEnabled = _hasItems`; their children keep their own flags, and Presets stays enabled. Root items are pushed to Windows only when the menu is built, so a rebuild would otherwise freeze the Edit menu at whatever the queue state was then.
-- [ ] Add Preset opens `PresetDialog` pre-filled from `PresetCapturer.Capture`. After OK, append to `Config.Presets`, call `Config.Save()` and rebuild with `_menuBar?.Attach(BuildMenuSpec())` once the dialog has closed. Manage Presets rebuilds the same way when `Changed` is true.
-- [ ] tests: a spec with presets named `R&D`, `Blog` and `Banner` passes `MenuSpecValidator.Validate`; an empty list gives one disabled row; 200 presets pass. `NativeMenuSpec.Add` needs a non-null `onClick`, so the disabled row passes a no-op.
-- [ ] validation commands pass
+- [x] Add `PresetMenuBuilder.AddTo(NativeMenuSpec convert, presets, onApply, onAdd, onManage)`, appending a separator and `convert.AddMenu(_("&Presets"), ...)`. It lists each preset through `PresetValidator.EscapeAmpersands`, then a separator, `_("&Add Preset...")` and `_("&Manage Presets...")`.
+- [x] Show a disabled "No presets yet" item when the list is empty, so a screen reader user hears why the top of the menu has no presets.
+- [x] Call it at the end of the Convert block in `BuildMenuSpec`. In `ApplyMenuState`, remove both `convert.IsEnabled = _hasItems` and `edit.IsEnabled = _hasItems`; their children keep their own flags, and Presets stays enabled. Root items are pushed to Windows only when the menu is built, so a rebuild would otherwise freeze the Edit menu at whatever the queue state was then.
+- [x] Add Preset opens `PresetDialog` pre-filled from `PresetCapturer.Capture`. After OK, append to `Config.Presets`, call `Config.Save()` and rebuild with `_menuBar?.Attach(BuildMenuSpec())` once the dialog has closed. Manage Presets rebuilds the same way when `Changed` is true.
+- [x] tests: a spec with presets named `R&D`, `Blog` and `Banner` passes `MenuSpecValidator.Validate`; an empty list gives one disabled row; 200 presets pass. `NativeMenuSpec.Add` needs a non-null `onClick`, so the disabled row passes a no-op.
+- [x] validation commands pass
 
 ### Task 9: Translate all new strings
 

@@ -302,6 +302,7 @@ public partial class MainWindow: Form {
             convert.Add(_("&Fit to File Size..."), _("Ctrl+Alt+Shift+F5"),
                 Keys.Control | Keys.Alt | Keys.Shift | Keys.F5,
                 () => FitToFileSizeMenuItem_Click(this, EventArgs.Empty));
+            PresetMenuBuilder.AddTo(convert, Config.Presets, ApplyPreset, AddPreset, ManagePresets);
         });
 
         spec.AddMenu(_("&Help"), help => {
@@ -326,13 +327,13 @@ public partial class MainWindow: Form {
     /// <remarks>
     /// The spec is mutable on purpose: enabled state is read out of it on every
     /// <c>WM_INITMENUPOPUP</c>, so setting it here is enough and no rebuild is required.
+    /// The Edit and Convert menus themselves stay enabled: root items reach Windows only when the
+    /// menu is built, so a flag set on them would freeze at whatever the queue held at the last
+    /// rebuild, and Convert > Presets must work on an empty queue.
     /// </remarks>
     private void ApplyMenuState(NativeMenuSpec spec) {
         var edit = spec.Items[1];
         var convert = spec.Items[2];
-
-        edit.IsEnabled = _hasItems;
-        convert.IsEnabled = _hasItems;
 
         edit.Children![0].IsEnabled = _hasSelection;   // Remove
         edit.Children![1].IsEnabled = _hasItems;       // Remove All
@@ -341,6 +342,7 @@ public partial class MainWindow: Form {
         convert.Children![1].IsEnabled = _hasItems;       // Convert All
         convert.Children![3].IsEnabled = _hasSelection;   // Create multi-size ICO
         convert.Children![4].IsEnabled = _hasSelection;   // Fit to file size
+        // Children 5 and 6 are the separator and Presets, which stays enabled.
     }
 
     /// <summary>Pushes the current enabled flags into the live menu.</summary>
@@ -1183,6 +1185,51 @@ public partial class MainWindow: Form {
         _autoFilledBox = DimensionBox.None;
         UpdatePreview();
         statusLabel.Text = _("Preset applied: {0}", PresetValidator.EscapeAmpersands(preset.Name));
+    }
+
+    /// <summary>
+    /// Opens the preset editor pre-filled from the current format and resize controls, and saves
+    /// the new preset. The menu is rebuilt only after the dialog has closed.
+    /// </summary>
+    private void AddPreset() {
+        var initial = PresetCapturer.Capture(
+            formatComboBox.SelectedItem as string ?? "",
+            resizeCheckBox.Checked,
+            cropRadioButton.Checked ? Models.ResizeMode.Crop : Models.ResizeMode.KeepProportions,
+            widthTextBox.Text,
+            heightTextBox.Text,
+            _autoFilledBox);
+
+        ConversionPreset? added;
+        using (var dialog = new PresetDialog(initial, Config.Presets.Select(preset => preset.Name), isEdit: false)) {
+            if (dialog.ShowDialog(this) != DialogResult.OK) {
+                return;
+            }
+
+            added = dialog.Result;
+        }
+
+        if (added is null) {
+            return;
+        }
+
+        Config.Presets.Add(added);
+        Config.Save();
+        Log.Information("MainWindow: Added preset {Name}", added.Name);
+        _menuBar?.Attach(BuildMenuSpec());
+    }
+
+    /// <summary>Opens Manage Presets, and rebuilds the menu once it has closed if anything changed.</summary>
+    private void ManagePresets() {
+        bool changed;
+        using (var dialog = new ManagePresetsDialog()) {
+            dialog.ShowDialog(this);
+            changed = dialog.Changed;
+        }
+
+        if (changed) {
+            _menuBar?.Attach(BuildMenuSpec());
+        }
     }
 
     private void SchedulePreviewUpdate() {
