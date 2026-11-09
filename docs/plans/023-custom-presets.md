@@ -263,13 +263,13 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Run `Extract-Strings.ps1`, then `Update-Translations.ps1`.
-- [ ] Translate every new string in all six languages, reusing each language's existing word for "preset".
-- [ ] Remove every `#, fuzzy` flag on new entries. Window titles must have no `&` and no trailing `...`.
-- [ ] Add `&Presets` to `ConvertMenuStrings` in `TranslationCatalogTests`, and a new `PresetsMenuStrings` with `&Add Preset...` and `&Manage Presets...`.
-- [ ] Add `PresetDialogStrings` and `ManagePresetsDialogStrings` with the control texts under Technical details, because a clash there sends Alt+letter to the wrong control. Where a language clashes, change the mnemonic of a new string, not an existing one.
-- [ ] Run `Compile-Translations.ps1`.
-- [ ] validation commands pass, including `TranslationCatalogTests`
+- [x] Run `Extract-Strings.ps1`, then `Update-Translations.ps1`.
+- [x] Translate every new string in all six languages, reusing each language's existing word for "preset".
+- [x] Remove every `#, fuzzy` flag on new entries. Window titles must have no `&` and no trailing `...`.
+- [x] Add `&Presets` to `ConvertMenuStrings` in `TranslationCatalogTests`, and a new `PresetsMenuStrings` with `&Add Preset...` and `&Manage Presets...`.
+- [x] Add `PresetDialogStrings` and `ManagePresetsDialogStrings` with the control texts under Technical details, because a clash there sends Alt+letter to the wrong control. Where a language clashes, change the mnemonic of a new string, not an existing one.
+- [x] Run `Compile-Translations.ps1`.
+- [x] validation commands pass, including `TranslationCatalogTests`
 
 ### Task 10: Update the manuals
 

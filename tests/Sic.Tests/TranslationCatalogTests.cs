@@ -18,10 +18,21 @@ public sealed partial class TranslationCatalogTests {
     private static readonly string[] EditMenu = ["&Remove", "Remove &All"];
 
     private static readonly string[] ConvertMenu =
-        ["Convert &Selected", "Convert &All", "Create Multi-size &ICO...", "&Fit to File Size..."];
+        ["Convert &Selected", "Convert &All", "Create Multi-size &ICO...", "&Fit to File Size...", "&Presets"];
+
+    // Added by PresetMenuBuilder.AddTo. The saved presets listed above these have their ampersands
+    // escaped, so they never take a mnemonic.
+    private static readonly string[] PresetsMenu = ["No presets yet", "&Add Preset...", "&Manage Presets..."];
 
     private static readonly string[] HelpMenu =
         ["Read User &Manual", "Check for &Updates...", "&Donate...", "&About SIC!..."];
+
+    // The texts with a mnemonic in each dialog's designer: a clash sends Alt+letter to the wrong
+    // control. DialogLists_MatchDesigners fails when these and the designers drift apart.
+    private static readonly string[] PresetDialog =
+        ["&Name:", "Target &Format:", "Resi&ze", "Resize &Mode:", "&Width:", "&Height:", "&OK", "&Cancel"];
+
+    private static readonly string[] ManagePresetsDialog = ["Pre&sets:", "&Add...", "&Edit...", "&Remove", "&Close"];
 
     public static TheoryData<string> Languages => [.. PoCatalog.Languages];
 
@@ -37,6 +48,12 @@ public sealed partial class TranslationCatalogTests {
     public static TheoryData<string, string[]> ConvertMenuStrings => ForEveryLanguage(ConvertMenu);
 
     public static TheoryData<string, string[]> HelpMenuStrings => ForEveryLanguage(HelpMenu);
+
+    public static TheoryData<string, string[]> PresetsMenuStrings => ForEveryLanguage(PresetsMenu);
+
+    public static TheoryData<string, string[]> PresetDialogStrings => ForEveryLanguage(PresetDialog);
+
+    public static TheoryData<string, string[]> ManagePresetsDialogStrings => ForEveryLanguage(ManagePresetsDialog);
 
     [Fact]
     public void Languages_AreFoundOnDisk() {
@@ -158,16 +175,16 @@ public sealed partial class TranslationCatalogTests {
     [MemberData(nameof(EditMenuStrings))]
     [MemberData(nameof(ConvertMenuStrings))]
     [MemberData(nameof(HelpMenuStrings))]
+    [MemberData(nameof(PresetsMenuStrings))]
     public void MenuLevel_HasNoDuplicateMnemonics(string language, string[] msgIds) {
-        var catalog = PoCatalog.Load(language);
+        DuplicateMnemonics(Translate(language, msgIds)).Should().BeEmpty();
+    }
 
-        var labels = msgIds.Select(msgId => {
-            var entry = catalog.Find(msgId);
-            entry.Should().NotBeNull($"the {language} catalog should translate the menu item \"{msgId}\"");
-            return entry!.MsgStrs[0];
-        }).ToList();
-
-        DuplicateMnemonics(labels).Should().BeEmpty();
+    [Theory]
+    [MemberData(nameof(PresetDialogStrings))]
+    [MemberData(nameof(ManagePresetsDialogStrings))]
+    public void Dialog_HasNoDuplicateMnemonics(string language, string[] msgIds) {
+        DuplicateMnemonics(Translate(language, msgIds)).Should().BeEmpty();
     }
 
     [Fact]
@@ -179,12 +196,21 @@ public sealed partial class TranslationCatalogTests {
         end.Should().BeGreaterThan(start, "BuildMenuSpec should still end by applying the menu state");
 
         // Each AddMenu call opens a level; the .Add calls after it are that level's items.
+        // PresetMenuBuilder.AddTo adds the Presets submenu to the level it is called in.
         var levels = new List<(string Title, List<string> Items)>();
+        var presetsMenu = new List<string>();
         foreach (Match call in MenuCallPattern().Matches(source[start..end])) {
             if (call.Groups["call"].Value == "AddMenu") {
                 levels.Add((call.Groups["text"].Value, []));
+                continue;
+            }
+
+            levels.Should().NotBeEmpty("menu items are added inside a menu");
+            if (call.Groups["builder"].Success) {
+                var (title, items) = ReadPresetMenuBuilder();
+                levels[^1].Items.Add(title);
+                presetsMenu.AddRange(items);
             } else {
-                levels.Should().NotBeEmpty("menu items are added inside a menu");
                 levels[^1].Items.Add(call.Groups["text"].Value);
             }
         }
@@ -193,12 +219,31 @@ public sealed partial class TranslationCatalogTests {
         levels.Select(level => level.Items).Should().BeEquivalentTo(
             [FileMenu, EditMenu, ConvertMenu, HelpMenu],
             options => options.WithStrictOrdering());
+        presetsMenu.Should().Equal(PresetsMenu);
+    }
+
+    [Theory]
+    [InlineData("PresetDialog.Designer.cs", nameof(PresetDialog))]
+    [InlineData("ManagePresetsDialog.Designer.cs", nameof(ManagePresetsDialog))]
+    public void DialogLists_MatchDesigners(string designerFile, string listName) {
+        var source = File.ReadAllText(Path.Combine(PoCatalog.RepositoryRoot, "src", "Sic", designerFile));
+        var expected = listName == nameof(PresetDialog) ? PresetDialog : ManagePresetsDialog;
+
+        var texts = DesignerTextPattern().Matches(source)
+            .Select(match => match.Groups["text"].Value)
+            .Where(text => MenuTextFormatter.ExtractMnemonic(text) is not null);
+
+        texts.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public void EnglishMenus_HaveNoDuplicateMnemonics() {
-        foreach (var level in new[] { TopLevelMenu, FileMenu, EditMenu, ConvertMenu, HelpMenu }) {
-            DuplicateMnemonics(level).Should().BeEmpty();
+    public void EnglishMenusAndDialogs_HaveNoDuplicateMnemonics() {
+        string[][] groups = [
+            TopLevelMenu, FileMenu, EditMenu, ConvertMenu, HelpMenu, PresetsMenu, PresetDialog, ManagePresetsDialog,
+        ];
+
+        foreach (var group in groups) {
+            DuplicateMnemonics(group).Should().BeEmpty();
         }
     }
 
@@ -209,6 +254,42 @@ public sealed partial class TranslationCatalogTests {
         }
 
         return data;
+    }
+
+    /// <summary>
+    /// The Presets submenu as <c>PresetMenuBuilder.AddTo</c> builds it: the submenu's title, and
+    /// the items with translated text inside it.
+    /// </summary>
+    private static (string Title, List<string> Items) ReadPresetMenuBuilder() {
+        var source = File.ReadAllText(
+            Path.Combine(PoCatalog.RepositoryRoot, "src", "Sic", "Utils", "PresetMenuBuilder.cs"));
+        var start = source.IndexOf("public static void AddTo(", StringComparison.Ordinal);
+        start.Should().BeGreaterThanOrEqualTo(0, "PresetMenuBuilder.cs should still build the submenu in AddTo");
+
+        string? title = null;
+        var items = new List<string>();
+        foreach (Match call in MenuCallPattern().Matches(source[start..])) {
+            if (call.Groups["call"].Value == "AddMenu") {
+                title.Should().BeNull("AddTo should add a single submenu");
+                title = call.Groups["text"].Value;
+            } else if (call.Groups["call"].Success) {
+                title.Should().NotBeNull("menu items are added inside a menu");
+                items.Add(call.Groups["text"].Value);
+            }
+        }
+
+        title.Should().NotBeNull("AddTo should add the Presets submenu");
+        return (title!, items);
+    }
+
+    private static List<string> Translate(string language, string[] msgIds) {
+        var catalog = PoCatalog.Load(language);
+
+        return [.. msgIds.Select(msgId => {
+            var entry = catalog.Find(msgId);
+            entry.Should().NotBeNull($"the {language} catalog should translate \"{msgId}\"");
+            return entry!.MsgStrs[0];
+        })];
     }
 
     private static IEnumerable<string> DuplicateMnemonics(IEnumerable<string> labels) =>
@@ -229,7 +310,14 @@ public sealed partial class TranslationCatalogTests {
     [GeneratedRegex(@"\{\d+(?:,-?\d+)?(?::[^{}]*)?\}")]
     private static partial Regex PlaceholderPattern();
 
-    /// <summary>The first <c>_("...")</c> argument of an <c>AddMenu</c> or <c>.Add</c> call.</summary>
-    [GeneratedRegex(@"(?<call>AddMenu|\.Add)\(\s*_\(""(?<text>[^""]*)""\)")]
+    /// <summary>
+    /// The first <c>_("...")</c> argument of an <c>AddMenu</c> or <c>.Add</c> call, or a call to
+    /// <c>PresetMenuBuilder.AddTo</c>.
+    /// </summary>
+    [GeneratedRegex(@"(?<call>AddMenu|\.Add)\(\s*_\(""(?<text>[^""]*)""\)|(?<builder>PresetMenuBuilder\.AddTo)\(")]
     private static partial Regex MenuCallPattern();
+
+    /// <summary>A qualified <c>control.Text = "...";</c> assignment in a designer file.</summary>
+    [GeneratedRegex(@"^\s*\w+\.Text = ""(?<text>[^""]*)"";", RegexOptions.Multiline)]
+    private static partial Regex DesignerTextPattern();
 }
