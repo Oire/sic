@@ -1,6 +1,8 @@
 using System.CommandLine;
 using Oire.Sic.Models;
+using Oire.Sic.Services;
 using Oire.Sic.Utils;
+using Oire.Sic.Utils.Enums;
 using static Oire.Sic.Utils.Localization;
 using ImageConverter = Oire.Sic.Services.ImageConverter;
 using Serilog;
@@ -253,45 +255,28 @@ internal static class Program {
             var resizeMode = crop ? ResizeMode.Crop : ResizeMode.KeepProportions;
 
             if (!string.IsNullOrWhiteSpace(resize)) {
-                var normalized = resize.ToLowerInvariant();
-                string[] parts;
+                if (!ResizeValidator.TryParseSpec(resize, out var widthText, out var heightText)) {
+                    Log.Error("CLI: Invalid resize format: {Resize}", resize);
+                    Console.Error.WriteLine(_("Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, 128)", resize));
+                    return ExitCode.Error;
+                }
 
-                if (normalized.Contains('x')) {
-                    parts = normalized.Split('x');
-                    if (parts.Length != 2) {
-                        Log.Error("CLI: Invalid resize format: {Resize}", resize);
-                        Console.Error.WriteLine(_("Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, 128)", resize));
+                switch (ResizeValidator.Validate(widthText, heightText, ResizeMode.KeepProportions, out width, out height)) {
+                    case ResizeError.None:
+                        break;
+                    case ResizeError.InvalidWidth:
+                        Log.Error("CLI: Invalid width value: {Width}", widthText);
+                        Console.Error.WriteLine(_("Invalid width value: {0}", widthText));
                         return ExitCode.Error;
-                    }
-                } else {
-                    parts = [normalized, ""];
+                    case ResizeError.InvalidHeight:
+                        Log.Error("CLI: Invalid height value: {Height}", heightText);
+                        Console.Error.WriteLine(_("Invalid height value: {0}", heightText));
+                        return ExitCode.Error;
+                    default:
+                        Log.Error("CLI: Invalid resize format (no dimensions): {Resize}", resize);
+                        Console.Error.WriteLine(_("Invalid resize format: {0}. At least one dimension is required.", resize));
+                        return ExitCode.Error;
                 }
-
-                var hasWidth = int.TryParse(parts[0], out var w) && w >= 1;
-                var hasHeight = int.TryParse(parts[1], out var h) && h >= 1;
-
-                if (!hasWidth && !string.IsNullOrEmpty(parts[0])) {
-                    Log.Error("CLI: Invalid width value: {Width}", parts[0]);
-                    Console.Error.WriteLine(_("Invalid width value: {0}", parts[0]));
-                    return ExitCode.Error;
-                }
-
-                if (!hasHeight && !string.IsNullOrEmpty(parts[1])) {
-                    Log.Error("CLI: Invalid height value: {Height}", parts[1]);
-                    Console.Error.WriteLine(_("Invalid height value: {0}", parts[1]));
-                    return ExitCode.Error;
-                }
-
-                if (!hasWidth && !hasHeight) {
-                    Log.Error("CLI: Invalid resize format (no dimensions): {Resize}", resize);
-                    Console.Error.WriteLine(_("Invalid resize format: {0}. At least one dimension is required.", resize));
-                    return ExitCode.Error;
-                }
-
-                if (hasWidth)
-                    width = w;
-                if (hasHeight)
-                    height = h;
             }
 
             if (crop && (!width.HasValue || !height.HasValue)) {

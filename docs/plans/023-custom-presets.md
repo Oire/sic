@@ -21,7 +21,7 @@ It's the third of four plans. `89-json-config` must be merged first.
 - [ ] An unknown `--preset` name exits with `ExitCode.Error` and lists the available presets on stderr.
 - [ ] An invalid preset in a hand-edited `sic.json` drops only that preset, and is never lost silently: the file is backed up and the user is told.
 - [ ] Saving Settings, or anything else, never loses presets.
-- [ ] A size that SIC! fills in itself never triggers an "invalid size" error.
+- [x] A size that SIC! fills in itself never triggers an "invalid size" error.
 - [ ] All new strings are translated into de, es, fr, he, ru and uk, and all 7 manuals are updated.
 - [ ] all validation commands pass
 
@@ -95,18 +95,18 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `ResizeValidator` as under Technical details. It's pure: no dialogs, no focus handling, no gettext.
-- [ ] Replace the parsing in `MainWindow.TryGetConversionParams` with `Validate`, using the GUI mapping under Technical details, with new per-box messages for a mistyped size in keep mode.
-- [ ] Add `ResizeValidator.ScaleDimension(target, sourceFrom, sourceTo)`, returning a size clamped to 1..`MaxDimension`, working in `double` and clamping before the cast, and use it in `AutoFillFromWidth` and `AutoFillFromHeight`. Today a 4000x100 image at width 16 gets height 0, which the stricter validation would reject.
-- [ ] Clamp in `PopulateResizeFieldsFromSelection` with `Math.Min(value, ResizeValidator.MaxDimension)`, because an image above 65535 px on a side would otherwise fail with a size SIC! typed itself.
-- [ ] Replace the parsing in `Program.RunCli` with `TryParseSpec` and `Validate`, using the CLI mapping under Technical details. It always passes `KeepProportions`, and the existing crop check stays where it is.
-- [ ] tests for `Validate`: keep mode with width only, height only and both; crop with both; the limits 1 and 65535
-- [ ] tests for `Validate`: blank fields, 0, 65536, non-numeric text with the other size valid, and crop missing either size
-- [ ] tests for the evaluation order: crop `("abc", "1")` gives `InvalidWidth`, crop `("", "abc")` gives `CropNeedsWidth`, and keep `("abc", "")`, `("", "abc")` and `("abc", "xyz")` give `InvalidWidth`, `InvalidHeight` and `InvalidWidth`
-- [ ] tests for `TryParseSpec`: `128x128`, `128x`, `x128`, `128`, `128X128`, and the rejected `1x2x3`
-- [ ] tests for `ScaleDimension`: a normal ratio, rounding to 0 giving 1, a result above 65535 giving 65535, and a huge target that would overflow an `int`
-- [ ] Add `CliTests` cases: `--resize 70000x` now fails, and `--resize 128x --crop` keeps its existing message.
-- [ ] validation commands pass
+- [x] Add `ResizeValidator` as under Technical details. It's pure: no dialogs, no focus handling, no gettext.
+- [x] Replace the parsing in `MainWindow.TryGetConversionParams` with `Validate`, using the GUI mapping under Technical details, with new per-box messages for a mistyped size in keep mode.
+- [x] Add `ResizeValidator.ScaleDimension(target, sourceFrom, sourceTo)`, returning a size clamped to 1..`MaxDimension`, working in `double` and clamping before the cast, and use it in `AutoFillFromWidth` and `AutoFillFromHeight`. Today a 4000x100 image at width 16 gets height 0, which the stricter validation would reject.
+- [x] Clamp in `PopulateResizeFieldsFromSelection` with `Math.Min(value, ResizeValidator.MaxDimension)`, because an image above 65535 px on a side would otherwise fail with a size SIC! typed itself.
+- [x] Replace the parsing in `Program.RunCli` with `TryParseSpec` and `Validate`, using the CLI mapping under Technical details. It always passes `KeepProportions`, and the existing crop check stays where it is.
+- [x] tests for `Validate`: keep mode with width only, height only and both; crop with both; the limits 1 and 65535
+- [x] tests for `Validate`: blank fields, 0, 65536, non-numeric text with the other size valid, and crop missing either size
+- [x] tests for the evaluation order: crop `("abc", "1")` gives `InvalidWidth`, crop `("", "abc")` gives `CropNeedsWidth`, and keep `("abc", "")`, `("", "abc")` and `("abc", "xyz")` give `InvalidWidth`, `InvalidHeight` and `InvalidWidth`
+- [x] tests for `TryParseSpec`: `128x128`, `128x`, `x128`, `128`, `128X128`, and the rejected `1x2x3`
+- [x] tests for `ScaleDimension`: a normal ratio, rounding to 0 giving 1, a result above 65535 giving 65535, and a huge target that would overflow an `int`
+- [x] Add `CliTests` cases: `--resize 70000x` now fails, and `--resize 128x --crop` keeps its existing message.
+- [x] validation commands pass
 
 ### Task 2: Add presets to the configuration
 

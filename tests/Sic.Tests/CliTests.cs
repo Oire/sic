@@ -400,6 +400,8 @@ public sealed class CliTests: StaticStateTestBase {
     [InlineData("-5", "Invalid width value: -5")]
     [InlineData("10xb", "Invalid height value: b")]
     [InlineData("10x0", "Invalid height value: 0")]
+    [InlineData("70000x", "Invalid width value: 70000")]
+    [InlineData("10x65536", "Invalid height value: 65536")]
     [InlineData("10x20x30", "Invalid resize format: 10x20x30. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, 128)")]
     [InlineData("x", "Invalid resize format: x. At least one dimension is required.")]
     public void InvalidResize_Fails(string resize, string message) {
@@ -415,6 +417,7 @@ public sealed class CliTests: StaticStateTestBase {
 
     [Theory]
     [InlineData("50x")]
+    [InlineData("128x")]
     [InlineData("x50")]
     [InlineData("50")]
     public void CropWithOneSize_Fails(string resize) {

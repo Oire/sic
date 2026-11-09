@@ -7,6 +7,7 @@ using Oire.Sic.Models;
 using Oire.WinForms.NativeControls;
 using Oire.Sic.Services;
 using Oire.Sic.Utils;
+using Oire.Sic.Utils.Enums;
 using static Oire.Sic.Utils.Localization;
 using Serilog;
 using ImageConverter = Oire.Sic.Services.ImageConverter;
@@ -516,48 +517,42 @@ public partial class MainWindow: Form {
 
         targetFormat = format;
 
-        if (resizeCheckBox.Checked) {
-            resizeMode = cropRadioButton.Checked ? Models.ResizeMode.Crop : Models.ResizeMode.KeepProportions;
+        if (!resizeCheckBox.Checked)
+            return true;
 
-            var hasWidth = int.TryParse(widthTextBox.Text, out var w) && w >= 1 && w <= 65535;
-            var hasHeight = int.TryParse(heightTextBox.Text, out var h) && h >= 1 && h <= 65535;
+        resizeMode = cropRadioButton.Checked ? Models.ResizeMode.Crop : Models.ResizeMode.KeepProportions;
+        var error = ResizeValidator.Validate(widthTextBox.Text, heightTextBox.Text, resizeMode, out width, out height);
 
-            if (resizeMode == Models.ResizeMode.Crop) {
-                if (!hasWidth) {
-                    Log.Debug("TryGetConversionParams: Invalid crop width: {Input}", widthTextBox.Text);
-                    DialogHelper.Show(_("Crop mode requires a valid width (1\u201365535)."), _("Invalid width"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    widthTextBox.Focus();
-                    widthTextBox.SelectAll();
-                    return false;
-                }
-
-                if (!hasHeight) {
-                    Log.Debug("TryGetConversionParams: Invalid crop height: {Input}", heightTextBox.Text);
-                    DialogHelper.Show(_("Crop mode requires a valid height (1\u201365535)."), _("Invalid height"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    heightTextBox.Focus();
-                    heightTextBox.SelectAll();
-                    return false;
-                }
-
-                width = w;
-                height = h;
-            } else {
-                if (!hasWidth && !hasHeight) {
-                    Log.Debug("TryGetConversionParams: No valid resize dimensions entered");
-                    DialogHelper.Show(_("Please enter at least one valid dimension (1\u201365535)."), _("Invalid dimensions"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    widthTextBox.Focus();
-                    widthTextBox.SelectAll();
-                    return false;
-                }
-
-                if (hasWidth)
-                    width = w;
-                if (hasHeight)
-                    height = h;
-            }
+        switch (error) {
+            case ResizeError.None:
+                return true;
+            case ResizeError.InvalidWidth or ResizeError.CropNeedsWidth when resizeMode == Models.ResizeMode.Crop:
+                Log.Debug("TryGetConversionParams: Invalid crop width: {Input}", widthTextBox.Text);
+                ShowResizeError(_("Crop mode requires a valid width (1\u201365535)."), _("Invalid width"), widthTextBox);
+                return false;
+            case ResizeError.InvalidHeight or ResizeError.CropNeedsHeight when resizeMode == Models.ResizeMode.Crop:
+                Log.Debug("TryGetConversionParams: Invalid crop height: {Input}", heightTextBox.Text);
+                ShowResizeError(_("Crop mode requires a valid height (1\u201365535)."), _("Invalid height"), heightTextBox);
+                return false;
+            case ResizeError.InvalidWidth:
+                Log.Debug("TryGetConversionParams: Invalid width: {Input}", widthTextBox.Text);
+                ShowResizeError(_("The width must be a whole number from 1 to 65535, or left empty."), _("Invalid width"), widthTextBox);
+                return false;
+            case ResizeError.InvalidHeight:
+                Log.Debug("TryGetConversionParams: Invalid height: {Input}", heightTextBox.Text);
+                ShowResizeError(_("The height must be a whole number from 1 to 65535, or left empty."), _("Invalid height"), heightTextBox);
+                return false;
+            default:
+                Log.Debug("TryGetConversionParams: No valid resize dimensions entered");
+                ShowResizeError(_("Please enter at least one valid dimension (1\u201365535)."), _("Invalid dimensions"), widthTextBox);
+                return false;
         }
+    }
 
-        return true;
+    private static void ShowResizeError(string message, string caption, TextBox box) {
+        DialogHelper.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        box.Focus();
+        box.SelectAll();
     }
 
     private static string ValidateOutputFolder() {
@@ -1038,8 +1033,8 @@ public partial class MainWindow: Form {
 
         _isAutoFilling = true;
         try {
-            widthTextBox.Text = _selectedItem.Width.ToString();
-            heightTextBox.Text = _selectedItem.Height.ToString();
+            widthTextBox.Text = Math.Min(_selectedItem.Width, ResizeValidator.MaxDimension).ToString();
+            heightTextBox.Text = Math.Min(_selectedItem.Height, ResizeValidator.MaxDimension).ToString();
         } finally {
             _isAutoFilling = false;
         }
@@ -1082,7 +1077,7 @@ public partial class MainWindow: Form {
         if (!int.TryParse(widthTextBox.Text, out var w) || w < 1)
             return;
 
-        var newHeight = (int)Math.Round((double)w / _selectedItem.Width * _selectedItem.Height);
+        var newHeight = ResizeValidator.ScaleDimension(w, _selectedItem.Width, _selectedItem.Height);
         _isAutoFilling = true;
         try {
             heightTextBox.Text = newHeight.ToString();
@@ -1098,7 +1093,7 @@ public partial class MainWindow: Form {
         if (!int.TryParse(heightTextBox.Text, out var h) || h < 1)
             return;
 
-        var newWidth = (int)Math.Round((double)h / _selectedItem.Height * _selectedItem.Width);
+        var newWidth = ResizeValidator.ScaleDimension(h, _selectedItem.Height, _selectedItem.Width);
         _isAutoFilling = true;
         try {
             widthTextBox.Text = newWidth.ToString();
