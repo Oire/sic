@@ -23,7 +23,7 @@ It's the third of four plans. `89-json-config` must be merged first.
 - [x] Saving Settings, or anything else, never loses presets.
 - [x] A size that SIC! fills in itself never triggers an "invalid size" error.
 - [x] All new strings are translated into de, es, fr, he, ru and uk, and all 7 manuals are updated.
-- [ ] all validation commands pass
+- [x] all validation commands pass
 
 ## Validation commands
 
@@ -295,10 +295,10 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] `README.md`: add presets and `--preset`.
-- [ ] `CHANGELOG.md` and `changelogs/1.2.0.0.md`: add presets ([#23](https://github.com/Oire/sic/issues/23)) and the behavior changes listed under Technical details.
-- [ ] `CLAUDE.md`: add the new classes, the `Oire.Sic.Utils.Enums` namespace and the CLI option, and record the gotchas future work needs: the preset pin and `_isApplyingPreset`, why session formats go through `GetDropdownFormats`, and escaping names for the menu.
-- [ ] validation commands pass
+- [x] `README.md`: add presets and `--preset`.
+- [x] `CHANGELOG.md` and `changelogs/1.2.0.0.md`: add presets ([#23](https://github.com/Oire/sic/issues/23)) and the behavior changes listed under Technical details.
+- [x] `CLAUDE.md`: add the new classes, the `Oire.Sic.Utils.Enums` namespace and the CLI option, and record the gotchas future work needs: the preset pin and `_isApplyingPreset`, why session formats go through `GetDropdownFormats`, and escaping names for the menu.
+- [x] validation commands pass
 
 ## Technical details
 
