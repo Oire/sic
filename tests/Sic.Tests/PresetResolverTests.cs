@@ -57,6 +57,14 @@ public sealed class PresetResolverTests {
         PresetResolver.Find(Presets, name).Should().BeNull();
     }
 
+    // Built in code: xUnit turns a lone surrogate in InlineData into U+FFFD.
+    [Theory]
+    [InlineData(0xD800)]
+    [InlineData(0xFFFE)]
+    public void Find_NameThatCantBeNormalized_GivesNull(int codeUnit) {
+        PresetResolver.Find(Presets, "Blog" + (char)codeUnit).Should().BeNull();
+    }
+
     [Fact]
     public void Find_EmptyList_GivesNull() {
         PresetResolver.Find([], "Blog").Should().BeNull();
@@ -68,39 +76,39 @@ public sealed class PresetResolverTests {
 
     [Fact]
     public void ResolveResize_NoPresetAndNoResize_GivesNoSizes() {
-        PresetResolver.ResolveResize(null, false, null, null, false)
+        PresetResolver.ResolveResize(null, null, null, false)
             .Should().Be(((int?)null, (int?)null, ResizeMode.KeepProportions));
     }
 
     [Fact]
     public void ResolveResize_NoPresetWithResize_GivesTheExplicitSizes() {
-        PresetResolver.ResolveResize(null, true, 64, 32, false)
+        PresetResolver.ResolveResize(null, 64, 32, false)
             .Should().Be(((int?)64, (int?)32, ResizeMode.KeepProportions));
     }
 
     [Fact]
     public void ResolveResize_NoPresetWithResizeAndCrop_GivesCrop() {
-        PresetResolver.ResolveResize(null, true, 64, 32, true)
+        PresetResolver.ResolveResize(null, 64, 32, true)
             .Should().Be(((int?)64, (int?)32, ResizeMode.Crop));
     }
 
     [Fact]
     public void ResolveResize_PresetOnly_GivesThePresetSizesAndMode() {
-        PresetResolver.ResolveResize(Blog, false, null, null, false)
+        PresetResolver.ResolveResize(Blog, null, null, false)
             .Should().Be(((int?)300, (int?)null, ResizeMode.KeepProportions));
-        PresetResolver.ResolveResize(Avatar, false, null, null, false)
+        PresetResolver.ResolveResize(Avatar, null, null, false)
             .Should().Be(((int?)128, (int?)128, ResizeMode.Crop));
     }
 
     [Fact]
     public void ResolveResize_ExplicitResize_ReplacesThePresetSizesAndMode() {
-        PresetResolver.ResolveResize(Avatar, true, 50, null, false)
+        PresetResolver.ResolveResize(Avatar, 50, null, false)
             .Should().Be(((int?)50, (int?)null, ResizeMode.KeepProportions));
     }
 
     [Fact]
     public void ResolveResize_ExplicitResizeWithCrop_TakesTheModeFromCrop() {
-        PresetResolver.ResolveResize(Blog, true, 50, 40, true)
+        PresetResolver.ResolveResize(Blog, 50, 40, true)
             .Should().Be(((int?)50, (int?)40, ResizeMode.Crop));
     }
 
@@ -108,13 +116,13 @@ public sealed class PresetResolverTests {
     public void ResolveResize_CropAloneOverAPresetWithBothSizes_KeepsTheSizesAndCrops() {
         var fitInside = new ConversionPreset { Name = "Box", Format = "JPG", Width = 800, Height = 600 };
 
-        PresetResolver.ResolveResize(fitInside, false, null, null, true)
+        PresetResolver.ResolveResize(fitInside, null, null, true)
             .Should().Be(((int?)800, (int?)600, ResizeMode.Crop));
     }
 
     [Fact]
     public void ResolveResize_PresetWithoutResize_GivesNoSizes() {
-        PresetResolver.ResolveResize(Demarche, false, null, null, false)
+        PresetResolver.ResolveResize(Demarche, null, null, false)
             .Should().Be(((int?)null, (int?)null, ResizeMode.KeepProportions));
     }
 

@@ -29,11 +29,11 @@ internal static class PresetCapturer {
         var height = ParseSize(heightText);
 
         if (mode != ResizeMode.Crop) {
-            if (autoFilledBox is DimensionBox.Width or DimensionBox.Both) {
+            if (autoFilledBox.HasFlag(DimensionBox.Width)) {
                 width = null;
             }
 
-            if (autoFilledBox is DimensionBox.Height or DimensionBox.Both) {
+            if (autoFilledBox.HasFlag(DimensionBox.Height)) {
                 height = null;
             }
         }

@@ -31,8 +31,33 @@ public partial class ManagePresetsDialog: Form {
         editButton.Click += EditButton_Click;
         removeButton.Click += RemoveButton_Click;
         presetsListBox.SelectedIndexChanged += (_, _) => UpdateButtonState();
+        presetsListBox.KeyDown += PresetsListBox_KeyDown;
+        presetsListBox.DoubleClick += (_, _) => EditButton_Click(this, EventArgs.Empty);
 
         RefreshList(0);
+
+        // An empty list has nothing to land on, so the dialog opens on Add, as FocusList does.
+        if (_presets.Count == 0) {
+            ActiveControl = addButton;
+        }
+    }
+
+    /// <summary>Enter edits the selected preset and Delete removes it, as in other Windows lists.</summary>
+    private void PresetsListBox_KeyDown(object? sender, KeyEventArgs e) {
+        if (presetsListBox.SelectedIndex < 0 || e.Modifiers != Keys.None) {
+            return;
+        }
+
+        switch (e.KeyCode) {
+            case Keys.Enter:
+                e.SuppressKeyPress = true;
+                EditButton_Click(sender, e);
+                break;
+            case Keys.Delete:
+                e.SuppressKeyPress = true;
+                RemoveButton_Click(sender, e);
+                break;
+        }
     }
 
     private void AddButton_Click(object? sender, EventArgs e) {

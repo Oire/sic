@@ -34,6 +34,13 @@ public sealed partial class TranslationCatalogTests {
 
     private static readonly string[] ManagePresetsDialog = ["Pre&sets:", "&Add...", "&Edit...", "&Remove", "&Close"];
 
+    // Every dialog whose mnemonics are tested, by the name of its form. To cover another dialog,
+    // add its array here and an InlineData row to DialogLists_MatchDesigners.
+    private static readonly Dictionary<string, string[]> DialogLists = new() {
+        [nameof(PresetDialog)] = PresetDialog,
+        [nameof(ManagePresetsDialog)] = ManagePresetsDialog,
+    };
+
     public static TheoryData<string> Languages => [.. PoCatalog.Languages];
 
     // One set per level of MainWindow.BuildMenuSpec: a duplicate mnemonic within a level makes
@@ -51,9 +58,18 @@ public sealed partial class TranslationCatalogTests {
 
     public static TheoryData<string, string[]> PresetsMenuStrings => ForEveryLanguage(PresetsMenu);
 
-    public static TheoryData<string, string[]> PresetDialogStrings => ForEveryLanguage(PresetDialog);
+    public static TheoryData<string, string[]> DialogStrings {
+        get {
+            var data = new TheoryData<string, string[]>();
+            foreach (var msgIds in DialogLists.Values) {
+                foreach (var language in PoCatalog.Languages) {
+                    data.Add(language, msgIds);
+                }
+            }
 
-    public static TheoryData<string, string[]> ManagePresetsDialogStrings => ForEveryLanguage(ManagePresetsDialog);
+            return data;
+        }
+    }
 
     [Fact]
     public void Languages_AreFoundOnDisk() {
@@ -181,8 +197,7 @@ public sealed partial class TranslationCatalogTests {
     }
 
     [Theory]
-    [MemberData(nameof(PresetDialogStrings))]
-    [MemberData(nameof(ManagePresetsDialogStrings))]
+    [MemberData(nameof(DialogStrings))]
     public void Dialog_HasNoDuplicateMnemonics(string language, string[] msgIds) {
         DuplicateMnemonics(Translate(language, msgIds)).Should().BeEmpty();
     }
@@ -227,7 +242,8 @@ public sealed partial class TranslationCatalogTests {
     [InlineData("ManagePresetsDialog.Designer.cs", nameof(ManagePresetsDialog))]
     public void DialogLists_MatchDesigners(string designerFile, string listName) {
         var source = File.ReadAllText(Path.Combine(PoCatalog.RepositoryRoot, "src", "Sic", designerFile));
-        var expected = listName == nameof(PresetDialog) ? PresetDialog : ManagePresetsDialog;
+        DialogLists.Should().ContainKey(listName, "every dialog checked against its designer needs its list in DialogLists");
+        var expected = DialogLists[listName];
 
         var texts = DesignerTextPattern().Matches(source)
             .Select(match => match.Groups["text"].Value)
@@ -239,7 +255,7 @@ public sealed partial class TranslationCatalogTests {
     [Fact]
     public void EnglishMenusAndDialogs_HaveNoDuplicateMnemonics() {
         string[][] groups = [
-            TopLevelMenu, FileMenu, EditMenu, ConvertMenu, HelpMenu, PresetsMenu, PresetDialog, ManagePresetsDialog,
+            TopLevelMenu, FileMenu, EditMenu, ConvertMenu, HelpMenu, PresetsMenu, .. DialogLists.Values,
         ];
 
         foreach (var group in groups) {

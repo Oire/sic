@@ -107,7 +107,7 @@ sic -i photo.png -p "Product banner" -o banner.jpg
 | `--input` | `-i` | Yes | Path to the source image |
 | `--output` | `-o` | No* | Path for the converted image (format inferred from extension) |
 | `--format` | `-f` | No* | Target format (e.g. jpg, png, webp). Used when `--output` is omitted |
-| `--resize` | `-r` | No | Target dimensions as WxH, Wx, or xH (e.g. `128x128`, `128x`, `x128`) |
+| `--resize` | `-r` | No | Target dimensions as WxH, Wx, xH or W (e.g. `128x128`, `128x`, `x128`, `128`), each from 1 to 65535 |
 | `--crop` | `-c` | No | Crop mode: scale to cover, then center-crop to exact dimensions |
 | `--preset` | `-p` | No* | Name of a saved preset (case doesn't matter) whose format and resize settings to use |
 

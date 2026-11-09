@@ -286,7 +286,7 @@ footer {
 <p>Mit <em>Zuschneiden</em> sind beide Größen erforderlich, und jedes Bild hat danach genau diese Größe.</p>
 
 <h3>Eine Voreinstellung anwenden</h3>
-<p>Wählen Sie die Voreinstellung nach ihrem Namen unter <strong>Konvertieren > Voreinstellungen</strong>. SIC! trägt daraus <strong>Zielformat</strong>, <strong>Größe ändern</strong>, den Größenänderungsmodus, <strong>Breite</strong> und <strong>Höhe</strong> ein, und die Statusleiste meldet zum Beispiel <em>Voreinstellung angewendet: Blog</em>. Das Anwenden einer Voreinstellung konvertiert noch nichts: Prüfen Sie die Einstellungen, ändern Sie sie bei Bedarf und verwenden Sie dann wie gewohnt <strong>Ausgewählte konvertieren</strong> oder <strong>Alle konvertieren</strong>. Solange es keine Voreinstellungen gibt, zeigt das Untermenü <em>Noch keine Voreinstellungen</em> über <strong>Voreinstellung hinzufügen</strong> und <strong>Voreinstellungen verwalten</strong>.</p>
+<p>Wählen Sie die Voreinstellung nach ihrem Namen unter <strong>Konvertieren > Voreinstellungen</strong>. SIC! trägt daraus <strong>Zielformat</strong>, <strong>Größe ändern</strong>, den Größenänderungsmodus, <strong>Breite</strong> und <strong>Höhe</strong> ein, und die Statusleiste meldet zum Beispiel <em>Voreinstellung angewendet: Blog</em>. Screenreader sagen diese Meldung ebenfalls an. Das Anwenden einer Voreinstellung konvertiert noch nichts: Prüfen Sie die Einstellungen, ändern Sie sie bei Bedarf und verwenden Sie dann wie gewohnt <strong>Ausgewählte konvertieren</strong> oder <strong>Alle konvertieren</strong>. Solange es keine Voreinstellungen gibt, zeigt das Untermenü <em>Noch keine Voreinstellungen</em> über <strong>Voreinstellung hinzufügen</strong> und <strong>Voreinstellungen verwalten</strong>.</p>
 <p>Die Größen einer Voreinstellung bleiben in den Feldern <strong>Breite</strong> und <strong>Höhe</strong> stehen, während Sie Bilder hinzufügen, auswählen und entfernen: SIC! ersetzt sie nicht, wie sonst, durch die Abmessungen des ausgewählten Bildes, und bei einer Voreinstellung mit nur einer Höhe bleibt das Feld für die Breite leer. Sobald Sie selbst eine Größe ändern, <strong>Größe ändern</strong> aktivieren oder deaktivieren oder den Größenänderungsmodus wechseln, trägt die Auswahl eines Bildes wieder wie gewohnt seine Abmessungen ein.</p>
 <p>Konvertiert eine Voreinstellung in ein Format, das Sie in den <a href="#settings">Einstellungen</a> unter <strong>In der Liste anzuzeigende Zielformate</strong> deaktiviert haben, lässt sie sich trotzdem anwenden: Das Format wird dem Auswahlfeld <strong>Zielformat</strong> hinzugefügt und bleibt dort, bis Sie SIC! schließen.</p>
 
@@ -297,10 +297,10 @@ footer {
     <dd>Öffnet denselben Dialog wie <strong>Voreinstellung hinzufügen</strong>, aber leer.</dd>
 
     <dt>Bearbeiten</dt>
-    <dd>Öffnet die ausgewählte Voreinstellung in diesem Dialog. Sie können alles ändern, auch den Namen.</dd>
+    <dd>Öffnet die ausgewählte Voreinstellung in diesem Dialog. Sie können alles ändern, auch den Namen. Die <kbd>Eingabetaste</kbd> in der Liste oder ein Doppelklick auf eine Voreinstellung bewirkt dasselbe.</dd>
 
     <dt>Entfernen</dt>
-    <dd>Entfernt die ausgewählte Voreinstellung nach einer Rückfrage.</dd>
+    <dd>Entfernt die ausgewählte Voreinstellung nach einer Rückfrage. <kbd>Entf</kbd> in der Liste bewirkt dasselbe.</dd>
 
     <dt>Schließen</dt>
     <dd>Schließt den Dialog. <kbd>Escape</kbd> bewirkt dasselbe.</dd>
@@ -364,7 +364,7 @@ sic -i photo.png -p "Produktbanner" -o banner.jpg</pre>
     <dd>Name des Zielformats (z. B. <code>png</code>, <code>jpg</code>). Verwenden Sie dies anstelle von <code>--output</code>, um den Ausgabepfad automatisch zu generieren.</dd>
 
     <dt><code>--resize</code>, <code>-r</code></dt>
-    <dd>Bildgröße ändern. Format: <code>BxH</code>, <code>Bx</code> (nur Breite) oder <code>xH</code> (nur Höhe).</dd>
+    <dd>Bildgröße ändern. Format: <code>BxH</code>, <code>Bx</code> oder <code>B</code> (nur Breite) oder <code>xH</code> (nur Höhe), jede Größe von 1 bis 65535 Pixel.</dd>
 
     <dt><code>--crop</code>, <code>-c</code></dt>
     <dd>Zuschneiden statt proportional skalieren. Erfordert sowohl Breite als auch Höhe, aus <code>--resize</code> oder aus der Voreinstellung.</dd>

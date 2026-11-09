@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Oire.Sic.Models;
 using Oire.Sic.Utils.Enums;
@@ -18,21 +19,43 @@ internal static class PresetValidator {
     public static readonly StringComparer NameComparer = StringComparer.OrdinalIgnoreCase;
 
     /// <summary>The name as it is stored: trimmed and in Unicode normalization form C.</summary>
+    /// <exception cref="ArgumentException">The name holds text that can't be normalized, such as
+    /// an unpaired surrogate or U+FFFE. Use <see cref="TryCleanName"/> for text a user typed.</exception>
     public static string CleanName(string name) {
         ArgumentNullException.ThrowIfNull(name);
         return name.Trim().Normalize(NormalizationForm.FormC);
     }
 
     /// <summary>
+    /// <see cref="CleanName"/> for any text: false, with <paramref name="cleaned"/> empty, when the
+    /// name can't be normalized (an unpaired surrogate, or a noncharacter such as U+FFFE, which
+    /// <see cref="string.Normalize(NormalizationForm)"/> refuses).
+    /// </summary>
+    public static bool TryCleanName(string name, out string cleaned) {
+        ArgumentNullException.ThrowIfNull(name);
+
+        try {
+            cleaned = CleanName(name);
+            return true;
+        } catch (ArgumentException) {
+            cleaned = "";
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Checks <paramref name="name"/>, cleaned, against the rules for a preset name. Any script is
-    /// fine; only control characters are refused. <paramref name="takenNames"/> holds the names of
+    /// fine; only control characters, line and paragraph separators, and text that can't be
+    /// normalized are refused. <paramref name="takenNames"/> holds the names of
     /// the other presets; when editing, callers leave the preset's own name out, so a rename that
     /// only changes case works.
     /// </summary>
     public static PresetNameResult ValidateName(string? name, IEnumerable<string> takenNames) {
         ArgumentNullException.ThrowIfNull(takenNames);
 
-        var cleaned = CleanName(name ?? "");
+        if (!TryCleanName(name ?? "", out var cleaned)) {
+            return PresetNameResult.InvalidCharacters;
+        }
 
         if (cleaned.Length == 0) {
             return PresetNameResult.Empty;
@@ -42,11 +65,12 @@ internal static class PresetValidator {
             return PresetNameResult.TooLong;
         }
 
-        if (cleaned.Any(char.IsControl)) {
+        if (cleaned.Any(IsRefusedCharacter)) {
             return PresetNameResult.InvalidCharacters;
         }
 
-        return takenNames.Any(taken => taken is not null && NameComparer.Equals(CleanName(taken), cleaned))
+        return takenNames.Any(taken => taken is not null
+                && TryCleanName(taken, out var cleanedTaken) && NameComparer.Equals(cleanedTaken, cleaned))
             ? PresetNameResult.Duplicate
             : PresetNameResult.Valid;
     }
@@ -56,8 +80,8 @@ internal static class PresetValidator {
     /// A preset is dropped, with a logged warning, when it is null, its name or format is null, its
     /// name fails <see cref="ValidateName"/> (a duplicate included), its format isn't a supported
     /// target, a size is outside 1..<see cref="ResizeValidator.MaxDimension"/>, or its mode is
-    /// undefined or Crop with only one size. Kept presets get a cleaned name, an upper-cased format
-    /// key (JPEG becomes JPG, TIF becomes TIFF), and <see cref="ResizeMode.KeepProportions"/> when
+    /// undefined or Crop with only one size. Kept presets get a cleaned name, an format key from
+    /// <see cref="ImageConverter.NormalizeTargetFormat"/> (JPEG becomes JPG, TIF becomes TIFF), and <see cref="ResizeMode.KeepProportions"/> when
     /// they have no sizes.
     /// </summary>
     public static (List<ConversionPreset> Presets, int Dropped) Normalize(IEnumerable<ConversionPreset?>? presets) {
@@ -114,7 +138,7 @@ internal static class PresetValidator {
             return null;
         }
 
-        if (NormalizeFormat(preset.Format) is not { } format) {
+        if (ImageConverter.NormalizeTargetFormat(preset.Format) is not { } format) {
             reason = $"unsupported format {preset.Format}";
             return null;
         }
@@ -147,17 +171,11 @@ internal static class PresetValidator {
         return normalized;
     }
 
-    /// <summary>The SIC! format key for <paramref name="format"/>, or <see langword="null"/> when
-    /// it isn't a conversion target. HEIC is input-only, so it isn't one.</summary>
-    private static string? NormalizeFormat(string format) {
-        var key = format.Trim().ToUpperInvariant() switch {
-            "JPEG" => "JPG",
-            "TIF" => "TIFF",
-            var other => other,
-        };
-
-        return ImageConverter.GetSupportedFormats().Contains(key, StringComparer.Ordinal) ? key : null;
-    }
+    /// <summary>Control characters, and the line and paragraph separators, which break a name
+    /// over lines without being control characters.</summary>
+    private static bool IsRefusedCharacter(char c) =>
+        char.IsControl(c)
+        || char.GetUnicodeCategory(c) is UnicodeCategory.LineSeparator or UnicodeCategory.ParagraphSeparator;
 
     private static bool IsValidSize(int? size) => size is null or (>= 1 and <= ResizeValidator.MaxDimension);
 }

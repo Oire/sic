@@ -55,8 +55,24 @@ public sealed class PresetValidatorTests {
     [InlineData("Blog\u001B")]
     [InlineData("Blog\u007F")]
     [InlineData("Blog\u0085Wide")]
+    [InlineData("Blog\u2028Wide")]
+    [InlineData("Blog\u2029Wide")]
     public void ValidateName_ControlCharacter_IsInvalid(string name) {
         PresetValidator.ValidateName(name, []).Should().Be(PresetNameResult.InvalidCharacters);
+    }
+
+    // Built in code: xUnit turns a lone surrogate in InlineData into U+FFFD.
+    [Theory]
+    [InlineData(0xD800, false)]
+    [InlineData(0xDC00, true)]
+    [InlineData(0xFFFE, false)]
+    public void ValidateName_TextThatCantBeNormalized_IsInvalidWithoutThrowing(int codeUnit, bool first) {
+        PresetValidator.ValidateName(NameWith(codeUnit, first), []).Should().Be(PresetNameResult.InvalidCharacters);
+    }
+
+    [Fact]
+    public void ValidateName_TakenNameThatCantBeNormalized_IsSkipped() {
+        PresetValidator.ValidateName("Blog", ["Blog\uFFFE"]).Should().Be(PresetNameResult.Valid);
     }
 
     [Theory]
@@ -85,6 +101,30 @@ public sealed class PresetValidatorTests {
     public void CleanName_TrimsAndComposes() {
         PresetValidator.CleanName("  " + DecomposedName + " ").Should().Be(ComposedName);
     }
+
+    [Fact]
+    public void TryCleanName_UsableName_CleansIt() {
+        PresetValidator.TryCleanName("  " + DecomposedName + " ", out var cleaned).Should().BeTrue();
+        cleaned.Should().Be(ComposedName);
+    }
+
+    [Theory]
+    [InlineData(0xD800)]
+    [InlineData(0xFFFE)]
+    public void TryCleanName_TextThatCantBeNormalized_GivesFalse(int codeUnit) {
+        PresetValidator.TryCleanName(NameWith(codeUnit, first: false), out var cleaned).Should().BeFalse();
+        cleaned.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CleanName_TextThatCantBeNormalized_Throws() {
+        var clean = () => PresetValidator.CleanName(NameWith(0xD800, first: false));
+
+        clean.Should().Throw<ArgumentException>();
+    }
+
+    private static string NameWith(int codeUnit, bool first) =>
+        first ? (char)codeUnit + "Blog" : "Blog" + (char)codeUnit;
 
     #endregion
 
@@ -118,9 +158,12 @@ public sealed class PresetValidatorTests {
         { "empty name", Preset("  ", "PNG") },
         { "name too long", Preset(new string('a', 65), "PNG") },
         { "control character", Preset("Bad\tName", "PNG") },
+        { "unpaired surrogate", Preset("Bad\uD800", "PNG") },
+        { "noncharacter Normalize refuses", Preset("Bad\uFFFE", "PNG") },
         { "duplicate name", Preset("BLOG", "PNG") },
         { "unknown format", Preset("Bad", "PSD") },
         { "input-only format", Preset("Bad", "HEIC") },
+        { "input-only format alias", Preset("Bad", "HEIF") },
         { "empty format", Preset("Bad", "") },
         { "width 0", Preset("Bad", "PNG", width: 0) },
         { "negative height", Preset("Bad", "PNG", height: -1) },

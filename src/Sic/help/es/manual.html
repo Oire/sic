@@ -286,7 +286,7 @@ footer {
 <p>Con <em>Recortar</em>, los dos tamaños son obligatorios, y cada imagen queda exactamente de ese tamaño.</p>
 
 <h3>Aplicar un preajuste</h3>
-<p>Elija el preajuste por su nombre en <strong>Convertir &gt; Preajustes</strong>. SIC! rellena con él <strong>Formato de destino</strong>, <strong>Redimensionar</strong>, el modo de redimensionado, <strong>Ancho</strong> y <strong>Alto</strong>, y la barra de estado lo indica, por ejemplo <em>Preajuste aplicado: Blog</em>. Aplicar un preajuste no convierte nada: revise los ajustes, cambie los que quiera y luego use <strong>Convertir seleccionadas</strong> o <strong>Convertir todas</strong> como de costumbre. Mientras no haya preajustes, el submenú muestra <em>Aún no hay preajustes</em> encima de <strong>Añadir preajuste</strong> y <strong>Gestionar preajustes</strong>.</p>
+<p>Elija el preajuste por su nombre en <strong>Convertir &gt; Preajustes</strong>. SIC! rellena con él <strong>Formato de destino</strong>, <strong>Redimensionar</strong>, el modo de redimensionado, <strong>Ancho</strong> y <strong>Alto</strong>, y la barra de estado lo indica, por ejemplo <em>Preajuste aplicado: Blog</em>. Los lectores de pantalla también anuncian este mensaje. Aplicar un preajuste no convierte nada: revise los ajustes, cambie los que quiera y luego use <strong>Convertir seleccionadas</strong> o <strong>Convertir todas</strong> como de costumbre. Mientras no haya preajustes, el submenú muestra <em>Aún no hay preajustes</em> encima de <strong>Añadir preajuste</strong> y <strong>Gestionar preajustes</strong>.</p>
 <p>Los tamaños de un preajuste se mantienen en los campos <strong>Ancho</strong> y <strong>Alto</strong> mientras añade, selecciona y quita imágenes: SIC! no los sustituye por las dimensiones de la imagen seleccionada, como hace normalmente, y un preajuste con solo un alto deja vacío el campo del ancho. En cuanto usted cambia un tamaño, marca o desmarca <strong>Redimensionar</strong> o cambia el modo de redimensionado, al seleccionar una imagen vuelven a rellenarse sus dimensiones como de costumbre.</p>
 <p>Si un preajuste convierte a un formato que ha desmarcado en <strong>Formatos de destino que se muestran en la lista</strong>, en la <a href="#settings">configuración</a>, se aplica igualmente: ese formato se añade a la lista desplegable <strong>Formato de destino</strong> y permanece en ella hasta que cierre SIC!.</p>
 
@@ -297,10 +297,10 @@ footer {
     <dd>Abre el mismo cuadro de diálogo que <strong>Añadir preajuste</strong>, vacío.</dd>
 
     <dt>Editar</dt>
-    <dd>Abre el preajuste seleccionado en ese cuadro de diálogo. Puede cambiar cualquier cosa, también el nombre.</dd>
+    <dd>Abre el preajuste seleccionado en ese cuadro de diálogo. Puede cambiar cualquier cosa, también el nombre. Pulsar <kbd>Intro</kbd> en la lista, o hacer doble clic en un preajuste, hace lo mismo.</dd>
 
     <dt>Quitar</dt>
-    <dd>Quita el preajuste seleccionado después de pedirle confirmación.</dd>
+    <dd>Quita el preajuste seleccionado después de pedirle confirmación. Pulsar <kbd>Supr</kbd> en la lista hace lo mismo.</dd>
 
     <dt>Cerrar</dt>
     <dd>Cierra el cuadro de diálogo. <kbd>Esc</kbd> hace lo mismo.</dd>
@@ -364,7 +364,7 @@ sic -i foto.png -p "Banner de producto" -o banner.jpg</pre>
     <dd>Nombre del formato de destino (por ejemplo, <code>png</code> o <code>jpg</code>). Úselo en lugar de <code>--output</code> para generar la ruta de salida automáticamente.</dd>
 
     <dt><code>--resize</code>, <code>-r</code></dt>
-    <dd>Redimensiona la imagen. Formato: <code>AnchoxAlto</code>, <code>Anchox</code> (solo el ancho) o <code>xAlto</code> (solo el alto).</dd>
+    <dd>Redimensiona la imagen. Formato: <code>AnchoxAlto</code>, <code>Anchox</code> o <code>Ancho</code> (solo el ancho), o <code>xAlto</code> (solo el alto), cada tamaño de 1 a 65535 píxeles.</dd>
 
     <dt><code>--crop</code>, <code>-c</code></dt>
     <dd>Recorta en lugar de escalar proporcionalmente. Requiere tanto el ancho como el alto, de <code>--resize</code> o del preajuste.</dd>

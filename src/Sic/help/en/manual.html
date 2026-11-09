@@ -286,7 +286,7 @@ footer {
 <p>With <em>Crop</em>, both sizes are required, and every image comes out at exactly that size.</p>
 
 <h3>Applying a preset</h3>
-<p>Choose the preset by name in <strong>Convert > Presets</strong>. SIC! fills in <strong>Target Format</strong>, <strong>Resize</strong>, the resize mode, <strong>Width</strong> and <strong>Height</strong> from it, and the status bar says, for example, <em>Preset applied: Blog</em>. Applying a preset doesn't convert anything: check the settings, change any of them if you like, then use <strong>Convert Selected</strong> or <strong>Convert All</strong> as usual. When there are no presets yet, the submenu shows <em>No presets yet</em> above <strong>Add Preset</strong> and <strong>Manage Presets</strong>.</p>
+<p>Choose the preset by name in <strong>Convert > Presets</strong>. SIC! fills in <strong>Target Format</strong>, <strong>Resize</strong>, the resize mode, <strong>Width</strong> and <strong>Height</strong> from it, and the status bar says, for example, <em>Preset applied: Blog</em>. Screen readers announce this message too. Applying a preset doesn't convert anything: check the settings, change any of them if you like, then use <strong>Convert Selected</strong> or <strong>Convert All</strong> as usual. When there are no presets yet, the submenu shows <em>No presets yet</em> above <strong>Add Preset</strong> and <strong>Manage Presets</strong>.</p>
 <p>A preset's sizes stay in the <strong>Width</strong> and <strong>Height</strong> fields while you add, select and remove images: SIC! doesn't replace them with the selected image's dimensions, as it otherwise does, and a preset with only a height keeps the width field empty. Once you change a size, tick or untick <strong>Resize</strong>, or switch the resize mode yourself, selecting an image fills in its dimensions again as usual.</p>
 <p>If a preset converts to a format you have unticked under <strong>Target formats to show in the list</strong> in <a href="#settings">Settings</a>, it still applies: that format is added to the <strong>Target Format</strong> dropdown and stays there until you close SIC!.</p>
 
@@ -297,10 +297,10 @@ footer {
     <dd>Opens the same dialog as <strong>Add Preset</strong>, starting empty.</dd>
 
     <dt>Edit</dt>
-    <dd>Opens the selected preset in that dialog. You can change anything, including the name.</dd>
+    <dd>Opens the selected preset in that dialog. You can change anything, including the name. Pressing <kbd>Enter</kbd> on the list, or double-clicking a preset, does the same.</dd>
 
     <dt>Remove</dt>
-    <dd>Removes the selected preset after asking you to confirm.</dd>
+    <dd>Removes the selected preset after asking you to confirm. Pressing <kbd>Delete</kbd> on the list does the same.</dd>
 
     <dt>Close</dt>
     <dd>Closes the dialog. <kbd>Escape</kbd> does the same.</dd>
@@ -364,7 +364,7 @@ sic -i photo.png -p "Product banner" -o banner.jpg</pre>
     <dd>Target format name (e.g., <code>png</code>, <code>jpg</code>). Use this instead of <code>--output</code> to auto-generate the output path.</dd>
 
     <dt><code>--resize</code>, <code>-r</code></dt>
-    <dd>Resize the image. Format: <code>WxH</code>, <code>Wx</code> (width only), or <code>xH</code> (height only).</dd>
+    <dd>Resize the image. Format: <code>WxH</code>, <code>Wx</code> or <code>W</code> (width only), or <code>xH</code> (height only), each size from 1 to 65535 pixels.</dd>
 
     <dt><code>--crop</code>, <code>-c</code></dt>
     <dd>Crop instead of scaling proportionally. Requires both width and height, from <code>--resize</code> or from the preset.</dd>

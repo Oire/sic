@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-11-09 21:34:16+0100\n"
+"POT-Creation-Date: 2026-11-09 22:19:50+0100\n"
 "PO-Revision-Date: 2026-08-21 14:36:45+0200\n"
 "Last-Translator: \n"
 "Language-Team: he\n"
@@ -12,11 +12,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: GetText.NET Extractor\n"
 
-#: ..\..\MainWindow.cs:719
+#: ..\..\MainWindow.cs:693
 msgid ", "
 msgstr ", "
 
-#: ..\..\MainWindow.cs:1706
+#: ..\..\MainWindow.cs:1682
 #, csharp-format
 msgid "...and {0} more"
 msgstr "...ועוד {0}"
@@ -46,31 +46,31 @@ msgstr "{0} (מומלץ)"
 msgid "{0} B"
 msgstr "{0} B"
 
-#: ..\..\MainWindow.cs:1694
+#: ..\..\MainWindow.cs:1670
 #, csharp-format
 msgid "{0} cloud-only file skipped"
 msgid_plural "{0} cloud-only files skipped"
 msgstr[0] "דולג {0} קובץ שנמצא בענן בלבד"
 msgstr[1] "דולגו {0} קבצים שנמצאים בענן בלבד"
 
-#: ..\..\MainWindow.cs:713
+#: ..\..\MainWindow.cs:687
 #, csharp-format
 msgid "{0} converted"
 msgstr "{0} הומרו"
 
-#: ..\..\MainWindow.cs:717
+#: ..\..\MainWindow.cs:691
 #, csharp-format
 msgid "{0} failed"
 msgstr "{0} נכשלו"
 
-#: ..\..\MainWindow.cs:1696
+#: ..\..\MainWindow.cs:1672
 #, csharp-format
 msgid "{0} file failed to load"
 msgid_plural "{0} files failed to load"
 msgstr[0] "טעינת {0} קובץ נכשלה"
 msgstr[1] "טעינת {0} קבצים נכשלה"
 
-#: ..\..\MainWindow.cs:1575
+#: ..\..\MainWindow.cs:1551
 #, csharp-format
 msgid ""
 "{0} file is stored in the cloud and needs to be downloaded first.\n"
@@ -85,7 +85,7 @@ msgstr[1] ""
 "{0} קבצים מאוחסנים בענן ויש להוריד אותם תחילה.\n"
 "להוריד אותם?"
 
-#: ..\..\MainWindow.cs:1692
+#: ..\..\MainWindow.cs:1668
 #, csharp-format
 msgid "{0} image loaded"
 msgid_plural "{0} images loaded"
@@ -125,7 +125,7 @@ msgstr[0] "{0} הגדרה בקובץ {1} הכילה ערך לא תקין ואו�
 msgstr[1] ""
 "{0} הגדרות בקובץ {1} הכילו ערכים לא תקינים ואופסו לברירות המחדל שלהן."
 
-#: ..\..\MainWindow.cs:715
+#: ..\..\MainWindow.cs:689
 #, csharp-format
 msgid "{0} skipped"
 msgstr "{0} דולגו"
@@ -160,7 +160,7 @@ msgstr "{0}: {1}"
 msgid "{0}x{1}"
 msgstr "{0}x{1}"
 
-#: ..\..\MainWindow.cs:315
+#: ..\..\MainWindow.cs:313
 msgid "&About SIC!..."
 msgstr "&אודות SIC!..."
 
@@ -177,11 +177,12 @@ msgstr "&הוסף..."
 msgid "&Browse..."
 msgstr "&עיון..."
 
+#: ..\..\AddUrlDialog.Designer.cs:76
 #: ..\..\FitToSizeResultsDialog.Designer.cs:81
-#: ..\..\AddUrlDialog.Designer.cs:76 ..\..\AddSizeDialog.Designer.cs:76
-#: ..\..\AddFolderDialog.Designer.cs:126 ..\..\FitToSizeDialog.Designer.cs:117
-#: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\ProgressDialog.Designer.cs:83
-#: ..\..\PresetDialog.Designer.cs:216 ..\..\SettingsDialog.Designer.cs:304
+#: ..\..\AddFolderDialog.Designer.cs:126 ..\..\AddSizeDialog.Designer.cs:76
+#: ..\..\FitToSizeDialog.Designer.cs:117 ..\..\IcoPresetDialog.Designer.cs:164
+#: ..\..\ProgressDialog.Designer.cs:83 ..\..\PresetDialog.Designer.cs:216
+#: ..\..\SettingsDialog.Designer.cs:304
 msgid "&Cancel"
 msgstr "&ביטול"
 
@@ -189,7 +190,7 @@ msgstr "&ביטול"
 msgid "&Close"
 msgstr "ס&גור"
 
-#: ..\..\MainWindow.cs:294
+#: ..\..\MainWindow.cs:292
 msgid "&Convert"
 msgstr "&המרה"
 
@@ -205,11 +206,11 @@ msgstr "&חיתוך"
 msgid "&Detect images in clipboard"
 msgstr "ז&הה תמונות בלוח הגזירים"
 
-#: ..\..\MainWindow.cs:313
+#: ..\..\MainWindow.cs:311
 msgid "&Donate..."
 msgstr "&תרומה..."
 
-#: ..\..\MainWindow.cs:284
+#: ..\..\MainWindow.cs:282
 msgid "&Edit"
 msgstr "&עריכה"
 
@@ -221,11 +222,11 @@ msgstr "ע&רוך..."
 msgid "&Favicon"
 msgstr "&Favicon"
 
-#: ..\..\MainWindow.cs:269
+#: ..\..\MainWindow.cs:267
 msgid "&File"
 msgstr "&קובץ"
 
-#: ..\..\MainWindow.cs:302
+#: ..\..\MainWindow.cs:300
 msgid "&Fit to File Size..."
 msgstr "&התאם לגודל קובץ..."
 
@@ -237,7 +238,7 @@ msgstr "&תיקייה:"
 msgid "&Height:"
 msgstr "&גובה:"
 
-#: ..\..\MainWindow.cs:308
+#: ..\..\MainWindow.cs:306
 msgid "&Help"
 msgstr "ע&זרה"
 
@@ -266,8 +267,8 @@ msgid "&Name:"
 msgstr "שם ה&ערכה:"
 
 #: ..\..\AddUrlDialog.Designer.cs:67 ..\..\AddSizeDialog.Designer.cs:67
-#: ..\..\AddFolderDialog.Designer.cs:117 ..\..\AboutDialog.Designer.cs:117
-#: ..\..\FitToSizeDialog.Designer.cs:108 ..\..\IcoPresetDialog.Designer.cs:155
+#: ..\..\AddFolderDialog.Designer.cs:117 ..\..\FitToSizeDialog.Designer.cs:108
+#: ..\..\AboutDialog.Designer.cs:117 ..\..\IcoPresetDialog.Designer.cs:155
 #: ..\..\PresetDialog.Designer.cs:207 ..\..\SettingsDialog.Designer.cs:293
 msgid "&OK"
 msgstr "&אישור"
@@ -276,7 +277,7 @@ msgstr "&אישור"
 msgid "&Presets"
 msgstr "&ערכות מוגדרות מראש"
 
-#: ..\..\IcoPresetDialog.Designer.cs:145 ..\..\MainWindow.cs:288
+#: ..\..\IcoPresetDialog.Designer.cs:145 ..\..\MainWindow.cs:286
 #: ..\..\ManagePresetsDialog.Designer.cs:97
 msgid "&Remove"
 msgstr "ה&סר"
@@ -289,7 +290,7 @@ msgstr "שח&זור ברירת המחדל"
 msgid "&Save converted images in the same folder as the original"
 msgstr "&שמור תמונות מומרות באותה תיקייה שבה נמצא המקור"
 
-#: ..\..\MainWindow.cs:277
+#: ..\..\MainWindow.cs:275
 msgid "&Settings..."
 msgstr "ה&גדרות..."
 
@@ -306,7 +307,7 @@ msgstr "&רוחב:"
 msgid "© {0} Oire Software"
 msgstr "© {0} Oire Software"
 
-#: ..\..\MainWindow.cs:472 ..\..\MainWindow.cs:1669 ..\..\MainWindow.cs:1735
+#: ..\..\MainWindow.cs:470 ..\..\MainWindow.cs:1645 ..\..\MainWindow.cs:1711
 #, csharp-format
 msgid "1 image in queue"
 msgid_plural "{0} images in queue"
@@ -318,18 +319,18 @@ msgstr[1] "{0} תמונות בתור"
 msgid "A copy of the original file was saved as {0}."
 msgstr "עותק של הקובץ המקורי נשמר בשם {0}."
 
-#: ..\..\PresetDialog.cs:117
+#: ..\..\PresetDialog.cs:125
 #, csharp-format
 msgid "A preset name can be at most {0} characters long."
 msgstr "שם של ערכה מוגדרת מראש יכול להכיל {0} תווים לכל היותר."
 
-#: ..\..\PresetDialog.cs:118
+#: ..\..\PresetDialog.cs:126
 msgid ""
 "A preset name can't contain tabs, line breaks or other control characters."
 msgstr ""
 "שם של ערכה מוגדרת מראש לא יכול להכיל טאבים, מעברי שורה או תווי בקרה אחרים."
 
-#: ..\..\PresetDialog.cs:119
+#: ..\..\PresetDialog.cs:127
 #, csharp-format
 msgid "A preset named \"{0}\" already exists."
 msgstr "כבר קיימת ערכה מוגדרת מראש בשם \"{0}\"."
@@ -338,11 +339,11 @@ msgstr "כבר קיימת ערכה מוגדרת מראש בשם \"{0}\"."
 msgid "About SIC!"
 msgstr "אודות SIC!"
 
-#: ..\..\MainWindow.cs:270
+#: ..\..\MainWindow.cs:268
 msgid "Add &Image..."
 msgstr "הוסף &תמונה..."
 
-#: ..\..\MainWindow.cs:272
+#: ..\..\MainWindow.cs:270
 msgid "Add F&older..."
 msgstr "הוסף ת&יקייה..."
 
@@ -350,7 +351,7 @@ msgstr "הוסף ת&יקייה..."
 msgid "Add Folder"
 msgstr "הוספת תיקייה"
 
-#: ..\..\MainWindow.cs:274
+#: ..\..\MainWindow.cs:272
 msgid "Add Image by &Link..."
 msgstr "הוסף תמונה לפי &קישור..."
 
@@ -358,7 +359,7 @@ msgstr "הוסף תמונה לפי &קישור..."
 msgid "Add Image by Link"
 msgstr "הוספת תמונה לפי קישור"
 
-#: ..\..\MainWindow.cs:1711
+#: ..\..\MainWindow.cs:1687
 msgid "Add Images"
 msgstr "הוספת תמונות"
 
@@ -370,20 +371,20 @@ msgstr "הוספת ערכה מוגדרת מראש"
 msgid "Add Size"
 msgstr "הוספת גודל"
 
-#: ..\..\MainWindow.cs:370
+#: ..\..\MainWindow.cs:368
 msgid "Add your images here"
 msgstr "הוסיפו כאן את התמונות שלכם"
 
-#: ..\..\MainWindow.cs:1521
+#: ..\..\MainWindow.cs:1497
 #, csharp-format
 msgid "Added {0} from URL"
 msgstr "{0} נוספה מכתובת האינטרנט"
 
-#: ..\..\MainWindow.cs:1466
+#: ..\..\MainWindow.cs:1442
 msgid "Added image from clipboard"
 msgstr "התמונה נוספה מלוח הגזירים"
 
-#: ..\..\MainWindow.cs:393
+#: ..\..\MainWindow.cs:391
 msgid "All files"
 msgstr "כל הקבצים"
 
@@ -391,7 +392,7 @@ msgstr "כל הקבצים"
 msgid "All supported images"
 msgstr "כל התמונות הנתמכות"
 
-#: ..\..\MainWindow.cs:280
+#: ..\..\MainWindow.cs:278
 msgid "Alt+F4"
 msgstr "Alt+F4"
 
@@ -432,7 +433,7 @@ msgstr "בחרו &תוצאה להמרה:"
 msgid "C&ustom"
 msgstr "&מותאם אישית"
 
-#: ..\..\MainWindow.cs:721
+#: ..\..\MainWindow.cs:695
 msgid "Cancelled."
 msgstr "בוטל."
 
@@ -440,7 +441,7 @@ msgstr "בוטל."
 msgid "Check for &updates on startup"
 msgstr "בדוק &עדכונים בעת ההפעלה"
 
-#: ..\..\MainWindow.cs:311
+#: ..\..\MainWindow.cs:309
 msgid "Check for &Updates..."
 msgstr "בדוק &עדכונים..."
 
@@ -448,16 +449,16 @@ msgstr "בדוק &עדכונים..."
 msgid "Check for updates in the back&ground:"
 msgstr "בדיקת עדכונים ב&רקע:"
 
-#: ..\..\MainWindow.cs:879
+#: ..\..\MainWindow.cs:853
 #, csharp-format
 msgid "Checking {0} ({1}/{2})..."
 msgstr "בודק {0} ({1}/{2})..."
 
-#: ..\..\MainWindow.cs:1374
+#: ..\..\MainWindow.cs:1350
 msgid "Clipboard Content Detected"
 msgstr "זוהה תוכן בלוח הגזירים"
 
-#: ..\..\MainWindow.cs:1578
+#: ..\..\MainWindow.cs:1554
 msgid "Cloud Files"
 msgstr "קבצים בענן"
 
@@ -465,7 +466,7 @@ msgstr "קבצים בענן"
 msgid "Con&vert"
 msgstr "ה&מר"
 
-#: ..\..\MainWindow.cs:1329
+#: ..\..\MainWindow.cs:1305
 msgid "Confirm Exit"
 msgstr "אישור יציאה"
 
@@ -473,40 +474,40 @@ msgstr "אישור יציאה"
 msgid "Confirm on exit with non-empty &queue"
 msgstr "בקש אישור ביציאה כשה&תור אינו ריק"
 
-#: ..\..\MainWindow.cs:728 ..\..\MainWindow.cs:962
+#: ..\..\MainWindow.cs:702 ..\..\MainWindow.cs:936
 msgid "Conversion Complete"
 msgstr "ההמרה הושלמה"
 
-#: ..\..\MainWindow.cs:679 ..\..\MainWindow.cs:970
+#: ..\..\MainWindow.cs:653 ..\..\MainWindow.cs:944
 msgid "Conversion Error"
 msgstr "שגיאת המרה"
 
-#: ..\..\Program.cs:344
+#: ..\..\Program.cs:340
 #, csharp-format
 msgid "Conversion failed: {0}"
 msgstr "ההמרה נכשלה: {0}"
 
-#: ..\..\MainWindow.Designer.cs:269 ..\..\MainWindow.cs:297
+#: ..\..\MainWindow.cs:295 ..\..\MainWindow.Designer.cs:269
 msgid "Convert &All"
 msgstr "המר ה&כול"
 
-#: ..\..\MainWindow.Designer.cs:259 ..\..\MainWindow.cs:295
+#: ..\..\MainWindow.cs:293 ..\..\MainWindow.Designer.cs:259
 msgid "Convert &Selected"
 msgstr "המר &נבחרות"
 
-#: ..\..\MainWindow.cs:959 ..\..\Program.cs:340
+#: ..\..\MainWindow.cs:933 ..\..\Program.cs:336
 #, csharp-format
 msgid "Converted: {0}"
 msgstr "הומר: {0}"
 
-#: ..\..\MainWindow.cs:631
+#: ..\..\MainWindow.cs:605
 #, csharp-format
 msgid "Converting {0} ({1}/{2})..."
 msgstr "ממיר {0} ({1}/{2})..."
 
-#: ..\..\MainWindow.cs:615 ..\..\MainWindow.cs:633 ..\..\MainWindow.cs:788
-#: ..\..\MainWindow.cs:792 ..\..\MainWindow.cs:937 ..\..\MainWindow.cs:938
-#: ..\..\MainWindow.cs:942
+#: ..\..\MainWindow.cs:589 ..\..\MainWindow.cs:607 ..\..\MainWindow.cs:762
+#: ..\..\MainWindow.cs:766 ..\..\MainWindow.cs:911 ..\..\MainWindow.cs:912
+#: ..\..\MainWindow.cs:916
 msgid "Converting..."
 msgstr "ממיר..."
 
@@ -514,7 +515,7 @@ msgstr "ממיר..."
 msgid "Copied!"
 msgstr "הועתק!"
 
-#: ..\..\MainWindow.cs:300
+#: ..\..\MainWindow.cs:298
 msgid "Create Multi-size &ICO..."
 msgstr "צור &ICO מרובה גדלים..."
 
@@ -522,89 +523,91 @@ msgstr "צור &ICO מרובה גדלים..."
 msgid "Create Multi-size ICO"
 msgstr "יצירת ICO מרובה גדלים"
 
-#: ..\..\MainWindow.cs:787
+#: ..\..\MainWindow.cs:761
 msgid "Creating multi-size ICO..."
 msgstr "יוצר ICO מרובה גדלים..."
 
-#: ..\..\PresetDialog.cs:40
+#: ..\..\PresetDialog.cs:45
 msgid "Crop"
 msgstr "חיתוך"
 
-#: ..\..\MainWindow.cs:554 ..\..\PresetDialog.cs:152
-msgid "Crop mode requires a valid height (1–65535)."
-msgstr "מצב חיתוך מחייב גובה תקין (1–65535)."
+#: ..\..\Services\ResizeErrorDescriber.cs:27
+#, csharp-format
+msgid "Crop mode requires a valid height (1–{0})."
+msgstr "מצב חיתוך מחייב גובה תקין (1–{0})."
 
-#: ..\..\MainWindow.cs:550 ..\..\PresetDialog.cs:149
-msgid "Crop mode requires a valid width (1–65535)."
-msgstr "מצב חיתוך מחייב רוחב תקין (1–65535)."
+#: ..\..\Services\ResizeErrorDescriber.cs:25
+#, csharp-format
+msgid "Crop mode requires a valid width (1–{0})."
+msgstr "מצב חיתוך מחייב רוחב תקין (1–{0})."
 
-#: ..\..\Program.cs:319
+#: ..\..\Program.cs:315
 msgid "Crop mode requires both width and height (e.g. --resize 128x128 --crop)"
 msgstr "מצב חיתוך מחייב גם רוחב וגם גובה (למשל: --resize 128x128 --crop)"
 
-#: ..\..\MainWindow.cs:277
+#: ..\..\MainWindow.cs:275
 msgid "Ctrl+,"
 msgstr "Ctrl+,"
 
-#: ..\..\MainWindow.cs:300
+#: ..\..\MainWindow.cs:298
 msgid "Ctrl+Alt+F5"
 msgstr "Ctrl+Alt+F5"
 
-#: ..\..\MainWindow.cs:302
+#: ..\..\MainWindow.cs:300
 msgid "Ctrl+Alt+Shift+F5"
 msgstr "Ctrl+Alt+Shift+F5"
 
-#: ..\..\MainWindow.cs:274
+#: ..\..\MainWindow.cs:272
 msgid "Ctrl+L"
 msgstr "Ctrl+L"
 
-#: ..\..\MainWindow.cs:270
+#: ..\..\MainWindow.cs:268
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: ..\..\MainWindow.cs:313
+#: ..\..\MainWindow.cs:311
 msgid "Ctrl+Shift+D"
 msgstr "Ctrl+Shift+D"
 
-#: ..\..\MainWindow.cs:290
+#: ..\..\MainWindow.cs:288
 msgid "Ctrl+Shift+Del"
 msgstr "Ctrl+Shift+Del"
 
-#: ..\..\MainWindow.cs:297
+#: ..\..\MainWindow.cs:295
 msgid "Ctrl+Shift+F5"
 msgstr "Ctrl+Shift+F5"
 
-#: ..\..\MainWindow.cs:272
+#: ..\..\MainWindow.cs:270
 msgid "Ctrl+Shift+N"
 msgstr "Ctrl+Shift+N"
 
-#: ..\..\MainWindow.cs:288
+#: ..\..\MainWindow.cs:286
 msgid "Del"
 msgstr "Del"
 
-#: ..\..\MainWindow.Designer.cs:135 ..\..\MainWindow.cs:362
+#: ..\..\MainWindow.Designer.cs:135 ..\..\MainWindow.cs:360
 msgid "Dimensions"
 msgstr "ממדים"
 
-#: ..\..\MainWindow.cs:1495
+#: ..\..\MainWindow.cs:1471
 msgid "Downloading image..."
 msgstr "מוריד את התמונה..."
 
-#: ..\..\MainWindow.cs:1508
+#: ..\..\MainWindow.cs:1484
 #, csharp-format
 msgid "Downloading image... ({0} KB)"
 msgstr "מוריד את התמונה... ({0} KB)"
 
-#: ..\..\MainWindow.cs:1505
+#: ..\..\MainWindow.cs:1481
 #, csharp-format
 msgid "Downloading image... {0}%"
 msgstr "מוריד את התמונה... {0}%"
 
-#: ..\..\MainWindow.cs:1496
+#: ..\..\MainWindow.cs:1472
 msgid "Downloading..."
 msgstr "מוריד..."
 
-#: ..\..\MainWindow.cs:280
+#: ..\..\MainWindow.cs:278
 msgid "E&xit"
 msgstr "י&ציאה"
 
@@ -612,17 +615,17 @@ msgstr "י&ציאה"
 msgid "Edit Preset"
 msgstr "עריכת ערכה מוגדרת מראש"
 
-#: ..\..\Program.cs:253
+#: ..\..\Program.cs:251
 msgid "Either --output, --format or --preset must be specified."
 msgstr "יש לציין את --output, את --format או את --preset."
 
-#: ..\..\MainWindow.cs:820 ..\..\MainWindow.cs:889 ..\..\MainWindow.cs:1469
-#: ..\..\MainWindow.cs:1528 ..\..\MainWindow.cs:1533 ..\..\MainWindow.cs:1721
+#: ..\..\MainWindow.cs:794 ..\..\MainWindow.cs:863 ..\..\MainWindow.cs:1445
+#: ..\..\MainWindow.cs:1504 ..\..\MainWindow.cs:1509 ..\..\MainWindow.cs:1697
 #: ..\..\Utils\Config.cs:68 ..\..\Program.cs:54 ..\..\Program.cs:102
 msgid "Error"
 msgstr "שגיאה"
 
-#: ..\..\MainWindow.cs:1701
+#: ..\..\MainWindow.cs:1677
 msgid "Errors:"
 msgstr "שגיאות:"
 
@@ -634,19 +637,19 @@ msgstr "כל 3 ימים"
 msgid "Existing size"
 msgstr "גודל קיים"
 
-#: ..\..\MainWindow.cs:309
+#: ..\..\MainWindow.cs:307
 msgid "F1"
 msgstr "F1"
 
-#: ..\..\MainWindow.cs:295
+#: ..\..\MainWindow.cs:293
 msgid "F5"
 msgstr "F5"
 
-#: ..\..\MainWindow.cs:678 ..\..\MainWindow.cs:819 ..\..\MainWindow.cs:969
+#: ..\..\MainWindow.cs:652 ..\..\MainWindow.cs:793 ..\..\MainWindow.cs:943
 msgid "Failed"
 msgstr "נכשל"
 
-#: ..\..\MainWindow.cs:889
+#: ..\..\MainWindow.cs:863
 #, csharp-format
 msgid ""
 "Failed to analyze the image:\n"
@@ -655,7 +658,7 @@ msgstr ""
 "ניתוח התמונה נכשל:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:679 ..\..\MainWindow.cs:970
+#: ..\..\MainWindow.cs:653 ..\..\MainWindow.cs:944
 #, csharp-format
 msgid ""
 "Failed to convert {0}:\n"
@@ -664,7 +667,7 @@ msgstr ""
 "המרת {0} נכשלה:\n"
 "{1}"
 
-#: ..\..\MainWindow.cs:820
+#: ..\..\MainWindow.cs:794
 #, csharp-format
 msgid ""
 "Failed to create multi-size ICO:\n"
@@ -673,7 +676,7 @@ msgstr ""
 "יצירת ICO מרובה גדלים נכשלה:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:1469
+#: ..\..\MainWindow.cs:1445
 #, csharp-format
 msgid ""
 "Failed to load clipboard image:\n"
@@ -682,7 +685,7 @@ msgstr ""
 "טעינת התמונה מלוח הגזירים נכשלה:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:1533
+#: ..\..\MainWindow.cs:1509
 #, csharp-format
 msgid ""
 "Failed to load image from URL:\n"
@@ -691,7 +694,7 @@ msgstr ""
 "טעינת התמונה מכתובת האינטרנט נכשלה:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:1721
+#: ..\..\MainWindow.cs:1697
 #, csharp-format
 msgid ""
 "Failed to load image:\n"
@@ -711,11 +714,11 @@ msgstr "שגיאה חמורה: {0}"
 msgid "Fi&lter:"
 msgstr "&סינון:"
 
-#: ..\..\MainWindow.cs:1744
+#: ..\..\MainWindow.cs:1720
 msgid "File Already Exists"
 msgstr "הקובץ כבר קיים"
 
-#: ..\..\MainWindow.Designer.cs:131 ..\..\MainWindow.cs:360
+#: ..\..\MainWindow.Designer.cs:131 ..\..\MainWindow.cs:358
 msgid "File Name"
 msgstr "שם הקובץ"
 
@@ -724,7 +727,7 @@ msgstr "שם הקובץ"
 msgid "File not found: {0}"
 msgstr "הקובץ לא נמצא: {0}"
 
-#: ..\..\FitToSizeDialog.cs:21
+#: ..\..\FitToSizeDialog.cs:20
 msgid "Fit to File Size"
 msgstr "התאמה לגודל קובץ"
 
@@ -732,7 +735,7 @@ msgstr "התאמה לגודל קובץ"
 msgid "Fit to File Size — Results"
 msgstr "התאמה לגודל קובץ — תוצאות"
 
-#: ..\..\MainWindow.cs:862
+#: ..\..\MainWindow.cs:836
 msgid "Fitting..."
 msgstr "מתאים..."
 
@@ -740,7 +743,7 @@ msgstr "מתאים..."
 msgid "Folder Not Found"
 msgstr "התיקייה לא נמצאה"
 
-#: ..\..\MainWindow.Designer.cs:133 ..\..\MainWindow.cs:361
+#: ..\..\MainWindow.Designer.cs:133 ..\..\MainWindow.cs:359
 msgid "Format"
 msgstr "פורמט"
 
@@ -760,7 +763,7 @@ msgstr "מאגר GitHub"
 msgid "HEIC images (*.heic, *.heif)"
 msgstr "תמונות HEIC (*.heic, *.heif)"
 
-#: ..\..\MainWindow.cs:848
+#: ..\..\MainWindow.cs:822
 msgid ""
 "ICO and GIF can't be fitted to a file size, and no other format is enabled.\n"
 "Please enable at least one more target format in Settings."
@@ -768,7 +771,7 @@ msgstr ""
 "אי אפשר להתאים ICO ו-GIF לגודל קובץ, ואף פורמט אחר אינו מופעל.\n"
 "הפעילו לפחות פורמט יעד אחד נוסף בהגדרות."
 
-#: ..\..\MainWindow.cs:812
+#: ..\..\MainWindow.cs:786
 msgid "ICO Created"
 msgstr "ICO נוצר"
 
@@ -776,7 +779,7 @@ msgstr "ICO נוצר"
 msgid "ICO icons (*.ico)"
 msgstr "סמלי ICO (*.ico)"
 
-#: ..\..\MainWindow.cs:962
+#: ..\..\MainWindow.cs:936
 #, csharp-format
 msgid ""
 "Image converted successfully:\n"
@@ -785,7 +788,7 @@ msgstr ""
 "התמונה הומרה בהצלחה:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:393
+#: ..\..\MainWindow.cs:391
 msgid "Image files"
 msgstr "קובצי תמונה"
 
@@ -797,34 +800,34 @@ msgstr "תמונות"
 msgid "Include &All Subfolders"
 msgstr "כלול את &כל תת-התיקיות"
 
-#: ..\..\MainWindow.cs:566 ..\..\PresetDialog.cs:161
+#: ..\..\Services\ResizeErrorDescriber.cs:32
 msgid "Invalid dimensions"
 msgstr "ממדים לא תקינים"
 
-#: ..\..\MainWindow.cs:554 ..\..\MainWindow.cs:562 ..\..\PresetDialog.cs:152
-#: ..\..\PresetDialog.cs:158
+#: ..\..\Services\ResizeErrorDescriber.cs:27
+#: ..\..\Services\ResizeErrorDescriber.cs:31
 msgid "Invalid height"
 msgstr "גובה לא תקין"
 
-#: ..\..\Program.cs:303
+#: ..\..\Program.cs:299
 #, csharp-format
 msgid "Invalid height value: {0}"
 msgstr "ערך גובה לא תקין: {0}"
 
-#: ..\..\AddUrlDialog.cs:35 ..\..\MainWindow.cs:1485
+#: ..\..\AddUrlDialog.cs:35 ..\..\MainWindow.cs:1461
 msgid "Invalid link"
 msgstr "קישור לא תקין"
 
-#: ..\..\PresetDialog.cs:128
+#: ..\..\PresetDialog.cs:136
 msgid "Invalid name"
 msgstr "שם לא תקין"
 
-#: ..\..\Program.cs:307
+#: ..\..\Program.cs:303
 #, csharp-format
 msgid "Invalid resize format: {0}. At least one dimension is required."
 msgstr "תבנית שינוי גודל לא תקינה: {0}. נדרש לפחות ממד אחד."
 
-#: ..\..\Program.cs:290
+#: ..\..\Program.cs:286
 #, csharp-format
 msgid ""
 "Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, "
@@ -833,7 +836,7 @@ msgstr ""
 "תבנית שינוי גודל לא תקינה: {0}. השתמשו ב-WxH, Wx, xH או W (למשל: 128x128, "
 "128x, x128, 128)"
 
-#: ..\..\FitToSizeDialog.cs:51
+#: ..\..\FitToSizeDialog.cs:50
 msgid "Invalid size"
 msgstr "גודל לא תקין"
 
@@ -841,12 +844,12 @@ msgstr "גודל לא תקין"
 msgid "Invalid Size"
 msgstr "גודל לא תקין"
 
-#: ..\..\FitToSizeDialog.cs:69 ..\..\MainWindow.cs:550
-#: ..\..\PresetDialog.cs:149 ..\..\MainWindow.cs:558 ..\..\PresetDialog.cs:155
+#: ..\..\FitToSizeDialog.cs:68 ..\..\Services\ResizeErrorDescriber.cs:25
+#: ..\..\Services\ResizeErrorDescriber.cs:29
 msgid "Invalid width"
 msgstr "רוחב לא תקין"
 
-#: ..\..\Program.cs:299
+#: ..\..\Program.cs:295
 #, csharp-format
 msgid "Invalid width value: {0}"
 msgstr "ערך רוחב לא תקין: {0}"
@@ -855,20 +858,20 @@ msgstr "ערך רוחב לא תקין: {0}"
 msgid "JPEG images (*.jpg, *.jpeg)"
 msgstr "תמונות JPEG (*.jpg, *.jpeg)"
 
-#: ..\..\PresetDialog.cs:40
+#: ..\..\PresetDialog.cs:45
 msgid "Keep proportions"
 msgstr "שמור על יחס הממדים"
 
-#: ..\..\MainWindow.cs:1599 ..\..\MainWindow.cs:1623
+#: ..\..\MainWindow.cs:1575 ..\..\MainWindow.cs:1599
 #, csharp-format
 msgid "Loading images ({0}/{1})..."
 msgstr "טוען תמונות ({0}/{1})..."
 
-#: ..\..\MainWindow.cs:1600
+#: ..\..\MainWindow.cs:1576
 msgid "Loading..."
 msgstr "טוען..."
 
-#: ..\..\MainWindow.cs:861
+#: ..\..\MainWindow.cs:835
 msgid "Looking for the best fit..."
 msgstr "מחפש את ההתאמה הטובה ביותר..."
 
@@ -884,7 +887,7 @@ msgstr "&רוחב מרבי (פיקסלים):"
 msgid "Maximum file size (&KB):"
 msgstr "גודל קובץ מרבי (&KB):"
 
-#: ..\..\MainWindow.cs:812
+#: ..\..\MainWindow.cs:786
 #, csharp-format
 msgid ""
 "Multi-size ICO created successfully:\n"
@@ -893,7 +896,7 @@ msgstr ""
 "ICO מרובה גדלים נוצר בהצלחה:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:809
+#: ..\..\MainWindow.cs:783
 #, csharp-format
 msgid "Multi-size ICO created: {0}"
 msgstr "נוצר ICO מרובה גדלים: {0}"
@@ -910,7 +913,7 @@ msgstr ""
 msgid "Never"
 msgstr "אף פעם"
 
-#: ..\..\MainWindow.cs:849 ..\..\MainWindow.cs:899
+#: ..\..\MainWindow.cs:823 ..\..\MainWindow.cs:873
 msgid "No fit found"
 msgstr "לא נמצאה התאמה"
 
@@ -918,7 +921,7 @@ msgstr "לא נמצאה התאמה"
 msgid "No folder selected"
 msgstr "לא נבחרה תיקייה"
 
-#: ..\..\MainWindow.cs:533
+#: ..\..\MainWindow.cs:531
 msgid "No format selected"
 msgstr "לא נבחר פורמט"
 
@@ -926,11 +929,11 @@ msgstr "לא נבחר פורמט"
 msgid "No Formats Selected"
 msgstr "לא נבחרו פורמטים"
 
-#: ..\..\MainWindow.cs:417
+#: ..\..\MainWindow.cs:415
 msgid "No images found"
 msgstr "לא נמצאו תמונות"
 
-#: ..\..\MainWindow.cs:734
+#: ..\..\MainWindow.cs:708
 msgid "No images to convert. Add some images first."
 msgstr "אין תמונות להמרה. הוסיפו קודם כמה תמונות."
 
@@ -938,7 +941,7 @@ msgstr "אין תמונות להמרה. הוסיפו קודם כמה תמונו�
 msgid "No link entered"
 msgstr "לא הוזן קישור"
 
-#: ..\..\MainWindow.cs:417
+#: ..\..\MainWindow.cs:415
 msgid "No matching images found in the selected folder."
 msgstr "לא נמצאו תמונות מתאימות בתיקייה שנבחרה."
 
@@ -950,7 +953,7 @@ msgstr "אין עדיין ערכות מוגדרות מראש"
 msgid "No Sizes"
 msgstr "אין גדלים"
 
-#: ..\..\MainWindow.cs:898
+#: ..\..\MainWindow.cs:872
 #, csharp-format
 msgid ""
 "None of the enabled formats can bring this image under {0} KB.\n"
@@ -960,7 +963,7 @@ msgstr ""
 "KB.\n"
 "נסו גודל גדול יותר, רוחב קטן יותר, או הפעילו פורמטים נוספים בהגדרות."
 
-#: ..\..\MainWindow.cs:734
+#: ..\..\MainWindow.cs:708
 msgid "Nothing to convert"
 msgstr "אין מה להמיר"
 
@@ -984,7 +987,7 @@ msgstr "פעם בשבוע"
 msgid "Output &Folder:"
 msgstr "&תיקיית פלט:"
 
-#: ..\..\MainWindow.cs:586 ..\..\Program.cs:161
+#: ..\..\MainWindow.cs:560 ..\..\Program.cs:161
 msgid "Output Folder Not Found"
 msgstr "תיקיית הפלט לא נמצאה"
 
@@ -992,7 +995,7 @@ msgstr "תיקיית הפלט לא נמצאה"
 msgid "Output path must have a file extension (e.g. .jpg, .png)"
 msgstr "נתיב הפלט חייב לכלול סיומת קובץ (למשל: .jpg, .png)"
 
-#: ..\..\MainWindow.cs:1772
+#: ..\..\MainWindow.cs:1748
 msgid "Overwrite"
 msgstr "החלף"
 
@@ -1012,11 +1015,11 @@ msgstr "הוסיפו לפחות גודל אחד לרשימה."
 msgid "Please enter a link."
 msgstr "הזינו קישור."
 
-#: ..\..\FitToSizeDialog.cs:50
+#: ..\..\FitToSizeDialog.cs:49
 msgid "Please enter a maximum file size in KB (a whole number of at least 1)."
 msgstr "הזינו גודל קובץ מרבי ב-KB (מספר שלם של 1 לפחות)."
 
-#: ..\..\PresetDialog.cs:116 ..\..\PresetDialog.cs:120
+#: ..\..\PresetDialog.cs:124 ..\..\PresetDialog.cs:128
 msgid "Please enter a name for the preset."
 msgstr "הזינו שם לערכה המוגדרת מראש."
 
@@ -1029,20 +1032,21 @@ msgstr "הזינו מספר בין {0} ל-{1}."
 msgid "Please enter a valid link starting with http:// or https://."
 msgstr "הזינו קישור תקין שמתחיל ב-http:// או ב-https://."
 
-#: ..\..\FitToSizeDialog.cs:68
+#: ..\..\FitToSizeDialog.cs:67
 #, csharp-format
 msgid "Please enter a valid maximum width (1–{0})."
 msgstr "הזינו רוחב מרבי תקין (1–{0})."
 
-#: ..\..\MainWindow.cs:566 ..\..\PresetDialog.cs:161
-msgid "Please enter at least one valid dimension (1–65535)."
-msgstr "הזינו לפחות ממד תקין אחד (1–65535)."
+#: ..\..\Services\ResizeErrorDescriber.cs:32
+#, csharp-format
+msgid "Please enter at least one valid dimension (1–{0})."
+msgstr "הזינו לפחות ממד תקין אחד (1–{0})."
 
 #: ..\..\AddFolderDialog.cs:65
 msgid "Please select a folder."
 msgstr "בחרו תיקייה."
 
-#: ..\..\MainWindow.cs:533
+#: ..\..\MainWindow.cs:531
 msgid "Please select a target format."
 msgstr "בחרו פורמט יעד."
 
@@ -1066,47 +1070,47 @@ msgstr "&ערכה מוגדרת מראש:"
 msgid "Pre&sets:"
 msgstr "&ערכות מוגדרות מראש:"
 
-#: ..\..\MainWindow.cs:614
+#: ..\..\MainWindow.cs:588
 msgid "Preparing to convert..."
 msgstr "מתכונן להמרה..."
 
-#: ..\..\MainWindow.cs:1187
+#: ..\..\MainWindow.cs:1163
 #, csharp-format
 msgid "Preset applied: {0}"
 msgstr "הוחלה ערכה מוגדרת מראש: {0}"
 
-#: ..\..\MainWindow.cs:710
+#: ..\..\MainWindow.cs:684
 #, csharp-format
 msgid "Processed {0} image."
 msgid_plural "Processed {0} images."
 msgstr[0] "עובדה {0} תמונה."
 msgstr[1] "עובדו {0} תמונות."
 
-#: ..\..\MainWindow.cs:309
+#: ..\..\MainWindow.cs:307
 msgid "Read User &Manual"
 msgstr "קרא את &מדריך המשתמש"
 
-#: ..\..\MainWindow.Designer.cs:305 ..\..\MainWindow.cs:483
-#: ..\..\MainWindow.cs:516 ..\..\MainWindow.cs:816 ..\..\MainWindow.cs:885
-#: ..\..\MainWindow.cs:966 ..\..\MainWindow.cs:1523 ..\..\MainWindow.cs:1530
-#: ..\..\MainWindow.cs:1534
+#: ..\..\MainWindow.Designer.cs:305 ..\..\MainWindow.cs:481
+#: ..\..\MainWindow.cs:514 ..\..\MainWindow.cs:790 ..\..\MainWindow.cs:859
+#: ..\..\MainWindow.cs:940 ..\..\MainWindow.cs:1499 ..\..\MainWindow.cs:1506
+#: ..\..\MainWindow.cs:1510
 msgid "Ready"
 msgstr "מוכן"
 
-#: ..\..\MainWindow.cs:290
+#: ..\..\MainWindow.cs:288
 msgid "Remove &All"
 msgstr "הסר ה&כול"
 
-#: ..\..\ManagePresetsDialog.cs:82
+#: ..\..\ManagePresetsDialog.cs:107
 msgid "Remove Preset"
 msgstr "הסרת ערכה מוגדרת מראש"
 
-#: ..\..\ManagePresetsDialog.cs:81
+#: ..\..\ManagePresetsDialog.cs:106
 #, csharp-format
 msgid "Remove the preset \"{0}\"?"
 msgstr "להסיר את הערכה המוגדרת מראש \"{0}\"?"
 
-#: ..\..\MainWindow.cs:1773
+#: ..\..\MainWindow.cs:1749
 msgid "Rename"
 msgstr "שנה שם"
 
@@ -1126,7 +1130,7 @@ msgstr "ממדי שינוי הגודל בתבנית WxH, Wx או xH (למשל: 1
 msgid "Select folder containing images"
 msgstr "בחרו תיקייה שמכילה תמונות"
 
-#: ..\..\MainWindow.cs:392
+#: ..\..\MainWindow.cs:390
 msgid "Select images to add"
 msgstr "בחרו תמונות להוספה"
 
@@ -1138,7 +1142,7 @@ msgstr "בחרו תיקיית פלט לתמונות המומרות"
 msgid "Settings"
 msgstr "הגדרות"
 
-#: ..\..\MainWindow.cs:315
+#: ..\..\MainWindow.cs:313
 msgid "Shift+F1"
 msgstr "Shift+F1"
 
@@ -1185,7 +1189,7 @@ msgstr ""
 msgid "SIC! is already running. Press Alt+Tab to switch to it."
 msgstr "SIC! כבר פועל. הקישו Alt+Tab כדי לעבור אליו."
 
-#: ..\..\MainWindow.Designer.cs:137 ..\..\MainWindow.cs:363
+#: ..\..\MainWindow.Designer.cs:137 ..\..\MainWindow.cs:361
 msgid "Size"
 msgstr "גודל"
 
@@ -1194,34 +1198,34 @@ msgstr "גודל"
 msgid "Size {0} is already in the list."
 msgstr "הגודל {0} כבר נמצא ברשימה."
 
-#: ..\..\MainWindow.cs:1774
+#: ..\..\MainWindow.cs:1750
 msgid "Skip"
 msgstr "דלג"
 
-#: ..\..\MainWindow.cs:659
+#: ..\..\MainWindow.cs:633
 msgid "Skipped"
 msgstr "דולג"
 
-#: ..\..\MainWindow.cs:640
+#: ..\..\MainWindow.cs:614
 msgid "Skipped (same format)"
 msgstr "דולג (אותו פורמט)"
 
-#: ..\..\Program.cs:330
+#: ..\..\Program.cs:326
 #, csharp-format
 msgid "Skipped: {0} is already in {1} format."
 msgstr "דולג: {0} כבר בפורמט {1}."
 
-#: ..\..\MainWindow.cs:1019 ..\..\Services\UpdateService.cs:108
+#: ..\..\MainWindow.cs:993 ..\..\Services\UpdateService.cs:108
 #: ..\..\Services\UpdateService.cs:116 ..\..\Services\UpdateService.cs:124
 #: ..\..\Services\UpdateService.cs:136
 msgid "Software Update"
 msgstr "עדכון תוכנה"
 
-#: ..\..\MainWindow.Designer.cs:139 ..\..\MainWindow.cs:364
+#: ..\..\MainWindow.Designer.cs:139 ..\..\MainWindow.cs:362
 msgid "Status"
 msgstr "מצב"
 
-#: ..\..\Program.cs:261
+#: ..\..\Program.cs:258
 #, csharp-format
 msgid "Supported formats: {0}"
 msgstr "פורמטים נתמכים: {0}"
@@ -1238,7 +1242,7 @@ msgstr "&פורמט יעד:"
 msgid "Target format (e.g. jpg, png, webp). Used when --output is omitted."
 msgstr "פורמט היעד (למשל: jpg, png, webp). בשימוש כאשר --output מושמט."
 
-#: ..\..\MainWindow.cs:1422
+#: ..\..\MainWindow.cs:1398
 #, csharp-format
 msgid ""
 "The clipboard contains a link:\n"
@@ -1251,18 +1255,18 @@ msgstr ""
 "\n"
 "להוריד את התמונה ולהוסיף אותה לתור?"
 
-#: ..\..\MainWindow.cs:1403
+#: ..\..\MainWindow.cs:1379
 #, csharp-format
 msgid "The clipboard contains an image file. Add it to the queue?"
 msgid_plural "The clipboard contains {0} image files. Add them to the queue?"
 msgstr[0] "לוח הגזירים מכיל קובץ תמונה. להוסיף אותו לתור?"
 msgstr[1] "לוח הגזירים מכיל {0} קובצי תמונה. להוסיף אותם לתור?"
 
-#: ..\..\MainWindow.cs:1416
+#: ..\..\MainWindow.cs:1392
 msgid "The clipboard contains an image. Add it to the queue?"
 msgstr "לוח הגזירים מכיל תמונה. להוסיף אותה לתור?"
 
-#: ..\..\MainWindow.cs:1762
+#: ..\..\MainWindow.cs:1738
 #, csharp-format
 msgid ""
 "The file \"{0}\" already exists.\n"
@@ -1271,25 +1275,26 @@ msgstr ""
 "הקובץ \"{0}\" כבר קיים.\n"
 "מה ברצונכם לעשות?"
 
-#: ..\..\MainWindow.cs:562 ..\..\PresetDialog.cs:158
-msgid "The height must be a whole number from 1 to 65535, or left empty."
-msgstr "הגובה חייב להיות מספר שלם בין 1 ל-65535, או להישאר ריק."
+#: ..\..\Services\ResizeErrorDescriber.cs:31
+#, csharp-format
+msgid "The height must be a whole number from 1 to {0}, or left empty."
+msgstr "הגובה חייב להיות מספר שלם בין 1 ל-{0}, או להישאר ריק."
 
 #: ..\..\Services\UpdateService.cs:115
 msgid "The latest available update was previously skipped."
 msgstr "העדכון הזמין האחרון דולג בעבר."
 
-#: ..\..\MainWindow.cs:1527
+#: ..\..\MainWindow.cs:1503
 msgid "The link does not point to a supported image."
 msgstr "הקישור אינו מפנה לתמונה נתמכת."
 
-#: ..\..\MainWindow.cs:585 ..\..\Program.cs:160
+#: ..\..\MainWindow.cs:559 ..\..\Program.cs:160
 #, csharp-format
 msgid ""
 "The output folder \"{0}\" no longer exists. The default folder will be used."
 msgstr "תיקיית הפלט \"{0}\" כבר אינה קיימת. ייעשה שימוש בתיקיית ברירת המחדל."
 
-#: ..\..\MainWindow.cs:1484
+#: ..\..\MainWindow.cs:1460
 msgid ""
 "The pasted text is not a valid link.\n"
 "Links must start with http:// or https://."
@@ -1320,15 +1325,16 @@ msgstr ""
 "קובץ ההגדרות {0} פגום, ולכן SIC! הופעל עם הגדרות ברירת המחדל. עותק של הקובץ "
 "הפגום נשמר בשם {1}."
 
-#: ..\..\MainWindow.cs:1005
+#: ..\..\MainWindow.cs:979
 msgid "The user manual file could not be found."
 msgstr "קובץ מדריך המשתמש לא נמצא."
 
-#: ..\..\MainWindow.cs:558 ..\..\PresetDialog.cs:155
-msgid "The width must be a whole number from 1 to 65535, or left empty."
-msgstr "הרוחב חייב להיות מספר שלם בין 1 ל-65535, או להישאר ריק."
+#: ..\..\Services\ResizeErrorDescriber.cs:29
+#, csharp-format
+msgid "The width must be a whole number from 1 to {0}, or left empty."
+msgstr "הרוחב חייב להיות מספר שלם בין 1 ל-{0}, או להישאר ריק."
 
-#: ..\..\MainWindow.cs:1328
+#: ..\..\MainWindow.cs:1304
 msgid "There are images in the queue. Are you sure you want to exit?"
 msgstr "יש תמונות בתור. בטוחים שברצונכם לצאת?"
 
@@ -1340,12 +1346,12 @@ msgstr "אין ערכות מוגדרות מראש שמורות."
 msgid "TIFF images (*.tif, *.tiff)"
 msgstr "תמונות TIFF (*.tif, *.tiff)"
 
-#: ..\..\MainWindow.cs:1018 ..\..\Services\UpdateService.cs:123
+#: ..\..\MainWindow.cs:992 ..\..\Services\UpdateService.cs:123
 #: ..\..\Services\UpdateService.cs:135
 msgid "Unable to check for updates. Please try again later."
 msgstr "לא ניתן לבדוק עדכונים. נסו שוב מאוחר יותר."
 
-#: ..\..\Utils\ConfigSerializer.cs:535
+#: ..\..\Utils\ConfigSerializer.cs:549
 #, csharp-format
 msgid "Unable to save configuration: {0}"
 msgstr "לא ניתן לשמור את ההגדרות: {0}"
@@ -1359,7 +1365,7 @@ msgstr "לא ניתן להפעיל את התוכנה. פנו למפתח."
 msgid "Unknown preset: {0}"
 msgstr "ערכה מוגדרת מראש לא ידועה: {0}"
 
-#: ..\..\Program.cs:260
+#: ..\..\Program.cs:257
 #, csharp-format
 msgid "Unsupported format: {0}"
 msgstr "פורמט לא נתמך: {0}"
@@ -1369,7 +1375,7 @@ msgid "Use crop mode (scale to cover, then center-crop to exact dimensions)"
 msgstr ""
 "השתמשו במצב חיתוך (הגדלה לכיסוי ולאחר מכן חיתוך מהמרכז לממדים המדויקים)"
 
-#: ..\..\MainWindow.cs:1005
+#: ..\..\MainWindow.cs:979
 msgid "User Manual"
 msgstr "מדריך המשתמש"
 

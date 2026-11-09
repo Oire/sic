@@ -9,13 +9,34 @@ namespace Oire.Sic.Tests;
 // The menu labels come from _(), so these tests run in the static-state collection, in en-US.
 [Collection(StaticStateCollection.Name)]
 public sealed class PresetMenuBuilderTests: StaticStateTestBase {
+    // Unescaped, R&D and &Drafts both take D, and Web &Avatar takes A beside &Add Preset...
+    private static readonly string[] ClashingNames = ["R&D", "&Drafts", "Web &Avatar"];
+
     [Fact]
     public void AddTo_PresetsWithAmpersands_PassesValidation() {
-        var spec = BuildSpec([Preset("R&D"), Preset("Blog"), Preset("Banner")]);
+        var spec = BuildSpec([.. ClashingNames.Select(Preset)]);
 
         var validate = () => MenuSpecValidator.Validate(spec);
 
         validate.Should().NotThrow();
+    }
+
+    [Fact]
+    public void Validate_TheSameNamesUnescaped_Throws() {
+        // The control for the test above: without the escaping, these names do clash.
+        var spec = new NativeMenuSpec();
+        spec.AddMenu("&Presets", presets => {
+            foreach (var name in ClashingNames) {
+                presets.Add(name, () => { });
+            }
+
+            presets.Add("&Add Preset...", () => { });
+            presets.Add("&Manage Presets...", () => { });
+        });
+
+        var validate = () => MenuSpecValidator.Validate(spec);
+
+        validate.Should().Throw<ArgumentException>();
     }
 
     [Fact]

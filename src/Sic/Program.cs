@@ -234,31 +234,28 @@ internal static class Program {
                 }
             }
 
-            string targetFormat;
+            string requestedFormat;
             if (!string.IsNullOrWhiteSpace(output)) {
-                var extension = Path.GetExtension(output).TrimStart('.').ToUpperInvariant();
-                if (string.IsNullOrWhiteSpace(extension)) {
+                requestedFormat = Path.GetExtension(output).TrimStart('.').ToUpperInvariant();
+                if (string.IsNullOrWhiteSpace(requestedFormat)) {
                     Log.Error("CLI: Output path has no file extension: {Output}", output);
                     Console.Error.WriteLine(_("Output path must have a file extension (e.g. .jpg, .png)"));
                     return ExitCode.Error;
                 }
-                targetFormat = extension == "JPEG" ? "JPG" : extension == "TIF" ? "TIFF" : extension;
             } else if (!string.IsNullOrWhiteSpace(format)) {
-                targetFormat = format.TrimStart('.').ToUpperInvariant();
-                targetFormat = targetFormat == "JPEG" ? "JPG" : targetFormat == "TIF" ? "TIFF" : targetFormat;
+                requestedFormat = format.TrimStart('.').ToUpperInvariant();
             } else if (preset is not null) {
-                targetFormat = preset.Format;
+                requestedFormat = preset.Format;
             } else {
                 Log.Error("CLI: None of --output, --format or --preset specified");
                 Console.Error.WriteLine(_("Either --output, --format or --preset must be specified."));
                 return ExitCode.Error;
             }
 
-            var supportedFormats = ImageConverter.GetSupportedFormats();
-            if (!supportedFormats.Any(f => f.Equals(targetFormat, StringComparison.OrdinalIgnoreCase))) {
-                Log.Error("CLI: Unsupported format: {Format}", targetFormat);
-                Console.Error.WriteLine(_("Unsupported format: {0}", targetFormat));
-                Console.Error.WriteLine(_("Supported formats: {0}", string.Join(", ", supportedFormats)));
+            if (ImageConverter.NormalizeTargetFormat(requestedFormat) is not { } targetFormat) {
+                Log.Error("CLI: Unsupported format: {Format}", requestedFormat);
+                Console.Error.WriteLine(_("Unsupported format: {0}", requestedFormat));
+                Console.Error.WriteLine(_("Supported formats: {0}", string.Join(", ", ImageConverter.GetSupportedFormats())));
                 return ExitCode.Error;
             }
 
@@ -282,7 +279,6 @@ internal static class Program {
             }
 
             int? width = null, height = null;
-            var hasExplicitResize = !string.IsNullOrWhiteSpace(resize);
 
             if (!string.IsNullOrWhiteSpace(resize)) {
                 if (!ResizeValidator.TryParseSpec(resize, out var widthText, out var heightText)) {
@@ -311,7 +307,7 @@ internal static class Program {
 
             // --resize replaces the preset's sizes and mode; --crop alone only changes the mode.
             ResizeMode resizeMode;
-            (width, height, resizeMode) = PresetResolver.ResolveResize(preset, hasExplicitResize, width, height, crop);
+            (width, height, resizeMode) = PresetResolver.ResolveResize(preset, width, height, crop);
 
             // On the --crop flag, after the merge, so a preset with no sizes can't trigger it.
             if (crop && (!width.HasValue || !height.HasValue)) {

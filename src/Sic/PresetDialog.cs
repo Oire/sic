@@ -37,6 +37,11 @@ public partial class PresetDialog: Form {
         TextDirection.Apply(this);
         Text = isEdit ? _("Edit Preset") : _("Add Preset");
 
+        // Tabbing never reaches the hint, a label no field points to, so the size boxes carry it
+        // as their description, which screen readers read after the field's name.
+        widthTextBox.AccessibleDescription = hintLabel.Text;
+        heightTextBox.AccessibleDescription = hintLabel.Text;
+
         resizeModeComboBox.Items.AddRange([_("Keep proportions"), _("Crop")]);
 
         foreach (var format in ImageConverter.GetSupportedFormats()) {
@@ -109,9 +114,12 @@ public partial class PresetDialog: Form {
     }
 
     private bool TryGetName(out string name) {
-        name = PresetValidator.CleanName(nameTextBox.Text);
+        // Validated as typed: a pasted name that can't be normalized gives InvalidCharacters,
+        // and only a valid name is cleaned.
+        var result = PresetValidator.ValidateName(nameTextBox.Text, _takenNames);
+        name = PresetValidator.TryCleanName(nameTextBox.Text, out var cleaned) ? cleaned : nameTextBox.Text;
 
-        var message = PresetValidator.ValidateName(name, _takenNames) switch {
+        var message = result switch {
             PresetNameResult.Valid => null,
             PresetNameResult.Empty => _("Please enter a name for the preset."),
             PresetNameResult.TooLong => _("A preset name can be at most {0} characters long.", PresetValidator.MaxNameLength),
@@ -125,7 +133,9 @@ public partial class PresetDialog: Form {
         }
 
         Log.Debug("PresetDialog: Invalid preset name entered: {Input}", nameTextBox.Text);
-        ShowError(message, _("Invalid name"), nameTextBox);
+        DialogHelper.Show(message, _("Invalid name"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        nameTextBox.Focus();
+        nameTextBox.SelectAll();
         return false;
     }
 
@@ -142,35 +152,15 @@ public partial class PresetDialog: Form {
         mode = resizeModeComboBox.SelectedIndex == CropIndex ? ResizeMode.Crop : ResizeMode.KeepProportions;
         var error = ResizeValidator.Validate(widthTextBox.Text, heightTextBox.Text, mode, out width, out height);
 
-        switch (error) {
-            case ResizeError.None:
-                return true;
-            case ResizeError.InvalidWidth or ResizeError.CropNeedsWidth when mode == ResizeMode.Crop:
-                ShowError(_("Crop mode requires a valid width (1–65535)."), _("Invalid width"), widthTextBox);
-                break;
-            case ResizeError.InvalidHeight or ResizeError.CropNeedsHeight when mode == ResizeMode.Crop:
-                ShowError(_("Crop mode requires a valid height (1–65535)."), _("Invalid height"), heightTextBox);
-                break;
-            case ResizeError.InvalidWidth:
-                ShowError(_("The width must be a whole number from 1 to 65535, or left empty."), _("Invalid width"), widthTextBox);
-                break;
-            case ResizeError.InvalidHeight:
-                ShowError(_("The height must be a whole number from 1 to 65535, or left empty."), _("Invalid height"), heightTextBox);
-                break;
-            default:
-                ShowError(_("Please enter at least one valid dimension (1–65535)."), _("Invalid dimensions"), widthTextBox);
-                break;
+        if (error == ResizeError.None) {
+            return true;
         }
 
         Log.Debug("PresetDialog: Invalid resize sizes ({Error}): {Width} x {Height}", error, widthTextBox.Text, heightTextBox.Text);
+        DialogHelper.ShowResizeError(error, mode, widthTextBox, heightTextBox);
         width = null;
         height = null;
         return false;
     }
 
-    private static void ShowError(string message, string caption, TextBox box) {
-        DialogHelper.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        box.Focus();
-        box.SelectAll();
-    }
 }

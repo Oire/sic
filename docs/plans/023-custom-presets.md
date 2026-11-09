@@ -12,10 +12,10 @@ It's the third of four plans. `89-json-config` must be merged first.
 
 - [x] Convert > Presets lists saved presets, and offers Add Preset and Manage Presets, even when the queue is empty.
 - [x] Choosing a preset fills in the format and resize controls without converting, and says so in the status bar.
-- [ ] A preset's sizes survive adding, selecting and removing images until the user changes the resize controls.
-- [ ] A "Blog" preset (WEBP, keep proportions, width 300, no height) resizes a mixed batch of portrait and landscape images to 300 px wide.
-- [ ] A height-only preset keeps its width box empty, with or without an image selected.
-- [ ] A preset targeting a format unticked in Settings still applies, and that format stays in the dropdown until SIC! closes.
+- [ ] A preset's sizes survive adding, selecting and removing images until the user changes the resize controls. (built; manual check pending, see Post-completion)
+- [ ] A "Blog" preset (WEBP, keep proportions, width 300, no height) resizes a mixed batch of portrait and landscape images to 300 px wide. (built; manual check pending, see Post-completion)
+- [ ] A height-only preset keeps its width box empty, with or without an image selected. (built; manual check pending, see Post-completion)
+- [ ] A preset targeting a format unticked in Settings still applies, and that format stays in the dropdown until SIC! closes. (built; manual check pending, see Post-completion)
 - [x] A preset can be added, edited and removed with the keyboard, and the menu updates straight away.
 - [x] `sic -i a.png --preset Blog` converts with the preset. An explicit `--output` extension, `--format`, `--resize` or `--crop` wins over the matching part of the preset.
 - [x] An unknown `--preset` name exits with `ExitCode.Error` and lists the available presets on stderr.

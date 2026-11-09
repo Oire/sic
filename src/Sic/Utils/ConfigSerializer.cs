@@ -365,10 +365,24 @@ internal static class ConfigSerializer {
         var config = new AppConfig();
         var badValues = 0;
         var droppedPresets = 0;
+        var presetsRead = false;
 
         foreach (var section in root.EnumerateObject()) {
             if (string.Equals(section.Name, nameof(AppConfig.Presets), StringComparison.OrdinalIgnoreCase)) {
-                (config.Presets, droppedPresets) = ReadPresets(section.Value);
+                var (presets, dropped) = ReadPresets(section.Value);
+
+                // A hand-edited file can hold the key twice, in any case. The last one wins, as
+                // JSON readers usually do, and the presets it replaces count as dropped, so they
+                // are backed up and reported rather than lost at the next save.
+                if (presetsRead) {
+                    Log.Warning("sic.json: {Name} appears more than once, dropping the {Count} presets read before",
+                        section.Name, config.Presets.Count);
+                    droppedPresets += config.Presets.Count;
+                }
+
+                config.Presets = presets;
+                droppedPresets += dropped;
+                presetsRead = true;
                 continue;
             }
 

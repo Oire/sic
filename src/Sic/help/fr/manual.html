@@ -286,7 +286,7 @@ footer {
 <p>Avec <em>Recadrer</em>, les deux tailles sont obligatoires, et chaque image sort exactement à cette taille.</p>
 
 <h3>Appliquer un préréglage</h3>
-<p>Choisissez le préréglage par son nom dans <strong>Convertir > Préréglages</strong>. SIC! en reprend le <strong>Format cible</strong>, <strong>Redimensionner</strong>, le mode de redimensionnement, la <strong>Largeur</strong> et la <strong>Hauteur</strong>, et la barre d'état l'annonce, par exemple <em>Préréglage appliqué : Blog</em>. Appliquer un préréglage ne convertit rien : vérifiez les réglages, modifiez-les si vous le souhaitez, puis utilisez <strong>Convertir la sélection</strong> ou <strong>Tout convertir</strong> comme d'habitude. Tant qu'il n'y a aucun préréglage, le sous-menu affiche <em>Aucun préréglage pour l'instant</em> au-dessus de <strong>Ajouter un préréglage</strong> et <strong>Gérer les préréglages</strong>.</p>
+<p>Choisissez le préréglage par son nom dans <strong>Convertir > Préréglages</strong>. SIC! en reprend le <strong>Format cible</strong>, <strong>Redimensionner</strong>, le mode de redimensionnement, la <strong>Largeur</strong> et la <strong>Hauteur</strong>, et la barre d'état l'annonce, par exemple <em>Préréglage appliqué : Blog</em>. Les lecteurs d'écran annoncent aussi ce message. Appliquer un préréglage ne convertit rien : vérifiez les réglages, modifiez-les si vous le souhaitez, puis utilisez <strong>Convertir la sélection</strong> ou <strong>Tout convertir</strong> comme d'habitude. Tant qu'il n'y a aucun préréglage, le sous-menu affiche <em>Aucun préréglage pour l'instant</em> au-dessus de <strong>Ajouter un préréglage</strong> et <strong>Gérer les préréglages</strong>.</p>
 <p>Les tailles d'un préréglage restent dans les champs <strong>Largeur</strong> et <strong>Hauteur</strong> pendant que vous ajoutez, sélectionnez et supprimez des images : SIC! ne les remplace pas par les dimensions de l'image sélectionnée, comme il le fait d'habitude, et un préréglage qui n'a qu'une hauteur laisse le champ de largeur vide. Dès que vous modifiez vous-même une taille, cochez ou décochez <strong>Redimensionner</strong> ou changez de mode de redimensionnement, sélectionner une image remplit de nouveau ses dimensions comme d'habitude.</p>
 <p>Si un préréglage convertit vers un format que vous avez décoché sous <strong>Formats cibles à afficher dans la liste</strong> dans les <a href="#settings">Paramètres</a>, il s'applique quand même : ce format est ajouté à la liste déroulante <strong>Format cible</strong> et y reste jusqu'à la fermeture de SIC!.</p>
 
@@ -297,10 +297,10 @@ footer {
     <dd>Ouvre la même boîte de dialogue que <strong>Ajouter un préréglage</strong>, vide.</dd>
 
     <dt>Modifier</dt>
-    <dd>Ouvre le préréglage sélectionné dans cette boîte de dialogue. Vous pouvez tout changer, y compris le nom.</dd>
+    <dd>Ouvre le préréglage sélectionné dans cette boîte de dialogue. Vous pouvez tout changer, y compris le nom. Appuyer sur <kbd>Entrée</kbd> dans la liste, ou double-cliquer sur un préréglage, fait de même.</dd>
 
     <dt>Supprimer</dt>
-    <dd>Supprime le préréglage sélectionné après vous avoir demandé confirmation.</dd>
+    <dd>Supprime le préréglage sélectionné après vous avoir demandé confirmation. Appuyer sur <kbd>Suppr</kbd> dans la liste fait de même.</dd>
 
     <dt>Fermer</dt>
     <dd>Ferme la boîte de dialogue. <kbd>Escape</kbd> fait de même.</dd>
@@ -364,7 +364,7 @@ sic -i photo.png -p "Bannière produit" -o banniere.jpg</pre>
     <dd>Nom du format cible (par exemple <code>png</code>, <code>jpg</code>). Utilisez ceci au lieu de <code>--output</code> pour générer automatiquement le chemin de sortie.</dd>
 
     <dt><code>--resize</code>, <code>-r</code></dt>
-    <dd>Redimensionner l'image. Format : <code>LxH</code>, <code>Lx</code> (largeur uniquement) ou <code>xH</code> (hauteur uniquement).</dd>
+    <dd>Redimensionner l'image. Format : <code>LxH</code>, <code>Lx</code> ou <code>L</code> (largeur uniquement), ou <code>xH</code> (hauteur uniquement), chaque taille de 1 à 65535 pixels.</dd>
 
     <dt><code>--crop</code>, <code>-c</code></dt>
     <dd>Recadrer au lieu de mettre à l'échelle proportionnellement. Nécessite à la fois la largeur et la hauteur, venant de <code>--resize</code> ou du préréglage.</dd>

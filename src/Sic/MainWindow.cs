@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Windows.Forms.Automation;
 using GetText.WindowsForms;
 using Oire.Sic.Models;
 using Oire.WinForms.NativeControls;
@@ -29,13 +30,10 @@ public partial class MainWindow: Form {
     // the pin. Unlike _isAutoFilling, it's set once around the whole write.
     private bool _isApplyingPreset;
 
-    // A preset's sizes stay in the boxes when the selection changes, until the user changes the
-    // resize controls; otherwise selecting an image would overwrite them with its own size.
-    private bool _presetSizesPinned;
-
-    // Which size boxes hold a value SIC! filled in from the selected image rather than one the
-    // user typed. PresetCapturer leaves those out of a new preset.
-    private DimensionBox _autoFilledBox;
+    // Whether a preset's sizes are pinned, so selecting an image doesn't overwrite them, and which
+    // size boxes SIC! filled in from the selected image. PresetCapturer leaves those out of a new
+    // preset.
+    private readonly ResizeFieldTracker _resizeFields = new();
     private int _clipboardImageCount;
 
     // Formats a preset put in the dropdown although Settings hides them. They stay until SIC!
@@ -469,7 +467,7 @@ public partial class MainWindow: Form {
             previewPictureBox.Image = null;
         }
 
-        statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
+        SetStatus(_n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count));
         UpdateMenuState();
         UpdatePlaceholderState();
     }
@@ -480,7 +478,7 @@ public partial class MainWindow: Form {
         imageListView.Items.Clear();
         previewPictureBox.Image?.Dispose();
         previewPictureBox.Image = null;
-        statusLabel.Text = _("Ready");
+        SetStatus(_("Ready"));
         UpdateMenuState();
         UpdatePlaceholderState();
     }
@@ -513,7 +511,7 @@ public partial class MainWindow: Form {
         LocalizeColumns();
         _menuBar?.Attach(BuildMenuSpec());
 
-        statusLabel.Text = _("Ready");
+        SetStatus(_("Ready"));
     }
 
     private void ExitMenuItem_Click(object? sender, EventArgs e) {
@@ -542,36 +540,12 @@ public partial class MainWindow: Form {
         resizeMode = cropRadioButton.Checked ? Models.ResizeMode.Crop : Models.ResizeMode.KeepProportions;
         var error = ResizeValidator.Validate(widthTextBox.Text, heightTextBox.Text, resizeMode, out width, out height);
 
-        switch (error) {
-            case ResizeError.None:
-                return true;
-            case ResizeError.InvalidWidth or ResizeError.CropNeedsWidth when resizeMode == Models.ResizeMode.Crop:
-                Log.Debug("TryGetConversionParams: Invalid crop width: {Input}", widthTextBox.Text);
-                ShowResizeError(_("Crop mode requires a valid width (1\u201365535)."), _("Invalid width"), widthTextBox);
-                return false;
-            case ResizeError.InvalidHeight or ResizeError.CropNeedsHeight when resizeMode == Models.ResizeMode.Crop:
-                Log.Debug("TryGetConversionParams: Invalid crop height: {Input}", heightTextBox.Text);
-                ShowResizeError(_("Crop mode requires a valid height (1\u201365535)."), _("Invalid height"), heightTextBox);
-                return false;
-            case ResizeError.InvalidWidth:
-                Log.Debug("TryGetConversionParams: Invalid width: {Input}", widthTextBox.Text);
-                ShowResizeError(_("The width must be a whole number from 1 to 65535, or left empty."), _("Invalid width"), widthTextBox);
-                return false;
-            case ResizeError.InvalidHeight:
-                Log.Debug("TryGetConversionParams: Invalid height: {Input}", heightTextBox.Text);
-                ShowResizeError(_("The height must be a whole number from 1 to 65535, or left empty."), _("Invalid height"), heightTextBox);
-                return false;
-            default:
-                Log.Debug("TryGetConversionParams: No valid resize dimensions entered");
-                ShowResizeError(_("Please enter at least one valid dimension (1\u201365535)."), _("Invalid dimensions"), widthTextBox);
-                return false;
-        }
-    }
+        if (error == ResizeError.None)
+            return true;
 
-    private static void ShowResizeError(string message, string caption, TextBox box) {
-        DialogHelper.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        box.Focus();
-        box.SelectAll();
+        Log.Debug("TryGetConversionParams: Invalid resize sizes ({Error}): {Width} x {Height}", error, widthTextBox.Text, heightTextBox.Text);
+        DialogHelper.ShowResizeError(error, resizeMode, widthTextBox, heightTextBox);
+        return false;
     }
 
     private static string ValidateOutputFolder() {
@@ -720,7 +694,7 @@ public partial class MainWindow: Form {
         if (wasCancelled)
             summary += " " + _("Cancelled.");
 
-        statusLabel.Text = summary;
+        SetStatus(summary);
         // Must run before MessageBox so the placeholder row is inserted before the
         // MessageBox pump dispatches any queued ListView notifications.
         UpdateMenuState();
@@ -806,14 +780,14 @@ public partial class MainWindow: Form {
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = null;
 
-            statusLabel.Text = _("Multi-size ICO created: {0}", Path.GetFileName(outputPath));
+            SetStatus(_("Multi-size ICO created: {0}", Path.GetFileName(outputPath)));
             UpdateMenuState();
             UpdatePlaceholderState();
             DialogHelper.Show(_("Multi-size ICO created successfully:\n{0}", outputPath), _("ICO Created"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         } catch (OperationCanceledException) {
             imageListView.Items[index].Cells[4] = "";
-            statusLabel.Text = _("Ready");
+            SetStatus(_("Ready"));
         } catch (Exception ex) {
             Log.Error("Failed to create multi-size ICO for {FileName}: {Error}", item.FileName, ex.Message);
             imageListView.Items[index].Cells[4] = _("Failed");
@@ -882,7 +856,7 @@ public partial class MainWindow: Form {
 
             proposals = await Task.Run(() => ImageConverter.FindSizeFitProposals(item, formats, maxBytes, maxWidth, searchProgress, token)).WaitAsync(token);
         } catch (OperationCanceledException) {
-            statusLabel.Text = _("Ready");
+            SetStatus(_("Ready"));
             return;
         } catch (Exception ex) {
             Log.Error("Failed to compute size-fit proposals for {FileName}: {Error}", item.FileName, ex.Message);
@@ -956,14 +930,14 @@ public partial class MainWindow: Form {
             previewPictureBox.Image?.Dispose();
             previewPictureBox.Image = null;
 
-            statusLabel.Text = _("Converted: {0}", Path.GetFileName(outputPath));
+            SetStatus(_("Converted: {0}", Path.GetFileName(outputPath)));
             UpdateMenuState();
             UpdatePlaceholderState();
             DialogHelper.Show(_("Image converted successfully:\n{0}", outputPath), _("Conversion Complete"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         } catch (OperationCanceledException) {
             imageListView.Items[index].Cells[4] = "";
-            statusLabel.Text = _("Ready");
+            SetStatus(_("Ready"));
         } catch (Exception ex) {
             Log.Error("Failed to fit {FileName} to size: {Error}", item.FileName, ex.Message);
             imageListView.Items[index].Cells[4] = _("Failed");
@@ -1043,9 +1017,7 @@ public partial class MainWindow: Form {
         if (_isApplyingPreset)
             return;
 
-        if (!_isAutoFilling) {
-            _presetSizesPinned = false;
-        }
+        _resizeFields.ResizeSettingsChanged();
 
         if (enabled) {
             PopulateResizeFieldsFromSelection();
@@ -1062,7 +1034,7 @@ public partial class MainWindow: Form {
         try {
             widthTextBox.Text = Math.Min(_selectedItem.Width, ResizeValidator.MaxDimension).ToString();
             heightTextBox.Text = Math.Min(_selectedItem.Height, ResizeValidator.MaxDimension).ToString();
-            _autoFilledBox = DimensionBox.Both;
+            _resizeFields.AutoFilled(DimensionBox.Both);
         } finally {
             _isAutoFilling = false;
         }
@@ -1072,9 +1044,7 @@ public partial class MainWindow: Form {
         if (_isApplyingPreset)
             return;
 
-        if (!_isAutoFilling) {
-            _presetSizesPinned = false;
-        }
+        _resizeFields.ResizeSettingsChanged();
 
         if (!cropRadioButton.Checked) {
             AutoFillFromWidth();
@@ -1087,8 +1057,7 @@ public partial class MainWindow: Form {
         if (_isApplyingPreset || _isAutoFilling)
             return;
 
-        _presetSizesPinned = false;
-        _autoFilledBox = WithoutBox(_autoFilledBox, DimensionBox.Width);
+        _resizeFields.UserEdited(DimensionBox.Width);
 
         if (!cropRadioButton.Checked && resizeCheckBox.Checked) {
             AutoFillFromWidth();
@@ -1101,8 +1070,7 @@ public partial class MainWindow: Form {
         if (_isApplyingPreset || _isAutoFilling)
             return;
 
-        _presetSizesPinned = false;
-        _autoFilledBox = WithoutBox(_autoFilledBox, DimensionBox.Height);
+        _resizeFields.UserEdited(DimensionBox.Height);
 
         if (!cropRadioButton.Checked && resizeCheckBox.Checked) {
             AutoFillFromHeight();
@@ -1122,7 +1090,7 @@ public partial class MainWindow: Form {
         _isAutoFilling = true;
         try {
             heightTextBox.Text = newHeight.ToString();
-            _autoFilledBox = WithBox(_autoFilledBox, DimensionBox.Height);
+            _resizeFields.AutoFilled(DimensionBox.Height);
         } finally {
             _isAutoFilling = false;
         }
@@ -1139,31 +1107,40 @@ public partial class MainWindow: Form {
         _isAutoFilling = true;
         try {
             widthTextBox.Text = newWidth.ToString();
-            _autoFilledBox = WithBox(_autoFilledBox, DimensionBox.Width);
+            _resizeFields.AutoFilled(DimensionBox.Width);
         } finally {
             _isAutoFilling = false;
         }
     }
 
-    // DimensionBox isn't a flags enum, so adding or removing one box is spelled out.
-    private static DimensionBox WithBox(DimensionBox value, DimensionBox box) => (value, box) switch {
-        (DimensionBox.None, _) => box,
-        _ when value == box => value,
-        _ => DimensionBox.Both,
-    };
+    /// <summary>
+    /// Shows <paramref name="text"/> in the status bar as it is. The label takes <c>&amp;</c> as a
+    /// mnemonic prefix, so a file or preset name such as <c>R&amp;D</c> is escaped here. With
+    /// <paramref name="announce"/>, screen readers also speak it, for an action whose only
+    /// feedback is the status bar: changing the label's text raises no event they follow.
+    /// </summary>
+    private void SetStatus(string text, bool announce = false) {
+        statusLabel.Text = PresetValidator.EscapeAmpersands(text);
 
-    private static DimensionBox WithoutBox(DimensionBox value, DimensionBox box) => (value, box) switch {
-        (DimensionBox.Both, DimensionBox.Width) => DimensionBox.Height,
-        (DimensionBox.Both, DimensionBox.Height) => DimensionBox.Width,
-        _ when value == box => DimensionBox.None,
-        _ => value,
-    };
+        if (announce && statusStrip.IsHandleCreated) {
+            statusStrip.AccessibilityObject.RaiseAutomationNotification(
+                AutomationNotificationKind.ActionCompleted,
+                AutomationNotificationProcessing.ImportantMostRecent,
+                text);
+        }
+    }
 
     /// <summary>
     /// Fills in the format and resize controls from <paramref name="preset"/> without converting.
     /// The preset's sizes are pinned, so selecting another image doesn't replace them.
     /// </summary>
     private void ApplyPreset(ConversionPreset preset) {
+        // Unticking Resize disables the size controls, and disabling the focused one would send
+        // focus on to an unrelated control. Move it to Resize first, which says why they went.
+        if (!preset.Resizes && (resizeModeGroupBox.ContainsFocus || widthTextBox.Focused || heightTextBox.Focused)) {
+            resizeCheckBox.Focus();
+        }
+
         _isApplyingPreset = true;
         try {
             if (!formatComboBox.Items.Contains(preset.Format)) {
@@ -1181,10 +1158,9 @@ public partial class MainWindow: Form {
             _isApplyingPreset = false;
         }
 
-        _presetSizesPinned = preset.Resizes;
-        _autoFilledBox = DimensionBox.None;
+        _resizeFields.PresetApplied(preset.Resizes);
         UpdatePreview();
-        statusLabel.Text = _("Preset applied: {0}", PresetValidator.EscapeAmpersands(preset.Name));
+        SetStatus(_("Preset applied: {0}", preset.Name), announce: true);
     }
 
     /// <summary>
@@ -1198,7 +1174,7 @@ public partial class MainWindow: Form {
             cropRadioButton.Checked ? Models.ResizeMode.Crop : Models.ResizeMode.KeepProportions,
             widthTextBox.Text,
             heightTextBox.Text,
-            _autoFilledBox);
+            _resizeFields.AutoFilledBox);
 
         ConversionPreset? added;
         using (var dialog = new PresetDialog(initial, Config.Presets.Select(preset => preset.Name), isEdit: false)) {
@@ -1289,7 +1265,7 @@ public partial class MainWindow: Form {
         var item = _imageItems[index];
         _selectedItem = item;
 
-        if (resizeCheckBox.Checked && !_presetSizesPinned && !widthTextBox.Focused && !heightTextBox.Focused) {
+        if (resizeCheckBox.Checked && !_resizeFields.SizesPinned && !widthTextBox.Focused && !heightTextBox.Focused) {
             PopulateResizeFieldsFromSelection();
         }
 
@@ -1463,7 +1439,7 @@ public partial class MainWindow: Form {
                 AddImageItem(item);
                 UpdateMenuState();
                 UpdatePlaceholderState();
-                statusLabel.Text = _("Added image from clipboard");
+                SetStatus(_("Added image from clipboard"));
             } catch (Exception ex) {
                 Log.Error("Failed to load clipboard image: {Error}", ex.Message);
                 DialogHelper.Show(_("Failed to load clipboard image:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1518,20 +1494,20 @@ public partial class MainWindow: Form {
             AddImageItem(item);
             UpdateMenuState();
             UpdatePlaceholderState();
-            statusLabel.Text = _("Added {0} from URL", item.FileName);
+            SetStatus(_("Added {0} from URL", item.FileName));
         } catch (OperationCanceledException) {
-            statusLabel.Text = _("Ready");
+            SetStatus(_("Ready"));
         } catch (UnsupportedImageException) {
             Log.Information("URL did not point to a supported image: {Url}", url);
             DialogHelper.Show(
                 _("The link does not point to a supported image."),
                 _("Error"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            statusLabel.Text = _("Ready");
+            SetStatus(_("Ready"));
         } catch (Exception ex) {
             Log.Error("Failed to load image from URL {Url}: {Error}", url, ex.Message);
             DialogHelper.Show(_("Failed to load image from URL:\n{0}", ex.Message), _("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
-            statusLabel.Text = _("Ready");
+            SetStatus(_("Ready"));
         } finally {
             if (progressDialog != null) {
                 progressDialog.Close();
@@ -1666,7 +1642,7 @@ public partial class MainWindow: Form {
                     imageListView.Items[lastIndex].EnsureVisible();
                 }
 
-                statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
+                SetStatus(_n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count));
                 UpdateMenuState();
                 UpdatePlaceholderState();
                 imageListView.Focus();
@@ -1732,7 +1708,7 @@ public partial class MainWindow: Form {
         row.Selected = true;
         row.Focused = true;
         row.EnsureVisible();
-        statusLabel.Text = _n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count);
+        SetStatus(_n("1 image in queue", "{0} images in queue", _imageItems.Count, _imageItems.Count));
     }
 
     private ConflictResolution ResolveFileConflict(string outputPath) {

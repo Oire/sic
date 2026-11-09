@@ -124,6 +124,19 @@ public static class ImageConverter {
     }
 
     /// <summary>
+    /// The SIC! format key for a target format the user named (<c>jpeg</c>, <c>.tif</c> or
+    /// <c>PNG</c>), or <see langword="null"/> when it isn't a conversion target. Built on the same
+    /// alias list as format detection, so the CLI and presets accept the same spellings; HEIC is
+    /// input-only, so it is never a target.
+    /// </summary>
+    public static string? NormalizeTargetFormat(string format) {
+        ArgumentNullException.ThrowIfNull(format);
+
+        var key = GetCanonicalFormat(format.Trim().TrimStart('.'));
+        return key is not null && GetSupportedFormats().Contains(key, StringComparer.Ordinal) ? key : null;
+    }
+
+    /// <summary>
     /// Maps an arbitrary format name (a SIC! format key like "JPG", or a Magick.NET
     /// format name like "Jpeg"/"Bmp3") to one of the canonical SIC! format keys.
     /// Returns <c>null</c> for unknown formats.

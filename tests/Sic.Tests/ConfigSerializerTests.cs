@@ -993,10 +993,6 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
     [InlineData("\"width\": 300.5")]
     [InlineData("\"width\": 70000")]
     [InlineData("\"width\": []")]
-    [InlineData("\"name\": null")]
-    [InlineData("\"name\": 42")]
-    [InlineData("\"format\": null")]
-    [InlineData("\"format\": \"HEIC\"")]
     public void Load_OneBadPresetValue_DropsOnlyThatPreset(string badValue) {
         var bad = "{ \"name\": \"Bad\", \"format\": \"PNG\", \"height\": 50, " + badValue + " }";
         WriteJson(BuildJsonWithPresets($"[{BlogPreset}, {bad}, {AvatarPreset}]"));
@@ -1007,6 +1003,55 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
         result.Config.General.Should().BeEquivalentTo(ValidSettings());
         result.LoadError.Should().StartWith($"1 preset in {JsonPath} couldn't be used");
         result.SavesBlocked.Should().BeFalse();
+        Backups().Should().ContainSingle();
+    }
+
+    // Whole entries, so no key appears twice: each reaches the branch it names on its own.
+    [Theory]
+    [InlineData("{ \"name\": null, \"format\": \"PNG\" }")]
+    [InlineData("{ \"name\": \"Bad\", \"format\": null }")]
+    [InlineData("{ \"name\": \"Bad\", \"format\": \"HEIC\" }")]
+    [InlineData("{ \"name\": 42, \"format\": \"PNG\" }")]
+    [InlineData("{ \"format\": \"PNG\" }")]
+    [InlineData("{ \"name\": \"Bad\" }")]
+    [InlineData("{ \"name\": \"Bad\\uD800\", \"format\": \"PNG\" }")]
+    [InlineData("{ \"name\": \"Bad\\uFFFE\", \"format\": \"PNG\" }")]
+    [InlineData("{ \"name\": \"Bad\uFFFE\", \"format\": \"PNG\" }")]
+    public void Load_OneBadPresetEntry_DropsOnlyThatPreset(string bad) {
+        WriteJson(BuildJsonWithPresets($"[{BlogPreset}, {bad}, {AvatarPreset}]"));
+
+        var result = Load();
+
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Blog", "Avatar");
+        result.Config.General.Should().BeEquivalentTo(ValidSettings());
+        result.LoadError.Should().StartWith($"1 preset in {JsonPath} couldn't be used");
+        result.SavesBlocked.Should().BeFalse();
+        Backups().Should().ContainSingle();
+    }
+
+    [Fact]
+    public void Load_PresetsKeyTwice_ReportsAndBacksUpThePresetsItReplaced() {
+        var json = $$"""{ "presets": [{{BlogPreset}}], "Presets": [{{AvatarPreset}}] }""";
+        WriteJson(json);
+
+        var result = Load();
+
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Avatar");
+        result.LoadError.Should().StartWith($"1 preset in {JsonPath} couldn't be used");
+        result.SavesBlocked.Should().BeFalse();
+        Backups().Should().ContainSingle();
+        File.ReadAllText(BadPath).Should().Be(json);
+        ShouldBeSilent(Load());
+    }
+
+    [Fact]
+    public void Load_PresetsKeyTwiceWithTheDropInTheFirst_CountsBoth() {
+        WriteJson($$"""{ "presets": [{{BlogPreset}}, "x"], "presets": [{{AvatarPreset}}] }""");
+
+        var result = Load();
+
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Avatar");
+        result.LoadError.Should().StartWith($"2 presets in {JsonPath} couldn't be used");
         Backups().Should().ContainSingle();
     }
 

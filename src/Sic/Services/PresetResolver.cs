@@ -15,28 +15,29 @@ internal static class PresetResolver {
         ArgumentNullException.ThrowIfNull(presets);
         ArgumentNullException.ThrowIfNull(name);
 
-        var cleaned = PresetValidator.CleanName(name);
+        // A name that can't be normalized can't be a stored one.
+        if (!PresetValidator.TryCleanName(name, out var cleaned)) {
+            return null;
+        }
+
         return presets.FirstOrDefault(preset =>
-            PresetValidator.NameComparer.Equals(PresetValidator.CleanName(preset.Name), cleaned));
+            PresetValidator.TryCleanName(preset.Name, out var stored)
+            && PresetValidator.NameComparer.Equals(stored, cleaned));
     }
 
     /// <summary>
-    /// The sizes and mode a conversion uses. With an explicit resize, its sizes win and the mode
-    /// comes only from <paramref name="crop"/>, ignoring the preset's resize settings entirely.
-    /// Without one, the sizes come from <paramref name="preset"/> (none when it is
-    /// <see langword="null"/>), and the mode is Crop when <paramref name="crop"/> is set, otherwise
-    /// the preset's mode.
+    /// The sizes and mode a conversion uses. An explicit resize is one with a size, which the CLI
+    /// sets only for a valid <c>--resize</c>: its sizes win and the mode comes only from
+    /// <paramref name="crop"/>, ignoring the preset's resize settings entirely. Without one, the
+    /// sizes come from <paramref name="preset"/> (none when it is <see langword="null"/>), and the
+    /// mode is Crop when <paramref name="crop"/> is set, otherwise the preset's.
     /// </summary>
     public static (int? Width, int? Height, ResizeMode Mode) ResolveResize(
-        ConversionPreset? preset, bool hasExplicitResize, int? explicitWidth, int? explicitHeight, bool crop) {
-        if (hasExplicitResize) {
-            return (explicitWidth, explicitHeight, crop ? ResizeMode.Crop : ResizeMode.KeepProportions);
-        }
+        ConversionPreset? preset, int? explicitWidth, int? explicitHeight, bool crop) {
+        var hasExplicitResize = explicitWidth.HasValue || explicitHeight.HasValue;
 
-        if (preset is null) {
-            return (null, null, crop ? ResizeMode.Crop : ResizeMode.KeepProportions);
-        }
-
-        return (preset.Width, preset.Height, crop ? ResizeMode.Crop : preset.ResizeMode);
+        return hasExplicitResize
+            ? (explicitWidth, explicitHeight, crop ? ResizeMode.Crop : ResizeMode.KeepProportions)
+            : (preset?.Width, preset?.Height, crop ? ResizeMode.Crop : preset?.ResizeMode ?? ResizeMode.KeepProportions);
     }
 }
