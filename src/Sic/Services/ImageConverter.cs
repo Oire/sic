@@ -98,6 +98,22 @@ public static class ImageConverter {
     }
 
     /// <summary>
+    /// The formats the main window's dropdown offers: the enabled formats from
+    /// <see cref="GetEnabledFormats"/>, plus <paramref name="sessionFormats"/>, which a preset added
+    /// although Settings hides them, in canonical order and without duplicates. Session formats are
+    /// added afterwards, never passed to <see cref="GetEnabledFormats"/>, because an empty or unknown
+    /// filter there means "every format".
+    /// </summary>
+    public static IReadOnlyList<string> GetDropdownFormats(
+        IEnumerable<string>? enabledKeys, IEnumerable<string> sessionFormats) {
+        ArgumentNullException.ThrowIfNull(sessionFormats);
+
+        var shown = new HashSet<string>(GetEnabledFormats(enabledKeys), StringComparer.OrdinalIgnoreCase);
+        shown.UnionWith(sessionFormats);
+        return [.. FormatMap.Keys.Where(shown.Contains)];
+    }
+
+    /// <summary>
     /// The subset of <paramref name="formats"/> that can sensibly be used as "fit to file size" targets
     /// (issue #24), in the same order. Unlike <see cref="GetEnabledFormats"/> this may legitimately return
     /// an empty list — when the user has enabled nothing but ICO and GIF — so callers can tell "no format
@@ -105,6 +121,19 @@ public static class ImageConverter {
     /// </summary>
     public static IReadOnlyList<string> GetSizeFitFormats(IEnumerable<string> formats) {
         return [.. formats.Where(f => !SizeFitExcludedFormats.Contains(f))];
+    }
+
+    /// <summary>
+    /// The SIC! format key for a target format the user named (<c>jpeg</c>, <c>.tif</c> or
+    /// <c>PNG</c>), or <see langword="null"/> when it isn't a conversion target. Built on the same
+    /// alias list as format detection, so the CLI and presets accept the same spellings; HEIC is
+    /// input-only, so it is never a target.
+    /// </summary>
+    public static string? NormalizeTargetFormat(string format) {
+        ArgumentNullException.ThrowIfNull(format);
+
+        var key = GetCanonicalFormat(format.Trim().TrimStart('.'));
+        return key is not null && GetSupportedFormats().Contains(key, StringComparer.Ordinal) ? key : null;
     }
 
     /// <summary>

@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Oire.Sic.Models;
+using Oire.Sic.Services;
 using Serilog;
 using static Oire.Sic.Utils.Localization;
 using App = Oire.Sic.Utils.Constants.App;
@@ -191,6 +192,7 @@ internal static class ConfigSerializer {
 
         AppConfig config;
         int badValues;
+        int droppedPresets;
 
         try {
             using var document = JsonDocument.Parse(StrictUtf8.GetString(SkipBom(bytes)), DocumentOptions);
@@ -199,7 +201,7 @@ internal static class ConfigSerializer {
                 throw new JsonException("The root of the settings file is not an object.");
             }
 
-            (config, badValues) = ReadConfig(document.RootElement);
+            (config, badValues, droppedPresets) = ReadConfig(document.RootElement);
         } catch (Exception ex) when (ex is JsonException or DecoderFallbackException or InvalidOperationException) {
             // InvalidOperationException: JsonDocument accepts a name with an unpaired surrogate
             // such as "\uD800", which JsonProperty.Name then can't decode.
@@ -209,35 +211,59 @@ internal static class ConfigSerializer {
 
         CleanUp(config);
 
-        if (badValues == 0) {
+        if (badValues == 0 && droppedPresets == 0) {
             return new ConfigLoadResult(config, null, null, SavesBlocked: false);
         }
 
-        Log.Warning("{Path}: {Count} invalid values were reset to their defaults", jsonPath, badValues);
+        Log.Warning("{Path}: {Count} invalid values were reset to their defaults, {Presets} presets were dropped",
+            jsonPath, badValues, droppedPresets);
+
+        // Dropped presets would vanish from disk with the next save, so the file is kept first,
+        // in the same single backup as bad settings.
+        var problems = DescribeProblems(jsonPath, badValues, droppedPresets);
         string backupPath;
 
         try {
             backupPath = BackUpFile(jsonPath);
         } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
             Log.Error(ex, "Failed to back up {Path}", jsonPath);
-            return new ConfigLoadResult(config, _n(
-                "{0} setting in {1} had an invalid value and was reset to its default. SIC! couldn't "
-                + "make a copy of the file ({2}), so it was left as it is, and changes won't be saved "
-                + "this session.",
-                "{0} settings in {1} had invalid values and were reset to their defaults. SIC! couldn't "
-                + "make a copy of the file ({2}), so it was left as it is, and changes won't be saved "
-                + "this session.",
-                badValues, badValues, jsonPath, ex.Message), null, SavesBlocked: true);
+            var blockedError = problems + " " + _(
+                "SIC! couldn't make a copy of the file ({0}), so it was left as it is, and changes won't "
+                + "be saved this session.", ex.Message);
+            return new ConfigLoadResult(config, blockedError, null, SavesBlocked: true);
         }
 
-        var loadError = _n(
-            "{0} setting in {1} had an invalid value and was reset to its default. A copy of the "
-            + "original file was saved as {2}.",
-            "{0} settings in {1} had invalid values and were reset to their defaults. A copy of the "
-            + "original file was saved as {2}.",
-            badValues, badValues, jsonPath, backupPath);
-
+        var loadError = problems + " " + _("A copy of the original file was saved as {0}.", backupPath);
         return new ConfigLoadResult(config, loadError, TrySave(jsonPath, config), SavesBlocked: false);
+    }
+
+    /// <summary>
+    /// The sentences naming what loading had to repair: bad settings, dropped presets or both. The
+    /// path is named once, in the first sentence.
+    /// </summary>
+    private static string DescribeProblems(string jsonPath, int badValues, int droppedPresets) {
+        var sentences = new List<string>(2);
+
+        if (badValues > 0) {
+            sentences.Add(_n(
+                "{0} setting in {1} had an invalid value and was reset to its default.",
+                "{0} settings in {1} had invalid values and were reset to their defaults.",
+                badValues, badValues, jsonPath));
+        }
+
+        if (droppedPresets > 0) {
+            sentences.Add(badValues > 0
+                ? _n(
+                    "{0} preset couldn't be used and was removed.",
+                    "{0} presets couldn't be used and were removed.",
+                    droppedPresets, droppedPresets)
+                : _n(
+                    "{0} preset in {1} couldn't be used and was removed.",
+                    "{0} presets in {1} couldn't be used and were removed.",
+                    droppedPresets, droppedPresets, jsonPath));
+        }
+
+        return string.Join(" ", sentences);
     }
 
     /// <summary>Keeps a file that isn't valid JSON as <c>sic.json.bad</c>, then replaces it with defaults.</summary>
@@ -333,12 +359,33 @@ internal static class ConfigSerializer {
     /// <summary>
     /// Reads the root object one section and one value at a time, so a bad value costs only itself.
     /// </summary>
-    /// <returns>The settings read, and how many values were bad and kept their defaults.</returns>
-    private static (AppConfig Config, int BadValues) ReadConfig(JsonElement root) {
+    /// <returns>The settings read, how many values were bad and kept their defaults, and how many
+    /// presets couldn't be used.</returns>
+    private static (AppConfig Config, int BadValues, int DroppedPresets) ReadConfig(JsonElement root) {
         var config = new AppConfig();
         var badValues = 0;
+        var droppedPresets = 0;
+        var presetsRead = false;
 
         foreach (var section in root.EnumerateObject()) {
+            if (string.Equals(section.Name, nameof(AppConfig.Presets), StringComparison.OrdinalIgnoreCase)) {
+                var (presets, dropped) = ReadPresets(section.Value);
+
+                // A hand-edited file can hold the key twice, in any case. The last one wins, as
+                // JSON readers usually do, and the presets it replaces count as dropped, so they
+                // are backed up and reported rather than lost at the next save.
+                if (presetsRead) {
+                    Log.Warning("sic.json: {Name} appears more than once, dropping the {Count} presets read before",
+                        section.Name, config.Presets.Count);
+                    droppedPresets += config.Presets.Count;
+                }
+
+                config.Presets = presets;
+                droppedPresets += dropped;
+                presetsRead = true;
+                continue;
+            }
+
             if (!string.Equals(section.Name, nameof(AppConfig.General), StringComparison.OrdinalIgnoreCase)) {
                 continue;
             }
@@ -358,7 +405,39 @@ internal static class ConfigSerializer {
             }
         }
 
-        return (config, badValues);
+        return (config, badValues, droppedPresets);
+    }
+
+    /// <summary>
+    /// Reads the <c>presets</c> array one entry at a time, so an entry that can't be deserialized
+    /// costs only itself, then keeps the usable ones through <see cref="PresetValidator.Normalize"/>.
+    /// A section that is neither an array nor null counts as one dropped preset.
+    /// </summary>
+    private static (List<ConversionPreset> Presets, int Dropped) ReadPresets(JsonElement section) {
+        switch (section.ValueKind) {
+            case JsonValueKind.Null:
+                return ([], 0);
+            case JsonValueKind.Array:
+                break;
+            default:
+                Log.Warning("sic.json: the presets section is not an array, dropping it");
+                return ([], 1);
+        }
+
+        var entries = new List<ConversionPreset?>();
+        var failed = 0;
+
+        foreach (var entry in section.EnumerateArray()) {
+            try {
+                entries.Add(entry.Deserialize<ConversionPreset>(Options));
+            } catch (Exception ex) when (ex is JsonException or InvalidOperationException) {
+                Log.Warning("sic.json: dropping a preset that can't be read: {Error}", ex.Message);
+                failed++;
+            }
+        }
+
+        var (presets, dropped) = PresetValidator.Normalize(entries);
+        return (presets, failed + dropped);
     }
 
     private static GeneralSettings ReadGeneral(JsonElement section, ref int badValues) {
@@ -408,10 +487,12 @@ internal static class ConfigSerializer {
     /// <summary>
     /// The clean-up every loaded config goes through: nulls become defaults, null and blank format
     /// keys are dropped, a blank output folder becomes the default one, an invalid language
-    /// becomes <c>System</c>, and an update interval no member has becomes the default.
+    /// becomes <c>System</c>, an update interval no member has becomes the default, and a null
+    /// preset list becomes an empty one.
     /// </summary>
     private static void CleanUp(AppConfig config) {
         config.General ??= new GeneralSettings();
+        config.Presets ??= [];
         var general = config.General;
         var defaults = new GeneralSettings();
 

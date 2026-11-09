@@ -363,7 +363,7 @@ public sealed class CliTests: StaticStateTestBase {
         var result = Run("-i", input);
 
         ShouldFail(result);
-        result.Error.Trim().Should().Be("Either --output or --format must be specified.");
+        result.Error.Trim().Should().Be("Either --output, --format or --preset must be specified.");
     }
 
     [Fact]
@@ -400,6 +400,8 @@ public sealed class CliTests: StaticStateTestBase {
     [InlineData("-5", "Invalid width value: -5")]
     [InlineData("10xb", "Invalid height value: b")]
     [InlineData("10x0", "Invalid height value: 0")]
+    [InlineData("70000x", "Invalid width value: 70000")]
+    [InlineData("10x65536", "Invalid height value: 65536")]
     [InlineData("10x20x30", "Invalid resize format: 10x20x30. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, 128)")]
     [InlineData("x", "Invalid resize format: x. At least one dimension is required.")]
     public void InvalidResize_Fails(string resize, string message) {
@@ -415,6 +417,7 @@ public sealed class CliTests: StaticStateTestBase {
 
     [Theory]
     [InlineData("50x")]
+    [InlineData("128x")]
     [InlineData("x50")]
     [InlineData("50")]
     public void CropWithOneSize_Fails(string resize) {
@@ -475,6 +478,200 @@ public sealed class CliTests: StaticStateTestBase {
 
         ShouldFail(result);
         result.Error.Should().StartWith("Conversion failed: ");
+        File.Exists(output).Should().BeFalse();
+    }
+
+    // Presets
+
+    private const string PresetsJson = """
+        {
+          "general": { "language": "System" },
+          "presets": [
+            { "name": "Blog", "format": "WEBP", "resizeMode": "KeepProportions", "width": 20 },
+            { "name": "Avatar", "format": "PNG", "resizeMode": "Crop", "width": 16, "height": 16 },
+            { "name": "Mon blog à moi", "format": "BMP", "resizeMode": "KeepProportions", "height": 15 },
+            { "name": "Plain", "format": "GIF" }
+          ]
+        }
+        """;
+
+    private static void WriteConfig(string json) {
+        File.WriteAllText(Path.Combine(App.DataFolder, App.ConfigFileName), json);
+    }
+
+    [Fact]
+    public void Preset_Alone_ConvertsToTheDefaultOutputFolder() {
+        WriteConfig(PresetsJson);
+        var baseName = UniqueName("cli-preset");
+        var input = _images.Create(baseName + ".png", 40, 30);
+        var output = DefaultFolderOutput(baseName, ".webp");
+
+        var result = Run("-i", input, "--preset", "Blog");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        result.Error.Should().BeEmpty();
+        result.Output.Trim().Should().Be($"Converted: {output}");
+        TestImages.ShouldBeImage(output, MagickFormat.WebP, 20, 15);
+    }
+
+    [Fact]
+    public void ShortPresetOption_Works() {
+        WriteConfig(PresetsJson);
+        var baseName = UniqueName("cli-short-preset");
+        var input = _images.Create(baseName + ".png", 40, 30);
+        var output = DefaultFolderOutput(baseName, ".png");
+
+        var result = Run("-i", input, "-p", "avatar");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        TestImages.ShouldBeImage(output, MagickFormat.Png, 16, 16);
+    }
+
+    [Fact]
+    public void Preset_WithoutResize_ConvertsAtFullSize() {
+        WriteConfig(PresetsJson);
+        var baseName = UniqueName("cli-plain-preset");
+        var input = _images.Create(baseName + ".png", 40, 30);
+        var output = DefaultFolderOutput(baseName, ".gif");
+
+        var result = Run("-i", input, "--preset", "Plain");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        TestImages.ShouldBeImage(output, MagickFormat.Gif, 40, 30);
+    }
+
+    [Fact]
+    public void Preset_OutputExtensionWins_AndThePresetSizesStillApply() {
+        WriteConfig(PresetsJson);
+        var input = _images.Create("photo.png", 40, 30);
+        var output = Output("photo.jpg");
+
+        var result = Run("-i", input, "-o", output, "--preset", "Blog");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        result.Output.Trim().Should().Be($"Converted: {output}");
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 20, 15);
+    }
+
+    [Fact]
+    public void Preset_WithOutputWithoutExtension_KeepsTheExistingError() {
+        WriteConfig(PresetsJson);
+        var input = _images.Create("photo.png", 40, 30);
+
+        var result = Run("-i", input, "-o", Output("photo"), "--preset", "Blog");
+
+        ShouldFail(result);
+        result.Error.Trim().Should().Be("Output path must have a file extension (e.g. .jpg, .png)");
+        File.Exists(Output("photo")).Should().BeFalse();
+    }
+
+    [Fact]
+    public void Preset_FormatWins_AndThePresetSizesStillApply() {
+        WriteConfig(PresetsJson);
+        var baseName = UniqueName("cli-preset-format");
+        var input = _images.Create(baseName + ".png", 40, 30);
+        var output = DefaultFolderOutput(baseName, ".jpg");
+        var presetOutput = DefaultFolderOutput(baseName, ".webp");
+
+        var result = Run("-i", input, "--format", "jpg", "--preset", "Blog");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        result.Output.Trim().Should().Be($"Converted: {output}");
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 20, 15);
+        File.Exists(presetOutput).Should().BeFalse();
+    }
+
+    [Fact]
+    public void Preset_ResizeReplacesThePresetSizesAndMode() {
+        WriteConfig(PresetsJson);
+        var input = _images.Create("wide.png", 200, 100);
+        var output = Output("wide.png");
+
+        var result = Run("-i", input, "-o", output, "--preset", "Avatar", "--resize", "50x");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        TestImages.ShouldBeImage(output, MagickFormat.Png, 50, 25);
+    }
+
+    [Fact]
+    public void Preset_CropWithAOneSizePreset_GivesTheCropError() {
+        WriteConfig(PresetsJson);
+        var input = _images.Create("photo.png", 40, 30);
+        var output = Output("photo.webp");
+
+        var result = Run("-i", input, "-o", output, "--preset", "Blog", "--crop");
+
+        ShouldFail(result);
+        result.Error.Trim().Should().Be("Crop mode requires both width and height (e.g. --resize 128x128 --crop)");
+        File.Exists(output).Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("Mon blog à moi")]
+    [InlineData("  MON BLOG À MOI  ")]
+    public void Preset_NameWithSpacesAndDiacritics_IsFound(string name) {
+        WriteConfig(PresetsJson);
+        var input = _images.Create("photo.png", 40, 30);
+        var output = Output("photo.bmp");
+
+        var result = Run("-i", input, "-o", output, "--preset", name);
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        TestImages.ShouldBeImage(output, MagickFormat.Bmp, 20, 15);
+    }
+
+    [Fact]
+    public void Preset_NonLatinName_IsFound() {
+        WriteConfig("""
+            { "general": { "language": "System" },
+              "presets": [ { "name": "Мой блог", "format": "JPG", "width": 20 } ] }
+            """);
+        var input = _images.Create("photo.png", 40, 30);
+        var output = Output("photo.jpg");
+
+        var result = Run("-i", input, "-o", output, "--preset", "мой БЛОГ");
+
+        result.ExitCode.Should().Be(ExitCode.Success);
+        result.Error.Should().BeEmpty();
+        TestImages.ShouldBeImage(output, MagickFormat.Jpeg, 20, 15);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void UnknownPreset_FailsAndListsTheAvailablePresets(bool withFormat) {
+        WriteConfig(PresetsJson);
+        var baseName = UniqueName("cli-unknown-preset");
+        var input = _images.Create(baseName + ".png", 40, 30);
+        var output = DefaultFolderOutput(baseName, ".jpg");
+        string[] args = withFormat
+            ? ["-i", input, "--preset", "Banner", "--format", "jpg"]
+            : ["-i", input, "--preset", "Banner"];
+
+        var result = Run(args);
+
+        ShouldFail(result);
+        var lines = result.Error.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        lines.Should().Equal(
+            "Unknown preset: Banner",
+            "Available presets:",
+            "  Blog",
+            "  Avatar",
+            "  Mon blog à moi",
+            "  Plain");
+        File.Exists(output).Should().BeFalse();
+    }
+
+    [Fact]
+    public void Preset_WithNoPresetsSaved_FailsAndSaysSo() {
+        var input = _images.Create("photo.png", 40, 30);
+        var output = Output("photo.jpg");
+
+        var result = Run("-i", input, "-o", output, "--preset", "Blog");
+
+        ShouldFail(result);
+        var lines = result.Error.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        lines.Should().Equal("Unknown preset: Blog", "There are no saved presets.");
         File.Exists(output).Should().BeFalse();
     }
 

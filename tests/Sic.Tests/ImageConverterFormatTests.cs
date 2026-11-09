@@ -55,6 +55,42 @@ public class ImageConverterFormatTests {
     }
 
     [Fact]
+    public void GetDropdownFormats_WithoutSessionFormats_ShowsTheEnabledFormats() {
+        ImageConverter.GetDropdownFormats(["PNG", "JPG"], []).Should().Equal("JPG", "PNG");
+    }
+
+    [Fact]
+    public void GetDropdownFormats_AddsAHiddenSessionFormatInCanonicalOrder() {
+        ImageConverter.GetDropdownFormats(["JPG", "AVIF"], ["WEBP"]).Should().Equal("JPG", "WEBP", "AVIF");
+    }
+
+    [Fact]
+    public void GetDropdownFormats_EmptyEnabledKeys_StillShowsEveryFormat() {
+        ImageConverter.GetDropdownFormats([], ["WEBP"]).Should().Equal(CanonicalOrder);
+    }
+
+    [Fact]
+    public void GetDropdownFormats_NullEnabledKeys_ShowsEveryFormat() {
+        ImageConverter.GetDropdownFormats(null, []).Should().Equal(CanonicalOrder);
+    }
+
+    [Fact]
+    public void GetDropdownFormats_EnabledKeysMatchingNothingKnown_StillShowsEveryFormat() {
+        ImageConverter.GetDropdownFormats(["HEIC", "XYZ"], ["WEBP"]).Should().Equal(CanonicalOrder);
+    }
+
+    [Fact]
+    public void GetDropdownFormats_NeverShowsDuplicates() {
+        ImageConverter.GetDropdownFormats(["PNG", "WEBP"], ["webp", "WEBP", "PNG", "GIF", "gif"])
+            .Should().Equal("PNG", "WEBP", "GIF");
+    }
+
+    [Fact]
+    public void GetDropdownFormats_IgnoresUnknownSessionFormats() {
+        ImageConverter.GetDropdownFormats(["PNG"], ["HEIC", "XYZ"]).Should().Equal("PNG");
+    }
+
+    [Fact]
     public void GetSizeFitFormats_RemovesIcoAndGif() {
         ImageConverter.GetSizeFitFormats(CanonicalOrder)
             .Should().Equal("JPG", "PNG", "WEBP", "BMP", "TIFF", "AVIF");

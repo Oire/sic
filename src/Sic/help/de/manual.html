@@ -118,6 +118,7 @@ footer {
     <li><a href="#resizing">Größe ändern</a></li>
     <li><a href="#multi-size-ico">Mehrgrößen-ICO-Dateien erstellen</a></li>
     <li><a href="#fit-to-size">Ein Bild an eine Dateigröße anpassen</a></li>
+    <li><a href="#presets">Voreinstellungen</a></li>
     <li><a href="#settings">Einstellungen</a></li>
     <li><a href="#updates">Softwareaktualisierungen</a></li>
     <li><a href="#cli">Kommandozeilenverwendung</a></li>
@@ -137,8 +138,8 @@ footer {
     <dd>Vier Menüs am oberen Rand des Fensters:
         <ul>
             <li><strong>Datei</strong> — Bilder hinzufügen (aus Dateien, Ordnern oder per Link), Einstellungen öffnen oder die Anwendung beenden.</li>
-            <li><strong>Bearbeiten</strong> — Ausgewählte oder alle Bilder aus der Warteschlange entfernen. Dieses Menü ist deaktiviert, wenn die Warteschlange leer ist.</li>
-            <li><strong>Konvertieren</strong> — Konvertierung starten, ein Mehrgrößen-ICO erstellen oder ein Bild an eine Dateigröße anpassen. Dieses Menü ist deaktiviert, wenn die Warteschlange leer ist.</li>
+            <li><strong>Bearbeiten</strong> — Ausgewählte oder alle Bilder aus der Warteschlange entfernen. Seine Einträge sind nicht verfügbar, solange die Warteschlange leer ist.</li>
+            <li><strong>Konvertieren</strong> — Konvertierung starten, ein Mehrgrößen-ICO erstellen, ein Bild an eine Dateigröße anpassen oder <a href="#presets">Voreinstellungen</a> anwenden und verwalten. Die Einträge, die Bilder benötigen, sind nicht verfügbar, solange die Warteschlange leer ist; das Untermenü <strong>Voreinstellungen</strong> ist immer verfügbar.</li>
             <li><strong>Hilfe</strong> — Dieses Handbuch öffnen, nach Softwareaktualisierungen suchen, spenden oder den Info-Dialog anzeigen.</li>
         </ul>
     </dd>
@@ -261,6 +262,51 @@ footer {
 </ul>
 <p>Das gewählte Ergebnis wird nach den üblichen Regeln für Ausgabeordner und Dateinamenskonflikte gespeichert, genau wie bei einer normalen Konvertierung.</p>
 
+<h2 id="presets">Voreinstellungen</h2>
+<p>Wenn Sie Bilder oft auf dieselbe Weise konvertieren — etwa als WebP-Bilder mit 300 Pixeln Breite für ein Blog —, speichern Sie das als Voreinstellung und wählen Sie sie nach ihrem Namen aus, statt jedes Mal Format und Größenänderung von Hand einzustellen. Voreinstellungen finden Sie im Untermenü <strong>Konvertieren > Voreinstellungen</strong>, das auch bei leerer Warteschlange verfügbar ist. Sie werden zusammen mit Ihren Einstellungen in <code>sic.json</code> gespeichert, und auch die <a href="#cli">Kommandozeile</a> kann sie verwenden.</p>
+<p>Diese Voreinstellungen haben nichts mit den Voreinstellungen Favicon und Anwendungssymbol im Dialog für <a href="#multi-size-ico">Mehrgrößen-ICO-Dateien</a> zu tun, die nur festlegen, welche Größen in einer ICO-Datei landen.</p>
+
+<h3>Eine Voreinstellung hinzufügen</h3>
+<ol>
+    <li>Wählen Sie <strong>Konvertieren > Voreinstellungen > Voreinstellung hinzufügen</strong>.</li>
+    <li>Geben Sie im Feld <strong>Name</strong> einen Namen ein. Namen dürfen in jeder Sprache geschrieben und bis zu 64 Zeichen lang sein; sie dürfen keine Tabulatoren, Zeilenumbrüche oder anderen Steuerzeichen enthalten, und zwei Voreinstellungen dürfen nicht denselben Namen tragen, auch nicht in anderer Groß- und Kleinschreibung.</li>
+    <li>Wählen Sie das <strong>Zielformat</strong>. Diese Liste enthält immer alle Formate, auch die, die Sie in den <a href="#settings">Einstellungen</a> ausgeblendet haben.</li>
+    <li>Um zusätzlich die Größe zu ändern, aktivieren Sie <strong>Größe ändern</strong>, wählen den <strong>Größenänderungsmodus</strong> (<em>Proportionen beibehalten</em> oder <em>Zuschneiden</em>) und füllen <strong>Breite</strong>, <strong>Höhe</strong> oder beide Felder aus, in Pixeln von 1 bis 65535. Lassen Sie <strong>Größe ändern</strong> deaktiviert, damit jedes Bild seine eigene Größe behält.</li>
+    <li>Drücken Sie <strong>OK</strong>. Die neue Voreinstellung erscheint sofort im Untermenü <strong>Voreinstellungen</strong>.</li>
+</ol>
+<p>Der Dialog übernimmt anfangs das Format und die Größenänderung, die gerade im Hauptfenster eingestellt sind. So können Sie dort alles einrichten, ausprobieren und dann speichern. Größen, die Sie selbst eingegeben haben, bleiben erhalten; Größen, die SIC! aus dem ausgewählten Bild eingetragen hat, werden weggelassen, weil sie nur zu diesem einen Bild passen. Anders als im Hauptfenster füllt die Eingabe einer Größe in diesem Dialog nie die andere aus.</p>
+<p>Stimmt etwas nicht, ist zum Beispiel der Name leer oder schon vergeben oder hat <em>Zuschneiden</em> nur eine Größe, sagt SIC!, was zu korrigieren ist, und setzt den Fokus in das betreffende Feld.</p>
+
+<h3>Eine Größe oder beide</h3>
+<p>Mit <em>Proportionen beibehalten</em> kann eine Voreinstellung eine Größe oder beide enthalten, und bei einem Stapel unterschiedlich geformter Bilder macht das einen Unterschied:</p>
+<ul>
+    <li><strong>Nur eine Breite</strong> (oder nur eine Höhe): Jedes Bild wird auf genau diese Breite (oder Höhe) skaliert, und die andere Seite folgt den Proportionen des Bildes. Eine Voreinstellung „Blog“ mit der Breite 300 macht aus einer Mischung von Hoch- und Querformatfotos lauter Bilder mit 300 Pixeln Breite.</li>
+    <li><strong>Beide</strong>: Jedes Bild wird unter Beibehaltung seiner Proportionen auf die größte Größe skaliert, die in diesen Rahmen passt.</li>
+</ul>
+<p>Mit <em>Zuschneiden</em> sind beide Größen erforderlich, und jedes Bild hat danach genau diese Größe.</p>
+
+<h3>Eine Voreinstellung anwenden</h3>
+<p>Wählen Sie die Voreinstellung nach ihrem Namen unter <strong>Konvertieren > Voreinstellungen</strong>. SIC! trägt daraus <strong>Zielformat</strong>, <strong>Größe ändern</strong>, den Größenänderungsmodus, <strong>Breite</strong> und <strong>Höhe</strong> ein, und die Statusleiste meldet zum Beispiel <em>Voreinstellung angewendet: Blog</em>. Screenreader sagen diese Meldung ebenfalls an. Das Anwenden einer Voreinstellung konvertiert noch nichts: Prüfen Sie die Einstellungen, ändern Sie sie bei Bedarf und verwenden Sie dann wie gewohnt <strong>Ausgewählte konvertieren</strong> oder <strong>Alle konvertieren</strong>. Solange es keine Voreinstellungen gibt, zeigt das Untermenü <em>Noch keine Voreinstellungen</em> über <strong>Voreinstellung hinzufügen</strong> und <strong>Voreinstellungen verwalten</strong>.</p>
+<p>Die Größen einer Voreinstellung bleiben in den Feldern <strong>Breite</strong> und <strong>Höhe</strong> stehen, während Sie Bilder hinzufügen, auswählen und entfernen: SIC! ersetzt sie nicht, wie sonst, durch die Abmessungen des ausgewählten Bildes, und bei einer Voreinstellung mit nur einer Höhe bleibt das Feld für die Breite leer. Sobald Sie selbst eine Größe ändern, <strong>Größe ändern</strong> aktivieren oder deaktivieren oder den Größenänderungsmodus wechseln, trägt die Auswahl eines Bildes wieder wie gewohnt seine Abmessungen ein.</p>
+<p>Konvertiert eine Voreinstellung in ein Format, das Sie in den <a href="#settings">Einstellungen</a> unter <strong>In der Liste anzuzeigende Zielformate</strong> deaktiviert haben, lässt sie sich trotzdem anwenden: Das Format wird dem Auswahlfeld <strong>Zielformat</strong> hinzugefügt und bleibt dort, bis Sie SIC! schließen.</p>
+
+<h3>Voreinstellungen bearbeiten und entfernen</h3>
+<p>Wählen Sie <strong>Konvertieren > Voreinstellungen > Voreinstellungen verwalten</strong>. Die Liste <strong>Voreinstellungen</strong> zeigt jede Voreinstellung mit einer Zusammenfassung dessen, was sie tut, etwa <em>Blog: WEBP, Breite 300</em>, <em>Banner: WEBP, einpassen in 800x600</em> oder <em>Avatar: PNG, zuschneiden auf 128x128</em>.</p>
+<dl>
+    <dt>Hinzufügen</dt>
+    <dd>Öffnet denselben Dialog wie <strong>Voreinstellung hinzufügen</strong>, aber leer.</dd>
+
+    <dt>Bearbeiten</dt>
+    <dd>Öffnet die ausgewählte Voreinstellung in diesem Dialog. Sie können alles ändern, auch den Namen. Die <kbd>Eingabetaste</kbd> in der Liste oder ein Doppelklick auf eine Voreinstellung bewirkt dasselbe.</dd>
+
+    <dt>Entfernen</dt>
+    <dd>Entfernt die ausgewählte Voreinstellung nach einer Rückfrage. <kbd>Entf</kbd> in der Liste bewirkt dasselbe.</dd>
+
+    <dt>Schließen</dt>
+    <dd>Schließt den Dialog. <kbd>Escape</kbd> bewirkt dasselbe.</dd>
+</dl>
+<p><strong>Bearbeiten</strong> und <strong>Entfernen</strong> sind erst verfügbar, wenn eine Voreinstellung ausgewählt ist. Ihre Änderungen werden beim Schließen des Dialogs gespeichert, ganz gleich, wie Sie ihn schließen, und das Untermenü <strong>Voreinstellungen</strong> wird sofort aktualisiert.</p>
+
 <h2 id="settings">Einstellungen</h2>
 <p>Öffnen Sie <strong>Datei > Einstellungen</strong> (<kbd>Strg+,</kbd>), um SIC! zu konfigurieren. Der Dialog ist in zwei Registerkarten gegliedert: <strong>Allgemein</strong> und <strong>Bilder</strong>. Drücken Sie <kbd>Strg+Tab</kbd>, um zwischen den Registerkarten zu wechseln.</p>
 
@@ -304,7 +350,9 @@ footer {
 <pre>sic -i input.png -o output.jpg
 sic --input photo.bmp --output photo.webp
 sic -i avatar.png -o avatar.ico --resize 128x128
-sic -i photo.jpg -f png --resize 800x</pre>
+sic -i photo.jpg -f png --resize 800x
+sic -i photo.png --preset Blog
+sic -i photo.png -p "Produktbanner" -o banner.jpg</pre>
 <dl>
     <dt><code>--input</code>, <code>-i</code> (erforderlich)</dt>
     <dd>Pfad zum Quellbild.</dd>
@@ -316,12 +364,21 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <dd>Name des Zielformats (z. B. <code>png</code>, <code>jpg</code>). Verwenden Sie dies anstelle von <code>--output</code>, um den Ausgabepfad automatisch zu generieren.</dd>
 
     <dt><code>--resize</code>, <code>-r</code></dt>
-    <dd>Bildgröße ändern. Format: <code>BxH</code>, <code>Bx</code> (nur Breite) oder <code>xH</code> (nur Höhe).</dd>
+    <dd>Bildgröße ändern. Format: <code>BxH</code>, <code>Bx</code> oder <code>B</code> (nur Breite) oder <code>xH</code> (nur Höhe), jede Größe von 1 bis 65535 Pixel.</dd>
 
     <dt><code>--crop</code>, <code>-c</code></dt>
-    <dd>Zuschneiden statt proportional skalieren. Erfordert sowohl Breite als auch Höhe in <code>--resize</code>.</dd>
+    <dd>Zuschneiden statt proportional skalieren. Erfordert sowohl Breite als auch Höhe, aus <code>--resize</code> oder aus der Voreinstellung.</dd>
+
+    <dt><code>--preset</code>, <code>-p</code></dt>
+    <dd>Mit einer gespeicherten <a href="#presets">Voreinstellung</a> konvertieren, mit deren Format und Größenänderung. Groß- und Kleinschreibung spielt keine Rolle; setzen Sie einen Namen mit Leerzeichen in Anführungszeichen. Gibt es keine Voreinstellung mit diesem Namen, gibt SIC! <em>Unbekannte Voreinstellung:</em> mit dem Namen aus, gefolgt von <em>Verfügbare Voreinstellungen:</em> und deren Namen (oder <em>Es gibt keine gespeicherten Voreinstellungen.</em>), und beendet sich mit einem Fehler, auch wenn <code>--output</code> oder <code>--format</code> die Voreinstellung überflüssig gemacht hätten.</dd>
 </dl>
-<p>Es muss entweder <code>--output</code> oder <code>--format</code> angegeben werden (aber nicht beides).</p>
+<p>Mindestens eine der Optionen <code>--output</code>, <code>--format</code> oder <code>--preset</code> muss angegeben werden. Geben mehrere davon ein Format vor, gewinnt die Erweiterung von <code>--output</code>, dann <code>--format</code>, dann die Voreinstellung. Ohne <code>--output</code> landet die konvertierte Datei unter dem Namen der Quelldatei im Ausgabeordner aus den <a href="#settings">Einstellungen</a>.</p>
+<p>Ausdrücklich angegebene Optionen haben Vorrang vor dem entsprechenden Teil einer Voreinstellung:</p>
+<ul>
+    <li><code>--resize</code> ersetzt die Größen und den Größenänderungsmodus der Voreinstellung: Das Bild wird proportional skaliert oder, wenn Sie zusätzlich <code>--crop</code> angeben, zugeschnitten.</li>
+    <li><code>--crop</code> ohne <code>--resize</code> behält die Größen der Voreinstellung bei und schneidet auf sie zu; die Voreinstellung braucht dann sowohl eine Breite als auch eine Höhe.</li>
+    <li>Eine Voreinstellung ohne Größenänderung lässt das Bild in seiner eigenen Größe, sofern Sie nicht <code>--resize</code> angeben.</li>
+</ul>
 
 <h2 id="keyboard-shortcuts">Tastenkombinationen</h2>
 <table>
@@ -377,7 +434,7 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <dd>Wenn der benutzerdefinierte Ausgabeordner gelöscht oder verschoben wurde, warnt SIC! Sie und verwendet den Standard-Ordner <code>Converted</code>.</dd>
 
     <dt>SIC! meldet zurückgesetzte Einstellungen oder eine beschädigte Einstellungsdatei</dt>
-    <dd>SIC! bewahrt eine Kopie der ursprünglichen Datei als <code>sic.json.bad</code> im Anwendungsdatenverzeichnis auf. Waren nur einzelne Werte ungültig, werden nur diese auf ihre Standardwerte zurückgesetzt, und Ihre übrigen Einstellungen bleiben erhalten; war die ganze Datei beschädigt, startet SIC! mit den Standardeinstellungen. Um die alte Datei zurückzubekommen, etwa um sie von Hand zu korrigieren, schließen Sie SIC! und benennen Sie die Kopie in <code>sic.json</code> um. Meldet SIC!, dass Änderungen in dieser Sitzung nicht gespeichert werden, hielt ein anderes Programm wie ein Synchronisierungsprogramm oder ein Virenscanner die Datei geöffnet: Schließen Sie SIC!, warten Sie einen Moment und starten Sie es erneut.</dd>
+    <dd>SIC! bewahrt eine Kopie der ursprünglichen Datei als <code>sic.json.bad</code> im Anwendungsdatenverzeichnis auf. Waren nur einzelne Werte ungültig, werden nur diese auf ihre Standardwerte zurückgesetzt, und Ihre übrigen Einstellungen bleiben erhalten; war die ganze Datei beschädigt, startet SIC! mit den Standardeinstellungen. Lässt sich eine <a href="#presets">Voreinstellung</a> nicht verwenden, etwa nachdem <code>sic.json</code> von Hand bearbeitet wurde, wird nur sie entfernt, Ihre übrigen Voreinstellungen bleiben erhalten, und SIC! teilt Ihnen mit, wie viele entfernt wurden. Um die alte Datei zurückzubekommen, etwa um sie von Hand zu korrigieren, schließen Sie SIC! und benennen Sie die Kopie in <code>sic.json</code> um. Meldet SIC!, dass Änderungen in dieser Sitzung nicht gespeichert werden, hielt ein anderes Programm wie ein Synchronisierungsprogramm oder ein Virenscanner die Datei geöffnet: Schließen Sie SIC!, warten Sie einen Moment und starten Sie es erneut.</dd>
 </dl>
 </main>
 

@@ -1,4 +1,5 @@
 using GetText.WindowsForms;
+using Oire.Sic.Services;
 using Oire.Sic.Utils;
 using Serilog;
 using static Oire.Sic.Utils.Localization;
@@ -6,8 +7,6 @@ using static Oire.Sic.Utils.Localization;
 namespace Oire.Sic;
 
 public partial class FitToSizeDialog: Form {
-    private const int MaxDimension = 65535;
-
     /// <summary>The requested size budget in bytes.</summary>
     public long MaxBytes { get; private set; }
 
@@ -62,10 +61,10 @@ public partial class FitToSizeDialog: Form {
         if (limitWidthCheckBox.Checked) {
             var widthText = maxWidthTextBox.Text.Trim();
 
-            if (!int.TryParse(widthText, out var w) || w < 1 || w > MaxDimension) {
+            if (!int.TryParse(widthText, out var w) || w < 1 || w > ResizeValidator.MaxDimension) {
                 Log.Debug("FitToSizeDialog: Invalid width entered: {Input}", widthText);
                 DialogHelper.Show(
-                    _("Please enter a valid maximum width (1–{0}).", MaxDimension),
+                    _("Please enter a valid maximum width (1–{0}).", ResizeValidator.MaxDimension),
                     _("Invalid width"),
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);

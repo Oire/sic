@@ -118,6 +118,7 @@ footer {
     <li><a href="#resizing">Resizing</a></li>
     <li><a href="#multi-size-ico">Creating multi-size ICO files</a></li>
     <li><a href="#fit-to-size">Fitting an image to a file size</a></li>
+    <li><a href="#presets">Presets</a></li>
     <li><a href="#settings">Settings</a></li>
     <li><a href="#updates">Software updates</a></li>
     <li><a href="#cli">Command-line usage</a></li>
@@ -137,8 +138,8 @@ footer {
     <dd>Four menus at the top of the window:
         <ul>
             <li><strong>File</strong> — add images (from files, folders, or links), open Settings, or exit the application.</li>
-            <li><strong>Edit</strong> — remove selected or all images from the queue. This menu is disabled when the queue is empty.</li>
-            <li><strong>Convert</strong> — run conversion, create a multi-size ICO, or fit an image to a file size. This menu is disabled when the queue is empty.</li>
+            <li><strong>Edit</strong> — remove selected or all images from the queue. Its items are unavailable while the queue is empty.</li>
+            <li><strong>Convert</strong> — run conversion, create a multi-size ICO, fit an image to a file size, or apply and manage <a href="#presets">presets</a>. The items that need images are unavailable while the queue is empty; the <strong>Presets</strong> submenu is always available.</li>
             <li><strong>Help</strong> — open this manual, check for software updates, donate, or view the About dialog.</li>
         </ul>
     </dd>
@@ -261,6 +262,51 @@ footer {
 </ul>
 <p>The chosen result is saved using the usual output folder and filename-conflict rules, exactly like a normal conversion.</p>
 
+<h2 id="presets">Presets</h2>
+<p>If you often convert images the same way — say, WebP images 300 pixels wide for a blog — save that as a preset and pick it by name instead of setting the format and the resize controls by hand every time. Presets live in the <strong>Convert > Presets</strong> submenu, which is available even when the queue is empty. They are saved in <code>sic.json</code> together with your settings, and the <a href="#cli">command line</a> can use them too.</p>
+<p>These presets have nothing to do with the Favicon and Application icon presets of the <a href="#multi-size-ico">multi-size ICO</a> dialog, which only choose the sizes stored in one ICO file.</p>
+
+<h3>Adding a preset</h3>
+<ol>
+    <li>Choose <strong>Convert > Presets > Add Preset</strong>.</li>
+    <li>Enter a <strong>Name</strong>. Names can be in any language and up to 64 characters long; they can't contain tabs, line breaks or other control characters, and two presets can't share a name, even written in a different case.</li>
+    <li>Choose the <strong>Target Format</strong>. This list always holds every format, including the ones you have hidden in <a href="#settings">Settings</a>.</li>
+    <li>To resize as well, tick <strong>Resize</strong>, choose the <strong>Resize Mode</strong> (<em>Keep proportions</em> or <em>Crop</em>), and fill in <strong>Width</strong>, <strong>Height</strong> or both, in pixels from 1 to 65535. Leave <strong>Resize</strong> unticked to keep every image at its own size.</li>
+    <li>Press <strong>OK</strong>. The new preset appears in the <strong>Presets</strong> submenu straight away.</li>
+</ol>
+<p>The dialog starts out with the format and resize settings currently in the main window, so you can set things up there, try them, and then save them. Sizes you typed yourself are kept; sizes SIC! filled in from the selected image are left out, because they only fit that one image. Unlike the main window, typing one size in this dialog never fills in the other.</p>
+<p>If something is wrong, for example the name is empty or already taken, or <em>Crop</em> has only one size, SIC! says what to fix and moves the focus to that field.</p>
+
+<h3>One size or both</h3>
+<p>With <em>Keep proportions</em>, a preset can hold one size or both, and the difference matters for a batch of images of different shapes:</p>
+<ul>
+    <li><strong>Only a width</strong> (or only a height): every image is scaled to exactly that width (or height), and the other side follows the image's own proportions. A "Blog" preset with a width of 300 turns a mix of portrait and landscape photos into images that are all 300 pixels wide.</li>
+    <li><strong>Both</strong>: every image is scaled, keeping its proportions, to the largest size that fits inside that box.</li>
+</ul>
+<p>With <em>Crop</em>, both sizes are required, and every image comes out at exactly that size.</p>
+
+<h3>Applying a preset</h3>
+<p>Choose the preset by name in <strong>Convert > Presets</strong>. SIC! fills in <strong>Target Format</strong>, <strong>Resize</strong>, the resize mode, <strong>Width</strong> and <strong>Height</strong> from it, and the status bar says, for example, <em>Preset applied: Blog</em>. Screen readers announce this message too. Applying a preset doesn't convert anything: check the settings, change any of them if you like, then use <strong>Convert Selected</strong> or <strong>Convert All</strong> as usual. When there are no presets yet, the submenu shows <em>No presets yet</em> above <strong>Add Preset</strong> and <strong>Manage Presets</strong>.</p>
+<p>A preset's sizes stay in the <strong>Width</strong> and <strong>Height</strong> fields while you add, select and remove images: SIC! doesn't replace them with the selected image's dimensions, as it otherwise does, and a preset with only a height keeps the width field empty. Once you change a size, tick or untick <strong>Resize</strong>, or switch the resize mode yourself, selecting an image fills in its dimensions again as usual.</p>
+<p>If a preset converts to a format you have unticked under <strong>Target formats to show in the list</strong> in <a href="#settings">Settings</a>, it still applies: that format is added to the <strong>Target Format</strong> dropdown and stays there until you close SIC!.</p>
+
+<h3>Editing and removing presets</h3>
+<p>Choose <strong>Convert > Presets > Manage Presets</strong>. The <strong>Presets</strong> list shows each preset with a summary of what it does, such as <em>Blog: WEBP, width 300</em>, <em>Banner: WEBP, fit inside 800x600</em> or <em>Avatar: PNG, crop to 128x128</em>.</p>
+<dl>
+    <dt>Add</dt>
+    <dd>Opens the same dialog as <strong>Add Preset</strong>, starting empty.</dd>
+
+    <dt>Edit</dt>
+    <dd>Opens the selected preset in that dialog. You can change anything, including the name. Pressing <kbd>Enter</kbd> on the list, or double-clicking a preset, does the same.</dd>
+
+    <dt>Remove</dt>
+    <dd>Removes the selected preset after asking you to confirm. Pressing <kbd>Delete</kbd> on the list does the same.</dd>
+
+    <dt>Close</dt>
+    <dd>Closes the dialog. <kbd>Escape</kbd> does the same.</dd>
+</dl>
+<p><strong>Edit</strong> and <strong>Remove</strong> are unavailable until a preset is selected. Your changes are saved when the dialog closes, however you close it, and the <strong>Presets</strong> submenu is updated straight away.</p>
+
 <h2 id="settings">Settings</h2>
 <p>Open <strong>File > Settings</strong> (<kbd>Ctrl+,</kbd>) to configure SIC!. The dialog is organized into two tabs, <strong>General</strong> and <strong>Images</strong>. Press <kbd>Ctrl+Tab</kbd> to move between tabs.</p>
 
@@ -304,7 +350,9 @@ footer {
 <pre>sic -i input.png -o output.jpg
 sic --input photo.bmp --output photo.webp
 sic -i avatar.png -o avatar.ico --resize 128x128
-sic -i photo.jpg -f png --resize 800x</pre>
+sic -i photo.jpg -f png --resize 800x
+sic -i photo.png --preset Blog
+sic -i photo.png -p "Product banner" -o banner.jpg</pre>
 <dl>
     <dt><code>--input</code>, <code>-i</code> (required)</dt>
     <dd>Path to the source image.</dd>
@@ -316,12 +364,21 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <dd>Target format name (e.g., <code>png</code>, <code>jpg</code>). Use this instead of <code>--output</code> to auto-generate the output path.</dd>
 
     <dt><code>--resize</code>, <code>-r</code></dt>
-    <dd>Resize the image. Format: <code>WxH</code>, <code>Wx</code> (width only), or <code>xH</code> (height only).</dd>
+    <dd>Resize the image. Format: <code>WxH</code>, <code>Wx</code> or <code>W</code> (width only), or <code>xH</code> (height only), each size from 1 to 65535 pixels.</dd>
 
     <dt><code>--crop</code>, <code>-c</code></dt>
-    <dd>Crop instead of scaling proportionally. Requires both width and height in <code>--resize</code>.</dd>
+    <dd>Crop instead of scaling proportionally. Requires both width and height, from <code>--resize</code> or from the preset.</dd>
+
+    <dt><code>--preset</code>, <code>-p</code></dt>
+    <dd>Convert with a saved <a href="#presets">preset</a>, using its format and resize settings. Case doesn't matter; put a name with spaces in quotes. If no preset has that name, SIC! prints <em>Unknown preset:</em> with the name, followed by <em>Available presets:</em> and their names (or <em>There are no saved presets.</em>), and exits with an error, even when <code>--output</code> or <code>--format</code> would have made the preset unnecessary.</dd>
 </dl>
-<p>Either <code>--output</code> or <code>--format</code> must be provided (but not both).</p>
+<p>At least one of <code>--output</code>, <code>--format</code> or <code>--preset</code> must be provided. When more than one of them gives a format, the extension of <code>--output</code> wins, then <code>--format</code>, then the preset. Without <code>--output</code>, the converted file goes to the output folder set in <a href="#settings">Settings</a>, under the source file's name.</p>
+<p>Options you give explicitly win over the matching part of a preset:</p>
+<ul>
+    <li><code>--resize</code> replaces the preset's sizes and its resize mode: the image is scaled proportionally, or cropped if you also give <code>--crop</code>.</li>
+    <li><code>--crop</code> without <code>--resize</code> keeps the preset's sizes and crops to them, so the preset needs both a width and a height.</li>
+    <li>A preset that doesn't resize simply leaves the image at its own size, unless you give <code>--resize</code>.</li>
+</ul>
 
 <h2 id="keyboard-shortcuts">Keyboard shortcuts</h2>
 <table>
@@ -377,7 +434,7 @@ sic -i photo.jpg -f png --resize 800x</pre>
     <dd>If the custom output folder has been deleted or moved, SIC! will warn you and fall back to the default <code>Converted</code> folder.</dd>
 
     <dt>SIC! says settings were reset or the settings file is damaged</dt>
-    <dd>SIC! keeps a copy of the original file as <code>sic.json.bad</code> in the application data directory. If only some values were invalid, just those go back to their defaults and your other settings are kept; if the whole file was damaged, SIC! starts with the default settings. To get the old file back, for example to fix it by hand, close SIC! and rename the copy to <code>sic.json</code>. If SIC! says changes won't be saved this session, another program, such as a sync client or an antivirus, was holding the file: close SIC!, wait a moment and start it again.</dd>
+    <dd>SIC! keeps a copy of the original file as <code>sic.json.bad</code> in the application data directory. If only some values were invalid, just those go back to their defaults and your other settings are kept; if the whole file was damaged, SIC! starts with the default settings. A <a href="#presets">preset</a> that can't be used, for example after <code>sic.json</code> was edited by hand, is removed on its own, your other presets are kept, and SIC! tells you how many were removed. To get the old file back, for example to fix it by hand, close SIC! and rename the copy to <code>sic.json</code>. If SIC! says changes won't be saved this session, another program, such as a sync client or an antivirus, was holding the file: close SIC!, wait a moment and start it again.</dd>
 </dl>
 </main>
 

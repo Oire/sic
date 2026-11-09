@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Sic\n"
-"POT-Creation-Date: 2026-11-06 01:18:08+0100\n"
+"POT-Creation-Date: 2026-11-09 22:19:50+0100\n"
 "PO-Revision-Date: 2026-08-21 14:36:45+0200\n"
 "Last-Translator: \n"
 "Language-Team: es\n"
@@ -12,11 +12,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: GetText.NET Extractor\n"
 
-#: ..\..\MainWindow.cs:705
+#: ..\..\MainWindow.cs:693
 msgid ", "
 msgstr ", "
 
-#: ..\..\MainWindow.cs:1581
+#: ..\..\MainWindow.cs:1682
 #, csharp-format
 msgid "...and {0} more"
 msgstr "...y {0} más"
@@ -46,31 +46,31 @@ msgstr "{0} (recomendado)"
 msgid "{0} B"
 msgstr "{0} B"
 
-#: ..\..\MainWindow.cs:1569
+#: ..\..\MainWindow.cs:1670
 #, csharp-format
 msgid "{0} cloud-only file skipped"
 msgid_plural "{0} cloud-only files skipped"
 msgstr[0] "{0} archivo solo en la nube omitido"
 msgstr[1] "{0} archivos solo en la nube omitidos"
 
-#: ..\..\MainWindow.cs:699
+#: ..\..\MainWindow.cs:687
 #, csharp-format
 msgid "{0} converted"
 msgstr "{0} convertidas"
 
-#: ..\..\MainWindow.cs:703
+#: ..\..\MainWindow.cs:691
 #, csharp-format
 msgid "{0} failed"
 msgstr "{0} con errores"
 
-#: ..\..\MainWindow.cs:1571
+#: ..\..\MainWindow.cs:1672
 #, csharp-format
 msgid "{0} file failed to load"
 msgid_plural "{0} files failed to load"
 msgstr[0] "No se pudo cargar {0} archivo"
 msgstr[1] "No se pudieron cargar {0} archivos"
 
-#: ..\..\MainWindow.cs:1450
+#: ..\..\MainWindow.cs:1551
 #, csharp-format
 msgid ""
 "{0} file is stored in the cloud and needs to be downloaded first.\n"
@@ -85,7 +85,7 @@ msgstr[1] ""
 "{0} archivos están almacenados en la nube y primero hay que descargarlos.\n"
 "¿Descargarlos?"
 
-#: ..\..\MainWindow.cs:1567
+#: ..\..\MainWindow.cs:1668
 #, csharp-format
 msgid "{0} image loaded"
 msgid_plural "{0} images loaded"
@@ -102,55 +102,77 @@ msgstr "{0} KB"
 msgid "{0} MB"
 msgstr "{0} MB"
 
-#: ..\..\Utils\ConfigSerializer.cs:205
+#: ..\..\Utils\ConfigSerializer.cs:257
 #, csharp-format
-msgid ""
-"{0} setting in {1} had an invalid value and was reset to its default. A copy "
-"of the original file was saved as {2}."
+msgid "{0} preset couldn't be used and was removed."
+msgid_plural "{0} presets couldn't be used and were removed."
+msgstr[0] "{0} preajuste no se podía usar y se eliminó."
+msgstr[1] "{0} preajustes no se podían usar y se eliminaron."
+
+#: ..\..\Utils\ConfigSerializer.cs:261
+#, csharp-format
+msgid "{0} preset in {1} couldn't be used and was removed."
+msgid_plural "{0} presets in {1} couldn't be used and were removed."
+msgstr[0] "{0} preajuste de {1} no se podía usar y se eliminó."
+msgstr[1] "{0} preajustes de {1} no se podían usar y se eliminaron."
+
+#: ..\..\Utils\ConfigSerializer.cs:249
+#, csharp-format
+msgid "{0} setting in {1} had an invalid value and was reset to its default."
 msgid_plural ""
-"{0} settings in {1} had invalid values and were reset to their defaults. A "
-"copy of the original file was saved as {2}."
+"{0} settings in {1} had invalid values and were reset to their defaults."
 msgstr[0] ""
 "{0} opción de {1} tenía un valor no válido y se restableció a su valor "
-"predeterminado. Se guardó una copia del archivo original como {2}."
+"predeterminado."
 msgstr[1] ""
 "{0} opciones de {1} tenían valores no válidos y se restablecieron a sus "
-"valores predeterminados. Se guardó una copia del archivo original como {2}."
+"valores predeterminados."
 
-#: ..\..\Utils\ConfigSerializer.cs:195
-#, csharp-format
-msgid ""
-"{0} setting in {1} had an invalid value and was reset to its default. SIC! "
-"couldn't make a copy of the file ({2}), so it was left as it is, and changes "
-"won't be saved this session."
-msgid_plural ""
-"{0} settings in {1} had invalid values and were reset to their defaults. "
-"SIC! couldn't make a copy of the file ({2}), so it was left as it is, and "
-"changes won't be saved this session."
-msgstr[0] ""
-"{0} opción de {1} tenía un valor no válido y se restableció a su valor "
-"predeterminado. SIC! no pudo hacer una copia del archivo ({2}), así que se "
-"dejó tal como estaba y los cambios no se guardarán en esta sesión."
-msgstr[1] ""
-"{0} opciones de {1} tenían valores no válidos y se restablecieron a sus "
-"valores predeterminados. SIC! no pudo hacer una copia del archivo ({2}), así "
-"que se dejó tal como estaba y los cambios no se guardarán en esta sesión."
-
-#: ..\..\MainWindow.cs:701
+#: ..\..\MainWindow.cs:689
 #, csharp-format
 msgid "{0} skipped"
 msgstr "{0} omitidas"
+
+#: ..\..\Services\PresetDescriber.cs:18
+#, csharp-format
+msgid "{0}, crop to {1}x{2}"
+msgstr "{0}, recortar a {1}x{2}"
+
+#: ..\..\Services\PresetDescriber.cs:19
+#, csharp-format
+msgid "{0}, fit inside {1}x{2}"
+msgstr "{0}, ajustar dentro de {1}x{2}"
+
+#: ..\..\Services\PresetDescriber.cs:21
+#, csharp-format
+msgid "{0}, height {1}"
+msgstr "{0}, alto {1}"
+
+#: ..\..\Services\PresetDescriber.cs:20
+#, csharp-format
+msgid "{0}, width {1}"
+msgstr "{0}, ancho {1}"
+
+#: ..\..\Services\PresetDescriber.cs:30
+#, csharp-format
+msgid "{0}: {1}"
+msgstr "{0}: {1}"
 
 #: ..\..\FitToSizeResultsDialog.cs:38 ..\..\Models\ImageItem.cs:19
 #, csharp-format
 msgid "{0}x{1}"
 msgstr "{0}x{1}"
 
-#: ..\..\MainWindow.cs:296
+#: ..\..\MainWindow.cs:313
 msgid "&About SIC!..."
 msgstr "&Acerca de SIC!..."
 
+#: ..\..\Utils\PresetMenuBuilder.cs:45
+msgid "&Add Preset..."
+msgstr "&Añadir preajuste..."
+
 #: ..\..\IcoPresetDialog.Designer.cs:135
+#: ..\..\ManagePresetsDialog.Designer.cs:80
 msgid "&Add..."
 msgstr "Aña&dir..."
 
@@ -158,15 +180,20 @@ msgstr "Aña&dir..."
 msgid "&Browse..."
 msgstr "&Examinar..."
 
-#: ..\..\AddUrlDialog.Designer.cs:76 ..\..\AddSizeDialog.Designer.cs:76
+#: ..\..\AddUrlDialog.Designer.cs:76
 #: ..\..\FitToSizeResultsDialog.Designer.cs:81
-#: ..\..\FitToSizeDialog.Designer.cs:117 ..\..\AddFolderDialog.Designer.cs:126
-#: ..\..\IcoPresetDialog.Designer.cs:164 ..\..\ProgressDialog.Designer.cs:83
+#: ..\..\AddFolderDialog.Designer.cs:126 ..\..\AddSizeDialog.Designer.cs:76
+#: ..\..\FitToSizeDialog.Designer.cs:117 ..\..\IcoPresetDialog.Designer.cs:164
+#: ..\..\ProgressDialog.Designer.cs:83 ..\..\PresetDialog.Designer.cs:216
 #: ..\..\SettingsDialog.Designer.cs:304
 msgid "&Cancel"
 msgstr "&Cancelar"
 
-#: ..\..\MainWindow.cs:276
+#: ..\..\ManagePresetsDialog.Designer.cs:106
+msgid "&Close"
+msgstr "&Cerrar"
+
+#: ..\..\MainWindow.cs:292
 msgid "&Convert"
 msgstr "&Convertir"
 
@@ -182,23 +209,27 @@ msgstr "Re&cortar"
 msgid "&Detect images in clipboard"
 msgstr "&Detectar imágenes en el portapapeles"
 
-#: ..\..\MainWindow.cs:294
+#: ..\..\MainWindow.cs:311
 msgid "&Donate..."
 msgstr "&Donar..."
 
-#: ..\..\MainWindow.cs:266
+#: ..\..\MainWindow.cs:282
 msgid "&Edit"
 msgstr "&Edición"
+
+#: ..\..\ManagePresetsDialog.Designer.cs:88
+msgid "&Edit..."
+msgstr "&Editar..."
 
 #: ..\..\IcoPresetDialog.Designer.cs:91
 msgid "&Favicon"
 msgstr "&Favicon"
 
-#: ..\..\MainWindow.cs:251
+#: ..\..\MainWindow.cs:267
 msgid "&File"
 msgstr "&Archivo"
 
-#: ..\..\MainWindow.cs:284
+#: ..\..\MainWindow.cs:300
 msgid "&Fit to File Size..."
 msgstr "Ajustar al ta&maño de archivo..."
 
@@ -206,11 +237,11 @@ msgstr "Ajustar al ta&maño de archivo..."
 msgid "&Folder:"
 msgstr "Car&peta:"
 
-#: ..\..\MainWindow.Designer.cs:221
+#: ..\..\MainWindow.Designer.cs:221 ..\..\PresetDialog.Designer.cs:178
 msgid "&Height:"
 msgstr "A&lto:"
 
-#: ..\..\MainWindow.cs:289
+#: ..\..\MainWindow.cs:306
 msgid "&Help"
 msgstr "A&yuda"
 
@@ -230,14 +261,27 @@ msgstr "&Limitar el ancho (mantiene las proporciones)"
 msgid "&Link:"
 msgstr "En&lace:"
 
+#: ..\..\Utils\PresetMenuBuilder.cs:46
+msgid "&Manage Presets..."
+msgstr "&Gestionar preajustes..."
+
+#: ..\..\PresetDialog.Designer.cs:95
+msgid "&Name:"
+msgstr "N&ombre:"
+
 #: ..\..\AddUrlDialog.Designer.cs:67 ..\..\AddSizeDialog.Designer.cs:67
-#: ..\..\FitToSizeDialog.Designer.cs:108 ..\..\AddFolderDialog.Designer.cs:117
+#: ..\..\AddFolderDialog.Designer.cs:117 ..\..\FitToSizeDialog.Designer.cs:108
 #: ..\..\AboutDialog.Designer.cs:117 ..\..\IcoPresetDialog.Designer.cs:155
-#: ..\..\SettingsDialog.Designer.cs:293
+#: ..\..\PresetDialog.Designer.cs:207 ..\..\SettingsDialog.Designer.cs:293
 msgid "&OK"
 msgstr "&Aceptar"
 
-#: ..\..\IcoPresetDialog.Designer.cs:145 ..\..\MainWindow.cs:270
+#: ..\..\Utils\PresetMenuBuilder.cs:33
+msgid "&Presets"
+msgstr "&Preajustes"
+
+#: ..\..\IcoPresetDialog.Designer.cs:145 ..\..\MainWindow.cs:286
+#: ..\..\ManagePresetsDialog.Designer.cs:97
 msgid "&Remove"
 msgstr "&Quitar"
 
@@ -249,7 +293,7 @@ msgstr "&Restablecer"
 msgid "&Save converted images in the same folder as the original"
 msgstr "&Guardar las imágenes convertidas en la misma carpeta que el original"
 
-#: ..\..\MainWindow.cs:259
+#: ..\..\MainWindow.cs:275
 msgid "&Settings..."
 msgstr "Con&figuración..."
 
@@ -257,7 +301,7 @@ msgstr "Con&figuración..."
 msgid "&Target formats to show in the list"
 msgstr "&Formatos de destino que se muestran en la lista"
 
-#: ..\..\MainWindow.Designer.cs:202
+#: ..\..\MainWindow.Designer.cs:202 ..\..\PresetDialog.Designer.cs:159
 msgid "&Width:"
 msgstr "A&ncho:"
 
@@ -266,22 +310,44 @@ msgstr "A&ncho:"
 msgid "© {0} Oire Software"
 msgstr "© {0} Oire Software"
 
-#: ..\..\MainWindow.cs:452 ..\..\MainWindow.cs:1544 ..\..\MainWindow.cs:1610
+#: ..\..\MainWindow.cs:470 ..\..\MainWindow.cs:1645 ..\..\MainWindow.cs:1711
 #, csharp-format
 msgid "1 image in queue"
 msgid_plural "{0} images in queue"
 msgstr[0] "1 imagen en la cola"
 msgstr[1] "{0} imágenes en la cola"
 
+#: ..\..\Utils\ConfigSerializer.cs:236
+#, csharp-format
+msgid "A copy of the original file was saved as {0}."
+msgstr "Se guardó una copia del archivo original como {0}."
+
+#: ..\..\PresetDialog.cs:125
+#, csharp-format
+msgid "A preset name can be at most {0} characters long."
+msgstr "El nombre de un preajuste puede tener como máximo {0} caracteres."
+
+#: ..\..\PresetDialog.cs:126
+msgid ""
+"A preset name can't contain tabs, line breaks or other control characters."
+msgstr ""
+"El nombre de un preajuste no puede contener tabulaciones, saltos de línea ni "
+"otros caracteres de control."
+
+#: ..\..\PresetDialog.cs:127
+#, csharp-format
+msgid "A preset named \"{0}\" already exists."
+msgstr "Ya existe un preajuste llamado «{0}»."
+
 #: ..\..\AboutDialog.cs:16
 msgid "About SIC!"
 msgstr "Acerca de SIC!"
 
-#: ..\..\MainWindow.cs:252
+#: ..\..\MainWindow.cs:268
 msgid "Add &Image..."
 msgstr "Añadir &imagen..."
 
-#: ..\..\MainWindow.cs:254
+#: ..\..\MainWindow.cs:270
 msgid "Add F&older..."
 msgstr "Añadir &carpeta..."
 
@@ -289,7 +355,7 @@ msgstr "Añadir &carpeta..."
 msgid "Add Folder"
 msgstr "Añadir carpeta"
 
-#: ..\..\MainWindow.cs:256
+#: ..\..\MainWindow.cs:272
 msgid "Add Image by &Link..."
 msgstr "Añadir imagen por &enlace..."
 
@@ -297,28 +363,32 @@ msgstr "Añadir imagen por &enlace..."
 msgid "Add Image by Link"
 msgstr "Añadir imagen por enlace"
 
-#: ..\..\MainWindow.cs:1586
+#: ..\..\MainWindow.cs:1687
 msgid "Add Images"
 msgstr "Añadir imágenes"
+
+#: ..\..\PresetDialog.cs:38
+msgid "Add Preset"
+msgstr "Añadir preajuste"
 
 #: ..\..\AddSizeDialog.cs:18
 msgid "Add Size"
 msgstr "Añadir tamaño"
 
-#: ..\..\MainWindow.cs:350
+#: ..\..\MainWindow.cs:368
 msgid "Add your images here"
 msgstr "Añada aquí sus imágenes"
 
-#: ..\..\MainWindow.cs:1396
+#: ..\..\MainWindow.cs:1497
 #, csharp-format
 msgid "Added {0} from URL"
 msgstr "Se añadió {0} desde la URL"
 
-#: ..\..\MainWindow.cs:1341
+#: ..\..\MainWindow.cs:1442
 msgid "Added image from clipboard"
 msgstr "Imagen añadida desde el portapapeles"
 
-#: ..\..\MainWindow.cs:373
+#: ..\..\MainWindow.cs:391
 msgid "All files"
 msgstr "Todos los archivos"
 
@@ -326,11 +396,11 @@ msgstr "Todos los archivos"
 msgid "All supported images"
 msgstr "Todas las imágenes compatibles"
 
-#: ..\..\MainWindow.cs:262
+#: ..\..\MainWindow.cs:278
 msgid "Alt+F4"
 msgstr "Alt+F4"
 
-#: ..\..\Program.cs:51
+#: ..\..\Program.cs:53
 #, csharp-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -346,6 +416,10 @@ msgstr ""
 #: ..\..\IcoPresetDialog.Designer.cs:100
 msgid "Application &Icon"
 msgstr "&Icono de aplicación"
+
+#: ..\..\Program.cs:228
+msgid "Available presets:"
+msgstr "Preajustes disponibles:"
 
 #: ..\..\AddFolderDialog.cs:18
 msgid "AVIF images (*.avif)"
@@ -363,7 +437,7 @@ msgstr "Ele&gir el resultado al que convertir:"
 msgid "C&ustom"
 msgstr "Personali&zado"
 
-#: ..\..\MainWindow.cs:707
+#: ..\..\MainWindow.cs:695
 msgid "Cancelled."
 msgstr "Cancelado."
 
@@ -371,7 +445,7 @@ msgstr "Cancelado."
 msgid "Check for &updates on startup"
 msgstr "Buscar act&ualizaciones al iniciar"
 
-#: ..\..\MainWindow.cs:292
+#: ..\..\MainWindow.cs:309
 msgid "Check for &Updates..."
 msgstr "Buscar act&ualizaciones..."
 
@@ -379,16 +453,16 @@ msgstr "Buscar act&ualizaciones..."
 msgid "Check for updates in the back&ground:"
 msgstr "Buscar actualizaciones en se&gundo plano:"
 
-#: ..\..\MainWindow.cs:865
+#: ..\..\MainWindow.cs:853
 #, csharp-format
 msgid "Checking {0} ({1}/{2})..."
 msgstr "Comprobando {0} ({1}/{2})..."
 
-#: ..\..\MainWindow.cs:1249
+#: ..\..\MainWindow.cs:1350
 msgid "Clipboard Content Detected"
 msgstr "Contenido detectado en el portapapeles"
 
-#: ..\..\MainWindow.cs:1453
+#: ..\..\MainWindow.cs:1554
 msgid "Cloud Files"
 msgstr "Archivos en la nube"
 
@@ -396,7 +470,7 @@ msgstr "Archivos en la nube"
 msgid "Con&vert"
 msgstr "Con&vertir"
 
-#: ..\..\MainWindow.cs:1204
+#: ..\..\MainWindow.cs:1305
 msgid "Confirm Exit"
 msgstr "Confirmar la salida"
 
@@ -404,40 +478,40 @@ msgstr "Confirmar la salida"
 msgid "Confirm on exit with non-empty &queue"
 msgstr "Confirmar al salir si la cola no está &vacía"
 
-#: ..\..\MainWindow.cs:714 ..\..\MainWindow.cs:948
+#: ..\..\MainWindow.cs:702 ..\..\MainWindow.cs:936
 msgid "Conversion Complete"
 msgstr "Conversión finalizada"
 
-#: ..\..\MainWindow.cs:665 ..\..\MainWindow.cs:956
+#: ..\..\MainWindow.cs:653 ..\..\MainWindow.cs:944
 msgid "Conversion Error"
 msgstr "Error de conversión"
 
-#: ..\..\Program.cs:324
+#: ..\..\Program.cs:340
 #, csharp-format
 msgid "Conversion failed: {0}"
 msgstr "La conversión ha fallado: {0}"
 
-#: ..\..\MainWindow.cs:279 ..\..\MainWindow.Designer.cs:269
+#: ..\..\MainWindow.cs:295 ..\..\MainWindow.Designer.cs:269
 msgid "Convert &All"
 msgstr "Convertir &todas"
 
-#: ..\..\MainWindow.cs:277 ..\..\MainWindow.Designer.cs:259
+#: ..\..\MainWindow.cs:293 ..\..\MainWindow.Designer.cs:259
 msgid "Convert &Selected"
 msgstr "Convertir &seleccionadas"
 
-#: ..\..\MainWindow.cs:945 ..\..\Program.cs:320
+#: ..\..\MainWindow.cs:933 ..\..\Program.cs:336
 #, csharp-format
 msgid "Converted: {0}"
 msgstr "Convertida: {0}"
 
-#: ..\..\MainWindow.cs:617
+#: ..\..\MainWindow.cs:605
 #, csharp-format
 msgid "Converting {0} ({1}/{2})..."
 msgstr "Convirtiendo {0} ({1}/{2})..."
 
-#: ..\..\MainWindow.cs:601 ..\..\MainWindow.cs:619 ..\..\MainWindow.cs:774
-#: ..\..\MainWindow.cs:778 ..\..\MainWindow.cs:923 ..\..\MainWindow.cs:924
-#: ..\..\MainWindow.cs:928
+#: ..\..\MainWindow.cs:589 ..\..\MainWindow.cs:607 ..\..\MainWindow.cs:762
+#: ..\..\MainWindow.cs:766 ..\..\MainWindow.cs:911 ..\..\MainWindow.cs:912
+#: ..\..\MainWindow.cs:916
 msgid "Converting..."
 msgstr "Convirtiendo..."
 
@@ -445,7 +519,7 @@ msgstr "Convirtiendo..."
 msgid "Copied!"
 msgstr "¡Copiado!"
 
-#: ..\..\MainWindow.cs:282
+#: ..\..\MainWindow.cs:298
 msgid "Create Multi-size &ICO..."
 msgstr "Crear &ICO multitamaño..."
 
@@ -453,101 +527,111 @@ msgstr "Crear &ICO multitamaño..."
 msgid "Create Multi-size ICO"
 msgstr "Crear ICO multitamaño"
 
-#: ..\..\MainWindow.cs:773
+#: ..\..\MainWindow.cs:761
 msgid "Creating multi-size ICO..."
 msgstr "Creando el ICO multitamaño..."
 
-#: ..\..\MainWindow.cs:536
-msgid "Crop mode requires a valid height (1–65535)."
-msgstr "El modo de recorte necesita un alto válido (1–65535)."
+#: ..\..\PresetDialog.cs:45
+msgid "Crop"
+msgstr "Recortar"
 
-#: ..\..\MainWindow.cs:528
-msgid "Crop mode requires a valid width (1–65535)."
-msgstr "El modo de recorte necesita un ancho válido (1–65535)."
+#: ..\..\Services\ResizeErrorDescriber.cs:27
+#, csharp-format
+msgid "Crop mode requires a valid height (1–{0})."
+msgstr "El modo de recorte necesita un alto válido (1–{0})."
 
-#: ..\..\Program.cs:299
+#: ..\..\Services\ResizeErrorDescriber.cs:25
+#, csharp-format
+msgid "Crop mode requires a valid width (1–{0})."
+msgstr "El modo de recorte necesita un ancho válido (1–{0})."
+
+#: ..\..\Program.cs:315
 msgid "Crop mode requires both width and height (e.g. --resize 128x128 --crop)"
 msgstr ""
 "El modo de recorte necesita tanto el ancho como el alto (p. ej. --resize "
 "128x128 --crop)"
 
-#: ..\..\MainWindow.cs:259
+#: ..\..\MainWindow.cs:275
 msgid "Ctrl+,"
 msgstr "Ctrl+,"
 
-#: ..\..\MainWindow.cs:282
+#: ..\..\MainWindow.cs:298
 msgid "Ctrl+Alt+F5"
 msgstr "Ctrl+Alt+F5"
 
-#: ..\..\MainWindow.cs:284
+#: ..\..\MainWindow.cs:300
 msgid "Ctrl+Alt+Shift+F5"
 msgstr "Ctrl+Alt+Mayús+F5"
 
-#: ..\..\MainWindow.cs:256
+#: ..\..\MainWindow.cs:272
 msgid "Ctrl+L"
 msgstr "Ctrl+L"
 
-#: ..\..\MainWindow.cs:252
+#: ..\..\MainWindow.cs:268
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: ..\..\MainWindow.cs:294
+#: ..\..\MainWindow.cs:311
 msgid "Ctrl+Shift+D"
 msgstr "Ctrl+Mayús+D"
 
-#: ..\..\MainWindow.cs:272
+#: ..\..\MainWindow.cs:288
 msgid "Ctrl+Shift+Del"
 msgstr "Ctrl+Mayús+Supr"
 
-#: ..\..\MainWindow.cs:279
+#: ..\..\MainWindow.cs:295
 msgid "Ctrl+Shift+F5"
 msgstr "Ctrl+Mayús+F5"
 
-#: ..\..\MainWindow.cs:254
+#: ..\..\MainWindow.cs:270
 msgid "Ctrl+Shift+N"
 msgstr "Ctrl+Mayús+N"
 
-#: ..\..\MainWindow.cs:270
+#: ..\..\MainWindow.cs:286
 msgid "Del"
 msgstr "Supr"
 
-#: ..\..\MainWindow.Designer.cs:135 ..\..\MainWindow.cs:342
+#: ..\..\MainWindow.Designer.cs:135 ..\..\MainWindow.cs:360
 msgid "Dimensions"
 msgstr "Dimensiones"
 
-#: ..\..\MainWindow.cs:1370
+#: ..\..\MainWindow.cs:1471
 msgid "Downloading image..."
 msgstr "Descargando la imagen..."
 
-#: ..\..\MainWindow.cs:1383
+#: ..\..\MainWindow.cs:1484
 #, csharp-format
 msgid "Downloading image... ({0} KB)"
 msgstr "Descargando la imagen... ({0} KB)"
 
-#: ..\..\MainWindow.cs:1380
+#: ..\..\MainWindow.cs:1481
 #, csharp-format
 msgid "Downloading image... {0}%"
 msgstr "Descargando la imagen... {0} %"
 
-#: ..\..\MainWindow.cs:1371
+#: ..\..\MainWindow.cs:1472
 msgid "Downloading..."
 msgstr "Descargando..."
 
-#: ..\..\MainWindow.cs:262
+#: ..\..\MainWindow.cs:278
 msgid "E&xit"
 msgstr "&Salir"
 
-#: ..\..\Program.cs:240
-msgid "Either --output or --format must be specified."
-msgstr "Hay que indicar --output o --format."
+#: ..\..\PresetDialog.cs:38
+msgid "Edit Preset"
+msgstr "Editar preajuste"
 
-#: ..\..\MainWindow.cs:806 ..\..\MainWindow.cs:875 ..\..\Utils\Config.cs:59
-#: ..\..\MainWindow.cs:1344 ..\..\MainWindow.cs:1403 ..\..\MainWindow.cs:1408
-#: ..\..\MainWindow.cs:1596 ..\..\Program.cs:52 ..\..\Program.cs:100
+#: ..\..\Program.cs:251
+msgid "Either --output, --format or --preset must be specified."
+msgstr "Hay que indicar --output, --format o --preset."
+
+#: ..\..\MainWindow.cs:794 ..\..\MainWindow.cs:863 ..\..\MainWindow.cs:1445
+#: ..\..\MainWindow.cs:1504 ..\..\MainWindow.cs:1509 ..\..\MainWindow.cs:1697
+#: ..\..\Utils\Config.cs:68 ..\..\Program.cs:54 ..\..\Program.cs:102
 msgid "Error"
 msgstr "Error"
 
-#: ..\..\MainWindow.cs:1576
+#: ..\..\MainWindow.cs:1677
 msgid "Errors:"
 msgstr "Errores:"
 
@@ -559,19 +643,19 @@ msgstr "Cada 3 días"
 msgid "Existing size"
 msgstr "Tamaño ya existente"
 
-#: ..\..\MainWindow.cs:290
+#: ..\..\MainWindow.cs:307
 msgid "F1"
 msgstr "F1"
 
-#: ..\..\MainWindow.cs:277
+#: ..\..\MainWindow.cs:293
 msgid "F5"
 msgstr "F5"
 
-#: ..\..\MainWindow.cs:664 ..\..\MainWindow.cs:805 ..\..\MainWindow.cs:955
+#: ..\..\MainWindow.cs:652 ..\..\MainWindow.cs:793 ..\..\MainWindow.cs:943
 msgid "Failed"
 msgstr "Error"
 
-#: ..\..\MainWindow.cs:875
+#: ..\..\MainWindow.cs:863
 #, csharp-format
 msgid ""
 "Failed to analyze the image:\n"
@@ -580,7 +664,7 @@ msgstr ""
 "No se pudo analizar la imagen:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:665 ..\..\MainWindow.cs:956
+#: ..\..\MainWindow.cs:653 ..\..\MainWindow.cs:944
 #, csharp-format
 msgid ""
 "Failed to convert {0}:\n"
@@ -589,7 +673,7 @@ msgstr ""
 "No se pudo convertir {0}:\n"
 "{1}"
 
-#: ..\..\MainWindow.cs:806
+#: ..\..\MainWindow.cs:794
 #, csharp-format
 msgid ""
 "Failed to create multi-size ICO:\n"
@@ -598,7 +682,7 @@ msgstr ""
 "No se pudo crear el ICO multitamaño:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:1344
+#: ..\..\MainWindow.cs:1445
 #, csharp-format
 msgid ""
 "Failed to load clipboard image:\n"
@@ -607,7 +691,7 @@ msgstr ""
 "No se pudo cargar la imagen del portapapeles:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:1408
+#: ..\..\MainWindow.cs:1509
 #, csharp-format
 msgid ""
 "Failed to load image from URL:\n"
@@ -616,7 +700,7 @@ msgstr ""
 "No se pudo cargar la imagen desde la URL:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:1596
+#: ..\..\MainWindow.cs:1697
 #, csharp-format
 msgid ""
 "Failed to load image:\n"
@@ -627,7 +711,7 @@ msgstr ""
 "{0}\n"
 "{1}"
 
-#: ..\..\Program.cs:96
+#: ..\..\Program.cs:98
 #, csharp-format
 msgid "Fatal error: {0}"
 msgstr "Error grave: {0}"
@@ -636,20 +720,20 @@ msgstr "Error grave: {0}"
 msgid "Fi&lter:"
 msgstr "Fi&ltro:"
 
-#: ..\..\MainWindow.cs:1619
+#: ..\..\MainWindow.cs:1720
 msgid "File Already Exists"
 msgstr "El archivo ya existe"
 
-#: ..\..\MainWindow.Designer.cs:131 ..\..\MainWindow.cs:340
+#: ..\..\MainWindow.Designer.cs:131 ..\..\MainWindow.cs:358
 msgid "File Name"
 msgstr "Nombre del archivo"
 
-#: ..\..\Program.cs:207
+#: ..\..\Program.cs:212
 #, csharp-format
 msgid "File not found: {0}"
 msgstr "No se encontró el archivo: {0}"
 
-#: ..\..\FitToSizeDialog.cs:21
+#: ..\..\FitToSizeDialog.cs:20
 msgid "Fit to File Size"
 msgstr "Ajustar al tamaño de archivo"
 
@@ -657,7 +741,7 @@ msgstr "Ajustar al tamaño de archivo"
 msgid "Fit to File Size — Results"
 msgstr "Ajustar al tamaño de archivo — Resultados"
 
-#: ..\..\MainWindow.cs:848
+#: ..\..\MainWindow.cs:836
 msgid "Fitting..."
 msgstr "Ajustando..."
 
@@ -665,7 +749,7 @@ msgstr "Ajustando..."
 msgid "Folder Not Found"
 msgstr "Carpeta no encontrada"
 
-#: ..\..\MainWindow.Designer.cs:133 ..\..\MainWindow.cs:341
+#: ..\..\MainWindow.Designer.cs:133 ..\..\MainWindow.cs:359
 msgid "Format"
 msgstr "Formato"
 
@@ -685,7 +769,7 @@ msgstr "Repositorio de GitHub"
 msgid "HEIC images (*.heic, *.heif)"
 msgstr "Imágenes HEIC (*.heic, *.heif)"
 
-#: ..\..\MainWindow.cs:834
+#: ..\..\MainWindow.cs:822
 msgid ""
 "ICO and GIF can't be fitted to a file size, and no other format is enabled.\n"
 "Please enable at least one more target format in Settings."
@@ -694,7 +778,7 @@ msgstr ""
 "formato activado.\n"
 "Active al menos un formato de destino más en la configuración."
 
-#: ..\..\MainWindow.cs:798
+#: ..\..\MainWindow.cs:786
 msgid "ICO Created"
 msgstr "ICO creado"
 
@@ -702,7 +786,7 @@ msgstr "ICO creado"
 msgid "ICO icons (*.ico)"
 msgstr "Iconos ICO (*.ico)"
 
-#: ..\..\MainWindow.cs:948
+#: ..\..\MainWindow.cs:936
 #, csharp-format
 msgid ""
 "Image converted successfully:\n"
@@ -711,7 +795,7 @@ msgstr ""
 "La imagen se convirtió correctamente:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:373
+#: ..\..\MainWindow.cs:391
 msgid "Image files"
 msgstr "Archivos de imagen"
 
@@ -723,30 +807,35 @@ msgstr "Imágenes"
 msgid "Include &All Subfolders"
 msgstr "Incluir todas las su&bcarpetas"
 
-#: ..\..\MainWindow.cs:547
+#: ..\..\Services\ResizeErrorDescriber.cs:32
 msgid "Invalid dimensions"
 msgstr "Dimensiones no válidas"
 
-#: ..\..\MainWindow.cs:536
+#: ..\..\Services\ResizeErrorDescriber.cs:27
+#: ..\..\Services\ResizeErrorDescriber.cs:31
 msgid "Invalid height"
 msgstr "Alto no válido"
 
-#: ..\..\Program.cs:281
+#: ..\..\Program.cs:299
 #, csharp-format
 msgid "Invalid height value: {0}"
 msgstr "Valor de alto no válido: {0}"
 
-#: ..\..\AddUrlDialog.cs:35 ..\..\MainWindow.cs:1360
+#: ..\..\AddUrlDialog.cs:35 ..\..\MainWindow.cs:1461
 msgid "Invalid link"
 msgstr "Enlace no válido"
 
-#: ..\..\Program.cs:287
+#: ..\..\PresetDialog.cs:136
+msgid "Invalid name"
+msgstr "Nombre no válido"
+
+#: ..\..\Program.cs:303
 #, csharp-format
 msgid "Invalid resize format: {0}. At least one dimension is required."
 msgstr ""
 "Formato de redimensionado no válido: {0}. Se necesita al menos una dimensión."
 
-#: ..\..\Program.cs:263
+#: ..\..\Program.cs:286
 #, csharp-format
 msgid ""
 "Invalid resize format: {0}. Use WxH, Wx, xH, or W (e.g. 128x128, 128x, x128, "
@@ -755,7 +844,7 @@ msgstr ""
 "Formato de redimensionado no válido: {0}. Use AnchoxAlto, Anchox, xAlto o "
 "Ancho (p. ej. 128x128, 128x, x128, 128)"
 
-#: ..\..\FitToSizeDialog.cs:51
+#: ..\..\FitToSizeDialog.cs:50
 msgid "Invalid size"
 msgstr "Tamaño no válido"
 
@@ -763,11 +852,12 @@ msgstr "Tamaño no válido"
 msgid "Invalid Size"
 msgstr "Tamaño no válido"
 
-#: ..\..\FitToSizeDialog.cs:69 ..\..\MainWindow.cs:528
+#: ..\..\FitToSizeDialog.cs:68 ..\..\Services\ResizeErrorDescriber.cs:25
+#: ..\..\Services\ResizeErrorDescriber.cs:29
 msgid "Invalid width"
 msgstr "Ancho no válido"
 
-#: ..\..\Program.cs:275
+#: ..\..\Program.cs:295
 #, csharp-format
 msgid "Invalid width value: {0}"
 msgstr "Valor de ancho no válido: {0}"
@@ -776,18 +866,26 @@ msgstr "Valor de ancho no válido: {0}"
 msgid "JPEG images (*.jpg, *.jpeg)"
 msgstr "Imágenes JPEG (*.jpg, *.jpeg)"
 
-#: ..\..\MainWindow.cs:1474 ..\..\MainWindow.cs:1498
+#: ..\..\PresetDialog.cs:45
+msgid "Keep proportions"
+msgstr "Mantener proporciones"
+
+#: ..\..\MainWindow.cs:1575 ..\..\MainWindow.cs:1599
 #, csharp-format
 msgid "Loading images ({0}/{1})..."
 msgstr "Cargando imágenes ({0}/{1})..."
 
-#: ..\..\MainWindow.cs:1475
+#: ..\..\MainWindow.cs:1576
 msgid "Loading..."
 msgstr "Cargando..."
 
-#: ..\..\MainWindow.cs:847
+#: ..\..\MainWindow.cs:835
 msgid "Looking for the best fit..."
 msgstr "Buscando el mejor ajuste..."
+
+#: ..\..\ManagePresetsDialog.cs:28
+msgid "Manage Presets"
+msgstr "Gestionar preajustes"
 
 #: ..\..\FitToSizeDialog.Designer.cs:90
 msgid "Maximum &width (px):"
@@ -797,7 +895,7 @@ msgstr "Ancho má&ximo (px):"
 msgid "Maximum file size (&KB):"
 msgstr "Tamaño máximo del archivo (&KB):"
 
-#: ..\..\MainWindow.cs:798
+#: ..\..\MainWindow.cs:786
 #, csharp-format
 msgid ""
 "Multi-size ICO created successfully:\n"
@@ -806,16 +904,24 @@ msgstr ""
 "El ICO multitamaño se creó correctamente:\n"
 "{0}"
 
-#: ..\..\MainWindow.cs:795
+#: ..\..\MainWindow.cs:783
 #, csharp-format
 msgid "Multi-size ICO created: {0}"
 msgstr "ICO multitamaño creado: {0}"
+
+#: ..\..\Program.cs:188
+msgid ""
+"Name of a saved preset to convert with. --output, --format, --resize and --"
+"crop override the matching part of it."
+msgstr ""
+"Nombre de un preajuste guardado con el que convertir. --output, --format, --"
+"resize y --crop tienen prioridad sobre la parte correspondiente."
 
 #: ..\..\SettingsDialog.cs:129
 msgid "Never"
 msgstr "Nunca"
 
-#: ..\..\MainWindow.cs:835 ..\..\MainWindow.cs:885
+#: ..\..\MainWindow.cs:823 ..\..\MainWindow.cs:873
 msgid "No fit found"
 msgstr "No se encontró ningún ajuste"
 
@@ -823,7 +929,7 @@ msgstr "No se encontró ningún ajuste"
 msgid "No folder selected"
 msgstr "No se ha seleccionado ninguna carpeta"
 
-#: ..\..\MainWindow.cs:513
+#: ..\..\MainWindow.cs:531
 msgid "No format selected"
 msgstr "No se ha seleccionado ningún formato"
 
@@ -831,11 +937,11 @@ msgstr "No se ha seleccionado ningún formato"
 msgid "No Formats Selected"
 msgstr "No hay formatos seleccionados"
 
-#: ..\..\MainWindow.cs:397
+#: ..\..\MainWindow.cs:415
 msgid "No images found"
 msgstr "No se encontraron imágenes"
 
-#: ..\..\MainWindow.cs:720
+#: ..\..\MainWindow.cs:708
 msgid "No images to convert. Add some images first."
 msgstr "No hay imágenes que convertir. Añada primero alguna imagen."
 
@@ -843,15 +949,19 @@ msgstr "No hay imágenes que convertir. Añada primero alguna imagen."
 msgid "No link entered"
 msgstr "No se ha introducido ningún enlace"
 
-#: ..\..\MainWindow.cs:397
+#: ..\..\MainWindow.cs:415
 msgid "No matching images found in the selected folder."
 msgstr "No se encontraron imágenes coincidentes en la carpeta seleccionada."
+
+#: ..\..\Utils\PresetMenuBuilder.cs:36
+msgid "No presets yet"
+msgstr "Aún no hay preajustes"
 
 #: ..\..\IcoPresetDialog.cs:126
 msgid "No Sizes"
 msgstr "Sin tamaños"
 
-#: ..\..\MainWindow.cs:884
+#: ..\..\MainWindow.cs:872
 #, csharp-format
 msgid ""
 "None of the enabled formats can bring this image under {0} KB.\n"
@@ -862,7 +972,7 @@ msgstr ""
 "Pruebe con un tamaño mayor, un ancho menor, o active más formatos en la "
 "configuración."
 
-#: ..\..\MainWindow.cs:720
+#: ..\..\MainWindow.cs:708
 msgid "Nothing to convert"
 msgstr "Nada que convertir"
 
@@ -886,24 +996,24 @@ msgstr "Una vez a la semana"
 msgid "Output &Folder:"
 msgstr "Carpeta de &salida:"
 
-#: ..\..\MainWindow.cs:572 ..\..\Program.cs:159
+#: ..\..\MainWindow.cs:560 ..\..\Program.cs:161
 msgid "Output Folder Not Found"
 msgstr "Carpeta de salida no encontrada"
 
-#: ..\..\Program.cs:216
+#: ..\..\Program.cs:242
 msgid "Output path must have a file extension (e.g. .jpg, .png)"
 msgstr ""
 "La ruta de salida debe llevar una extensión de archivo (p. ej. .jpg, .png)"
 
-#: ..\..\MainWindow.cs:1647
+#: ..\..\MainWindow.cs:1748
 msgid "Overwrite"
 msgstr "Sobrescribir"
 
-#: ..\..\Program.cs:182
+#: ..\..\Program.cs:184
 msgid "Path for the converted image (format inferred from extension)"
 msgstr "Ruta de la imagen convertida (el formato se deduce de la extensión)"
 
-#: ..\..\Program.cs:181
+#: ..\..\Program.cs:183
 msgid "Path to the source image file or a URL"
 msgstr "Ruta del archivo de imagen de origen o una URL"
 
@@ -915,11 +1025,15 @@ msgstr "Añada al menos un tamaño a la lista."
 msgid "Please enter a link."
 msgstr "Introduzca un enlace."
 
-#: ..\..\FitToSizeDialog.cs:50
+#: ..\..\FitToSizeDialog.cs:49
 msgid "Please enter a maximum file size in KB (a whole number of at least 1)."
 msgstr ""
 "Introduzca un tamaño máximo de archivo en KB (un número entero de al menos "
 "1)."
+
+#: ..\..\PresetDialog.cs:124 ..\..\PresetDialog.cs:128
+msgid "Please enter a name for the preset."
+msgstr "Introduzca un nombre para el preajuste."
 
 #: ..\..\AddSizeDialog.cs:32
 #, csharp-format
@@ -930,20 +1044,21 @@ msgstr "Introduzca un número entre {0} y {1}."
 msgid "Please enter a valid link starting with http:// or https://."
 msgstr "Introduzca un enlace válido que empiece por http:// o https://."
 
-#: ..\..\FitToSizeDialog.cs:68
+#: ..\..\FitToSizeDialog.cs:67
 #, csharp-format
 msgid "Please enter a valid maximum width (1–{0})."
 msgstr "Introduzca un ancho máximo válido (1–{0})."
 
-#: ..\..\MainWindow.cs:547
-msgid "Please enter at least one valid dimension (1–65535)."
-msgstr "Introduzca al menos una dimensión válida (1–65535)."
+#: ..\..\Services\ResizeErrorDescriber.cs:32
+#, csharp-format
+msgid "Please enter at least one valid dimension (1–{0})."
+msgstr "Introduzca al menos una dimensión válida (1–{0})."
 
 #: ..\..\AddFolderDialog.cs:65
 msgid "Please select a folder."
 msgstr "Seleccione una carpeta."
 
-#: ..\..\MainWindow.cs:513
+#: ..\..\MainWindow.cs:531
 msgid "Please select a target format."
 msgstr "Seleccione un formato de destino."
 
@@ -963,45 +1078,63 @@ msgstr "Imágenes PNG (*.png)"
 msgid "Pre&set:"
 msgstr "&Preajuste:"
 
-#: ..\..\MainWindow.cs:600
+#: ..\..\ManagePresetsDialog.Designer.cs:60
+msgid "Pre&sets:"
+msgstr "&Preajustes:"
+
+#: ..\..\MainWindow.cs:588
 msgid "Preparing to convert..."
 msgstr "Preparando la conversión..."
 
-#: ..\..\MainWindow.cs:696
+#: ..\..\MainWindow.cs:1163
+#, csharp-format
+msgid "Preset applied: {0}"
+msgstr "Preajuste aplicado: {0}"
+
+#: ..\..\MainWindow.cs:684
 #, csharp-format
 msgid "Processed {0} image."
 msgid_plural "Processed {0} images."
 msgstr[0] "Se procesó {0} imagen."
 msgstr[1] "Se procesaron {0} imágenes."
 
-#: ..\..\MainWindow.cs:290
+#: ..\..\MainWindow.cs:307
 msgid "Read User &Manual"
 msgstr "Leer el &manual de usuario"
 
-#: ..\..\MainWindow.Designer.cs:305 ..\..\MainWindow.cs:463
-#: ..\..\MainWindow.cs:496 ..\..\MainWindow.cs:802 ..\..\MainWindow.cs:871
-#: ..\..\MainWindow.cs:952 ..\..\MainWindow.cs:1398 ..\..\MainWindow.cs:1405
-#: ..\..\MainWindow.cs:1409
+#: ..\..\MainWindow.Designer.cs:305 ..\..\MainWindow.cs:481
+#: ..\..\MainWindow.cs:514 ..\..\MainWindow.cs:790 ..\..\MainWindow.cs:859
+#: ..\..\MainWindow.cs:940 ..\..\MainWindow.cs:1499 ..\..\MainWindow.cs:1506
+#: ..\..\MainWindow.cs:1510
 msgid "Ready"
 msgstr "Listo"
 
-#: ..\..\MainWindow.cs:272
+#: ..\..\MainWindow.cs:288
 msgid "Remove &All"
 msgstr "Quitar &todo"
 
-#: ..\..\MainWindow.cs:1648
+#: ..\..\ManagePresetsDialog.cs:107
+msgid "Remove Preset"
+msgstr "Quitar preajuste"
+
+#: ..\..\ManagePresetsDialog.cs:106
+#, csharp-format
+msgid "Remove the preset \"{0}\"?"
+msgstr "¿Quitar el preajuste «{0}»?"
+
+#: ..\..\MainWindow.cs:1749
 msgid "Rename"
 msgstr "Cambiar el nombre"
 
-#: ..\..\MainWindow.Designer.cs:172
+#: ..\..\MainWindow.Designer.cs:172 ..\..\PresetDialog.Designer.cs:130
 msgid "Resi&ze"
 msgstr "Re&dimensionar"
 
-#: ..\..\MainWindow.Designer.cs:181
+#: ..\..\MainWindow.Designer.cs:181 ..\..\PresetDialog.Designer.cs:139
 msgid "Resize &Mode:"
 msgstr "&Modo de redimensionado:"
 
-#: ..\..\Program.cs:184
+#: ..\..\Program.cs:186
 msgid "Resize dimensions as WxH, Wx, or xH (e.g. 128x128, 128x, x128)"
 msgstr ""
 "Dimensiones de redimensionado como AnchoxAlto, Anchox o xAlto (p. ej. "
@@ -1011,7 +1144,7 @@ msgstr ""
 msgid "Select folder containing images"
 msgstr "Seleccione la carpeta que contiene las imágenes"
 
-#: ..\..\MainWindow.cs:372
+#: ..\..\MainWindow.cs:390
 msgid "Select images to add"
 msgstr "Seleccione las imágenes que quiere añadir"
 
@@ -1023,7 +1156,7 @@ msgstr "Seleccione la carpeta de salida para las imágenes convertidas"
 msgid "Settings"
 msgstr "Configuración"
 
-#: ..\..\MainWindow.cs:296
+#: ..\..\MainWindow.cs:313
 msgid "Shift+F1"
 msgstr "Mayús+F1"
 
@@ -1035,11 +1168,20 @@ msgstr "Ta&maño (16–512):"
 msgid "Si&zes:"
 msgstr "Ta&maños:"
 
-#: ..\..\AboutDialog.Designer.cs:57 ..\..\Program.cs:187
+#: ..\..\AboutDialog.Designer.cs:57 ..\..\Program.cs:190
 msgid "SIC! — Simple Image Converter"
 msgstr "SIC! — Conversor de imágenes sencillo"
 
-#: ..\..\Utils\ConfigSerializer.cs:246
+#: ..\..\Utils\ConfigSerializer.cs:231
+#, csharp-format
+msgid ""
+"SIC! couldn't make a copy of the file ({0}), so it was left as it is, and "
+"changes won't be saved this session."
+msgstr ""
+"SIC! no pudo hacer una copia del archivo ({0}), así que se dejó tal como "
+"estaba y los cambios no se guardarán en esta sesión."
+
+#: ..\..\Utils\ConfigSerializer.cs:307
 #, csharp-format
 msgid ""
 "SIC! couldn't read the old settings file {0}: {1} It started with the "
@@ -1048,7 +1190,7 @@ msgstr ""
 "SIC! no pudo leer el antiguo archivo de configuración {0}: {1} Se inició con "
 "la configuración predeterminada y los cambios no se guardarán en esta sesión."
 
-#: ..\..\Utils\ConfigSerializer.cs:161
+#: ..\..\Utils\ConfigSerializer.cs:189
 #, csharp-format
 msgid ""
 "SIC! couldn't read the settings file {0}: {1} It started with the default "
@@ -1057,11 +1199,11 @@ msgstr ""
 "SIC! no pudo leer el archivo de configuración {0}: {1} Se inició con la "
 "configuración predeterminada y los cambios no se guardarán en esta sesión."
 
-#: ..\..\Program.cs:72
+#: ..\..\Program.cs:74
 msgid "SIC! is already running. Press Alt+Tab to switch to it."
 msgstr "SIC! ya se está ejecutando. Pulse Alt+Tab para cambiar a él."
 
-#: ..\..\MainWindow.Designer.cs:137 ..\..\MainWindow.cs:343
+#: ..\..\MainWindow.Designer.cs:137 ..\..\MainWindow.cs:361
 msgid "Size"
 msgstr "Tamaño"
 
@@ -1070,34 +1212,34 @@ msgstr "Tamaño"
 msgid "Size {0} is already in the list."
 msgstr "El tamaño {0} ya está en la lista."
 
-#: ..\..\MainWindow.cs:1649
+#: ..\..\MainWindow.cs:1750
 msgid "Skip"
 msgstr "Omitir"
 
-#: ..\..\MainWindow.cs:645
+#: ..\..\MainWindow.cs:633
 msgid "Skipped"
 msgstr "Omitida"
 
-#: ..\..\MainWindow.cs:626
+#: ..\..\MainWindow.cs:614
 msgid "Skipped (same format)"
 msgstr "Omitida (mismo formato)"
 
-#: ..\..\Program.cs:310
+#: ..\..\Program.cs:326
 #, csharp-format
 msgid "Skipped: {0} is already in {1} format."
 msgstr "Omitido: {0} ya está en formato {1}."
 
-#: ..\..\MainWindow.cs:1005 ..\..\Services\UpdateService.cs:108
+#: ..\..\MainWindow.cs:993 ..\..\Services\UpdateService.cs:108
 #: ..\..\Services\UpdateService.cs:116 ..\..\Services\UpdateService.cs:124
 #: ..\..\Services\UpdateService.cs:136
 msgid "Software Update"
 msgstr "Actualización del programa"
 
-#: ..\..\MainWindow.Designer.cs:139 ..\..\MainWindow.cs:344
+#: ..\..\MainWindow.Designer.cs:139 ..\..\MainWindow.cs:362
 msgid "Status"
 msgstr "Estado"
 
-#: ..\..\Program.cs:248
+#: ..\..\Program.cs:258
 #, csharp-format
 msgid "Supported formats: {0}"
 msgstr "Formatos compatibles: {0}"
@@ -1106,16 +1248,16 @@ msgstr "Formatos compatibles: {0}"
 msgid "System"
 msgstr "Sistema"
 
-#: ..\..\MainWindow.Designer.cs:155
+#: ..\..\MainWindow.Designer.cs:155 ..\..\PresetDialog.Designer.cs:112
 msgid "Target &Format:"
 msgstr "&Formato de destino:"
 
-#: ..\..\Program.cs:183
+#: ..\..\Program.cs:185
 msgid "Target format (e.g. jpg, png, webp). Used when --output is omitted."
 msgstr ""
 "Formato de destino (p. ej. jpg, png, webp). Se usa cuando se omite --output."
 
-#: ..\..\MainWindow.cs:1297
+#: ..\..\MainWindow.cs:1398
 #, csharp-format
 msgid ""
 "The clipboard contains a link:\n"
@@ -1128,7 +1270,7 @@ msgstr ""
 "\n"
 "¿Descargar la imagen y añadirla a la cola?"
 
-#: ..\..\MainWindow.cs:1278
+#: ..\..\MainWindow.cs:1379
 #, csharp-format
 msgid "The clipboard contains an image file. Add it to the queue?"
 msgid_plural "The clipboard contains {0} image files. Add them to the queue?"
@@ -1136,11 +1278,11 @@ msgstr[0] "El portapapeles contiene un archivo de imagen. ¿Añadirlo a la cola?
 msgstr[1] ""
 "El portapapeles contiene {0} archivos de imagen. ¿Añadirlos a la cola?"
 
-#: ..\..\MainWindow.cs:1291
+#: ..\..\MainWindow.cs:1392
 msgid "The clipboard contains an image. Add it to the queue?"
 msgstr "El portapapeles contiene una imagen. ¿Añadirla a la cola?"
 
-#: ..\..\MainWindow.cs:1637
+#: ..\..\MainWindow.cs:1738
 #, csharp-format
 msgid ""
 "The file \"{0}\" already exists.\n"
@@ -1149,22 +1291,27 @@ msgstr ""
 "El archivo «{0}» ya existe.\n"
 "¿Qué quiere hacer?"
 
+#: ..\..\Services\ResizeErrorDescriber.cs:31
+#, csharp-format
+msgid "The height must be a whole number from 1 to {0}, or left empty."
+msgstr "El alto debe ser un número entero de 1 a {0}, o quedar vacío."
+
 #: ..\..\Services\UpdateService.cs:115
 msgid "The latest available update was previously skipped."
 msgstr "La última actualización disponible se omitió anteriormente."
 
-#: ..\..\MainWindow.cs:1402
+#: ..\..\MainWindow.cs:1503
 msgid "The link does not point to a supported image."
 msgstr "El enlace no apunta a una imagen compatible."
 
-#: ..\..\MainWindow.cs:571 ..\..\Program.cs:158
+#: ..\..\MainWindow.cs:559 ..\..\Program.cs:160
 #, csharp-format
 msgid ""
 "The output folder \"{0}\" no longer exists. The default folder will be used."
 msgstr ""
 "La carpeta de salida «{0}» ya no existe. Se usará la carpeta predeterminada."
 
-#: ..\..\MainWindow.cs:1359
+#: ..\..\MainWindow.cs:1460
 msgid ""
 "The pasted text is not a valid link.\n"
 "Links must start with http:// or https://."
@@ -1176,7 +1323,7 @@ msgstr ""
 msgid "The selected folder does not exist. Please choose an existing folder."
 msgstr "La carpeta seleccionada no existe. Elija una carpeta que exista."
 
-#: ..\..\Utils\ConfigSerializer.cs:225
+#: ..\..\Utils\ConfigSerializer.cs:280
 #, csharp-format
 msgid ""
 "The settings file {0} is damaged, and SIC! couldn't make a copy of it: {1} "
@@ -1187,7 +1334,7 @@ msgstr ""
 "de él: {1} Se inició con la configuración predeterminada, el archivo se dejó "
 "tal como estaba y los cambios no se guardarán en esta sesión."
 
-#: ..\..\Utils\ConfigSerializer.cs:231
+#: ..\..\Utils\ConfigSerializer.cs:286
 #, csharp-format
 msgid ""
 "The settings file {0} is damaged, so SIC! started with the default settings. "
@@ -1197,45 +1344,59 @@ msgstr ""
 "configuración predeterminada. Se guardó una copia del archivo dañado como "
 "{1}."
 
-#: ..\..\MainWindow.cs:991
+#: ..\..\MainWindow.cs:979
 msgid "The user manual file could not be found."
 msgstr "No se encontró el archivo del manual de usuario."
 
-#: ..\..\MainWindow.cs:1203
+#: ..\..\Services\ResizeErrorDescriber.cs:29
+#, csharp-format
+msgid "The width must be a whole number from 1 to {0}, or left empty."
+msgstr "El ancho debe ser un número entero de 1 a {0}, o quedar vacío."
+
+#: ..\..\MainWindow.cs:1304
 msgid "There are images in the queue. Are you sure you want to exit?"
 msgstr "Hay imágenes en la cola. ¿Seguro que quiere salir?"
+
+#: ..\..\Program.cs:225
+msgid "There are no saved presets."
+msgstr "No hay preajustes guardados."
 
 #: ..\..\AddFolderDialog.cs:16
 msgid "TIFF images (*.tif, *.tiff)"
 msgstr "Imágenes TIFF (*.tif, *.tiff)"
 
-#: ..\..\MainWindow.cs:1004 ..\..\Services\UpdateService.cs:123
+#: ..\..\MainWindow.cs:992 ..\..\Services\UpdateService.cs:123
 #: ..\..\Services\UpdateService.cs:135
 msgid "Unable to check for updates. Please try again later."
 msgstr "No se pudieron buscar actualizaciones. Inténtelo de nuevo más tarde."
 
-#: ..\..\Utils\ConfigSerializer.cs:400
+#: ..\..\Utils\ConfigSerializer.cs:549
 #, csharp-format
 msgid "Unable to save configuration: {0}"
 msgstr "No se pudo guardar la configuración: {0}"
 
-#: ..\..\Program.cs:100
+#: ..\..\Program.cs:102
 msgid "Unable to start the program up. Please contact the developer."
 msgstr ""
 "No se pudo iniciar el programa. Póngase en contacto con el desarrollador."
 
-#: ..\..\Program.cs:247
+#: ..\..\Program.cs:223
+#, csharp-format
+msgid "Unknown preset: {0}"
+msgstr "Preajuste desconocido: {0}"
+
+#: ..\..\Program.cs:257
 #, csharp-format
 msgid "Unsupported format: {0}"
 msgstr "Formato no compatible: {0}"
 
-#: ..\..\Program.cs:185
+#: ..\..\Program.cs:187
 msgid "Use crop mode (scale to cover, then center-crop to exact dimensions)"
 msgstr ""
 "Usar el modo de recorte (escalar para cubrir y luego recortar desde el "
 "centro a las dimensiones exactas)"
 
-#: ..\..\MainWindow.cs:991
+#: ..\..\MainWindow.cs:979
 msgid "User Manual"
 msgstr "Manual de usuario"
 
@@ -1248,7 +1409,7 @@ msgstr "Versión"
 msgid "Version {0}"
 msgstr "Versión {0}"
 
-#: ..\..\Program.cs:165
+#: ..\..\Program.cs:167
 #, csharp-format
 msgid ""
 "Warning! The output folder \"{0}\" no longer exists. Using default folder."
@@ -1259,6 +1420,14 @@ msgstr ""
 #: ..\..\AddFolderDialog.cs:13
 msgid "WebP images (*.webp)"
 msgstr "Imágenes WebP (*.webp)"
+
+#: ..\..\PresetDialog.Designer.cs:197
+msgid ""
+"With Keep proportions, fill in one size to scale every image to it, or both "
+"to fit images inside that box."
+msgstr ""
+"Con «Mantener proporciones», rellene un tamaño para escalar cada imagen a "
+"él, o ambos para que las imágenes quepan dentro de ese recuadro."
 
 #: ..\..\Services\UpdateService.cs:107
 msgid "Your current version is up to date."

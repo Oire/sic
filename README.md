@@ -11,6 +11,7 @@ Built with accessibility in mind — screen-reader friendly with proper labels a
 - **HEIC input** — open and convert HEIC/HEIF photos from newer iPhones to any supported format (input only; HEIC can't be written)
 - **Resize and crop** — specify target dimensions with two modes: keep proportions or crop to exact size
 - **Multi-size ICO** — create `.ico` files with multiple embedded sizes using built-in presets or custom dimensions
+- **Conversion presets** — save a target format and resize settings under a name, such as "Blog" for WebP images 300 px wide, and pick it from **Convert > Presets** or pass it to the CLI with `--preset`
 - **Fit to file size** — give a maximum file size (and optionally a maximum width) and SIC! searches every enabled format for a combination of format, dimensions, and quality that fits, then converts to the result you pick
 - **Multiple input methods** — file dialog, folder import, drag & drop, Ctrl+V paste (files, screenshots, or URLs), download by link
 - **Clipboard detection** — optionally offers to add an image, image files, or an image link from the clipboard when the window opens or gains focus (opt-in)
@@ -67,6 +68,8 @@ Launch the app without arguments to open the graphical interface:
 3. Optionally check **Resize** and enter target dimensions
 4. Click **Convert Selected** or **Convert All**
 
+To reuse settings, save them as a preset with **Convert > Presets > Add Preset**. Choosing a preset from **Convert > Presets** fills in the format and resize controls without converting, so you can check them before you convert. **Manage Presets** edits and removes them.
+
 Converted files are saved to `%APPDATA%\Oire\Sic\Converted\` by default (or `userdata\Converted\` in portable mode). Change this in **Settings**.
 
 ### Keyboard Shortcuts
@@ -95,6 +98,8 @@ Converted files are saved to `%APPDATA%\Oire\Sic\Converted\` by default (or `use
 sic -i input.png -o output.jpg
 sic -i photo.bmp -o photo.webp
 sic -i avatar.png -o avatar.ico -r 128x128
+sic -i photo.png --preset Blog
+sic -i photo.png -p "Product banner" -o banner.jpg
 ```
 
 | Option | Short | Required | Description |
@@ -102,10 +107,11 @@ sic -i avatar.png -o avatar.ico -r 128x128
 | `--input` | `-i` | Yes | Path to the source image |
 | `--output` | `-o` | No* | Path for the converted image (format inferred from extension) |
 | `--format` | `-f` | No* | Target format (e.g. jpg, png, webp). Used when `--output` is omitted |
-| `--resize` | `-r` | No | Target dimensions as WxH, Wx, or xH (e.g. `128x128`, `128x`, `x128`) |
+| `--resize` | `-r` | No | Target dimensions as WxH, Wx, xH or W (e.g. `128x128`, `128x`, `x128`, `128`), each from 1 to 65535 |
 | `--crop` | `-c` | No | Crop mode: scale to cover, then center-crop to exact dimensions |
+| `--preset` | `-p` | No* | Name of a saved preset (case doesn't matter) whose format and resize settings to use |
 
-\* Either `--output` or `--format` must be specified.
+\* At least one of `--output`, `--format` or `--preset` must be specified. The format comes from the `--output` extension first, then `--format`, then the preset. `--resize` replaces the preset's sizes and mode, and `--crop` alone crops to the preset's sizes. An unknown preset name fails with the list of saved presets on stderr. Sizes go from 1 to 65535.
 
 ## Configuration
 
@@ -119,6 +125,8 @@ Settings are stored as JSON in `%APPDATA%\Oire\Sic\sic.json` (or `userdata\sic.j
 - **Check for updates in the background** — how often to check for updates while running: once a day, every 3 days, once a week, once a month, or never (default: once a day)
 - **Detect images in clipboard** — offer to add an image, image files, or an image link from the clipboard when the window opens or gains focus (default: off)
 - **Target formats to show in the list** — which formats appear in the target-format dropdown (default: all)
+
+The same file holds your conversion presets, in a `presets` array beside the settings. A preset that can't be used, for instance after a hand edit, is removed on its own; the file is backed up as `sic.json.bad` first and SIC! says how many were removed.
 
 ### Portable Mode
 
@@ -191,6 +199,8 @@ src/Sic/
   AddUrlDialog.cs/.Designer.cs   # Add image by link dialog
   AddFolderDialog.cs/.Designer.cs # Add images from folder dialog
   IcoPresetDialog.cs/.Designer.cs # Multi-size ICO preset picker
+  PresetDialog.cs/.Designer.cs    # Add or edit a conversion preset
+  ManagePresetsDialog.cs/.Designer.cs # List, add, edit and remove conversion presets
   AddSizeDialog.cs/.Designer.cs   # Custom ICO size entry dialog
   FitToSizeDialog.cs/.Designer.cs # Fit to file size: budget and max width entry
   FitToSizeResultsDialog.cs/.Designer.cs # Fit to file size: ranked results picker
@@ -198,12 +208,18 @@ src/Sic/
   Models/
     AppConfig.cs                  # The whole of sic.json
     ConfigLoadResult.cs           # Loaded settings plus any message for the user
+    ConversionPreset.cs           # A named format and resize setting (Convert > Presets, --preset)
     GeneralSettings.cs            # The general section of sic.json
     ImageItem.cs                  # Image queue item data model
     ResizeMode.cs                 # Resize mode enum (KeepProportions, Crop)
     SizeFitProposal.cs            # One viable fit-to-file-size result
   Services/
     ImageConverter.cs             # Magick.NET conversion engine
+    PresetCapturer.cs             # Turns the main window's controls into a preset
+    PresetDescriber.cs            # Summaries such as "WEBP, width 300"
+    PresetResolver.cs             # Finds a preset by name, merges it with CLI options
+    PresetValidator.cs            # Preset names and loaded presets
+    ResizeValidator.cs            # Resize sizes, shared by the GUI, the CLI and presets
     UpdateService.cs              # NetSparkle update checks
     UnsupportedImageException.cs  # Thrown when content loads but isn't a decodable image
   Utils/
@@ -213,9 +229,13 @@ src/Sic/
     FileHelper.cs                 # Cloud placeholder detection, file enumeration
     LegacyConfigReader.cs         # Reads Sic.cfg files from SIC! 1.1 and earlier
     Localization.cs               # GetText.NET wrapper
+    PresetMenuBuilder.cs          # The Convert > Presets submenu
     SingleInstanceGuard.cs        # One GUI per data folder
     UrlHelper.cs                  # http(s) link validation
     Enums/
+      DimensionBox.cs             # Which size boxes SIC! filled in itself
+      PresetNameResult.cs         # Outcome of checking a preset name
+      ResizeError.cs              # Outcome of checking resize sizes
       UpdateCheckInterval.cs      # Background update-check frequency
     Constants/
       App.cs                      # App metadata and paths

@@ -4,6 +4,11 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 
 ## [1.2.0.0] — unreleased
 
+### Features
+
+- **Conversion presets**: save a target format and resize settings under a name, such as "Blog" for WebP images 300 px wide, and pick it instead of setting everything by hand each time ([#23](https://github.com/Oire/sic/issues/23)). The new **Convert > Presets** submenu lists your presets and offers **Add Preset** and **Manage Presets**, even with an empty queue. Choosing a preset fills in the format and resize controls without converting, and its sizes stay put while you add and select images, until you change them yourself. A preset with only a width scales every image of a batch to that width, portrait or landscape; one with both sizes fits each image inside them. A preset whose format is hidden in Settings still applies, and that format stays in the dropdown until SIC! closes. Presets are saved in `sic.json`; a preset that can't be used, for instance after a hand edit, is removed on its own, after the file is backed up as `sic.json.bad`, and SIC! says how many were removed. These presets are separate from the sizes offered by **Create Multi-size ICO**.
+- **`--preset` on the command line**: `sic -i photo.png --preset Blog` converts with a saved preset (`-p` for short; case doesn't matter). An explicit `--output` extension, `--format`, `--resize` or `--crop` wins over the matching part of the preset, and an unknown name fails with the list of saved presets. Without `--output`, `--format` or `--preset`, the error message now names all three.
+
 ### Changes
 
 - **Native menus and image list**: the menu bar and the image list are now real Windows controls rather than WinForms-drawn imitations, which is what screen readers need from them ([#68](https://github.com/Oire/sic/issues/68)). The menu is a genuine `HMENU` attached with `SetMenu`, announced as a menu bar with real submenus instead of a panel that draws things resembling menu items. The image list is a genuine `SysListView32` rather than one wearing a window class no screen reader recognizes, so every column is read instead of only the file name. Nothing changes about how either looks or behaves for sighted users.
@@ -13,6 +18,9 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 - **Settings in JSON**: settings are now stored in `sic.json` instead of `Sic.cfg`, in the same folder ([#89](https://github.com/Oire/sic/issues/89)). The first start of this version moves your settings over automatically and keeps the old file as `Sic.cfg.bak`; to go back to 1.1 with your old settings, rename it back to `Sic.cfg`. A value SIC! can't use is reset to its default on its own, keeping every other setting, and a damaged file is kept as `sic.json.bad` and reported rather than silently replaced. If the file can't be read at all, SIC! says so and leaves it untouched, and changes made in that session aren't saved.
 - **One window at a time**: starting SIC! while it's already running brings the open window forward, or the dialog open in it, instead of opening a second window that could overwrite the first one's settings ([#89](https://github.com/Oire/sic/issues/89)). If Windows doesn't let it come forward, SIC! says it's already running and that Alt+Tab switches to it. Copies with their own settings, such as portable copies in different folders or a portable and an installed copy, still run side by side, and the command line still runs while the window is open.
 - Menu shortcut labels now use the key names of your language, such as `Strg+N` in German or `Maj` in French, matching the manual. The keys themselves are unchanged.
+- The **Edit** and **Convert** menus are no longer unavailable as a whole while the queue is empty; their items that need images are unavailable on their own, so **Convert > Presets** always works.
+- A mistyped size in the main window, such as `30o` in **Width**, now gets its own message and moves the focus to that field, whatever the other field holds. It used to be ignored, or to bring up the general "at least one valid dimension" message.
+- Command line: `--resize` now rejects sizes above 65535 pixels, as the main window always has, and the "Invalid width value" and "Invalid height value" messages quote the size exactly as typed.
 
 ### Fixes
 
@@ -27,6 +35,8 @@ All notable changes to SIC! (Simple Image Converter) will be documented in this 
 - One bad value in the settings file no longer makes SIC! discard all the others, and a language setting SIC! doesn't recognize no longer stops it from starting: it falls back to the system language.
 - A portable copy moved to another folder or drive letter now keeps saving to its own `Converted` folder. It used to keep the old copy's full path, writing there if it still existed or warning that the output folder no longer existed.
 - Command line: when the custom output folder is missing, for instance on a drive that is unplugged, SIC! now uses the default folder for that run only, and no longer forgets the custom one.
+- The size SIC! fills in for the other side of a very wide or very tall image is now always from 1 to 65535 pixels. A 4000x100 image set to a width of 16 used to get a height of 0, and an image over 65535 pixels on a side filled in a size SIC! then refused.
+- Command line: an unsupported `--format` no longer creates the output folder before failing.
 
 ### Other
 

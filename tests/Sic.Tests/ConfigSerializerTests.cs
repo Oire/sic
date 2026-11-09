@@ -838,6 +838,266 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
 
     #endregion
 
+    #region Presets
+
+    private const string BlogPreset = """{ "name": "Blog", "format": "WEBP", "resizeMode": "KeepProportions", "width": 300 }""";
+    private const string PsdPreset = """{ "name": "Bad", "format": "PSD" }""";
+    private const string AvatarPreset = """{ "name": "Avatar", "format": "PNG", "resizeMode": "Crop", "width": 128, "height": 128 }""";
+
+    [Fact]
+    public void Save_ThenLoad_KeepsPresetsInOrder() {
+        var config = new AppConfig {
+            General = ValidSettings(),
+            Presets = [
+                new ConversionPreset { Name = "Блог", Format = "WEBP", Width = 300 },
+                new ConversionPreset { Name = "Avatar", Format = "PNG", ResizeMode = ResizeMode.Crop, Width = 128, Height = 128 },
+                new ConversionPreset { Name = "R&D", Format = "TIFF" },
+            ],
+        };
+
+        ConfigSerializer.Save(JsonPath, config);
+        var result = Load();
+
+        result.Config.Presets.Should().BeEquivalentTo(config.Presets, options => options.WithStrictOrdering());
+        result.Config.General.Should().BeEquivalentTo(ValidSettings());
+        ShouldBeSilent(result);
+        File.ReadAllText(JsonPath).Should().Contain("\"Блог\"").And.Contain("\"resizeMode\": \"Crop\"")
+            .And.NotContain("resizes", "Resizes is derived from the sizes");
+    }
+
+    [Fact]
+    public void Save_PresetWithoutSizes_WritesNoSizes() {
+        ConfigSerializer.Save(JsonPath, new AppConfig { Presets = [new ConversionPreset { Name = "Plain", Format = "PNG" }] });
+
+        var text = File.ReadAllText(JsonPath);
+
+        text.Should().NotContain("\"width\"").And.NotContain("\"height\"");
+    }
+
+    [Fact]
+    public void Load_ValidPresets_AreReadSilently() {
+        WriteJson(BuildJsonWithPresets($"[{BlogPreset}, {AvatarPreset}]"));
+
+        var result = Load();
+
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Blog", "Avatar");
+        result.Config.Presets[0].Should().BeEquivalentTo(new ConversionPreset { Name = "Blog", Format = "WEBP", Width = 300 });
+        result.Config.General.Should().BeEquivalentTo(ValidSettings());
+        ShouldBeSilent(result);
+        Backups().Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("""{ "general": { "language": "de" } }""")]
+    [InlineData("""{ "general": { "language": "de" }, "presets": null }""")]
+    [InlineData("""{ "general": { "language": "de" }, "presets": [] }""")]
+    public void Load_NoPresets_GivesAnEmptyListSilently(string json) {
+        WriteJson(json);
+
+        var result = Load();
+
+        result.Config.Presets.Should().NotBeNull().And.BeEmpty();
+        result.Config.General.Language.Should().Be("de");
+        ShouldBeSilent(result);
+        Backups().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Load_NullPresetEntry_LoadsSafelyAndIsCountedAsDropped() {
+        WriteJson(BuildJsonWithPresets($"[null, {BlogPreset}]"));
+
+        var result = Load();
+
+        result.Config.Presets.Should().ContainSingle().Which.Name.Should().Be("Blog");
+        result.Config.General.Should().BeEquivalentTo(ValidSettings());
+        result.LoadError.Should().StartWith($"1 preset in {JsonPath} couldn't be used");
+        result.SavesBlocked.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("\"x\"")]
+    [InlineData("42")]
+    [InlineData("""{ "name": "Blog", "format": "WEBP" }""")]
+    public void Load_PresetsThatAreNotAnArray_CountAsOneDropped(string raw) {
+        WriteJson(BuildJsonWithPresets(raw));
+
+        var result = Load();
+
+        result.Config.Presets.Should().BeEmpty();
+        result.Config.General.Should().BeEquivalentTo(ValidSettings());
+        result.LoadError.Should().StartWith($"1 preset in {JsonPath} couldn't be used and was removed.");
+        result.SaveError.Should().BeNull();
+        result.SavesBlocked.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Load_DroppedPreset_IsBackedUpReportedAndRepaired() {
+        var json = BuildJsonWithPresets($"[{BlogPreset}, {PsdPreset}, {AvatarPreset}]");
+        WriteJson(json);
+
+        var result = Load();
+
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Blog", "Avatar");
+        result.LoadError.Should().Be(
+            $"1 preset in {JsonPath} couldn't be used and was removed. A copy of the original file was saved as {BadPath}.");
+        result.SaveError.Should().BeNull();
+        result.SavesBlocked.Should().BeFalse();
+        File.ReadAllText(BadPath).Should().Be(json);
+        File.ReadAllText(JsonPath).Should().NotContain("PSD");
+
+        var next = Load();
+        next.Config.Presets.Select(preset => preset.Name).Should().Equal("Blog", "Avatar");
+        next.Config.General.Should().BeEquivalentTo(ValidSettings());
+        ShouldBeSilent(next);
+        Backups().Should().ContainSingle();
+    }
+
+    [Fact]
+    public void Load_TwoDroppedPresets_NamesTheCount() {
+        WriteJson(BuildJsonWithPresets($"[null, {BlogPreset}, {BlogPreset}]"));
+
+        var result = Load();
+
+        result.LoadError.Should().StartWith($"2 presets in {JsonPath} couldn't be used and were removed.");
+    }
+
+    [Fact]
+    public void Load_BadSettingAndDroppedPreset_ShareOneBackupAndOneMessage() {
+        var json = BuildJsonWithPresets($"[{BlogPreset}, \"x\", {AvatarPreset}]", "updateCheckInterval", "\"Hourly\"");
+        WriteJson(json);
+
+        var result = Load();
+
+        result.LoadError.Should().Be(
+            $"1 setting in {JsonPath} had an invalid value and was reset to its default. "
+            + $"1 preset couldn't be used and was removed. A copy of the original file was saved as {BadPath}.");
+        result.SaveError.Should().BeNull();
+        result.SavesBlocked.Should().BeFalse();
+        result.Config.General.Should().BeEquivalentTo(ValidSettingsWithDefault("updateCheckInterval"));
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Blog", "Avatar");
+        Backups().Should().ContainSingle();
+        File.ReadAllText(BadPath).Should().Be(json);
+
+        var next = Load();
+        ShouldBeSilent(next);
+        next.Config.Presets.Select(preset => preset.Name).Should().Equal("Blog", "Avatar");
+        Backups().Should().ContainSingle();
+    }
+
+    [Theory]
+    [InlineData("\"resizeMode\": \"Fit\"")]
+    [InlineData("\"resizeMode\": 5")]
+    [InlineData("\"resizeMode\": \"KeepProportions, Fit\"")]
+    [InlineData("\"width\": \"300\"")]
+    [InlineData("\"width\": 300.5")]
+    [InlineData("\"width\": 70000")]
+    [InlineData("\"width\": []")]
+    public void Load_OneBadPresetValue_DropsOnlyThatPreset(string badValue) {
+        var bad = "{ \"name\": \"Bad\", \"format\": \"PNG\", \"height\": 50, " + badValue + " }";
+        WriteJson(BuildJsonWithPresets($"[{BlogPreset}, {bad}, {AvatarPreset}]"));
+
+        var result = Load();
+
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Blog", "Avatar");
+        result.Config.General.Should().BeEquivalentTo(ValidSettings());
+        result.LoadError.Should().StartWith($"1 preset in {JsonPath} couldn't be used");
+        result.SavesBlocked.Should().BeFalse();
+        Backups().Should().ContainSingle();
+    }
+
+    // Whole entries, so no key appears twice: each reaches the branch it names on its own.
+    [Theory]
+    [InlineData("{ \"name\": null, \"format\": \"PNG\" }")]
+    [InlineData("{ \"name\": \"Bad\", \"format\": null }")]
+    [InlineData("{ \"name\": \"Bad\", \"format\": \"HEIC\" }")]
+    [InlineData("{ \"name\": 42, \"format\": \"PNG\" }")]
+    [InlineData("{ \"format\": \"PNG\" }")]
+    [InlineData("{ \"name\": \"Bad\" }")]
+    [InlineData("{ \"name\": \"Bad\\uD800\", \"format\": \"PNG\" }")]
+    [InlineData("{ \"name\": \"Bad\\uFFFE\", \"format\": \"PNG\" }")]
+    [InlineData("{ \"name\": \"Bad\uFFFE\", \"format\": \"PNG\" }")]
+    public void Load_OneBadPresetEntry_DropsOnlyThatPreset(string bad) {
+        WriteJson(BuildJsonWithPresets($"[{BlogPreset}, {bad}, {AvatarPreset}]"));
+
+        var result = Load();
+
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Blog", "Avatar");
+        result.Config.General.Should().BeEquivalentTo(ValidSettings());
+        result.LoadError.Should().StartWith($"1 preset in {JsonPath} couldn't be used");
+        result.SavesBlocked.Should().BeFalse();
+        Backups().Should().ContainSingle();
+    }
+
+    [Fact]
+    public void Load_PresetsKeyTwice_ReportsAndBacksUpThePresetsItReplaced() {
+        var json = $$"""{ "presets": [{{BlogPreset}}], "Presets": [{{AvatarPreset}}] }""";
+        WriteJson(json);
+
+        var result = Load();
+
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Avatar");
+        result.LoadError.Should().StartWith($"1 preset in {JsonPath} couldn't be used");
+        result.SavesBlocked.Should().BeFalse();
+        Backups().Should().ContainSingle();
+        File.ReadAllText(BadPath).Should().Be(json);
+        ShouldBeSilent(Load());
+    }
+
+    [Fact]
+    public void Load_PresetsKeyTwiceWithTheDropInTheFirst_CountsBoth() {
+        WriteJson($$"""{ "presets": [{{BlogPreset}}, "x"], "presets": [{{AvatarPreset}}] }""");
+
+        var result = Load();
+
+        result.Config.Presets.Select(preset => preset.Name).Should().Equal("Avatar");
+        result.LoadError.Should().StartWith($"2 presets in {JsonPath} couldn't be used");
+        Backups().Should().ContainSingle();
+    }
+
+    [Fact]
+    public void Load_PresetNamesInAnotherCase_AreMatched() {
+        WriteJson("""{ "Presets": [ { "NAME": "Blog", "Format": "webp", "ResizeMode": "KeepProportions", "Width": 300 } ] }""");
+
+        var result = Load();
+
+        result.Config.Presets.Should().ContainSingle()
+            .Which.Should().BeEquivalentTo(new ConversionPreset { Name = "Blog", Format = "WEBP", Width = 300 });
+        ShouldBeSilent(result);
+    }
+
+    [Fact]
+    public void Load_DroppedPresetWhenTheBackupIsHeldOpen_KeepsTheFileAndBlocksSaves() {
+        var json = BuildJsonWithPresets($"[{BlogPreset}, \"x\"]");
+        WriteJson(json);
+        File.WriteAllText(BadPath, "older backup");
+
+        ConfigLoadResult result;
+
+        using (new FileStream(BadPath, FileMode.Open, FileAccess.Read, FileShare.None)) {
+            result = Load();
+        }
+
+        result.SavesBlocked.Should().BeTrue();
+        result.LoadError.Should().StartWith($"1 preset in {JsonPath} couldn't be used").And.Contain("won't be saved");
+        result.Config.Presets.Should().ContainSingle().Which.Name.Should().Be("Blog");
+        File.ReadAllText(JsonPath).Should().Be(json);
+        File.ReadAllText(BadPath).Should().Be("older backup");
+        Backups().Should().ContainSingle();
+    }
+
+    [Fact]
+    public void Load_LegacyFile_HasNoPresets() {
+        WriteLegacy("Language=de");
+
+        var result = Load();
+
+        result.Config.Presets.Should().NotBeNull().And.BeEmpty();
+        ShouldBeSilent(result);
+    }
+
+    #endregion
+
     #region Helpers
 
     private ConfigLoadResult Load(bool isPortable = true) => ConfigSerializer.Load(_folder, isPortable);
@@ -861,6 +1121,15 @@ public sealed partial class ConfigSerializerTests: StaticStateTestBase {
     private static string BuildJson(string? key = null, string? raw = null) {
         var values = ValidValues.Select(value => $"    \"{value.Key}\": {(value.Key == key ? raw : value.Raw)}");
         return "{\n  \"general\": {\n" + string.Join(",\n", values) + "\n  }\n}\n";
+    }
+
+    /// <summary>
+    /// A <c>sic.json</c> like <see cref="BuildJson"/>'s, with <paramref name="rawPresets"/> as the
+    /// raw value of <c>presets</c>.
+    /// </summary>
+    private static string BuildJsonWithPresets(string rawPresets, string? key = null, string? raw = null) {
+        var values = ValidValues.Select(value => $"    \"{value.Key}\": {(value.Key == key ? raw : value.Raw)}");
+        return "{\n  \"general\": {\n" + string.Join(",\n", values) + "\n  },\n  \"presets\": " + rawPresets + "\n}\n";
     }
 
     /// <summary>The settings <see cref="BuildJson"/> describes.</summary>
