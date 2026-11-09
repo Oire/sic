@@ -26,6 +26,10 @@ public partial class MainWindow: Form {
     private bool _isLoadingFiles;
     private int _clipboardImageCount;
 
+    // Formats a preset put in the dropdown although Settings hides them. They stay until SIC!
+    // closes, and go through ImageConverter.GetDropdownFormats, never GetEnabledFormats.
+    private readonly HashSet<string> _sessionFormats = new(StringComparer.OrdinalIgnoreCase);
+
     // Clipboard auto-detection (issue #36). _clipboardWatchArmed gates the watcher until the
     // window is first shown, so no prompt appears before the form is visible. Detection uses two
     // gates: Win32's monotonic sequence number is a cheap "did anything change at all" check,
@@ -151,7 +155,8 @@ public partial class MainWindow: Form {
 
         formatComboBox.BeginUpdate();
         formatComboBox.Items.Clear();
-        foreach (var format in ImageConverter.GetEnabledFormats(Config.General.GetEnabledFormatKeys())) {
+        var formats = ImageConverter.GetDropdownFormats(Config.General.GetEnabledFormatKeys(), _sessionFormats);
+        foreach (var format in formats) {
             formatComboBox.Items.Add(format);
         }
         formatComboBox.EndUpdate();

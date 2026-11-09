@@ -174,12 +174,12 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `ImageConverter.GetDropdownFormats(enabledKeys, sessionFormats)`: call `GetEnabledFormats(enabledKeys)`, add the session formats, then filter `GetSupportedFormats()` by that set, so the order stays canonical. Never pass the combined keys to `GetEnabledFormats`: an empty list means "all formats", and it also has a fallback when nothing it's given is known.
-- [ ] Add a private `HashSet<string> _sessionFormats` to `MainWindow`, and make `PopulateFormatComboBox` use `GetDropdownFormats`.
-- [ ] Add `PresetCapturer.Capture(format, resizeEnabled, mode, widthText, heightText, autoFilledBox)` and a `DimensionBox` enum (`None`, `Width`, `Height`, `Both`), with the rules under Technical details.
-- [ ] tests for `GetDropdownFormats`: no session formats, a hidden format added in canonical order, empty `enabledKeys` still showing all, `enabledKeys` matching nothing known still showing all, and no duplicates
-- [ ] tests for `Capture`: resize off; crop; keep mode with each `autoFilledBox` value; both boxes typed with no selection; one box cleared while the other holds a typed size, which keeps it; one box cleared while SIC! filled the other, which gives no sizes; `Both`, which gives no sizes; unparsable text; and no sizes storing `KeepProportions`
-- [ ] validation commands pass
+- [x] Add `ImageConverter.GetDropdownFormats(enabledKeys, sessionFormats)`: call `GetEnabledFormats(enabledKeys)`, add the session formats, then filter `GetSupportedFormats()` by that set, so the order stays canonical. Never pass the combined keys to `GetEnabledFormats`: an empty list means "all formats", and it also has a fallback when nothing it's given is known.
+- [x] Add a private `HashSet<string> _sessionFormats` to `MainWindow`, and make `PopulateFormatComboBox` use `GetDropdownFormats`.
+- [x] Add `PresetCapturer.Capture(format, resizeEnabled, mode, widthText, heightText, autoFilledBox)` and a `DimensionBox` enum (`None`, `Width`, `Height`, `Both`), with the rules under Technical details.
+- [x] tests for `GetDropdownFormats`: no session formats, a hidden format added in canonical order, empty `enabledKeys` still showing all, `enabledKeys` matching nothing known still showing all, and no duplicates
+- [x] tests for `Capture`: resize off; crop; keep mode with each `autoFilledBox` value; both boxes typed with no selection; one box cleared while the other holds a typed size, which keeps it; one box cleared while SIC! filled the other, which gives no sizes; `Both`, which gives no sizes; unparsable text; and no sizes storing `KeepProportions`
+- [x] validation commands pass
 
 ### Task 5: Apply a preset in the main window
 
