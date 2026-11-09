@@ -19,8 +19,8 @@ It's the third of four plans. `89-json-config` must be merged first.
 - [ ] A preset can be added, edited and removed with the keyboard, and the menu updates straight away.
 - [ ] `sic -i a.png --preset Blog` converts with the preset. An explicit `--output` extension, `--format`, `--resize` or `--crop` wins over the matching part of the preset.
 - [ ] An unknown `--preset` name exits with `ExitCode.Error` and lists the available presets on stderr.
-- [ ] An invalid preset in a hand-edited `sic.json` drops only that preset, and is never lost silently: the file is backed up and the user is told.
-- [ ] Saving Settings, or anything else, never loses presets.
+- [x] An invalid preset in a hand-edited `sic.json` drops only that preset, and is never lost silently: the file is backed up and the user is told.
+- [x] Saving Settings, or anything else, never loses presets.
 - [x] A size that SIC! fills in itself never triggers an "invalid size" error.
 - [ ] All new strings are translated into de, es, fr, he, ru and uk, and all 7 manuals are updated.
 - [ ] all validation commands pass
@@ -124,20 +124,20 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Add `ConversionPreset` as under Technical details, and `Presets` to `AppConfig`.
-- [ ] Add `PresetValidator`: `NameComparer` (`StringComparer.OrdinalIgnoreCase`); `CleanName(name)`, which trims and applies `Normalize(NormalizationForm.FormC)`; `ValidateName(name, takenNames)` returning `PresetNameResult` (`Valid`, `Empty`, `TooLong`, `InvalidCharacters`, `Duplicate`); `Normalize(presets)` for loaded data, returning the kept presets and the number dropped; and `EscapeAmpersands(name)`. Every comparison of names uses `NameComparer`, and every stored name goes through `CleanName`.
-- [ ] In `ConfigSerializer`, read `presets` entry by entry from the `JsonDocument`, deserializing each to `ConversionPreset`, so that an entry that fails counts as dropped rather than sending the whole file to the corrupt path. A non-null `presets` that isn't an array counts as one dropped. Then run `Normalize`.
-- [ ] Join this to step 1 of the load flow in `89-json-config`: bad settings and dropped presets share one `BackUpFile` call, one repaired save and one complete translated message in `LoadError`, naming both counts. If the backup fails, set `SavesBlocked` and say so.
-- [ ] Add `public static List<ConversionPreset> Presets { get; set; }` to `Config`. `Load` sets it from `result.Config.Presets`, and `Save` passes both `General` and `Presets`.
-- [ ] tests for `ValidateName`: trimmed names, 64 characters, and names in any script, with `Блог`, `Démarche administrative` and `בלוג` all `Valid`
-- [ ] tests for `ValidateName`: empty, 65 characters, tab and other control characters, duplicates differing only by case or by a composed and decomposed `é`
-- [ ] tests for `Normalize`: each unusable case under Technical details is dropped and counted, order is kept, a name with spaces around it is stored cleaned, the format is upper-cased, JPEG maps to JPG and TIF to TIFF, and a preset with no sizes stores `KeepProportions`
-- [ ] tests for `EscapeAmpersands`: `R&D` becomes `R&&D`, `MenuTextFormatter.ExtractMnemonic(EscapeAmpersands("R&D"))` is null, and a name with no ampersand is unchanged
-- [ ] tests for `ConfigSerializer`: presets round trip; null `presets` and `presets: [null]` load safely; `presets: {}` and `presets: "x"` count as dropped; a file with a dropped preset is backed up and reported; a file with both a bad setting and a dropped preset gets one backup and one message; and the next load is silent
-- [ ] tests for per-entry recovery: `"resizeMode": "Fit"`, `"resizeMode": 5`, `"width": "300"`, `"width": 300.5`, `"name": null` and `"format": null` each drop one preset, while the other presets and the `general` values survive
-- [ ] tests for a failed backup: with the `.bad` file locked, `SavesBlocked` is true and the file is unchanged
-- [ ] tests for `Config`: load a file with presets, change a general setting, call `Save`, reload, and assert the presets are still there
-- [ ] validation commands pass
+- [x] Add `ConversionPreset` as under Technical details, and `Presets` to `AppConfig`.
+- [x] Add `PresetValidator`: `NameComparer` (`StringComparer.OrdinalIgnoreCase`); `CleanName(name)`, which trims and applies `Normalize(NormalizationForm.FormC)`; `ValidateName(name, takenNames)` returning `PresetNameResult` (`Valid`, `Empty`, `TooLong`, `InvalidCharacters`, `Duplicate`); `Normalize(presets)` for loaded data, returning the kept presets and the number dropped; and `EscapeAmpersands(name)`. Every comparison of names uses `NameComparer`, and every stored name goes through `CleanName`.
+- [x] In `ConfigSerializer`, read `presets` entry by entry from the `JsonDocument`, deserializing each to `ConversionPreset`, so that an entry that fails counts as dropped rather than sending the whole file to the corrupt path. A non-null `presets` that isn't an array counts as one dropped. Then run `Normalize`.
+- [x] Join this to step 1 of the load flow in `89-json-config`: bad settings and dropped presets share one `BackUpFile` call, one repaired save and one complete translated message in `LoadError`, naming both counts. If the backup fails, set `SavesBlocked` and say so.
+- [x] Add `public static List<ConversionPreset> Presets { get; set; }` to `Config`. `Load` sets it from `result.Config.Presets`, and `Save` passes both `General` and `Presets`.
+- [x] tests for `ValidateName`: trimmed names, 64 characters, and names in any script, with `Блог`, `Démarche administrative` and `בלוג` all `Valid`
+- [x] tests for `ValidateName`: empty, 65 characters, tab and other control characters, duplicates differing only by case or by a composed and decomposed `é`
+- [x] tests for `Normalize`: each unusable case under Technical details is dropped and counted, order is kept, a name with spaces around it is stored cleaned, the format is upper-cased, JPEG maps to JPG and TIF to TIFF, and a preset with no sizes stores `KeepProportions`
+- [x] tests for `EscapeAmpersands`: `R&D` becomes `R&&D`, `MenuTextFormatter.ExtractMnemonic(EscapeAmpersands("R&D"))` is null, and a name with no ampersand is unchanged
+- [x] tests for `ConfigSerializer`: presets round trip; null `presets` and `presets: [null]` load safely; `presets: {}` and `presets: "x"` count as dropped; a file with a dropped preset is backed up and reported; a file with both a bad setting and a dropped preset gets one backup and one message; and the next load is silent
+- [x] tests for per-entry recovery: `"resizeMode": "Fit"`, `"resizeMode": 5`, `"width": "300"`, `"width": 300.5`, `"name": null` and `"format": null` each drop one preset, while the other presets and the `general` values survive
+- [x] tests for a failed backup: with the `.bad` file locked, `SavesBlocked` is true and the file is unchanged
+- [x] tests for `Config`: load a file with presets, change a general setting, call `Save`, reload, and assert the presets are still there
+- [x] validation commands pass
 
 ### Task 3: Add --preset to the CLI
 

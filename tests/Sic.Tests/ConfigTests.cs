@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using Oire.Sic.Models;
 using Oire.Sic.Utils;
 using Xunit;
 using App = Oire.Sic.Utils.Constants.App;
@@ -106,5 +107,58 @@ public sealed class ConfigTests: StaticStateTestBase {
         Config.Load(isGui: false);
         Config.General.Language.Should().Be("de");
         _error.ToString().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Save_AfterChangingAGeneralSetting_KeepsThePresets() {
+        File.WriteAllText(ConfigPath, """
+            {
+              "general": { "language": "de" },
+              "presets": [
+                { "name": "Blog", "format": "WEBP", "resizeMode": "KeepProportions", "width": 300 },
+                { "name": "Avatar", "format": "PNG", "resizeMode": "Crop", "width": 128, "height": 128 }
+              ]
+            }
+            """);
+
+        Config.Load(isGui: false);
+        Config.Presets.Select(preset => preset.Name).Should().Equal("Blog", "Avatar");
+        Config.General.DetectClipboardData = true;
+
+        Config.Save();
+
+        Config.Load(isGui: false);
+        Config.General.DetectClipboardData.Should().BeTrue();
+        Config.General.Language.Should().Be("de");
+        Config.Presets.Should().BeEquivalentTo(
+            [
+                new ConversionPreset { Name = "Blog", Format = "WEBP", Width = 300 },
+                new ConversionPreset { Name = "Avatar", Format = "PNG", ResizeMode = ResizeMode.Crop, Width = 128, Height = 128 },
+            ],
+            options => options.WithStrictOrdering());
+        _error.ToString().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Save_AfterAddingAPreset_WritesIt() {
+        Config.Load(isGui: false);
+        Config.Presets.Should().BeEmpty();
+        Config.Presets.Add(new ConversionPreset { Name = "Blog", Format = "WEBP", Width = 300 });
+
+        Config.Save();
+
+        Config.Load(isGui: false);
+        Config.Presets.Should().ContainSingle().Which.Name.Should().Be("Blog");
+        _error.ToString().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Load_DroppedPreset_IsReportedOnStderr() {
+        File.WriteAllText(ConfigPath, """{ "presets": [ { "name": "Bad", "format": "PSD" } ] }""");
+
+        Config.Load(isGui: false);
+
+        Config.Presets.Should().BeEmpty();
+        _error.ToString().Should().StartWith($"1 preset in {ConfigPath} couldn't be used").And.Contain("sic.json.bad");
     }
 }

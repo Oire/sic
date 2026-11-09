@@ -19,6 +19,15 @@ public static class Config {
     public static GeneralSettings General => _config.General;
 
     /// <summary>
+    /// The user's conversion presets, in their order. Part of the same configuration as
+    /// <see cref="General"/>, so <see cref="Save"/> writes both and saving settings never loses presets.
+    /// </summary>
+    public static List<ConversionPreset> Presets {
+        get => _config.Presets;
+        set => _config.Presets = value ?? throw new ArgumentNullException(nameof(value));
+    }
+
+    /// <summary>
     /// Loads <c>sic.json</c>, migrating a legacy <c>Sic.cfg</c> or repairing bad values as needed,
     /// and reports any problem the way <paramref name="isGui"/> says, which <see cref="Save"/>
     /// then follows too.
@@ -40,7 +49,7 @@ public static class Config {
     }
 
     /// <summary>
-    /// Writes the current settings to <c>sic.json</c>. Does nothing but log when <see cref="Load"/>
+    /// Writes the current settings and presets to <c>sic.json</c>. Does nothing but log when <see cref="Load"/>
     /// couldn't read the file, so a read failure never replaces the user's settings with defaults.
     /// </summary>
     public static void Save() {
