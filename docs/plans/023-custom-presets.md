@@ -226,15 +226,15 @@ There are no e2e tests. Forms are checked by hand; see Post-completion.
 
 #### Steps
 
-- [ ] Set `Text = _("Manage Presets")` in the constructor, after `TextDirection.Apply`, because the extractor can't see a form's own title.
+- [x] Set `Text = _("Manage Presets")` in the constructor, after `TextDirection.Apply`, because the extractor can't see a form's own title.
 
-- [ ] Build the designer as one flat `TableLayoutPanel` with the grid under Technical details, not from `IcoPresetDialog`'s layout, which nests a `GroupBox` and a `FlowLayoutPanel`.
-- [ ] Add `PresetDescriber.Describe(preset)`, and show each list row as the preset's name plus that summary, such as "Blog: WEBP, width 300". Set `HorizontalScrollbar = true` on the list, because a 64-character name plus its summary is wider than the dialog.
-- [ ] tests for `Describe`, one for each form: "WEBP", "WEBP, width 300", "WEBP, height 200", "WEBP, fit inside 800x600" and "PNG, crop to 128x128"
-- [ ] Add and Edit open `PresetDialog`. Remove asks for confirmation through `DialogHelper.Show`. Edit and Remove are disabled with nothing selected, and focus returns to the list predictably after each action.
-- [ ] Set `closeButton.DialogResult = DialogResult.Cancel` and `CancelButton = closeButton`, so Esc closes the dialog.
-- [ ] Work on a copy of `Config.Presets`. In `OnFormClosing`, so Esc and Alt+F4 don't lose edits, and only if something changed, write it back, call `Config.Save()`, and set a `Changed` property for the caller.
-- [ ] validation commands pass
+- [x] Build the designer as one flat `TableLayoutPanel` with the grid under Technical details, not from `IcoPresetDialog`'s layout, which nests a `GroupBox` and a `FlowLayoutPanel`.
+- [x] Add `PresetDescriber.Describe(preset)`, and show each list row as the preset's name plus that summary, such as "Blog: WEBP, width 300". Set `HorizontalScrollbar = true` on the list, because a 64-character name plus its summary is wider than the dialog.
+- [x] tests for `Describe`, one for each form: "WEBP", "WEBP, width 300", "WEBP, height 200", "WEBP, fit inside 800x600" and "PNG, crop to 128x128"
+- [x] Add and Edit open `PresetDialog`. Remove asks for confirmation through `DialogHelper.Show`. Edit and Remove are disabled with nothing selected, and focus returns to the list predictably after each action.
+- [x] Set `closeButton.DialogResult = DialogResult.Cancel` and `CancelButton = closeButton`, so Esc closes the dialog.
+- [x] Work on a copy of `Config.Presets`. In `OnFormClosing`, so Esc and Alt+F4 don't lose edits, and only if something changed, write it back, call `Config.Save()`, and set a `Changed` property for the caller.
+- [x] validation commands pass
 
 ### Task 8: Add the Presets submenu
 
