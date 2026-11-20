@@ -49,7 +49,7 @@
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="GetText.NET" Version="10.0.1" />
         <PackageReference Include="System.CommandLine" Version="3.0.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.12.0" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="11.0.100" PrivateAssets="all" />
     </ItemGroup>
 
